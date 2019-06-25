@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
+        android:id="@+id/rv_movies"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
+    <TextView
+        android:id="@+id/tips_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/tips2"
+        android:textSize="21.3sp"
+        android:gravity="center"
+        />
+</RelativeLayout>

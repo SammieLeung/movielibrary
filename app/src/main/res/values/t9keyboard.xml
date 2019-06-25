@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="k1"  translatable="false">
+        <item>1</item>
+
+    </string-array>
+    <string-array name="k2"  translatable="false">
+        <item>2</item>
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+    </string-array>
+    <string-array name="k3"  translatable="false">
+        <item>3</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+    </string-array>
+    <string-array name="k4"  translatable="false">
+        <item>4</item>
+        <item>G</item>
+        <item>H</item>
+        <item>I</item>
+    </string-array>
+    <string-array name="k5"  translatable="false">
+        <item>5</item>
+        <item>J</item>
+        <item>K</item>
+        <item>L</item>
+    </string-array>
+    <string-array name="k6"  translatable="false">
+        <item>6</item>
+        <item>M</item>
+        <item>N</item>
+        <item>O</item>
+    </string-array>
+    <string-array name="k7"  translatable="false">
+        <item>7</item>
+        <item>P</item>
+        <item>Q</item>
+        <item>R</item>
+        <item>S</item>
+    </string-array>
+    <string-array name="k8"  translatable="false">
+        <item>8</item>
+        <item>T</item>
+        <item>U</item>
+        <item>V</item>
+    </string-array>
+    <string-array name="k9"  translatable="false">
+        <item>9</item>
+        <item>W</item>
+        <item>X</item>
+        <item>Y</item>
+        <item>Z</item>
+    </string-array>
+    <string-array name="k0"  translatable="false">
+        <item>0</item>
+    </string-array>
+    <string-array name="kc"  translatable="false">
+        <item>C</item>
+    </string-array>
+
+</resources>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.hphtv.movielibrary"
+    android:versionCode="9"
+    android:versionName="2.3.7"
+
+    >
+
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <application
+        android:name=".MovieApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/MyTheme">
+
+
+        <activity
+            android:name=".activity.MovieDetailActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateUnchanged"></activity>
+        <activity
+            android:name=".activity.HomePageActivity"
+            android:banner="@mipmap/banner_logo"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.MovieSearchResultActivity"
+            android:windowSoftInputMode="stateUnchanged">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"></action>
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.MovieTrailerPlayerActivity"></activity>
+
+        <service android:name=".service.MovieScanService"></service>
+        <service android:name=".service.DeviceMonitorService"></service>
+        <receiver android:name=".BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <category android:name="android.intent.category.LAUNCHER"></category>
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".activity.FolderManagerActivity"
+            android:theme="@style/Theme.Transparent"></activity>
+        <activity android:name=".activity.MovieSearchActivity"></activity>
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="5a6a86fbb27b0a7d090003fc" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="MediaStation" />
+
+
+        <provider
+            android:name=".provider.PosterContentProvider"
+            android:authorities="com.hphtv.movielibrary"
+            android:exported="true"></provider>
+        <provider
+            android:name=".provider.MovieLibraryProvider"
+            android:authorities="com.hphtv.movielibrary.movieprovider"
+            android:exported="true"></provider>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.hphtv.movielibrary.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+    </application>
+
+</manifest>

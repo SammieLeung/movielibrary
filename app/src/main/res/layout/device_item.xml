@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="168dp"
+    android:layout_height="205.3dp"
+    android:padding="4dp"
+    android:layout_margin="10dp"
+    android:gravity="center_vertical|center_horizontal"
+    android:background="@drawable/st_movie_select_bg_slim"
+    android:focusable="true">
+
+    <ImageView android:id="@+id/iv_img"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:src="@mipmap/usb"
+        android:padding="40dp"
+        android:paddingBottom="20dp"
+        android:background="@color/usb_bg"/>
+
+    <TextView
+        android:layout_below="@id/iv_img"
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:padding="5dp"
+        android:gravity="center_horizontal"
+        android:textSize="15sp"
+        android:background="@color/usb_bg"/>
+    <ProgressBar
+        android:id="@+id/pb_search"
+        style="@style/my_pb"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+</RelativeLayout>

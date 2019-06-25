@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/start_service" />
+
+    <Button
+        android:id="@+id/stop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_service" />
+
+    <Button
+        android:id="@+id/test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/get_file_from_dlna" />
+
+    <Button
+        android:id="@+id/test_ex"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/get_file_from_external" />
+
+    <Button
+        android:id="@+id/text_ev"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/get_file_from_extra_volume" />
+
+    <Button
+        android:id="@+id/content_pro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/content_provider_test" />
+
+    <Button
+        android:id="@+id/condition_var_test"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/condition_variable_test" />
+
+    <Button
+        android:id="@+id/cp_device"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/content_provider_device_test" />
+
+    <Button
+        android:id="@+id/select_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/select_file_test" />
+
+</LinearLayout>

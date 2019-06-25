@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="54dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/lmi_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="18dp"
+        android:duplicateParentState="true"
+        android:layout_marginRight="36dp"/>
+
+    <TextView
+        android:gravity="center_vertical"
+        android:id="@+id/lmi_text"
+        android:textSize="18sp"
+        android:textColor="@drawable/selector_text_color_dbdbdb_b5b5b5"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+</LinearLayout>

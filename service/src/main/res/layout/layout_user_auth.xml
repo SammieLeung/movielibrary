@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="24dp"
+    android:paddingEnd="38dp"
+    android:paddingStart="38dp"
+    android:paddingTop="26dp">
+
+    <EditText
+        android:id="@+id/smb_url"
+        style="@style/DialogEditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginBottom="22dp"
+        android:background="@drawable/auth_input_bg"
+        android:hint="@string/smb_url_hint"
+        android:inputType="textPersonName"
+        android:visibility="gone">
+
+        <requestFocus />
+    </EditText>
+
+    <EditText
+        android:id="@+id/auth_username"
+        style="@style/DialogEditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_below="@+id/smb_url"
+        android:enabled="false"
+        android:focusable="false"
+        android:hint="@string/username" />
+
+    <EditText
+        android:id="@+id/auth_password"
+        style="@style/DialogEditTextStyle"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_below="@+id/auth_username"
+        android:layout_marginTop="22dp"
+        android:enabled="false"
+        android:focusable="false"
+        android:hint="@string/password"
+        android:inputType="textPassword" />
+
+    <CheckBox
+        android:id="@+id/anonymous_checkbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/auth_password"
+        android:layout_marginTop="22dp"
+        android:button="@drawable/checkbox_selector"
+        android:checked="true"
+        android:paddingEnd="0dp"
+        android:paddingStart="8dp"
+        android:text="@string/anonymous_access"
+        android:textColor="@color/textColor"
+        android:textSize="16sp" />
+</RelativeLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="384dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_window_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/top_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="26dp"
+        android:paddingTop="26dp">
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@android:string/dialog_alert_title"
+            android:textAlignment="center"
+            android:textColor="@color/textColor"
+            android:textSize="22sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/content_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="26dp"
+        android:paddingEnd="26dp"
+        android:paddingStart="26dp"
+        android:paddingTop="15dp">
+
+        <Button
+            android:id="@+id/negative_btn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/dialog_button_selector"
+            android:text="@android:string/cancel"
+            android:textColor="@color/textColor"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/positive_btn"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginStart="15dp"
+            android:layout_weight="1"
+            android:background="@drawable/dialog_button_selector"
+            android:text="@android:string/ok"
+            android:textColor="@color/textColor"
+            android:textSize="18sp">
+            <requestFocus />
+        </Button>
+    </LinearLayout>
+
+</LinearLayout>

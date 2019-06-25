@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <layer-list>
+            <item>
+                <shape >
+                    <solid android:color="@color/c167c98"></solid>
+                </shape>
+            </item>
+            <item android:left="66dp">
+                <shape >
+                    <solid android:color="@color/c1c9bbe"></solid>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <!--<item android:state_pressed="true"  android:drawable="@color/c27bbfa" />-->
+    <!--<item android:state_focused="true"  android:drawable="@color/theme_color" />-->
+    <!--<item android:drawable="@color/c50ffffff" />-->
+</selector>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<!-- selector_category_bg.xml 置于res/drawable 目录下  -->  
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@color/c27bbfa"/>
+    <item android:state_focused="true" android:drawable="@color/c1c9bbe"/>
+    <item android:state_checked="true" android:drawable="@color/c929292"/>
+    <item android:drawable="@android:color/transparent"/>
+</selector>

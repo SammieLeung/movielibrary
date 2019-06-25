@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DrawTopButton">
+        <attr name="dtbDrawableTopSize" format="dimension" />
+        <attr name="dtbDrawableTop" format="reference" />
+    </declare-styleable>
+
+    <declare-styleable name="FavoriteCollection">
+        <attr name="isFavorite" format="boolean" />
+    </declare-styleable>
+</resources>

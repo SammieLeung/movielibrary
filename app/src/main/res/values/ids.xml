@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="pos_0" type="id"/>
+    <item name="pos_1" type="id"/>
+    <item name="pos_2" type="id"/>
+    <item name="pos_3" type="id"/>
+    <item name="pos_4" type="id"/>
+    <item name="class_movie" type="id"/>
+    <item name="class_tv" type="id"/>
+    <item name="class_othervideo" type="id"/>
+    <item name="class_children" type="id"/>
+    <item name="class_show" type="id"/>
+    <item name="class_unmatched" type="id"/>
+    <item name="class_private" type="id"/>
+    <item name="tra_0" type="id"/>
+    <item name="tra_last" type="id"/>
+</resources>

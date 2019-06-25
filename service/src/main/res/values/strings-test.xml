@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_service" translatable="false">Start service</string>
+    <string name="stop_service" translatable="false">Stop service</string>
+    <string name="get_file_from_dlna" translatable="false">Get file from dlna</string>
+    <string name="get_file_from_external" translatable="false">Get file from external</string>
+    <string name="get_file_from_extra_volume" translatable="false">Get file from extra volume</string>
+    <string name="content_provider_test" translatable="false">Content provider test</string>
+    <string name="condition_variable_test" translatable="false">Condition variable test</string>
+    <string name="content_provider_device_test" translatable="false">Content provider Device test</string>
+</resources>

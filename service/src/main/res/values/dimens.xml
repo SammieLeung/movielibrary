@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="browse_width">884dp</dimen>
+    <dimen name="browse_height">544dp</dimen>
+</resources>

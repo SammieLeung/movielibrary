@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">文件选择器</string>
+    <string name="action_settings">设置</string>
+    <string name="local_storage">本地存储</string>
+    <string name="notice_for_request_permission">为使app正常运行，请赋予app权限</string>
+    <string name="select_dir_notice">长按OK选择文件夹</string>
+    <string name="add_directory">添加文件夹</string>
+    <string name="directory">文件夹: %1$s</string>
+    <string name="last_modify_date">修改日期: %1$s</string>
+    <string name="make_private">设为私密文件夹</string>
+    <string name="add_directory_dilog_title">温馨提示</string>
+    <string name="samba_access_to">访问: %1$s</string>
+    <string name="anonymous_access">匿名访问</string>
+    <string name="username">用户名</string>
+    <string name="username_cannot_empty">用户名不能为空</string>
+    <string name="samba_access_error">获取文件失败，请重试</string>
+    <string name="login_failed_try_again">认证失败，请重试</string>
+    <string name="password">密码</string>
+    <string name="no_files">未找到文件</string>
+    <string name="selected">选中：%1$s</string>
+    <string name="smb_url_hint">Url, 示例: smb://mypc/myshare/</string>
+    <string name="add_smb">添加samba设备</string>
+    <string name="url_cannot_empty">url不能为空。</string>
+    <string name="not_a_directory">url必须指向一个目录或分享</string>
+    <string name="can_not_access">无法连接url。</string>
+    <string name="url_is_invalid">url无效。</string>
+    <string name="must_end_with_divide">url必需以/结束。</string>
+    <string name="external_name">本地磁盘</string>
+    <string name="udisk_name">移动磁盘</string>
+</resources>

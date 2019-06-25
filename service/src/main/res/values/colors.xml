@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#282828</color>
+    <color name="colorPrimaryDark">#222324</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="textColor">#FFFFFFFF</color>
+    <color name="categorySelectedColor">#199ed8</color>
+    <color name="iconFocusBg">#167c98</color>
+    <color name="iconFocusBgSelected">#121212</color>
+    <color name="textFocusBg">#1C9BBE</color>
+    <color name="textFocusBgSelected">#161617</color>
+    <color name="textNormal">#b5b5b5</color>
+    <color name="textFocus">#FFFFFF</color>
+</resources>

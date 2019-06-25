@@ -1,0 +1,22 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="hs_detail_info">10.0dip</dimen>
+    <dimen name="itemOffset">4dp</dimen>
+    <dimen name="icon_f">10dp</dimen>
+    <dimen name="fkeyboard_width">120dp</dimen>
+    <dimen name="keybtn_item_width">67dp</dimen>
+    <!--For MovieClassification-->
+    <dimen name="poster_width">312dp</dimen>
+    <dimen name="poster_height">414dp</dimen>
+    <dimen name="morebtn_height">25dp</dimen>
+    <dimen name="text_size">32sp</dimen>
+    <dimen name="title_size">32sp</dimen>
+    <dimen name="classification_padding">4dp</dimen>
+    <dimen name="classificationItem_margin">10dp</dimen>
+    <!--For movie library item-->
+    <dimen name="movie_item_margin_left">-22dp</dimen>
+    <dimen name="movie_item_margin_left_2">-12dp</dimen>
+</resources>
