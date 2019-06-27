@@ -19,12 +19,15 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
+import com.hphtv.movielibrary.sqlite.bean.Directory;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.LocalSearchAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.decoration.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
@@ -51,15 +54,19 @@ public class MovieSearchActivity extends Activity {
     FloatKeyboard mRVFloatFastBoard;
     MovieLibraryAdapter movieLibraryAdapter;
     CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
+    private MovieApplication mApp;
 
     private MovieWrapperDao mMovieWrapperDao;
+    private DirectoryDao mDirDao;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_movie_search);
         mContext = this;
+        mApp = (MovieApplication) getApplication();
         mMovieWrapperDao = new MovieWrapperDao(mContext);
+        mDirDao = new DirectoryDao(mContext);
         initView();
         initMovie();
     }
@@ -241,8 +248,24 @@ public class MovieSearchActivity extends Activity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                boolean isShowEncrypted = mApp.isShowEncrypted();
                 mWrapperList = new ArrayList<>();
-                Cursor cursor=mMovieWrapperDao.selectAll();
+                Cursor cursor = null;
+                if (isShowEncrypted) {
+                    cursor = mMovieWrapperDao.selectAll();
+                } else {
+                    Cursor dirCursor = mDirDao.select("is_encrypted=?", new String[]{"0"}, null);
+                    if (dirCursor.getCount() > 0) {
+                        List<Directory> directories = mDirDao.parseList(dirCursor);
+                        StringBuffer buffer=new StringBuffer();
+                        buffer.append("(");
+                        for(Directory t_dir:directories){
+                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                        }
+                        buffer.append(")");
+                        cursor=mMovieWrapperDao.select(buffer.toString(),null,null);
+                    }
+                }
                 if (cursor != null && cursor.getCount() > 0) {
                     mWrapperList = mMovieWrapperDao.parseList(cursor);
                 }
