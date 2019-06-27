@@ -24,7 +24,7 @@ public class DirectoryDao extends BaseDao<Directory> {
         if (cursor.getCount() > 0) {
             while (cursor.moveToNext()) {
                 Directory directory = new Directory();
-                String id = cursor.getString(cursor.getColumnIndex("id"));
+                long id = cursor.getInt(cursor.getColumnIndex("id"));
                 String name = cursor.getString(cursor.getColumnIndex("name"));
                 long parent_id = cursor.getInt(cursor.getColumnIndex("parent_id"));
                 int video_number = cursor.getInt(cursor.getColumnIndex("video_number"));
@@ -52,7 +52,6 @@ public class DirectoryDao extends BaseDao<Directory> {
 
     public ContentValues parseContentValues(Directory directory) {
         ContentValues contentValues = new ContentValues();
-        String id = directory.getId();
         String name = directory.getName();
         long parent_id = directory.getParent_id();
         int video_number = directory.getVideo_number();
@@ -62,7 +61,6 @@ public class DirectoryDao extends BaseDao<Directory> {
         int is_encrypted = directory.getIsEncrypted();
         int scan_state = directory.getScan_state();
 
-        contentValues.put("id", id);
         contentValues.put("name", name);
         contentValues.put("parent_id", parent_id);
         contentValues.put("video_number", video_number);

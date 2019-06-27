@@ -14,7 +14,7 @@ public class VideoFile implements Serializable {
     private String search_name;
     private String thumbnail;
     private String thumbnail_s;
-    private String dir_id;
+    private long dir_id;
     private int is_matched=0;//1已匹配 0未匹配
     private String title_pinyin;
 
@@ -60,11 +60,11 @@ public class VideoFile implements Serializable {
                 '}';
     }
 
-    public String getDir_id() {
+    public long getDir_id() {
         return dir_id;
     }
 
-    public void setDir_id(String dir_id) {
+    public void setDir_id(long dir_id) {
         this.dir_id = dir_id;
     }
 

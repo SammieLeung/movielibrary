@@ -5,7 +5,7 @@ package com.hphtv.movielibrary.sqlite.bean;
  * @date 19-3-28
  */
 public class Directory {
-    private String id;
+    private long id;
     private String name;
     private long parent_id;//device 的id
     private int video_number=0;
@@ -50,11 +50,11 @@ public class Directory {
         this.uri = uri;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         this.id = id;
     }
 

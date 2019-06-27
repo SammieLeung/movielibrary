@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.DirectoryManagerAdapter;
 import com.hphtv.movielibrary.data.ConstData;
@@ -84,9 +85,9 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
 
     private Set<Integer> mCheckedSet = new HashSet<Integer>();
     private MovieSharedPreferences mPreferences;
+    private MovieApplication mApp;
     private String mMd5EncodePwd;
     private boolean isConfirm = true;
-    private boolean mIsShowEncryted = false;
 
     private DirectoryDao mDirectoryDao;
     private DeviceDao mDeviceDao;
@@ -99,14 +100,14 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_setting);
         Log.v(TAG, "onCreate");
-
+        this.mApp = (MovieApplication) getApplication();
         this.mContext = FolderManagerActivity.this;
         mPreferences = MovieSharedPreferences.getInstance();
         mDirectoryDao = new DirectoryDao(mContext);
         mDeviceDao = new DeviceDao(mContext);
         mVideoFileDao = new VideoFileDao(mContext);
-        mMovieWrapperDao=new MovieWrapperDao(mContext);
-        mMovieDao=new MovieDao(mContext);
+        mMovieWrapperDao = new MovieWrapperDao(mContext);
+        mMovieDao = new MovieDao(mContext);
 
     }
 
@@ -179,7 +180,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                 for (int j = 0; j < mHashMapList.size(); j++) {
                                     HashMap<String, Object> map = mHashMapList.get(j);
                                     Directory directory = (Directory) map.get(ConstData.DIRECTORY);
-                                    if (directory.getId().equals(scanDirectories.get(i).getId())) {
+                                    if (directory.getId()==scanDirectories.get(i).getId()){
                                         directory.setScanState(ConstData.DirectoryState.SCANNING);
                                         scanDirectories.remove(i);
                                         i = 0;
@@ -278,6 +279,10 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         mTextViewScanResult = (TextView) findViewById(R.id.footer_scan_result);
         mFooterGroup = (RelativeLayout) findViewById(R.id.statusbar_group_2);
         mFooterGroup2 = (RelativeLayout) findViewById(R.id.statusbar_group_3);
+
+        if(mApp.isShowEncrypted()){
+            mCheckBoxPrivate.setChecked(true);
+        }
     }
 
 
@@ -313,82 +318,82 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                 break;
             case R.id.privatedevice:
                 if (isChecked == true) {
-                    mMd5EncodePwd = mPreferences.getPassword();
-                    if (!TextUtils.isEmpty(mMd5EncodePwd)) {
-                        final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
-                        fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
-                            @Override
-                            public void onConfirm(List<EditText> editTextList) {
-                                if (editTextList.size() == 1) {
-                                    fragment.hideTips();
-                                    String psd = editTextList.get(0).getText().toString();
-                                    if (psd.length() < 4) {
-                                        fragment.showTips(0);
-                                        editTextList.get(0).requestFocus();
-                                    } else if (!Md5Util.md5(psd).equals(mMd5EncodePwd)) {
-                                        fragment.showTips(1);
-                                        editTextList.get(0).requestFocus();
-                                    } else {
-                                        mCheckedSet.clear();
-                                        initData();
-                                        fragment.dismiss();
+                    if(!mApp.isShowEncrypted()) {
+                        mMd5EncodePwd = mPreferences.getPassword();
+                        if (!TextUtils.isEmpty(mMd5EncodePwd)) {
+                            final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
+                            fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
+                                @Override
+                                public void onConfirm(List<EditText> editTextList) {
+                                    if (editTextList.size() == 1) {
+                                        fragment.hideTips();
+                                        String psd = editTextList.get(0).getText().toString();
+                                        if (psd.length() < 4) {
+                                            fragment.showTips(0);
+                                            editTextList.get(0).requestFocus();
+                                        } else if (!Md5Util.md5(psd).equals(mMd5EncodePwd)) {
+                                            fragment.showTips(1);
+                                            editTextList.get(0).requestFocus();
+                                        } else {
+                                            mCheckedSet.clear();
+                                            initData();
+                                            mApp.setShowEncrypted(true);
+                                            fragment.dismiss();
+                                        }
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onCancle() {
-                                mCheckBoxPrivate.setChecked(false);
-                            }
-                        });
-                        if (mIsShowEncryted) {
-                            mCheckedSet.clear();
-                            initData();
-                        } else {
+                                @Override
+                                public void onCancle() {
+                                    mCheckBoxPrivate.setChecked(false);
+                                }
+                            });
                             fragment.InputPassword().show(getFragmentManager(), TAG);
-                        }
+                        } else {
+                            final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
+                            fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
+                                @Override
+                                public void onConfirm(List<EditText> editTextList) {
+                                    if (editTextList.size() == 2) {
+                                        fragment.hideTips();
+                                        String psd1 = editTextList.get(0).getText().toString();
+                                        String psd2 = editTextList.get(1).getText().toString();
+                                        if (psd1.length() < 4) {
+                                            fragment.showTips(0);
+                                            editTextList.get(0).requestFocus();
+                                        } else if (psd2.length() < 4) {
+                                            fragment.showTips(0);
+                                            editTextList.get(1).requestFocus();
+                                        } else if (!psd1.equals(psd2)) {
+                                            fragment.showTips(1);
+                                            editTextList.get(1).requestFocus();
+                                        } else {
+                                            mMd5EncodePwd = Md5Util.md5(psd2);
+                                            mPreferences.setPassword(mMd5EncodePwd);
+                                            mCheckedSet.clear();
+                                            initData();
+                                            mApp.setShowEncrypted(true);
+                                            Toast.makeText(mContext, getResources().getString(R.string.psw_set_success), Toast.LENGTH_SHORT).show();
+                                            fragment.dismiss();
+                                        }
 
-                    } else {
-                        final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
-                        fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
-                            @Override
-                            public void onConfirm(List<EditText> editTextList) {
-                                if (editTextList.size() == 2) {
-                                    fragment.hideTips();
-                                    String psd1 = editTextList.get(0).getText().toString();
-                                    String psd2 = editTextList.get(1).getText().toString();
-                                    if (psd1.length() < 4) {
-                                        fragment.showTips(0);
-                                        editTextList.get(0).requestFocus();
-                                    } else if (psd2.length() < 4) {
-                                        fragment.showTips(0);
-                                        editTextList.get(1).requestFocus();
-                                    } else if (!psd1.equals(psd2)) {
-                                        fragment.showTips(1);
-                                        editTextList.get(1).requestFocus();
-                                    } else {
-                                        mMd5EncodePwd = Md5Util.md5(psd2);
-                                        mPreferences.setPassword(mMd5EncodePwd);
-                                        mCheckedSet.clear();
-                                        initData();
-                                        Toast.makeText(mContext, getResources().getString(R.string.psw_set_success), Toast.LENGTH_SHORT).show();
-                                        fragment.dismiss();
                                     }
-
                                 }
-                            }
 
-                            @Override
-                            public void onCancle() {
-                                mCheckBoxPrivate.setChecked(false);
-                            }
-                        });
-                        fragment.SetPassword().show(getFragmentManager(), TAG);
+                                @Override
+                                public void onCancle() {
+                                    mCheckBoxPrivate.setChecked(false);
+                                }
+                            });
+                            fragment.SetPassword().show(getFragmentManager(), TAG);
+
+                        }
 
                     }
                 } else {
                     mCheckedSet.clear();
                     initData();
+                    mApp.setShowEncrypted(false);
                 }
 
                 break;
@@ -432,17 +437,17 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                     int i = (int) iterator.next();
                     //清除Directory记录
                     Directory directory = (Directory) mHashMapList.get(i).get(ConstData.DIRECTORY);
-                    String id = directory.getId();
+                    long id = directory.getId();
                     directory.setMatchedVideo(0);
                     directory.setVideoNumber(0);
                     ContentValues deviceValues = mDirectoryDao.parseContentValues(directory);
-                    mDirectoryDao.update(deviceValues, "id=?", new String[]{id});
+                    mDirectoryDao.update(deviceValues, "id=?", new String[]{String.valueOf(id)});
                     //wrapper去掉对应的videofile id
-                    Cursor video_cursor = mVideoFileDao.select("dir_id=?", new String[]{id}, null);
+                    Cursor video_cursor = mVideoFileDao.select("dir_id=?", new String[]{String.valueOf(id)}, null);
                     if (video_cursor.getCount() > 0) {
                         List<VideoFile> videoFileList = mVideoFileDao.parseList(video_cursor);
                         for (VideoFile videoFile : videoFileList) {
-                            long wrapper_id=videoFile.getWrapper_id();
+                            long wrapper_id = videoFile.getWrapper_id();
                             if (wrapper_id != -1) {
                                 Cursor wrapper_cursor = mMovieWrapperDao.select("id=?", new String[]{String.valueOf(wrapper_id)}, "0,1");
                                 if (wrapper_cursor.getCount() > 0) {
@@ -459,17 +464,17 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                         wrapper.setFileIds(file_ids);
                                         ContentValues contentValues = mMovieWrapperDao.parseContentValues(wrapper);
                                         mMovieWrapperDao.update(contentValues, "id=?", new String[]{String.valueOf(wrapper_id)});
-                                    }else{
-                                        mMovieDao.delete("wrapper_id=?",new String[]{String.valueOf(wrapper_id)});
-                                        mMovieWrapperDao.delete("id=?",new String[]{String.valueOf(wrapper_id)});
+                                    } else {
+                                        mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
+                                        mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
                                     }
                                 }
                             }
                         }
                     }
                     //删除相关videofile
-                    mVideoFileDao.delete("dir_id=?", new String[]{id});
-                    mDirectoryDao.delete("id=?", new String[]{id});
+                    mVideoFileDao.delete("dir_id=?", new String[]{String.valueOf(id)});
+                    mDirectoryDao.delete("id=?", new String[]{String.valueOf(id)});
                 }
                 mCheckedSet.clear();
                 setResult(RESULT_OK);
@@ -490,18 +495,18 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                     int i = (int) iterator.next();
                     //清除Directory记录
                     Directory directory = (Directory) mHashMapList.get(i).get(ConstData.DIRECTORY);
-                    String id = directory.getId();
+                    long id = directory.getId();
                     directory.setMatchedVideo(0);
                     directory.setVideoNumber(0);
                     directory.setScanState(ConstData.DirectoryState.UNSCAN);
                     ContentValues deviceValues = mDirectoryDao.parseContentValues(directory);
-                    mDirectoryDao.update(deviceValues, "id=?", new String[]{id});
+                    mDirectoryDao.update(deviceValues, "id=?", new String[]{String.valueOf(id)});
                     //wrapper去掉对应的videofile id
-                    Cursor video_cursor = mVideoFileDao.select("dir_id=?", new String[]{id}, null);
+                    Cursor video_cursor = mVideoFileDao.select("dir_id=?", new String[]{String.valueOf(id)}, null);
                     if (video_cursor.getCount() > 0) {
                         List<VideoFile> videoFileList = mVideoFileDao.parseList(video_cursor);
                         for (VideoFile videoFile : videoFileList) {
-                            long wrapper_id=videoFile.getWrapper_id();
+                            long wrapper_id = videoFile.getWrapper_id();
                             if (wrapper_id != -1) {
                                 Cursor wrapper_cursor = mMovieWrapperDao.select("id=?", new String[]{String.valueOf(wrapper_id)}, "0,1");
                                 if (wrapper_cursor.getCount() > 0) {
@@ -517,16 +522,16 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                         wrapper.setFileIds(file_ids);
                                         ContentValues contentValues = mMovieWrapperDao.parseContentValues(wrapper);
                                         mMovieWrapperDao.update(contentValues, "id=?", new String[]{String.valueOf(wrapper_id)});
-                                    }else{
-                                        mMovieDao.delete("wrapper_id=?",new String[]{String.valueOf(wrapper_id)});
-                                        mMovieWrapperDao.delete("id=?",new String[]{String.valueOf(wrapper_id)});
+                                    } else {
+                                        mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
+                                        mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
                                     }
                                 }
                             }
                         }
                     }
                     //删除相关videofile
-                    mVideoFileDao.delete("dir_id=?", new String[]{id});
+                    mVideoFileDao.delete("dir_id=?", new String[]{String.valueOf(id)});
                 }
                 mCheckedSet.clear();
                 setResult(RESULT_OK);
@@ -585,11 +590,11 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         mTextViewScanResult.setText(getResources().getString(R.string.tx_scan_completed));
     }
 
-    private void notifyMovieInfoDataChange(String dirId, int total, int match, int status) {
+    private void notifyMovieInfoDataChange(long dirId, int total, int match, int status) {
         for (int i = 0; i < mHashMapList.size(); i++) {
             HashMap<String, Object> map = mHashMapList.get(i);
             Directory directory = (Directory) map.get(ConstData.DIRECTORY);
-            if (directory.getId().equals(dirId)) {
+            if (directory.getId()==dirId) {
                 directory.setScanState(status);
                 map.put(ConstData.DEVICE_VIDEO_COUNT, total);
                 map.put(ConstData.DEVICE_MATCHED_VIDEO, match);
@@ -665,7 +670,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             for (int i = 0; i < mHashMapList.size(); i++) {
                 HashMap<String, Object> map = mHashMapList.get(i);
                 Directory dir = (Directory) map.get(ConstData.DIRECTORY);
-                if (dir.getId().equals(directory.getId())) {
+                if (dir.getId()==directory.getId()) {
                     dir.setScanState(ConstData.DirectoryState.SCANNING);
                 }
             }
@@ -713,13 +718,8 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             mScanService = ((MovieScanService.ScanBinder) service).getService();
             mScanService.setScanProgressListener(mScanProgressListener);
             Log.v(TAG, "on serviceIntent " + name + " connected");
-//            if (mScanService.isRunning() && mScanService.getmCurrScanDir().getEncrypted() == 1) {
-//                initView();
-//                mCheckBoxPrivate.setChecked(true);
-//            } else {
             initView();
             initData();
-//            }
 
 
         }

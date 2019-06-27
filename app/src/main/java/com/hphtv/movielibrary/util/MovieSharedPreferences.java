@@ -28,7 +28,7 @@ public class MovieSharedPreferences {
     private boolean isSortByAsc;
     private String subType;
     private String password;
-    private String directoryId;
+    private long directoryId;
 
     private Context context;
 
@@ -47,7 +47,7 @@ public class MovieSharedPreferences {
         this.year = sharedPreferences.getString(YEAR, "");
         this.genres = sharedPreferences.getString(GENRES, "");
         this.sortType = sharedPreferences.getString(SORT_TYPE, "");
-        this.directoryId = sharedPreferences.getString(DIRECTORY_ID, "");
+        this.directoryId = sharedPreferences.getLong(DIRECTORY_ID, -1);
         this.deviceId = sharedPreferences.getLong(DEVICE_ID, -1);
         this.deviceName = sharedPreferences.getString(DEVICE_NAME, "");
         this.subType = sharedPreferences.getString(SUB_TYPE, "");
@@ -96,9 +96,9 @@ public class MovieSharedPreferences {
         this.deviceId = deviceId;
     }
 
-    public void setDirectoryId(String directoryId) {
+    public void setDirectoryId(long directoryId) {
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putString(DIRECTORY_ID,directoryId);
+        editor.putLong(DIRECTORY_ID,directoryId);
         editor.commit();
         this.directoryId=directoryId;
     }
@@ -160,5 +160,5 @@ public class MovieSharedPreferences {
         return password;
     }
 
-    public String getDirectoryId(){return directoryId;}
+    public long getDirectoryId(){return directoryId;}
 }

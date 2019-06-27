@@ -24,6 +24,7 @@ import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.activity.HomePageActivity;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Movie;
+import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.HistoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll;
@@ -49,6 +50,7 @@ public class HistoryFragment extends Fragment {
 
     private HistoryDao mHistoryDao;
     private MovieWrapperDao mMovieWrapperDao;
+    private DirectoryDao mDirDao;
     private static AtomicBoolean atomicBoolean = new AtomicBoolean();
 
 
@@ -83,6 +85,7 @@ public class HistoryFragment extends Fragment {
         mContext = (HomePageActivity) getActivity();
         mMovieWrapperDao = new MovieWrapperDao(mContext);
         mHistoryDao = new HistoryDao(mContext);
+        mDirDao=new DirectoryDao(mContext);
 
         mTextViewTips = (TextView) view.findViewById(R.id.tips_empty);
         mRVMovies = (RecyclerViewWithMouseScroll) view.findViewById(R.id.rv_movies);
@@ -117,23 +120,68 @@ public class HistoryFragment extends Fragment {
                 public void run() {
                     mWrapperList.clear();
                     long dev_id = ac.getFilterDeviceId();
-                    String dir_id = ac.getFilterDirId();
+                    long dir_id = ac.getFilterDirId();
+                    boolean isShowEncrypted=ac.isShowEncrypted();
+                    boolean isSkip=false;
                     StringBuffer buffer = new StringBuffer();
-                    if (!TextUtils.isEmpty(dir_id)) {
-                        buffer.append("dir_ids like '%" + dir_id.trim() + "%' and ");
-                    } else if (dev_id != -1) {
-                        buffer.append("(dev_ids like \"%" + dev_id + ",%\" or dev_ids like \"%" + dev_id + "]%\") and ");
+                    if (dir_id != -1) {
+                        buffer.append("dir_ids like '%" + dir_id + "%' and ");
+                    } else {
+                        if (dev_id != -1) {
+                            if(!isShowEncrypted){
+                                Cursor dirCursor=mDirDao.select("is_encrypted=? and parent_id=?",new String[]{"0", String.valueOf(dev_id)},null);
+                                if(dirCursor.getCount()>0){
+                                    List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    buffer.append("(");
+                                    for(Directory t_dir:directories){
+                                        buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                    }
+                                    buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                }else{
+                                    //没有获取到则跳过
+                                    isSkip=true;
+                                }
+                            }else{
+                                Cursor dirCursor=mDirDao.select("parent_id=?",new String[]{String.valueOf(dev_id)},null);
+                                if(dirCursor.getCount()>0){
+                                    List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    buffer.append("(");
+                                    for(Directory t_dir:directories){
+                                        buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                    }
+                                    buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                }
+                            }
+
+                        }else{
+                            if(!isShowEncrypted){
+                                Cursor dirCursor=mDirDao.select("is_encrypted=?",new String[]{"0"},null);
+                                if(dirCursor.getCount()>0){
+                                    List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    buffer.append("(");
+                                    for(Directory t_dir:directories){
+                                        buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                    }
+                                    buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                }else{
+                                    //没有获取到则跳过
+                                    isSkip=true;
+                                }
+                            }
+                        }
                     }
-                    buffer.append("id=?");
-                    Cursor historyCursor = mHistoryDao.select(null, null, null, null, null, "last_play_time desc", null);
-                    if (historyCursor.getCount() > 0) {
-                        List<History> historyList = mHistoryDao.parseList(historyCursor);
-                        for (int i = 0; i < historyList.size(); i++) {
-                            long wrapper_id = historyList.get(i).getWrapper_id();
-                            Cursor cursor = mMovieWrapperDao.select(buffer.toString(), new String[]{String.valueOf(wrapper_id)}, null);
-                            if (cursor.getCount() > 0) {
-                                MovieWrapper wrapper = mMovieWrapperDao.parseList(cursor).get(0);
-                                mWrapperList.add(wrapper);
+                    if(!isSkip) {
+                        buffer.append("id=?");
+                        Cursor historyCursor = mHistoryDao.select(null, null, null, null, null, "last_play_time desc", null);
+                        if (historyCursor.getCount() > 0) {
+                            List<History> historyList = mHistoryDao.parseList(historyCursor);
+                            for (int i = 0; i < historyList.size(); i++) {
+                                long wrapper_id = historyList.get(i).getWrapper_id();
+                                Cursor cursor = mMovieWrapperDao.select(buffer.toString(), new String[]{String.valueOf(wrapper_id)}, null);
+                                if (cursor.getCount() > 0) {
+                                    MovieWrapper wrapper = mMovieWrapperDao.parseList(cursor).get(0);
+                                    mWrapperList.add(wrapper);
+                                }
                             }
                         }
                     }

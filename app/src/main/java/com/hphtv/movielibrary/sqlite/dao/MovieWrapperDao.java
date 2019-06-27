@@ -39,7 +39,7 @@ public class MovieWrapperDao extends BaseDao<MovieWrapper> {
                 ScraperInfo[] scraper_infos = null;
                 Long[] file_ids = null;
                 Long[] device_ids=null;
-                String[] dir_ids=null;
+                Long[] dir_ids=null;
                 if (!StrUtils.isNull(scraper_infos_json))
                     scraper_infos = JSON.parseArray(scraper_infos_json, ScraperInfo.class).toArray(new ScraperInfo[0]);
                 if (!StrUtils.isNull(files_ids_json)) {
@@ -57,7 +57,11 @@ public class MovieWrapperDao extends BaseDao<MovieWrapper> {
                     }
                 }
                 if (!StrUtils.isNull(dir_ids_json)) {
-                    dir_ids= JSON.parseArray(dir_ids_json).toArray(new String[0]);
+                    Integer[] t_dir_ids= JSON.parseArray(dir_ids_json).toArray(new Integer[0]);
+                    dir_ids=new Long[t_dir_ids.length];
+                    for(int i=0;i<dir_ids.length;i++){
+                        dir_ids[i]= Long.valueOf(t_dir_ids[i]);
+                    }
                 }
                 String title_pinyin=cursor.getString(cursor.getColumnIndex("title_pinyin"));
 

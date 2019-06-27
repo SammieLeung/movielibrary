@@ -19,9 +19,11 @@ import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter.OnRecyclerViewItemClickListener;
 import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.sqlite.bean.Directory;
 import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.FavoriteDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
@@ -48,7 +50,10 @@ public class FavoriteFragment extends Fragment {
 
     private FavoriteDao mFarvoriteDao;
     private MovieWrapperDao mMovieWrapperDao;
+    private DirectoryDao mDirDao;
+
     private static AtomicBoolean atomicBoolean = new AtomicBoolean();
+
 
     @Nullable
     @Override
@@ -81,6 +86,7 @@ public class FavoriteFragment extends Fragment {
         mContext = (HomePageActivity) getActivity();
         mFarvoriteDao = new FavoriteDao(mContext);
         mMovieWrapperDao = new MovieWrapperDao(mContext);
+        mDirDao=new DirectoryDao(mContext);
         mTips = (TextView) view.findViewById(R.id.tips_empty);
         mRVMovies = (RecyclerViewWithMouseScroll) view.findViewById(R.id.rv_movies);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(mContext, COLUMS, GridLayoutManager.VERTICAL, false);
@@ -112,30 +118,81 @@ public class FavoriteFragment extends Fragment {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    mWrapperList.clear();
+
                     HomePageActivity ac = (HomePageActivity) mContext;
                     long dev_id = ac.getFilterDeviceId();
-                    String dir_id = ac.getFilterDirId();
+                    long dir_id = ac.getFilterDirId();
+                    boolean isShowEncrypted = ac.isShowEncrypted();
+                    boolean isSkip=false;
                     StringBuffer buffer = new StringBuffer();
-                    if (!TextUtils.isEmpty(dir_id)) {
-                        buffer.append("dir_ids like '%" + dir_id.trim() + "%' and ");
-                    } else if (dev_id != -1) {
-                        buffer.append("(dev_ids like \"%" + dev_id + ",%\" or dev_ids like \"%" + dev_id + "]%\") and ");
-                    }
-                    buffer.append("id=?");
+//                    if (dir_id!=-1) {
+//                        buffer.append("dir_ids like '%" + dir_id + "%' and ");
+//                    } else if (dev_id != -1) {
+//                        buffer.append("(dev_ids like \"%" + dev_id + ",%\" or dev_ids like \"%" + dev_id + "]%\") and ");
+//                    }
 
-                    mWrapperList.clear();
-                    Cursor favoriteCursor = mFarvoriteDao.select(null, null, null, null, null, "id desc", null);
-                    if (favoriteCursor.getCount() > 0) {
-                        List<Favorite> favoriteList = mFarvoriteDao.parseList(favoriteCursor);
-                        for (int i = 0; i < favoriteList.size(); i++) {
-                            long wrapper_id = favoriteList.get(i).getWrapper_id();
-                            Cursor cursor = mMovieWrapperDao.select(buffer.toString(), new String[]{String.valueOf(wrapper_id)}, null);
-                            if (cursor.getCount() > 0) {
-                                MovieWrapper wrapper = mMovieWrapperDao.parseList(cursor).get(0);
-                                mWrapperList.add(wrapper);
+                    if (dir_id != -1) {
+                        buffer.append("dir_ids like '%" + dir_id + "%' and ");
+                    } else {
+                        if (dev_id != -1) {
+                            if(!isShowEncrypted){
+                                Cursor dirCursor=mDirDao.select("is_encrypted=? and parent_id=?",new String[]{"0", String.valueOf(dev_id)},null);
+                                if(dirCursor.getCount()>0){
+                                    List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    buffer.append("(");
+                                    for(Directory t_dir:directories){
+                                        buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                    }
+                                    buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                }else{
+                                    //没有获取到则跳过
+                                    isSkip=true;
+                                }
+                            }else{
+                                Cursor dirCursor=mDirDao.select("parent_id=?",new String[]{String.valueOf(dev_id)},null);
+                                if(dirCursor.getCount()>0){
+                                    List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    buffer.append("(");
+                                    for(Directory t_dir:directories){
+                                        buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                    }
+                                    buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                }
+                            }
+
+                        }else{
+                            if(!isShowEncrypted){
+                                Cursor dirCursor=mDirDao.select("is_encrypted=?",new String[]{"0"},null);
+                                if(dirCursor.getCount()>0){
+                                    List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    buffer.append("(");
+                                    for(Directory t_dir:directories){
+                                        buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                    }
+                                    buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                }else{
+                                    //没有获取到则跳过
+                                    isSkip=true;
+                                }
                             }
                         }
+                    }
+                    if(!isSkip) {
+                        buffer.append("id=?");
+                        Cursor favoriteCursor = mFarvoriteDao.select(null, null, null, null, null, "id desc", null);
+                        if (favoriteCursor.getCount() > 0) {
+                            List<Favorite> favoriteList = mFarvoriteDao.parseList(favoriteCursor);
+                            for (int i = 0; i < favoriteList.size(); i++) {
+                                long wrapper_id = favoriteList.get(i).getWrapper_id();
+                                Cursor cursor = mMovieWrapperDao.select(buffer.toString(), new String[]{String.valueOf(wrapper_id)}, null);
+                                if (cursor.getCount() > 0) {
+                                    MovieWrapper wrapper = mMovieWrapperDao.parseList(cursor).get(0);
+                                    mWrapperList.add(wrapper);
+                                }
+                            }
 
+                        }
                     }
                     getActivity().runOnUiThread(new Runnable() {
                         @Override

@@ -108,7 +108,7 @@ public class HomePageActivity extends AppBaseActivity {
     // 筛选条件
     private String mFilterDeviceName;
     private long mFilterDeviceId;
-    private String mFilterDirId;
+    private long mFilterDirId;
     private String mFilterYear;// 年份
     private String mFilterGenres;// 类型
     private String mSortType;// 排列顺序
@@ -150,7 +150,7 @@ public class HomePageActivity extends AppBaseActivity {
     private MovieScanService mScanService;
 
     //当前选择的fragment的索引
-    MovieSharedPreferences preferences;
+    MovieSharedPreferences mPreferences;
 
     private DirectoryDao mDirectoryDao;
     private MovieDao mMovieDao;
@@ -169,8 +169,8 @@ public class HomePageActivity extends AppBaseActivity {
         TITLE = new String[]{getResources().getString(R.string.lb_title), getResources().getString(R.string.lb_sort_directory), getResources().getString(R.string.lb_setting)};
         mContext = this;
         mDevcieRefreshService = Executors.newSingleThreadExecutor();
-        preferences = MovieSharedPreferences.getInstance();
-        preferences.setContext(mContext);
+        mPreferences = MovieSharedPreferences.getInstance();
+        mPreferences.setContext(mContext);
         requestPermission();
     }
 
@@ -183,7 +183,7 @@ public class HomePageActivity extends AppBaseActivity {
         bindService(intent, connection, Service.BIND_AUTO_CREATE);
     }
 
-    private void initMovie() {
+    public void initMovie() {
         mHomePageFragment.initMovie();
         mHistoryFragment.initMovie();
         mFavoriteFragment.initMovie();
@@ -359,7 +359,7 @@ public class HomePageActivity extends AppBaseActivity {
             public void onPageSelected(int position) {
 
                 mLeftMenu.setSelection(position);
-                if (position != HOME_PAGE_FRAGMENT) {
+                if (position != HOME_PAGE_FRAGMENT&&position!=HISTORY_FRAGMENT&&position!=FAVORITE_FRAGMENT) {
                     mSortBox.setVisibility(View.GONE);
                 } else {
                     mSortBox.setVisibility(View.VISIBLE);
@@ -489,7 +489,6 @@ public class HomePageActivity extends AppBaseActivity {
             Log.v(TAG, "被选中设备的index=" + pos_device);
             mCategoryView = (CategoryView) (mPopupWindow.getContentView().findViewById(R.id.categoryview));
             mCategoryView.addRestButton();
-//            mCategoryView.addSingleItem(mDeviceList, getResources().getString(R.string.lb_sort_directory), devicePos);
 
             mCategoryView.addConditionForDeviceAt(mDeviceList, getResources().getString(R.string.lb_sort_device), pos_device, SORT_DEVICE);
             mCategoryView.addConditionForDirectoryAt(mDirectoryList, getResources().getString(R.string.lb_sort_directory), pos_dir, SORT_DIR);
@@ -511,9 +510,6 @@ public class HomePageActivity extends AppBaseActivity {
 
             int checkPosForGenres = mGenresData.indexOf(mFilterGenres);
             int checkPosForDevice = getCurrentSelectDevicePosition();
-//            mCategoryView
-//                    .setOnClickCategoryListener(mOnClickCategoryListener);
-//            mCategoryView.addSingleItem(mDeviceList, getResources().getString(R.string.lb_sort_directory), devicePos);
 
 
             mCategoryView.addConditionAt(mGenresData, getResources().getString(R.string.lb_sort_type), checkPosForGenres, SORT_GENRES);
@@ -523,6 +519,9 @@ public class HomePageActivity extends AppBaseActivity {
         }
     }
 
+    /**
+     * 刷新设备和目录分类
+     */
     private void refreshDeviceAndDirectoryPopUpWindow() {
         if (mCategoryView != null) {
             int checkPosForDevice = getCurrentSelectDevicePosition();
@@ -541,6 +540,10 @@ public class HomePageActivity extends AppBaseActivity {
 
     }
 
+    /**
+     * 刷新目录分类
+     * @param selectPosForDevice 目前选择的设备索引
+     */
     private void refreshDirectoryPopUpWindow(int selectPosForDevice) {
         if (mCategoryView != null) {
             if (selectPosForDevice == -1) {
@@ -629,6 +632,9 @@ public class HomePageActivity extends AppBaseActivity {
         }
     };
 
+    /**
+     * 初始化Fragment
+     */
     private void initFragment() {
         if (mFileManagerFragment == null) {
             mFileManagerFragment = new FileManagerFragment();
@@ -679,9 +685,7 @@ public class HomePageActivity extends AppBaseActivity {
             mCurrDevice = mDeviceList.get(device_index - 1);
 
         }
-//        if (!filter_sub_type.equals(ConstData.MovieSubType.PRIVATE)) {
 
-//        }
         //目录条件
         RelativeLayout dir_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_DIR);
         RadioGroup dir_group = (RadioGroup) dir_ll
@@ -690,7 +694,7 @@ public class HomePageActivity extends AppBaseActivity {
                 .findViewById(dir_group.getCheckedRadioButtonId());
         int dir_index = dir_group.indexOfChild(dir_check_button);//获取备选条件的index
         if (dir_index == 0 && dir_check_button.getText().equals(ALL)) {//0为全部，不做处理
-            mFilterDirId = null;
+            mFilterDirId = -1;
             if (mCurrDir != null)
                 isDevChange = true;
             mCurrDir = null;
@@ -717,11 +721,11 @@ public class HomePageActivity extends AppBaseActivity {
                 .findViewById(genres_group.getCheckedRadioButtonId());
         mFilterGenres = genres_check_button.getText().toString();
 
-        preferences.setDeviceId(mFilterDeviceId);
-        preferences.setDeviceName(mFilterDeviceName);
-        preferences.setDirectoryId(mFilterDirId);
-        preferences.setYear(mFilterYear);
-        preferences.setGenres(mFilterGenres);
+        mPreferences.setDeviceId(mFilterDeviceId);
+        mPreferences.setDeviceName(mFilterDeviceName);
+        mPreferences.setDirectoryId(mFilterDirId);
+        mPreferences.setYear(mFilterYear);
+        mPreferences.setGenres(mFilterGenres);
         //排序方式
         getSortWays();
     }
@@ -756,8 +760,8 @@ public class HomePageActivity extends AppBaseActivity {
         }
 
 
-        preferences.setSortType(mSortType);
-        preferences.setSortByAsc(isSortByAsc);
+        mPreferences.setSortType(mSortType);
+        mPreferences.setSortByAsc(isSortByAsc);
         updateSortText(i);
     }
 
@@ -766,14 +770,14 @@ public class HomePageActivity extends AppBaseActivity {
      * 获取缓存分类条件和获取分类信息列表
      */
     public void setFilterData() {
-        if (preferences != null) {
-            isSortByAsc = preferences.isSortByAsc();
-            mSortType = preferences.getSortType();
-            mFilterGenres = preferences.getGenres();
-            mFilterYear = preferences.getYear();
-            mFilterDeviceId = preferences.getDeviceId();
-            mFilterDeviceName = preferences.getDeviceName();
-            mFilterDirId = preferences.getDirectoryId();
+        if (mPreferences != null) {
+            isSortByAsc = mPreferences.isSortByAsc();
+            mSortType = mPreferences.getSortType();
+            mFilterGenres = mPreferences.getGenres();
+            mFilterYear = mPreferences.getYear();
+            mFilterDeviceId = mPreferences.getDeviceId();
+            mFilterDeviceName = mPreferences.getDeviceName();
+            mFilterDirId = mPreferences.getDirectoryId();
         }
         if (mSortTypeData == null) {
             mSortTypeData = new ArrayList<>();
@@ -828,7 +832,7 @@ public class HomePageActivity extends AppBaseActivity {
         Log.v(TAG, "updateSortText");
         // 更新筛选条件文字.
         StringBuffer st = new StringBuffer();
-        if (mFilterDirId == null) {
+        if (mFilterDirId == -1) {
             st.append(getResources().getString(R.string.tx_alldir) + SPLIT);
         } else {
             st.append(mCurrDir.getName() + SPLIT);
@@ -909,10 +913,10 @@ public class HomePageActivity extends AppBaseActivity {
 
     public int getCurrentSelectDirectoryPosition() {
         int pos = -1;
-        if (mFilterDirId == null)
+        if (mFilterDirId == -1)
             return pos;
         for (int i = 0; i < mDirectoryList.size(); i++) {
-            if (mDirectoryList.get(i).getId().equals(mFilterDirId)) {
+            if (mDirectoryList.get(i).getId() == mFilterDirId) {
                 pos = i;
                 break;
             }
@@ -923,7 +927,12 @@ public class HomePageActivity extends AppBaseActivity {
     private List<Directory> getDirectoriesByDeviceId(long dev_id) {
         if (mDirectoryDao == null)
             mDirectoryDao = new DirectoryDao(mContext);
-        Cursor cursor = mDirectoryDao.select("parent_id=?", new String[]{String.valueOf(dev_id)}, null);
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("parent_id=?");
+        boolean isShowPrivate = getApp().isShowEncrypted();
+        if (!isShowPrivate)
+            stringBuffer.append(" and is_encrypted=0");
+        Cursor cursor = mDirectoryDao.select(stringBuffer.toString(), new String[]{String.valueOf(dev_id)}, null);
         if (cursor.getCount() > 0) {
             List<Directory> directories = mDirectoryDao.parseList(cursor);
             return directories;
@@ -939,13 +948,16 @@ public class HomePageActivity extends AppBaseActivity {
             stringBuffer.append("(");
             List<String> whereArgsList = new ArrayList<>();
 
-
             for (int i = 0; i < mDeviceList.size(); i++) {
                 Device device = mDeviceList.get(i);
                 stringBuffer.append("(parent_id=?) or");
                 whereArgsList.add(String.valueOf(device.getId()));
             }
             stringBuffer.replace(stringBuffer.length() - 3, stringBuffer.length(), ")");
+            boolean isShowPrivate = getApp().isShowEncrypted();
+
+            if (!isShowPrivate)
+                stringBuffer.append(" and is_encrypted=0");
 
             String whereClause = stringBuffer.toString();
             Cursor cursor = mDirectoryDao.select(whereClause, whereArgsList.toArray(new String[0]), null);
@@ -1114,7 +1126,7 @@ public class HomePageActivity extends AppBaseActivity {
         return mFilterDeviceId;
     }
 
-    public String getFilterDirId() {
+    public long getFilterDirId() {
         return mFilterDirId;
     }
 
@@ -1159,7 +1171,9 @@ public class HomePageActivity extends AppBaseActivity {
         return isSortByAsc;
     }
 
-
+    public boolean isShowEncrypted(){
+        return getApp().isShowEncrypted();
+    }
     public void startLoading() {
         LogUtil.v(TAG, "startLoading");
         if (mLoadingCircleViewDialogFragment == null) {

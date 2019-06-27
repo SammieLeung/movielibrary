@@ -82,7 +82,7 @@ public class CategoryView extends LinearLayout implements
                 radioGroup.check(bt.getId());
             }
 
-            if (list.size() > 0) {
+            if (list!=null&&list.size() > 0) {
                 // 全部
                 for (Device device : list) {
                     int i = list.indexOf(device);
@@ -110,7 +110,7 @@ public class CategoryView extends LinearLayout implements
             if (checkPos == -1) {
                 radioGroup.check(bt.getId());
             }
-            if (list.size() > 0) {
+            if (list!=null&&list.size() > 0) {
                 // 全部
                 for (Directory directory : list) {
                     int i = list.indexOf(directory);

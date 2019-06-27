@@ -44,7 +44,7 @@ public class VideoFileDao extends BaseDao<VideoFile> {
                 String filename = cursor.getString(cursor.getColumnIndex("filename"));
                 String thumbnail = cursor.getString(cursor.getColumnIndex("thumbnail"));
                 String thumbnail_s = cursor.getString(cursor.getColumnIndex("thumbnail_s"));
-                String dir_id = cursor.getString(cursor.getColumnIndex("dir_id"));
+                long dir_id = cursor.getInt(cursor.getColumnIndex("dir_id"));
                 long dev_id = cursor.getInt(cursor.getColumnIndex("dev_id"));
                 int is_matched=cursor.getInt(cursor.getColumnIndex("is_matched"));
                 String search_name=cursor.getString(cursor.getColumnIndex("search_name"));
@@ -79,7 +79,7 @@ public class VideoFileDao extends BaseDao<VideoFile> {
         String filename = videoFile.getFilename();
         String thumbnail = videoFile.getThumbnail();
         String thumbnail_s = videoFile.getThumbnail_s();
-        String dir_id = videoFile.getDir_id();
+        long dir_id = videoFile.getDir_id();
         long dev_id = videoFile.getDev_id();
         int is_matched=videoFile.isMatched();
         String search_name=videoFile.getSearchName();

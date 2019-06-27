@@ -78,7 +78,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
             "search_name text",
             "thumbnail text",//缩略图地址
             "thumbnail_s text",//小缩略图
-            "dir_id text",
+            "dir_id integer",
             "dev_id integer",
             "is_matched integer",
             "title_pinyin text"
@@ -93,7 +93,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
     };
 
     private String[] directory_colums = new String[]{
-            "id text primary key",
+            "id integer primary key",
             "name text",
             "parent_id integer",
             "video_number integer",//视频数

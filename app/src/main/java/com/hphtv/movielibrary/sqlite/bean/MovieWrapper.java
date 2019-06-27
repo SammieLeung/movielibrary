@@ -12,7 +12,7 @@ public class MovieWrapper implements Serializable {
     private ScraperInfo[] scraper_infos;
     private Long[] file_ids;
     private Long[] dev_ids;
-    private String[] dir_ids;
+    private Long[] dir_ids;
     private String title;
     private String poster;
     private String average;
@@ -76,11 +76,11 @@ public class MovieWrapper implements Serializable {
         this.dev_ids = devId;
     }
 
-    public String[] getDirIds() {
+    public Long[] getDirIds() {
         return dir_ids;
     }
 
-    public void setDirIds(String[] dirId) {
+    public void setDirIds(Long[] dirId) {
         this.dir_ids = dirId;
     }
 

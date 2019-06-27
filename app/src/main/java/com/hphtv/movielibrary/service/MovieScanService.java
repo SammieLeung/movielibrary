@@ -271,7 +271,7 @@ public class MovieScanService extends Service {
                 videoFile.setDir_id(directory.getId());
                 videoFile.setSearchName(mni.getName());
                 videoFile.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(mni.getName()));
-                videoFile = saveVideoFile(videoFile);
+                videoFile = saveVideoFile(videoFile, directory, device);
                 final ParseFile parseFile = new ParseFile();
                 parseFile.setMni(mni);
                 parseFile.setVideoFile(videoFile);
@@ -306,12 +306,26 @@ public class MovieScanService extends Service {
      * @param videoFile
      * @return
      */
-    private VideoFile saveVideoFile(VideoFile videoFile) {
+    private VideoFile saveVideoFile(VideoFile videoFile, Directory currentDir, Device currentDev) {
         if (mVideoFileDao == null)
             mVideoFileDao = new VideoFileDao(MovieScanService.this);
         Cursor cursor = mVideoFileDao.select("uri=?", new String[]{videoFile.getUri()}, null);
         if (cursor != null && cursor.getCount() > 0) {
             VideoFile dbVideoFile = mVideoFileDao.parseList(cursor).get(0);
+            if (currentDev.getType() != ConstData.DeviceType.DEVICE_TYPE_DLNA) {
+                if (dbVideoFile.getDir_id() != currentDir.getId()) {
+                    Cursor dirCursor = mDirectoryDao.select("id=?", new String[]{String.valueOf(dbVideoFile.getDir_id())}, null);
+                    if (dirCursor.getCount() > 0) {
+                        Directory dbDir = mDirectoryDao.parseList(dirCursor).get(0);
+                        //这里需要获取的是videofile最准确的所属目录。
+                        //判断新的目录地址是否更详细。
+                        if (currentDir.getPath().contains(dbDir.getPath())) {
+                            dbVideoFile.setDir_id(currentDir.getId());
+                            mVideoFileDao.update(mVideoFileDao.parseContentValues(dbVideoFile), "id=?", new String[]{String.valueOf(dbVideoFile.getId())});
+                        }
+                    }
+                }
+            }
             return dbVideoFile;
         } else {
             ContentValues contentValues = mVideoFileDao.parseContentValues(videoFile);
@@ -359,7 +373,6 @@ public class MovieScanService extends Service {
             }
             onSuccess(movieWrapper, parseFile, fileCount);
         }
-
 
     }
 
@@ -423,7 +436,7 @@ public class MovieScanService extends Service {
             }
         }
         ContentValues contentValues = mDirectoryDao.parseContentValues(directory);
-        mDirectoryDao.update(contentValues, "id=?", new String[]{directory.getId()});
+        mDirectoryDao.update(contentValues, "id=?", new String[]{String.valueOf(directory.getId())});
     }
 
 
@@ -433,7 +446,7 @@ public class MovieScanService extends Service {
 
         VideoFile videoFile = parseFile.getVideoFile();
         long device_id = videoFile.getDev_id();
-        String dir_id = videoFile.getDir_id();
+        long dir_id = videoFile.getDir_id();
 
         if (movie != null) {
             long wrapper_id = movie.getWrapperId() != -1 ? movie.getWrapperId() : (videoFile.getWrapper_id() != -1 ? videoFile.getWrapper_id() : -1);
@@ -500,58 +513,86 @@ public class MovieScanService extends Service {
                     scraperInfos = scraperInfoList.toArray(new ScraperInfo[0]);
                     movieWrapper.setScraperInfos(scraperInfos);
 
-                    //获取设备id集合,更新
-                    Long[] dev_ids = movieWrapper.getDevIds();
-                    List<Long> dev_id_list;
-                    if (dev_ids == null) {
-                        dev_id_list = new ArrayList<>();
-                        dev_id_list.add(device_id);
-                        dev_ids = dev_id_list.toArray(new Long[0]);
-                        movieWrapper.setDevIds(dev_ids);
-                    } else {
-                        boolean isExsit = false;
-                        for (long t_id : dev_ids) {
-                            if (t_id == device_id) {
-                                isExsit = true;
-                                break;
+                    //获取videofile列表，获取设备和目录
+
+                    StringBuffer buffer = new StringBuffer();
+                    List<String> argList = new ArrayList<>();
+                    for (int i = 0; i < file_ids.length; i++) {
+                        buffer.append("id=? or ");
+                        argList.add(String.valueOf(file_ids[i]));
+                    }
+                    buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), "");
+                    Cursor vCursor = mVideoFileDao.select(buffer.toString(), argList.toArray(new String[0]), null);
+                    if (vCursor.getCount() > 0) {
+                        List<VideoFile> videoFileList = mVideoFileDao.parseList(vCursor);
+                        int num = videoFileList.size();
+                        List<Long> dev_id_list = new ArrayList<>();
+                        List<Long> dir_id_list = new ArrayList<>();
+                        for (int j = 0; j < num; j++) {
+                            VideoFile file = videoFileList.get(j);
+                            if (!dev_id_list.contains(file.getDev_id())) {
+                                dev_id_list.add(file.getDev_id());
+                            }
+                            if (!dir_id_list.contains(file.getDir_id())) {
+                                dir_id_list.add(file.getDir_id());
                             }
                         }
-                        if (!isExsit) {
-                            dev_id_list = new ArrayList<>(dev_ids.length);
-                            Collections.addAll(dev_id_list, dev_ids);
-                            dev_id_list.add(device_id);
-                            dev_ids = dev_id_list.toArray(new Long[0]);
-                            movieWrapper.setDevIds(dev_ids);
-                        }
-
-
+                        movieWrapper.setDevIds(dev_id_list.toArray(new Long[0]));
+                        movieWrapper.setDirIds(dir_id_list.toArray(new Long[0]));
                     }
 
-
-                    //获取目录id集合,更新
-                    String[] dir_ids = movieWrapper.getDirIds();
-                    List<String> dir_id_list;
-                    if (dir_ids == null) {
-                        dir_id_list = new ArrayList<>();
-                        dir_id_list.add(dir_id);
-                        dir_ids = dir_id_list.toArray(new String[0]);
-                        movieWrapper.setDirIds(dir_ids);
-                    } else {
-                        boolean isExsit = false;
-                        for (String t_id : dir_ids) {
-                            if (t_id.equals(dir_id)) {
-                                isExsit = true;
-                                break;
-                            }
-                        }
-                        if (!isExsit) {
-                            dir_id_list = new ArrayList<>(dir_ids.length);
-                            Collections.addAll(dir_id_list, dir_ids);
-                            dir_id_list.add(dir_id);
-                            dir_ids = dir_id_list.toArray(new String[0]);
-                            movieWrapper.setDirIds(dir_ids);
-                        }
-                    }
+//                    //获取设备id集合,更新
+//                    Long[] dev_ids = movieWrapper.getDevIds();
+//                    List<Long> dev_id_list;
+//                    if (dev_ids == null) {
+//                        dev_id_list = new ArrayList<>();
+//                        dev_id_list.add(device_id);
+//                        dev_ids = dev_id_list.toArray(new Long[0]);
+//                        movieWrapper.setDevIds(dev_ids);
+//                    } else {
+//                        boolean isExsit = false;
+//                        for (long t_id : dev_ids) {
+//                            if (t_id == device_id) {
+//                                isExsit = true;
+//                                break;
+//                            }
+//                        }
+//                        if (!isExsit) {
+//                            dev_id_list = new ArrayList<>(dev_ids.length);
+//                            Collections.addAll(dev_id_list, dev_ids);
+//                            dev_id_list.add(device_id);
+//                            dev_ids = dev_id_list.toArray(new Long[0]);
+//                            movieWrapper.setDevIds(dev_ids);
+//                        }
+//
+//
+//                    }
+//
+//
+//                    //获取目录id集合,更新
+//                    Long[] dir_ids = movieWrapper.getDirIds();
+//                    List<Long> dir_id_list;
+//                    if (dir_ids == null) {
+//                        dir_id_list = new ArrayList<>();
+//                        dir_id_list.add(dir_id);
+//                        dir_ids = dir_id_list.toArray(new Long[0]);
+//                        movieWrapper.setDirIds(dir_ids);
+//                    } else {
+//                        boolean isExsit = false;
+//                        for (long t_id : dir_ids) {
+//                            if (t_id==dir_id) {
+//                                isExsit = true;
+//                                break;
+//                            }
+//                        }
+//                        if (!isExsit) {
+//                            dir_id_list = new ArrayList<>(dir_ids.length);
+//                            Collections.addAll(dir_id_list, dir_ids);
+//                            dir_id_list.add(dir_id);
+//                            dir_ids = dir_id_list.toArray(new Long[0]);
+//                            movieWrapper.setDirIds(dir_ids);
+//                        }
+//                    }
 
 
                     int num = mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(movieWrapper), "id=?", new String[]{String.valueOf(movieWrapper.getId())});
@@ -583,7 +624,7 @@ public class MovieScanService extends Service {
                 scraperInfo.setApi(movie.getApi());
                 movieWrapper.setFileIds(new Long[]{videoFile.getId()});
                 movieWrapper.setDevIds(new Long[]{device_id});
-                movieWrapper.setDirIds(new String[]{dir_id});
+                movieWrapper.setDirIds(new Long[]{dir_id});
                 if (movie.getImages() != null)
                     movieWrapper.setPoster(movie.getImages().large);
                 if (!TextUtils.isEmpty(movie.getTitle())) {
@@ -628,7 +669,7 @@ public class MovieScanService extends Service {
                 movieWrapper = new MovieWrapper();
                 movieWrapper.setFileIds(new Long[]{videoFile.getId()});
                 movieWrapper.setDevIds(new Long[]{device_id});
-                movieWrapper.setDirIds(new String[]{dir_id});
+                movieWrapper.setDirIds(new Long[]{dir_id});
                 movieWrapper.setTitle(parseFile.getMni().getName());
                 movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(parseFile.getMni().getName()));
                 movieWrapper.setAverage("-1");
@@ -641,6 +682,14 @@ public class MovieScanService extends Service {
                         LogUtil.e(TAG, "insert vfile faild");
                         return null;
                     }
+                }
+            } else {
+                Cursor wrapperCursor = mMovieWrapperDao.select("id=?", new String[]{String.valueOf(wrapper_id)}, null);
+                if (wrapperCursor.getCount() > 0) {
+                    MovieWrapper wrapper = mMovieWrapperDao.parseList(wrapperCursor).get(0);
+                    wrapper.setDirIds(new Long[]{dir_id});
+                    wrapper.setDevIds(new Long[]{device_id});
+                    mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(wrapper),"id=?",new String[]{String.valueOf(wrapper.getId())});
                 }
             }
 

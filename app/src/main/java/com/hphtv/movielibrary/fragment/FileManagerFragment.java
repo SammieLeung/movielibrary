@@ -47,7 +47,7 @@ public class FileManagerFragment extends Fragment {
     private RelativeLayout rv_folder_add;
     private RelativeLayout rv_encrypted_setting;
     private HomePageActivity context;
-    private MovieApplication movieApplication;
+    private MovieApplication mApp;
     MovieScanService scanService;
     private MovieSharedPreferences preferences;
     private String md5Password;
@@ -67,7 +67,7 @@ public class FileManagerFragment extends Fragment {
         rv_folder_add.setOnFocusChangeListener(mOnFocusChangeListener);
         rv_encrypted_setting.setOnFocusChangeListener(mOnFocusChangeListener);
         context = (HomePageActivity) getActivity();
-        movieApplication = (MovieApplication) context.getApplication();
+        mApp = (MovieApplication) context.getApplication();
         preferences = MovieSharedPreferences.getInstance();
         return view;
     }
@@ -140,10 +140,11 @@ public class FileManagerFragment extends Fragment {
 
                                 switch (pos) {
                                     case 0:
-                                        if (movieApplication.isShowEncrypted()) {
-                                            movieApplication.setShowEncrypted(false);
+                                        if (mApp.isShowEncrypted()) {
+                                            mApp.setShowEncrypted(false);
                                             updateShowPrivateText((TextView) v, false);
                                             context.checkConnectedDevices();
+                                            context.initMovie();
                                             Toast.makeText(context, context.getResources().getString(R.string.tips_for_hide_private_videos), Toast.LENGTH_SHORT).show();
                                             return;
                                         }
@@ -162,9 +163,10 @@ public class FileManagerFragment extends Fragment {
                                                         fragment.showTips(1);
                                                         editTextList.get(0).requestFocus();
                                                     } else {//
-                                                        movieApplication.setShowEncrypted(true);
+                                                        mApp.setShowEncrypted(true);
                                                         updateShowPrivateText((TextView) v, true);
                                                         context.checkConnectedDevices();
+                                                        context.initMovie();
                                                         Toast.makeText(context, context.getResources().getString(R.string.tips_for_show_private_videos), Toast.LENGTH_SHORT).show();
                                                         fragment.dismiss();
                                                     }
@@ -274,7 +276,7 @@ public class FileManagerFragment extends Fragment {
                 //获取uri基本信息
                 String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
                 int deviceType = ConstData.DeviceType.DEVICE_TYPE_LOCAL;
-                String base64Id = uri.getPathSegments().get(1);//device id
+                String base64Id = uri.getPathSegments().get(1);//dir id
                 final int isEncrypted = Integer.valueOf(uri.getPathSegments().get(3));
                 //base64解码
                 String decodeData = Base64Helper.decode(base64Id);
@@ -370,7 +372,6 @@ public class FileManagerFragment extends Fragment {
                     device.setId(id);
                 }
 
-                directory.setId(base64Id);
                 directory.setIsEcrypted(isEncrypted);
                 directory.setMatchedVideo(0);
                 directory.setName(dirName);
@@ -381,16 +382,19 @@ public class FileManagerFragment extends Fragment {
                 directory.setVideoNumber(0);
 
                 long rowId = -1;
-                Cursor dirCusor = dirDao.select(null, "id=?", new String[]{directory.getId()});
+                Cursor dirCusor = dirDao.select(null, "uri=?", new String[]{directory.getUri()});
                 if (dirCusor != null && dirCusor.getCount() > 0) {
                     directory = dirDao.parseList(dirCusor).get(0);
                 } else {
                     rowId = dirDao.insert(dirDao.parseContentValues(directory));
+                    if(rowId>0)
+                        directory.setId(rowId);
                 }
 
 
                 final Device t_device = device;
                 final Directory t_dir = directory;
+
                 if (isEncrypted == ConstData.EncryptState.ENCRYPTED) {
                     md5Password = preferences.getPassword();
                     if (!TextUtils.isEmpty(md5Password)) {
@@ -415,6 +419,7 @@ public class FileManagerFragment extends Fragment {
                                                 Toast.makeText(context, "开始扫描...", Toast.LENGTH_SHORT).show();
                                             }
                                         });
+                                        mApp.setShowEncrypted(true);
                                         scanService.initScanService();
                                         scanService.addToScanQueue(t_device, t_dir, isEncrypted);
                                         Intent intent = new Intent(getActivity(), FolderManagerActivity.class);
@@ -458,6 +463,7 @@ public class FileManagerFragment extends Fragment {
                                                 Toast.makeText(context, "开始扫描...", Toast.LENGTH_SHORT).show();
                                             }
                                         });
+                                        mApp.setShowEncrypted(true);
                                         scanService.initScanService();
                                         scanService.addToScanQueue(t_device, t_dir, isEncrypted);
                                         Intent intent = new Intent(getActivity(), FolderManagerActivity.class);
@@ -471,7 +477,6 @@ public class FileManagerFragment extends Fragment {
                             }
                         });
                         fragment.SetPassword().show(getFragmentManager(), TAG);
-
                     }
                 } else {
                     scanService.initScanService();
