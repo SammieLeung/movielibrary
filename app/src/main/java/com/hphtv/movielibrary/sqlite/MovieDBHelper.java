@@ -219,6 +219,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
                 dropTable(sqLiteDatabase, TABLE_FAVORITE);
                 dropTable(sqLiteDatabase, TABLE_POSTERPROVIDER);
                 dropTable(sqLiteDatabase, TABLE_HISTORY);
+
                 onCreate(sqLiteDatabase);
                 break;
             case 19:

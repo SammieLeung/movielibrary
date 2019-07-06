@@ -106,4 +106,9 @@ public abstract class AppBaseActivity extends Activity {
     public MovieApplication getApp(){
         return (MovieApplication) getApplication();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

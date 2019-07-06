@@ -3,6 +3,7 @@ package com.hphtv.movielibrary;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
+import android.util.Log;
 import android.webkit.WebView;
 
 import com.hphtv.movielibrary.service.MovieScanService;
@@ -68,6 +69,8 @@ public class MovieApplication extends Application {
             }
         }
     }
+
+
 
     // 遍历所有Activity并finish
     public void exit() {
