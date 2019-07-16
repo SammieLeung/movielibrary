@@ -231,24 +231,21 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             @Override
             public void OnItemFocus(Device device, Directory directory, boolean isHover) {
 
-                String folder = directory.getName();
-                String uri = device.getPath();
-                String[] datas;
-                String local;
+                String deviceName = device.getName();
+                String dirPath = directory.getPath();
+                String location;
                 int devType = device.getType();
-                String parent;
                 switch (devType) {
                     case ConstData.DeviceType.DEVICE_TYPE_LOCAL:
-                        local = uri.substring(0, uri.lastIndexOf("/"));
-                        setFooter(folder, local);
+                        location = dirPath;
+                        setFooter(deviceName, location);
                         break;
                     case ConstData.DeviceType.DEVICE_TYPE_DLNA:
-                        local = Base64Helper.decode(Uri.parse(uri).getPathSegments().get(1));
-                        setFooter(folder, local);
+                        location=device.getPath()+":"+dirPath;
+                        setFooter(deviceName, location);
                         break;
                     case ConstData.DeviceType.DEVICE_TYPE_SMB:
-                        local = uri.substring(0, uri.lastIndexOf("/"));
-                        setFooter(folder, local);
+                        setFooter("smb", "//"+dirPath);
                         break;
                 }
 
@@ -730,9 +727,9 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         }
     };
 
-    private void setFooter(String folder, String location) {
+    private void setFooter(String device, String location) {
         if (mScanService != null && !mScanService.isRunning()) {
-            mTextViewLocation.setText(getResources().getString(R.string.device_manager_footer_bar_path) + " " + location);
+            mTextViewLocation.setText(device + ":" + location);
         }
     }
 

@@ -337,7 +337,7 @@ public class FileManagerFragment extends Fragment {
                             Log.v(TAG, "decodeData=" + decodeData);
 
                         }
-                        decodeData = decodeData.substring(6, decodeData.length());//TCHIP/lxpshare/sc
+                        decodeData = decodeData.substring(6, decodeData.length());//   TCHIP/lxpshare/sc
                         part = decodeData.split("/");
                         //                        devicePath = decodeData.substring(0, decodeData.indexOf(part[part.length - 1]));
 
