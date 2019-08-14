@@ -36,7 +36,19 @@ public class MtimeApi {
         try {
             JSONArray movieAry = SearchMovies(keyword);
             if (movieAry != null && movieAry.size() > 0) {
-                JSONObject movieObj = movieAry.getJSONObject(0);
+                int idx=0;
+                for(int i=0;i<movieAry.size();i++){
+                    JSONObject movieObj=movieAry.getJSONObject(i);
+                    String name=movieObj.getString("name");
+                    String nameEn=movieObj.getString("nameEn");
+                    if(name.contains(keyword)||nameEn.contains(keyword)){
+                        idx=i;
+                        if(name.equalsIgnoreCase(keyword)||nameEn.equalsIgnoreCase(keyword)){
+                            break;
+                        }
+                    }
+                }
+                JSONObject movieObj = movieAry.getJSONObject(idx);
                 Rating rating = new Rating();
                 rating.max = 10;
                 rating.average = Float.valueOf(movieObj.getString("rating").equals("") ? "-1" : movieObj.getString("rating"));
