@@ -262,7 +262,7 @@ public class MovieSearchActivity extends Activity {
                         for(Directory t_dir:directories){
                             buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
                         }
-                        buffer.append(")");
+                        buffer.replace(buffer.lastIndexOf("or"),buffer.length(),")");
                         cursor=mMovieWrapperDao.select(buffer.toString(),null,null);
                     }
                 }
