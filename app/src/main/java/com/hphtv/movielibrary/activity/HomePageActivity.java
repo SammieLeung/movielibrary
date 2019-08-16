@@ -39,8 +39,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.LeftMenuListAdapter;
@@ -52,6 +50,7 @@ import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
+import com.hphtv.movielibrary.service.DlnaControlService;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
@@ -74,8 +73,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class HomePageActivity extends AppBaseActivity {
     public static final String TAG = HomePageActivity.class.getSimpleName();
@@ -149,13 +146,16 @@ public class HomePageActivity extends AppBaseActivity {
 
     private MovieScanService mScanService;
 
-    //当前选择的fragment的索引
-    MovieSharedPreferences mPreferences;
+
 
     private DirectoryDao mDirectoryDao;
     private MovieDao mMovieDao;
     private boolean isDevChange = false;
 
+    private Boolean isExit = false;
+
+    //当前选择的fragment的索引
+    MovieSharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,10 +183,11 @@ public class HomePageActivity extends AppBaseActivity {
         bindService(intent, connection, Service.BIND_AUTO_CREATE);
     }
 
-    public void initMovie() {
-        mHomePageFragment.initMovie();
-        mHistoryFragment.initMovie();
-        mFavoriteFragment.initMovie();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindService(connection);
+        LogUtil.v(TAG, "onPause()");
     }
 
     /**
@@ -236,30 +237,163 @@ public class HomePageActivity extends AppBaseActivity {
         }
     }
 
+    /**
+     * 退出
+     */
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
+            mDrawerLayout.closeDrawer(Gravity.START);
+        } else if (getCurrentFragment() != HOME_PAGE_FRAGMENT) {
+            setCurrentFragment(HOME_PAGE_FRAGMENT);
+        } else if (mScanService != null && mScanService.isRunning()) {
+            mApplication.moveToBack(HomePageActivity.this);
+        } else {
+            exitBy2Click();
+        }
+    }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        unbindService(connection);
-        LogUtil.v(TAG, "onPause()");
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LogUtil.v(TAG, "onRequestPermissionsResult()");
+        if (requestCode == 1) {
+            if (permissions.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                recreate();
+            } else {//没有获得到权限
+                finish();
+                LogUtil.v(TAG, "granted failed");
+            }
+        }
     }
 
 
-    ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mScanService = ((MovieScanService.ScanBinder) service).getService();
-            LogUtil.v(TAG, "on servcie" + name + " connected!!");
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
+
+                View view = getCurrentFocus();
+                LogUtil.v(TAG, "dispatchKeyEvent");
+                if (view instanceof ListView) {
+                    mDrawerLayout.closeDrawer(Gravity.START);
+                    mVViewPager.requestFocus();
+                    if (getCurrentFragment() == HOME_PAGE_FRAGMENT) {
+//                        mHomePageFragment.movieRequestFocus();
+                    }
+                    return true;
+                }
+            }
+        }
+        LogUtil.v(TAG, getCurrentFocus() != null ? getCurrentFocus().toString() : "null");
+        return super.dispatchKeyEvent(event);
+    }
+
+    public void initMovie() {
+        mHomePageFragment.initMovie();
+        mHistoryFragment.initMovie();
+        mFavoriteFragment.initMovie();
+    }
+
+    public MovieScanService getMovieSearchService() {
+        return mScanService;
+    }
+
+    public Device getCurrDevice() {
+        return mCurrDevice;
+    }
+
+    public List<Device> getDeviceList() {
+        return mDeviceList;
+    }
+
+    public List<Directory> getDirectoryList() {
+        return mDirectoryList;
+    }
+
+    public int getCurrentFragment() {
+        return mVViewPager.getCurrentItem();
+    }
+
+    public String getFilterDeviceName() {
+        return mFilterDeviceName;
+    }
+
+    public long getFilterDeviceId() {
+        return mFilterDeviceId;
+    }
+
+    public long getFilterDirId() {
+        return mFilterDirId;
+    }
+
+    public String getFilterYear() {
+        return mFilterYear;
+    }
+
+    public String getFilterGenres() {
+        return mFilterGenres;
+    }
+
+    public String getSortType() {
+        return mSortType;
+    }
+
+    public int getPosSortType() {
+        return mSortTypeData.indexOf(mSortType);
+    }
+
+    public String getOrderBySqlStr() {
+        int pos_order = mSortTypeData.indexOf(mSortType);
+        StringBuffer orderByBuffer = new StringBuffer();
+        String asc = isSortByAsc ? "asc" : "desc";
+        switch (pos_order) {
+            case 0:
+                orderByBuffer.append("title_pinyin " + asc + ",title " + asc + ",otitle " + asc);
+                break;
+            case 1:
+                orderByBuffer.append("rating " + asc);
+                break;
+            case 2:
+                orderByBuffer.append("genres " + asc);
+                break;
+            case 3:
+                orderByBuffer.append("year " + asc);
+                break;
+        }
+        return orderByBuffer.toString();
+    }
+
+    public boolean isSortByAsc() {
+        return isSortByAsc;
+    }
+
+    public boolean isShowEncrypted(){
+        return getApp().isShowEncrypted();
+    }
+    public void startLoading() {
+        LogUtil.v(TAG, "startLoading");
+        if (mLoadingCircleViewDialogFragment == null) {
+            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
+            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
         }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            LogUtil.v(TAG, "on scan servcie disconnected!!");
-            mScanService = null;
+    }
+
+    public void stopLoading() {
+        LogUtil.v(TAG, "stopLoading");
+        if (mLoadingCircleViewDialogFragment != null) {
+            mLoadingCircleViewDialogFragment.dismiss();
+            mLoadingCircleViewDialogFragment = null;
         }
-    };
-
-
+    }
+    /**
+     * 获取连接的设备列表
+     */
+    public void checkConnectedDevices() {
+        if (mService != null)
+            mService.checkDevices();
+    }
     /**
      * 初始化组件
      */
@@ -556,15 +690,6 @@ public class HomePageActivity extends AppBaseActivity {
 
         }
     }
-
-    /**
-     * 获取连接的设备列表
-     */
-    public void checkConnectedDevices() {
-        if (mService != null)
-            mService.checkDevices();
-    }
-
     /**
      * 筛选菜单点击事件
      *
@@ -605,32 +730,8 @@ public class HomePageActivity extends AppBaseActivity {
         }
     }
 
-    OnClickCategoryListener mOnClickCategoryListener = new OnClickCategoryListener() {
-        @Override
-        public void click(RadioGroup group, int checkedId) {
-            CategeoryViewEvent(group, checkedId);
-        }
 
-        @Override
-        public void onKeyPress(KeyEvent event, CategoryView view) {
-            if ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    try {
-                        RadioGroup parent = (RadioGroup) view.getChildAt(SORT_ORDER).findViewById(R.id.container);
-                        for (int i = 0; i < parent.getChildCount(); i++) {
-                            RadioButton focus_button = (RadioButton) parent.getChildAt(i);
-                            if (focus_button.isFocused()) {
-                                CategeoryViewEvent(parent, focus_button.getId());
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
 
-                }
-            }
-        }
-    };
 
     /**
      * 初始化Fragment
@@ -663,7 +764,7 @@ public class HomePageActivity extends AppBaseActivity {
     /**
      * 设置筛选条件
      */
-    public void getSortCondition() {
+    private void getSortCondition() {
         //所属设备条件
         RelativeLayout device_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_DEVICE);
         RadioGroup device_group = (RadioGroup) device_ll
@@ -769,7 +870,7 @@ public class HomePageActivity extends AppBaseActivity {
     /**
      * 获取缓存分类条件和获取分类信息列表
      */
-    public void setFilterData() {
+    private void setFilterData() {
         if (mPreferences != null) {
             isSortByAsc = mPreferences.isSortByAsc();
             mSortType = mPreferences.getSortType();
@@ -874,21 +975,7 @@ public class HomePageActivity extends AppBaseActivity {
     }
 
 
-    /**
-     * 退出
-     */
-    @Override
-    public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(Gravity.START)) {
-            mDrawerLayout.closeDrawer(Gravity.START);
-        } else if (getCurrentFragment() != HOME_PAGE_FRAGMENT) {
-            setCurrentFragment(HOME_PAGE_FRAGMENT);
-        } else if (mScanService != null && mScanService.isRunning()) {
-            mApplication.moveToBack(HomePageActivity.this);
-        } else {
-            exitBy2Click();
-        }
-    }
+
 
 
     /**
@@ -896,7 +983,7 @@ public class HomePageActivity extends AppBaseActivity {
      *
      * @return
      */
-    public int getCurrentSelectDevicePosition() {
+    private int getCurrentSelectDevicePosition() {
         int pos = -1;
         if (mFilterDeviceId == -1 || mFilterDeviceName == null) {
             mCurrDevice = null;
@@ -911,7 +998,7 @@ public class HomePageActivity extends AppBaseActivity {
         return pos;
     }
 
-    public int getCurrentSelectDirectoryPosition() {
+    private int getCurrentSelectDirectoryPosition() {
         int pos = -1;
         if (mFilterDirId == -1)
             return pos;
@@ -922,6 +1009,70 @@ public class HomePageActivity extends AppBaseActivity {
             }
         }
         return pos;
+    }
+
+
+
+    /**
+     * 切换Fragment
+     *
+     * @param pos
+     */
+    private void setCurrentFragment(int pos) {
+        mVViewPager.setCurrentItem(pos, true);
+        mTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[pos].toString());
+    }
+
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                //第一次请求权限的时候返回false,第二次shouldShowRequestPermissionRationale返回true
+                //如果用户选择了“不再提醒”永远返回false。
+                if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    //请求权限
+                    LogUtil.v(TAG, "showRequest true");
+                } else {
+                    LogUtil.v(TAG, "showRequest false");
+                }
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+            } else {
+                initView();
+                if (mDeviceList == null)
+                    mDeviceList = new ArrayList<>();
+                if (mDirectoryList == null)
+                    mDirectoryList = new ArrayList<>();
+                setFilterData();
+                initDevicePopUpWindow();
+            }
+        }
+    }
+
+
+
+
+
+
+    private void exitBy2Click() {
+        Timer tExit = null;
+
+        if (isExit == false) {
+
+            isExit = true; // 准备退出
+            Toast.makeText(HomePageActivity.this, "再按一次返回键退出程序",
+                    Toast.LENGTH_SHORT).show();
+            tExit = new Timer();
+            tExit.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    isExit = false; // 取消退出
+                }
+            }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
+
+        } else {
+            finish();
+            // System.exit(0);直接 System.exit 导致destory函数未被调用
+        }
     }
 
     private List<Directory> getDirectoriesByDeviceId(long dev_id) {
@@ -984,211 +1135,46 @@ public class HomePageActivity extends AppBaseActivity {
 
     }
 
-    /**
-     * 切换Fragment
-     *
-     * @param pos
-     */
-    public void setCurrentFragment(int pos) {
-        mVViewPager.setCurrentItem(pos, true);
-        mTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[pos].toString());
-    }
-
-    public boolean isOpenMenu() {
-        return mDrawerLayout.isDrawerOpen(Gravity.START);
-    }
-
-    public void setGaussianBlurBackground(String url) {
-        try {
-            if (url != null) {
-                Glide.with(mContext).load(url).apply(new RequestOptions().bitmapTransform(new BlurTransformation(0, 40))).into(mBackgroundImage);
-            } else {
-                Glide.with(mContext).load(R.mipmap.library_background).apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(mBackgroundImage);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    OnClickCategoryListener mOnClickCategoryListener = new OnClickCategoryListener() {
+        @Override
+        public void click(RadioGroup group, int checkedId) {
+            CategeoryViewEvent(group, checkedId);
         }
-    }
 
-    public void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-                //第一次请求权限的时候返回false,第二次shouldShowRequestPermissionRationale返回true
-                //如果用户选择了“不再提醒”永远返回false。
-                if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    //请求权限
-                    LogUtil.v(TAG, "showRequest true");
-                } else {
-                    LogUtil.v(TAG, "showRequest false");
-                }
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
-            } else {
-                initView();
-                if (mDeviceList == null)
-                    mDeviceList = new ArrayList<>();
-                if (mDirectoryList == null)
-                    mDirectoryList = new ArrayList<>();
-                setFilterData();
-                initDevicePopUpWindow();
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LogUtil.v(TAG, "onRequestPermissionsResult()");
-        if (requestCode == 1) {
-            if (permissions.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                recreate();
-            } else {//没有获得到权限
-                finish();
-                LogUtil.v(TAG, "granted failed");
-            }
-        }
-    }
-
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-
-                View view = getCurrentFocus();
-                LogUtil.v(TAG, "dispatchKeyEvent");
-                if (view instanceof ListView) {
-                    mDrawerLayout.closeDrawer(Gravity.START);
-                    mVViewPager.requestFocus();
-                    if (getCurrentFragment() == HOME_PAGE_FRAGMENT) {
-//                        mHomePageFragment.movieRequestFocus();
+        @Override
+        public void onKeyPress(KeyEvent event, CategoryView view) {
+            if ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER)) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    try {
+                        RadioGroup parent = (RadioGroup) view.getChildAt(SORT_ORDER).findViewById(R.id.container);
+                        for (int i = 0; i < parent.getChildCount(); i++) {
+                            RadioButton focus_button = (RadioButton) parent.getChildAt(i);
+                            if (focus_button.isFocused()) {
+                                CategeoryViewEvent(parent, focus_button.getId());
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    return true;
+
                 }
             }
         }
-        LogUtil.v(TAG, getCurrentFocus() != null ? getCurrentFocus().toString() : "null");
-        return super.dispatchKeyEvent(event);
-    }
+    };
 
-
-    public MovieScanService getMovieSearchService() {
-        return mScanService;
-    }
-
-    public Device getCurrDevice() {
-        return mCurrDevice;
-    }
-
-    public List<Device> getDeviceList() {
-        return mDeviceList;
-    }
-
-    public List<Directory> getDirectoryList() {
-        return mDirectoryList;
-    }
-
-    public int getCurrentFragment() {
-        return mVViewPager.getCurrentItem();
-    }
-
-
-    private static Boolean isExit = false;
-
-    private void exitBy2Click() {
-        Timer tExit = null;
-
-        if (isExit == false) {
-
-            isExit = true; // 准备退出
-            Toast.makeText(HomePageActivity.this, "再按一次返回键退出程序",
-                    Toast.LENGTH_SHORT).show();
-            tExit = new Timer();
-            tExit.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    isExit = false; // 取消退出
-                }
-            }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
-
-        } else {
-            finish();
-            // System.exit(0);直接 System.exit 导致destory函数未被调用
-        }
-    }
-
-
-    public String getFilterDeviceName() {
-        return mFilterDeviceName;
-    }
-
-    public long getFilterDeviceId() {
-        return mFilterDeviceId;
-    }
-
-    public long getFilterDirId() {
-        return mFilterDirId;
-    }
-
-    public String getFilterYear() {
-        return mFilterYear;
-    }
-
-    public String getFilterGenres() {
-        return mFilterGenres;
-    }
-
-    public String getSortType() {
-        return mSortType;
-    }
-
-    public int getPosSortType() {
-        return mSortTypeData.indexOf(mSortType);
-    }
-
-    public String getOrderBySqlStr() {
-        int pos_order = mSortTypeData.indexOf(mSortType);
-        StringBuffer orderByBuffer = new StringBuffer();
-        String asc = isSortByAsc ? "asc" : "desc";
-        switch (pos_order) {
-            case 0:
-                orderByBuffer.append("title_pinyin " + asc + ",title " + asc + ",otitle " + asc);
-                break;
-            case 1:
-                orderByBuffer.append("rating " + asc);
-                break;
-            case 2:
-                orderByBuffer.append("genres " + asc);
-                break;
-            case 3:
-                orderByBuffer.append("year " + asc);
-                break;
-        }
-        return orderByBuffer.toString();
-    }
-
-    public boolean isSortByAsc() {
-        return isSortByAsc;
-    }
-
-    public boolean isShowEncrypted(){
-        return getApp().isShowEncrypted();
-    }
-    public void startLoading() {
-        LogUtil.v(TAG, "startLoading");
-        if (mLoadingCircleViewDialogFragment == null) {
-            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
-            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
+    ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mScanService = ((MovieScanService.ScanBinder) service).getService();
+            LogUtil.v(TAG, "on servcie" + name + " connected!!");
         }
 
-    }
-
-    public void stopLoading() {
-        LogUtil.v(TAG, "stopLoading");
-        if (mLoadingCircleViewDialogFragment != null) {
-            mLoadingCircleViewDialogFragment.dismiss();
-            mLoadingCircleViewDialogFragment = null;
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            LogUtil.v(TAG, "on scan servcie disconnected!!");
+            mScanService = null;
         }
-    }
+    };
+
 
 }

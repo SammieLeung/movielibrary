@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.hphtv.movielibrary"
-    android:versionCode="10"
-    android:versionName="2.3.9"
-
     >
 
     <uses-feature
@@ -55,6 +52,7 @@
 
         <service android:name=".service.MovieScanService"></service>
         <service android:name=".service.DeviceMonitorService"></service>
+        <service android:name=".service.DlnaControlService"></service>
         <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>

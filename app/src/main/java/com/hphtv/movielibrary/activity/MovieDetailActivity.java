@@ -67,11 +67,11 @@ import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.LogUtil;
-import com.hphtv.movielibrary.util.MovieLibraryError;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
 import com.hphtv.movielibrary.util.StrUtils;
 import com.hphtv.movielibrary.util.UriParseUtil;
+import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
 import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
@@ -725,7 +725,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                         @Override
                         public void run() {
                             stopLoading();
-                            Toast.makeText(MovieDetailActivity.this, "获取电影信息失败！" + MovieLibraryError.SERVICE_UNAVAILABLE, Toast.LENGTH_LONG).show();
+                            Toast.makeText(MovieDetailActivity.this, "获取电影信息失败！", Toast.LENGTH_LONG).show();
                         }
                     });
                     return;
@@ -1103,91 +1103,42 @@ public class MovieDetailActivity extends AppBaseActivity {
      * @param file 路径
      */
     public void playingVideo(final VideoFile file) {
-        Uri uri = null;
-        String path = file.getUri();
-        Intent intent = new Intent();
-
-        if (path != null && path.startsWith("/")) {
-            uri = UriParseUtil.parseVideoUri(MovieDetailActivity.this, path);
-        }
-
-        if (uri == null) {
-            if (path.startsWith("/")) {
-                File tFile = new File(path);
-                uri = FileProvider.getUriForFile(MovieDetailActivity.this, ConstData.AUTHORITIES, tFile);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            } else if (path != null) {
-                uri = Uri.parse(path);
-            }
-            if (uri == null) {
-                Toast.makeText(MovieDetailActivity.this, "can't find the file", Toast.LENGTH_SHORT).show();
-                stopLoading();
-                return;
-            }
-        }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String poster = mCurrentWrapper.getPoster();
-                if (poster != null) {
-                    mPosterDao.deleteAll();
-                    PosterProviderBean posterProviderBean = new PosterProviderBean();
-                    posterProviderBean.setPoster(poster);
-                    ContentValues values = mPosterDao.parseContentValues(posterProviderBean);
-                    mPosterDao.insert(values);
-                }
-                Cursor historyCursor = mHistoryDao.select("wrapper_id=?", new String[]{String.valueOf(mCurrentWrapper.getId())}, null);
-                if (historyCursor.getCount() > 0) {
-                    long currentTime = System.currentTimeMillis();
-                    History history = mHistoryDao.parseList(historyCursor).get(0);
-                    history.setLast_play_time(String.valueOf(currentTime));
-                    ContentValues contentValues = mHistoryDao.parseContentValues(history);
-                    mHistoryDao.update(contentValues, "id=?", new String[]{String.valueOf(history.getId())});
-                } else {
-                    long currentTime = System.currentTimeMillis();
-                    History history = new History();
-                    history.setWrapper_id(mCurrentWrapper.getId());
-                    history.setTime("0");
-                    history.setLast_play_time(String.valueOf(currentTime));
-                    ContentValues contentValues = mHistoryDao.parseContentValues(history);
-                    mHistoryDao.insert(contentValues);
-                }
-
-            }
-        }).start();
-
-
-        ArrayList<HashMap<String, Object>> video_list = new ArrayList<>();
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("uri", uri);
-        map.put("name", file.getFilename());
-        map.put("play_url", file.getUri());
-        video_list.add(map);
-        if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)) {
-            intent.setAction(Intent.ACTION_VIEW);
-        } else {
-            intent.setAction("firefly.intent.action.PLAY_VIDEO");
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("playlist", video_list);
-            intent.putExtras(bundle);
-        }
-        intent.setDataAndType(uri, "video/*");
-
-
-        Log.v(TAG, "uri==" + uri.toString());
-
         try {
-            if (intent.resolveActivity(getPackageManager()) != null) {
-                Log.v(TAG, "----");
-                startActivity(intent);
-            } else {
-                startActivity(intent);
-                Log.v(TAG, "2----");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String poster = mCurrentWrapper.getPoster();
+                    if (poster != null) {
+                        mPosterDao.deleteAll();
+                        PosterProviderBean posterProviderBean = new PosterProviderBean();
+                        posterProviderBean.setPoster(poster);
+                        ContentValues values = mPosterDao.parseContentValues(posterProviderBean);
+                        mPosterDao.insert(values);
+                    }
+                    Cursor historyCursor = mHistoryDao.select("wrapper_id=?", new String[]{String.valueOf(mCurrentWrapper.getId())}, null);
+                    if (historyCursor.getCount() > 0) {
+                        long currentTime = System.currentTimeMillis();
+                        History history = mHistoryDao.parseList(historyCursor).get(0);
+                        history.setLast_play_time(String.valueOf(currentTime));
+                        ContentValues contentValues = mHistoryDao.parseContentValues(history);
+                        mHistoryDao.update(contentValues, "id=?", new String[]{String.valueOf(history.getId())});
+                    } else {
+                        long currentTime = System.currentTimeMillis();
+                        History history = new History();
+                        history.setWrapper_id(mCurrentWrapper.getId());
+                        history.setTime("0");
+                        history.setLast_play_time(String.valueOf(currentTime));
+                        ContentValues contentValues = mHistoryDao.parseContentValues(history);
+                        mHistoryDao.insert(contentValues);
+                    }
+
+                }
+            }).start();
+            VideoPlayTools.play(MovieDetailActivity.this,file);
+
+        }catch (Exception e){
+
+        }finally {
             stopLoading();
         }
     }

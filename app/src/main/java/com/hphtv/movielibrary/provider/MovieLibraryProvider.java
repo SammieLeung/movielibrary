@@ -28,6 +28,7 @@ import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.util.UriParseUtil;
+import com.hphtv.movielibrary.util.VideoPlayTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class MovieLibraryProvider extends ContentProvider {
             return cursor;
         } else if (code == FILE_LIST) {
             long id = ContentUris.parseId(uri);
-            Cursor cursor=mVideoFileDao.select("wrapper_id=?",new String[]{String.valueOf(id)},null);
+            Cursor cursor = mVideoFileDao.select("wrapper_id=?", new String[]{String.valueOf(id)}, null);
             return cursor;
         } else if (code == MOVIE_INFO) {
             long id = ContentUris.parseId(uri);
@@ -91,20 +92,6 @@ public class MovieLibraryProvider extends ContentProvider {
             long id = ContentUris.parseId(uri);
             Cursor cursor = mVideoFileDao.select("id=?", new String[]{String.valueOf(id)}, null);
             final VideoFile file = (new VideoFileDao(getContext())).parseList(cursor).get(0);
-            Uri fileuri = null;
-            String path = file.getUri();
-            if (path != null && path.startsWith("/")) {
-                fileuri = UriParseUtil.parseVideoUri(getContext(), path);
-            }
-
-            if (fileuri == null) {
-                fileuri = Uri.parse(path);
-                if (fileuri == null) {
-                    Toast.makeText(getContext(), "can't find the file", Toast.LENGTH_SHORT).show();
-                    return null;
-                }
-
-            }
             long wrapper_id = file.getWrapper_id();
             if (wrapper_id > 0) {
                 MovieWrapperDao dao = new MovieWrapperDao(getContext());
@@ -167,30 +154,7 @@ public class MovieLibraryProvider extends ContentProvider {
                     historyDao.insert(contentValues);
                 }
             }
-            Intent intent = new Intent("firefly.intent.action.PLAY_VIDEO");
-
-            if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)) {
-                intent.setAction(Intent.ACTION_VIEW);
-            } else {
-                ArrayList<HashMap<String, Object>> video_list = new ArrayList<>();
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("uri", fileuri);
-                map.put("name", file.getFilename());
-                map.put("play_url", file.getUri());
-                video_list.add(map);
-                intent.setAction("firefly.intent.action.PLAY_VIDEO");
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("playlist", video_list);
-                intent.putExtras(bundle);
-            }
-            intent.setDataAndType(fileuri, "video/*");
-            try {
-                if (intent.resolveActivity(getContext().getPackageManager()) != null) {
-                    getContext().startActivity(intent);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            VideoPlayTools.play(getContext(),file);
             return cursor;
         }
         return null;
