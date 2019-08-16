@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+apply from: "../config.gradle"
+
+android {
+    compileSdkVersion android.compileSdkVersion
+
+
+    defaultConfig {
+        minSdkVersion android.minSdkVersion
+        targetSdkVersion android.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'cling/core/src/main/java'
+        main.java.srcDirs += 'cling/support/src/main/java'
+        main.java.excludes += [
+                "org/fourthline/cling/support/contentdirectory/ui",
+                "org/fourthline/cling/support/shared/log",
+                "org/fourthline/cling/support/shared/AWTExceptionHandler.java",
+                "org/fourthline/cling/support/shared/C*",
+                "org/fourthline/cling/support/shared/M*",
+                "org/fourthline/cling/support/shared/N*",
+                "org/fourthline/cling/support/shared/P*",
+                "org/fourthline/cling/support/shared/S*",
+                "org/fourthline/cling/support/shared/T*",
+                "org/fourthline/cling/support/shared/V*",
+                "org/fourthline/cling/transport/impl/FixedSunURLStreamHandler.java"
+        ]
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: '../libs', include: ['*.jar'])
+    implementation support["appcompat-v7"]
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    // Version 1.1.2 will cause exception
+    api "org.seamless:seamless-util:1.1.1"
+    implementation "org.seamless:seamless-http:1.1.1"
+    api "org.seamless:seamless-xml:1.1.1"
+    implementation "org.eclipse.jetty:jetty-server:8.1.18.v20150929"
+    implementation "org.eclipse.jetty:jetty-servlet:8.1.18.v20150929"
+    implementation "org.eclipse.jetty:jetty-client:8.1.18.v20150929"
+
+    implementation 'javax.enterprise:cdi-api:2.0'
+    implementation 'com.sun.net.httpserver:http:20070405'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+}

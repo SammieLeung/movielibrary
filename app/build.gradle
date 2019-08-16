@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply from: "../config.gradle"
 android {
     signingConfigs {
         config {
@@ -9,14 +9,15 @@ android {
             storePassword '123456'
         }
     }
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdkVersion android.compileSdkVersion
+    buildToolsVersion android.buildToolsVersion
     defaultConfig {
-        applicationId "com.hphtv.movielibrary"
-        minSdkVersion 21
-        targetSdkVersion 27
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId android.applicationId
+        minSdkVersion android.minSdkVersion
+        targetSdkVersion android.targetSdkVersion
         signingConfig signingConfigs.config
+        versionCode = android.versionCode
+        versionName = android.versionName
     }
     packagingOptions {
         exclude 'META-INF/LICENSE'
@@ -38,6 +39,10 @@ android {
     }
     productFlavors {
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
     packagingOptions {
         exclude 'META-INF/beans.xml'
     }
@@ -45,9 +50,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:design:27.1.1'
-    implementation 'com.android.support:support-v13:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation support["design"]
+    implementation support["support-v13"]
+    implementation support["recyclerview-v7"]
     implementation files('libs/umeng/umeng-analytics-v6.1.2.jar')
     implementation files('libs/umeng/utdid4all-1.0.4.jar')
     implementation 'jp.wasabeef:glide-transformations:3.3.0'
@@ -56,4 +61,5 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
     implementation project(':service')
+    implementation project(path: ':dlna')
 }

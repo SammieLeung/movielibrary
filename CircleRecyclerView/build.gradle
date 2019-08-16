@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-
+apply from : "../config.gradle"
 android {
     signingConfigs {
         config {
@@ -9,12 +9,11 @@ android {
             storePassword '123456'
         }
     }
-    compileSdkVersion 27
-    buildToolsVersion '28.0.3'
+    compileSdkVersion android.compileSdkVersion
+    buildToolsVersion android.buildToolsVersion
     defaultConfig {
-        minSdkVersion 13
-        targetSdkVersion 27
-
+        minSdkVersion android.minSdkVersion
+        targetSdkVersion android.targetSdkVersion
         signingConfig signingConfigs.config
     }
     buildTypes {
@@ -34,6 +33,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation support["appcompat-v7"]
+    implementation support["recyclerview-v7"]
 }
