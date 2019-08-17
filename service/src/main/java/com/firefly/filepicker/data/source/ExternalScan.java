@@ -63,8 +63,8 @@ public class ExternalScan extends AbstractScanFiles {
                         }
 
                         if (mFilterType != -1) {
-                            String mimeType = getMimeType(file);
 
+                            String mimeType = getMimeType(file);
                             if (mimeType == null) {
                                 return false;
                             }
@@ -254,8 +254,9 @@ public class ExternalScan extends AbstractScanFiles {
     private static String getMimeType(File file) {
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(file).toString());
+
         if (extension != null) {
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
         }
         return type;
     }
