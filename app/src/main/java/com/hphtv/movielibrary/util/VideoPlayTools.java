@@ -28,22 +28,24 @@ import java.util.HashMap;
  */
 public class VideoPlayTools {
     public static final String TAG = VideoPlayTools.class.getSimpleName();
-    public static void play(Context context, Uri uri){
+
+    public static void play(Context context, Uri uri) {
         Intent intent = new Intent();
         if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)) {
             intent.setAction(Intent.ACTION_VIEW);
         } else {
-            intent.setAction("firefly.intent.action.PLAY_VIDEO");
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                intent.setAction("firefly.intent.action.PLAY_VIDEO");
+            } else {
+                intent.setAction(Intent.ACTION_VIEW);
+            }
             Bundle bundle = new Bundle();
             intent.putExtras(bundle);
         }
         intent.setDataAndType(uri, "video/*");
         Log.v(TAG, "fileUri==" + uri.toString());
         try {
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
-                Log.v(TAG, "----");
-                context.startActivity(intent);
-            }
+            context.startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -52,7 +54,7 @@ public class VideoPlayTools {
     public static void play(Context context, VideoFile file) {
         Uri fileUri = null;
         String path = file.getUri();
-        String name=file.getFilename();
+        String name = file.getFilename();
         Intent intent = new Intent();
 
         if (path != null && path.startsWith("/")) {
