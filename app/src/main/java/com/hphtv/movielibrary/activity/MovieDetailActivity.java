@@ -680,7 +680,10 @@ public class MovieDetailActivity extends AppBaseActivity {
                     mCurrentWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle()));
                     if (movie.getImages() != null)
                         mCurrentWrapper.setPoster(movie.getImages().getLarge());
-                    mCurrentWrapper.setAverage(String.valueOf(movie.getRating().average));
+                    if (movie.getRating() != null)
+                        mCurrentWrapper.setAverage(String.valueOf(movie.getRating().average));
+                    else
+                        mCurrentWrapper.setAverage(getString(R.string.rate_not));
 
                     mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(mCurrentWrapper), "id=?", new String[]{String.valueOf(mCurrentWrapper.getId())});
                     mCurrentMovie = movie;
@@ -1134,11 +1137,11 @@ public class MovieDetailActivity extends AppBaseActivity {
 
                 }
             }).start();
-            VideoPlayTools.play(MovieDetailActivity.this,file);
+            VideoPlayTools.play(MovieDetailActivity.this, file);
 
-        }catch (Exception e){
+        } catch (Exception e) {
 
-        }finally {
+        } finally {
             stopLoading();
         }
     }

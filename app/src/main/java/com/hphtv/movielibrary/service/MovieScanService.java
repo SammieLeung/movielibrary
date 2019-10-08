@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.hphtv.movielibrary.MovieApplication;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
@@ -490,7 +491,11 @@ public class MovieScanService extends Service {
                             movieWrapper.setTitle(parseFile.getMni().getName());
                             movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(parseFile.getMni().getName()));
                         }
-                        movieWrapper.setAverage(String.valueOf(movie.getRating().average));
+                        if (movie.getRating() != null)
+                            movieWrapper.setAverage(String.valueOf(movie.getRating().average));
+                        else
+                            movieWrapper.setAverage(getString(R.string.rate_not));
+
                         if (movie.getImages() != null)
                             movieWrapper.setPoster(movie.getImages().getLarge());
                     } else {
@@ -637,7 +642,10 @@ public class MovieScanService extends Service {
                     movieWrapper.setTitle(parseFile.getMni().getName());
                     movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getOriginalTitle()));
                 }
-                movieWrapper.setAverage(String.valueOf(movie.getRating().average));
+                if (movie.getRating() != null)
+                    movieWrapper.setAverage(String.valueOf(movie.getRating().average));
+                else
+                    movieWrapper.setAverage(getString(R.string.rate_not));
                 movieWrapper.setScraperInfos(new ScraperInfo[]{scraperInfo});
                 long rowId = mMovieWrapperDao.insert(mMovieWrapperDao.parseContentValues(movieWrapper));
                 if (rowId > 0) {
@@ -689,7 +697,7 @@ public class MovieScanService extends Service {
                     MovieWrapper wrapper = mMovieWrapperDao.parseList(wrapperCursor).get(0);
                     wrapper.setDirIds(new Long[]{dir_id});
                     wrapper.setDevIds(new Long[]{device_id});
-                    mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(wrapper),"id=?",new String[]{String.valueOf(wrapper.getId())});
+                    mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(wrapper), "id=?", new String[]{String.valueOf(wrapper.getId())});
                 }
             }
 
