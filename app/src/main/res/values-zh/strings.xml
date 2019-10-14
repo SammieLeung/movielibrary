@@ -174,4 +174,5 @@
     <string name="tx_choose_video">选择文件</string>
     <string name="tx_choose_confirm">确定</string>
     <string name="spinner_label">搜刮器源</string>
+    <string name="setting_confirm_hide_encrypted_video">需要隐藏加密视频吗?</string>
 </resources>

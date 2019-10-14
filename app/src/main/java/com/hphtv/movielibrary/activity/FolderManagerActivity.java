@@ -585,6 +585,9 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         setWidgetEnableWhenScanning(true);
         isConfirm = false;
         mTextViewScanResult.setText(getResources().getString(R.string.tx_scan_completed));
+        if(mApp.isShowEncrypted()){
+            showHideEncryptedFolderDialog();
+        }
     }
 
     private void notifyMovieInfoDataChange(long dirId, int total, int match, int status) {
@@ -625,6 +628,15 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         }).setMessage(getResources().getString(R.string.setting_confirm_clear)).show(getFragmentManager(), TAG);
     }
 
+    private void showHideEncryptedFolderDialog() {
+        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(FolderManagerActivity.this);
+        dialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+            @Override
+            public void OnPositivePress(Button button) {
+                mCheckBoxPrivate.setChecked(false);
+            }
+        }).setMessage(getResources().getString(R.string.setting_confirm_hide_encrypted_video)).show(getFragmentManager(), TAG);
+    }
     private void showDialog() {
         ConfirmDialogFragment dialog = new ConfirmDialogFragment(FolderManagerActivity.this);
         dialog.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {

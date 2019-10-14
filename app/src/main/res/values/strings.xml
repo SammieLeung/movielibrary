@@ -183,4 +183,5 @@
     <string name="api_imdb" translatable="false">Imdb</string>
     <string name="api_mtime" translatable="false">Mtime</string>
     <string name="spinner_label">Scraper Source</string>
+    <string name="setting_confirm_hide_encrypted_video">Do you need to hide encrypted video?</string>
 </resources>
