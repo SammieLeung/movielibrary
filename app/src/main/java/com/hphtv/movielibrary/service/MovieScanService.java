@@ -801,14 +801,14 @@ public class MovieScanService extends Service {
                 case ConstData.Scraper.MTIME:
                     if (mode == MODE_GETINFO) {
                         if (!TextUtils.isEmpty(exist_movie_id))
-                            movie = MtimeApi.parserMovieInfoById(exist_movie_id);
+                            movie = MtimeApi.parserMovieInfoFromHtmlById(exist_movie_id);
                         else
                             return null;
                     } else {
                         if (TextUtils.isEmpty(id)) {
                             return null;
                         }
-                        movie = MtimeApi.parserMovieInfoById(id);
+                        movie = MtimeApi.parserMovieInfoFromHtmlById(id);
                     }
 
                     break;

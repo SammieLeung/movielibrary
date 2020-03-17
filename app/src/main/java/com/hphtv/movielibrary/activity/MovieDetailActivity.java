@@ -637,6 +637,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                     if (mScanService != null)
                         movie = mScanService.getMovie(newMovieId, newAlt, false, MovieScanService.MODE_SEARCH_SERVICE, ConstData.Scraper.MTIME);
                     if (movie == null) {
+                        stopLoading();
                         showTipsDialog(getResources().getString(R.string.network_error));
                         return;
                     }

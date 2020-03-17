@@ -39,8 +39,8 @@ public class MtimeApi {
                 int idx=0;
                 for(int i=0;i<movieAry.size();i++){
                     JSONObject movieObj=movieAry.getJSONObject(i);
-                    String name=movieObj.getString("name");
-                    String nameEn=movieObj.getString("nameEn");
+                    String name=movieObj.getString("titlecn");
+                    String nameEn=movieObj.getString("titleen");
                     if(name.contains(keyword)||nameEn.contains(keyword)){
                         idx=i;
                         if(name.equalsIgnoreCase(keyword)||nameEn.equalsIgnoreCase(keyword)){
@@ -51,10 +51,10 @@ public class MtimeApi {
                 JSONObject movieObj = movieAry.getJSONObject(idx);
                 Rating rating = new Rating();
                 rating.max = 10;
-                rating.average = Float.valueOf(movieObj.getString("rating").equals("") ? "-1" : movieObj.getString("rating"));
-                String title = movieObj.getString("name");
+                rating.average =0;
+                String title = movieObj.getString("titlecn");
                 String year = movieObj.getString("year");
-                String cover = movieObj.getString("img");
+                String cover = movieObj.getString("cover");
                 String id = String.valueOf(movieObj.getInteger("id"));
                 SimpleMovie simpleMovie = new SimpleMovie();
                 simpleMovie.setId(id);
@@ -73,10 +73,10 @@ public class MtimeApi {
 
     private static JSONArray SearchMovies(String keyword) {
         try {
-            Response response = OkHttpUtil.getResponse(String.format(MtimeURL.SEARCH_URL, keyword));
+            Response response = OkHttpUtil.getResponse(String.format(MtimeURL.SEARCH_NEW_URL, keyword));
             String content = response.body().string();
             JSONObject contentObj = JSON.parseObject(content);
-            JSONArray movieAry = contentObj.getJSONArray("movies");
+            JSONArray movieAry = contentObj.getJSONArray("suggestions");
 
             return movieAry;
         } catch (Exception e) {
@@ -98,9 +98,9 @@ public class MtimeApi {
                 JSONObject movieObj = movie_array.getJSONObject(i);
                 Rating rating = new Rating();
                 rating.max = 10;
-                rating.average = Float.valueOf(movieObj.getString("rating").equals("") ? "-1" : movieObj.getString("rating"));
-                String title = movieObj.getString("name");
-                String cover = movieObj.getString("img");
+                rating.average = 0;
+                String title = movieObj.getString("titlecn");
+                String cover = movieObj.getString("cover");
                 String id = String.valueOf(movieObj.getInteger("id"));
                 String des1 = "";
 
@@ -108,16 +108,11 @@ public class MtimeApi {
                 if (subtypeStr != null && subtypeStr.length() > 0) {
                     des1 += subtypeStr + " | ";
                 }
-                des1 += movieObj.getString("nameEn");
+                des1 += movieObj.getString("titleen");
                 String des2 = "";
-                JSONArray casts = movieObj.getJSONArray("actors");
-                if (casts != null && casts.size() > 0) {
-                    for (int j = 0; j < casts.size(); j++) {
-                        des2 += casts.getString(j) + " | ";
-                    }
-                }
-                if (des2.length() > 4)
-                    des2 = des2.substring(0, des2.length() - 4);
+                String director = movieObj.getString("director");
+                des2+=director;
+
                 String[] abstracts = {des1, des2};
                 SimpleMovie simpleMovie = new SimpleMovie();
                 simpleMovie.setId(id);
@@ -132,117 +127,23 @@ public class MtimeApi {
         return movie_array;
     }
 
-    public static Movie parserMovieInfoById(String id) {
-        String content;
-        try {
-            Response response = OkHttpUtil.getResponseFromServer(String.format(MtimeURL.MOVIE_PAGE, id));
-            if (!response.isSuccessful()) {
-                Log.w(TAG, "httpget failed!");
-                return null;
-            }
-            content = response.body().string();
-            Movie movie = parseMovie(content, id);
+    public static Movie parserMovieInfoFromHtmlById(String id) {
+            Movie movie = parseMovie(id);
             movie.setAlt(String.format(MtimeURL.MOVIE_PAGE, id));
             movie.setMovieId(id);
             return movie;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
-    private static Movie parseMovie(String content, String id) {
+    private static Movie parseMovie(String id) {
         Movie movie = new Movie();
-
-        // 电影解析部分代码
-        Document doc = Jsoup.parse(content);
-
-        //解析 时长、类型、上映时间
-        Elements othersGroup = doc.select("div[pan=M14_Movie_Overview_MovieTypeAndRuntimeAndVersion]");
-        if (isNotEmpty(othersGroup)) {
-            Element otherEle = othersGroup.first();
-            if (otherEle.text().contains("电视系列剧")) {
-                movie.setSubtype(ConstData.MovieSubType.TV);
-            } else {
-                movie.setSubtype(ConstData.MovieSubType.MOVIE);
-            }
-            //解析上映时间
-            Elements pubdateEles = otherEle.select("a[property=v:initialReleaseDate]");
-            if (isNotEmpty(pubdateEles)) {
-                String pubdate = pubdateEles.first().text();
-                movie.setPubDates(new String[]{pubdate});
-            }
-        }
-        //解析导演
-        Elements directorGroup = doc.select("div[pan=M14_Movie_Overview_BaseInfo]");
-        if (isNotEmpty(directorGroup)) {
-            Elements directorsGroup = directorGroup.get(0).select("a[rel=v:directedBy]");
-            if (isNotEmpty(directorsGroup)) {
-                int size = directorGroup.size();
-                Celebrity[] directors = new Celebrity[size];
-                for (int i = 0; i < size; i++) {
-                    Celebrity director = new Celebrity();
-                    director.setName(directorGroup.get(i).text());
-                    director.setAlt(directorGroup.get(i).attr("href"));
-                    directors[i] = director;
-                }
-                movie.setDirectors(directors);
-            }
-        }
-        //解析国家
-        Elements baseEles = doc.select("dd[pan=M14_Movie_Overview_BaseInfo]");
-        if (isNotEmpty(baseEles)) {
-
-            for (int i = 0; i < baseEles.size(); i++) {
-                Element label = baseEles.get(i).select("strong").get(0);
-                if (label.text().equals("国家地区")) {
-                    Elements elem = baseEles.get(i).select("a");
-                    if (isNotEmpty(elem)) {
-                        int size = elem.size();
-                        String[] country = new String[size];
-                        for (int j = 0; j < size; j++) {
-                            country[j] = elem.get(j).text();
-                        }
-                        movie.setCountries(country);
-                    }
-                }
-
-            }
-
-        }
         //解析标题/别名/海报/评分/年份/剧情/分类/时长
         parseSubMovieInfo(id, movie);
         //解析剧照
         parseMoviePhoto(id, movie);
-        //解析剧情
-        parseMovieSummery(id, movie);
-        //解析演员
-        parseCast(id, movie);
         movie.setApi(ConstData.Scraper.MTIME);
         return movie;
     }
 
-    private static void parseCast(String id, Movie movie) {
-        try {
-            Response response = OkHttpUtil.getResponseFromServer(String.format(MtimeURL.MOVIE_DETAIL, id));
-            if (!response.isSuccessful()) {
-                Log.w(TAG, "httpget failed!");
-            }
-            String content = response.body().string();
-            JSONObject jsonObject = JSON.parseObject(content);
-            JSONArray actorList = jsonObject.getJSONArray("actorList");
-            Celebrity[] celebrities = new Celebrity[actorList.size() > 10 ? 10 : actorList.size()];
-            for (int i = 0; i < actorList.size() && i < 10; i++) {
-                Celebrity celebrity = new Celebrity();
-                celebrity.setName(actorList.getJSONObject(i).getString("actor"));
-                celebrities[i] = celebrity;
-            }
-            movie.setCasts(celebrities);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     private static void parseSubMovieInfo(String id, Movie movie) {
         try {
@@ -251,55 +152,43 @@ public class MtimeApi {
                 Log.w(TAG, "httpget failed!");
             }
             String content = response.body().string();
-            JSONObject subInfoObj = JSON.parseObject(content);
+            JSONObject movieObj = JSON.parseObject(content);
 
-            movie.setImages(new Images(null, null, subInfoObj.getString("image")));
-            movie.setTitle(subInfoObj.getString("titleCn"));
-            movie.setOriginalTitle(subInfoObj.getString("titleEn"));
+            movie.setImages(new Images(null, null, movieObj.getString("image")));
+            movie.setTitle(movieObj.getString("titleCn"));
+            movie.setOriginalTitle(movieObj.getString("titleEn"));
             Rating rating = new Rating();
-            rating.average = Float.valueOf(subInfoObj.getString("rating") != null && subInfoObj.getString("rating").equals("") ? "-1" : subInfoObj.getString("rating"));
+            rating.average = Float.valueOf(movieObj.getString("rating") != null && movieObj.getString("rating").equals("") ? "-1" : movieObj.getString("rating"));
             movie.setRating(rating);
-            movie.setRatingsCount(Integer.valueOf(subInfoObj.getString("scoreCount") != null && subInfoObj.getString("scoreCount").equals("") ? "0" : subInfoObj.getString("scoreCount")));
-            movie.setYear(subInfoObj.getString("year"));
-            movie.setSummary(subInfoObj.getString("content"));
-            JSONArray typeArry = subInfoObj.getJSONArray("type");
+            movie.setRatingsCount(Integer.valueOf(movieObj.getString("scoreCount") != null && movieObj.getString("scoreCount").equals("") ? "0" : movieObj.getString("scoreCount")));
+            movie.setYear(movieObj.getString("year"));
+            movie.setSummary(movieObj.getString("content"));
+            JSONArray typeArry = movieObj.getJSONArray("type");
             String[] genres = new String[typeArry.size()];
             for (int i = 0; i < genres.length; i++) {
                 genres[i] = typeArry.getString(i);
             }
             movie.setGenres(genres);
-            movie.setDurations(new String[]{subInfoObj.getString("runTime")});
+            movie.setDurations(new String[]{movieObj.getString("runTime")});
             Celebrity[] celebrities = new Celebrity[1];
             Celebrity celebrity = new Celebrity();
-            celebrity.setName(subInfoObj.getJSONObject("director").getString("directorName"));
+            celebrity.setName(movieObj.getJSONObject("director").getString("directorName"));
             celebrities[0] = celebrity;
             movie.setDirectors(celebrities);
+
+            JSONArray actorList = movieObj.getJSONArray("actorList");
+            Celebrity[] actors = new Celebrity[actorList.size() > 10 ? 10 : actorList.size()];
+            for (int i = 0; i < actorList.size() && i < 10; i++) {
+                Celebrity actor = new Celebrity();
+                actor.setName(actorList.getJSONObject(i).getString("actor"));
+                celebrities[i] = actor;
+            }
+            movie.setCasts(actors);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
-    private static void parseMovieSummery(String id, Movie movie) {
-        String content;
-        try {
-            Response response = OkHttpUtil.getResponseFromServer(String.format(MtimeURL.MOVIE_PLOTS_PAGE, id));
-            if (!response.isSuccessful()) {
-                Log.w(TAG, "httpget failed!");
-            }
-            content = response.body().string();
-            JSONArray plotsArray = JSON.parseArray(content);
-            if (plotsArray != null && plotsArray.size() > 0) {
-                String text = plotsArray.getJSONObject(0).getString("content");
-                if (text != null) {
-                    movie.setSummary(text);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     private static void parseMoviePhoto(String id, Movie movie) {
         String content;
