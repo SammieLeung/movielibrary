@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'lxp_project'
             keyPassword '123456'
-            storeFile file('/home/tchip/lxp_file/apkkey/lxpkey.jks')
+            storeFile file('../key/lxpkey.jks')
             storePassword '123456'
         }
     }
