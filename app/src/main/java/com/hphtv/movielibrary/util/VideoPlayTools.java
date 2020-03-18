@@ -93,8 +93,10 @@ public class VideoPlayTools {
         intent.setDataAndType(fileUri, "video/*");
         Log.v(TAG, "fileUri==" + fileUri.toString());
         try {
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
+            if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)&&intent.resolveActivity(context.getPackageManager()) != null) {
                 Log.v(TAG, "----");
+                context.startActivity(intent);
+            }else{
                 context.startActivity(intent);
             }
         } catch (Exception e) {

@@ -181,7 +181,7 @@ public class MtimeApi {
             for (int i = 0; i < actorList.size() && i < 10; i++) {
                 Celebrity actor = new Celebrity();
                 actor.setName(actorList.getJSONObject(i).getString("actor"));
-                celebrities[i] = actor;
+                actors[i] = actor;
             }
             movie.setCasts(actors);
         } catch (Exception e) {
