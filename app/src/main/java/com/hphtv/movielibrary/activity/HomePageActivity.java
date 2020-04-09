@@ -147,7 +147,6 @@ public class HomePageActivity extends AppBaseActivity {
     private MovieScanService mScanService;
 
 
-
     private DirectoryDao mDirectoryDao;
     private MovieDao mMovieDao;
     private boolean isDevChange = false;
@@ -360,6 +359,10 @@ public class HomePageActivity extends AppBaseActivity {
             case 3:
                 orderByBuffer.append("year " + asc);
                 break;
+            default:
+                orderByBuffer.append("title_pinyin " + asc + ",title " + asc + ",otitle " + asc);
+
+                break;
         }
         return orderByBuffer.toString();
     }
@@ -368,9 +371,10 @@ public class HomePageActivity extends AppBaseActivity {
         return isSortByAsc;
     }
 
-    public boolean isShowEncrypted(){
+    public boolean isShowEncrypted() {
         return getApp().isShowEncrypted();
     }
+
     public void startLoading() {
         LogUtil.v(TAG, "startLoading");
         if (mLoadingCircleViewDialogFragment == null) {
@@ -387,6 +391,7 @@ public class HomePageActivity extends AppBaseActivity {
             mLoadingCircleViewDialogFragment = null;
         }
     }
+
     /**
      * 获取连接的设备列表
      */
@@ -394,6 +399,7 @@ public class HomePageActivity extends AppBaseActivity {
         if (mService != null)
             mService.checkDevices();
     }
+
     /**
      * 初始化组件
      */
@@ -493,7 +499,7 @@ public class HomePageActivity extends AppBaseActivity {
             public void onPageSelected(int position) {
 
                 mLeftMenu.setSelection(position);
-                if (position != HOME_PAGE_FRAGMENT&&position!=HISTORY_FRAGMENT&&position!=FAVORITE_FRAGMENT) {
+                if (position != HOME_PAGE_FRAGMENT && position != HISTORY_FRAGMENT && position != FAVORITE_FRAGMENT) {
                     mSortBox.setVisibility(View.GONE);
                 } else {
                     mSortBox.setVisibility(View.VISIBLE);
@@ -676,6 +682,7 @@ public class HomePageActivity extends AppBaseActivity {
 
     /**
      * 刷新目录分类
+     *
      * @param selectPosForDevice 目前选择的设备索引
      */
     private void refreshDirectoryPopUpWindow(int selectPosForDevice) {
@@ -690,6 +697,7 @@ public class HomePageActivity extends AppBaseActivity {
 
         }
     }
+
     /**
      * 筛选菜单点击事件
      *
@@ -729,8 +737,6 @@ public class HomePageActivity extends AppBaseActivity {
                 break;
         }
     }
-
-
 
 
     /**
@@ -975,9 +981,6 @@ public class HomePageActivity extends AppBaseActivity {
     }
 
 
-
-
-
     /**
      * 获取当前选择设备的index
      *
@@ -1010,7 +1013,6 @@ public class HomePageActivity extends AppBaseActivity {
         }
         return pos;
     }
-
 
 
     /**
@@ -1047,10 +1049,6 @@ public class HomePageActivity extends AppBaseActivity {
             }
         }
     }
-
-
-
-
 
 
     private void exitBy2Click() {

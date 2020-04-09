@@ -134,11 +134,16 @@ public class HomePageFragment extends Fragment {
                     String year = ac.getFilterYear();
                     String order_sql = ac.getOrderBySqlStr();
                     boolean isShowEncrypted = ac.isShowEncrypted();
-                    boolean isSkip=false;//为true代表目录全部隐藏.
+                    boolean isSkip = false;//为true代表目录全部隐藏.
                     StringBuffer buffer = new StringBuffer();
                     List<String> argList = new ArrayList<>();
 
-
+                    if (genres.isEmpty()) {
+                        genres = ac.ALL;
+                    }
+                    if (year.isEmpty()) {
+                        year = ac.ALL;
+                    }
                     if (genres.equals(ac.ALL) && year.equals(ac.ALL)) {
                         isShowUnMatched = true;
                     } else {
@@ -169,52 +174,52 @@ public class HomePageFragment extends Fragment {
                             //特点设备查询条件
                             if (dev_id != -1) {
                                 //不显示私密
-                                if(!isShowEncrypted){
+                                if (!isShowEncrypted) {
                                     //获取属于特定设备并且是公开的目录
-                                    Cursor dirCursor=mDirDao.select("is_encrypted=? and parent_id=?",new String[]{"0", String.valueOf(dev_id)},null);
-                                    if(dirCursor.getCount()>0){
-                                        List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    Cursor dirCursor = mDirDao.select("is_encrypted=? and parent_id=?", new String[]{"0", String.valueOf(dev_id)}, null);
+                                    if (dirCursor.getCount() > 0) {
+                                        List<Directory> directories = mDirDao.parseList(dirCursor);
                                         buffer.append("(");
-                                        for(Directory t_dir:directories){
-                                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                        for (Directory t_dir : directories) {
+                                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                                         }
-                                        buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
-                                    }else{
+                                        buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), ") and ");
+                                    } else {
                                         //一个非隐私目录都没有则不允许查询
-                                        isSkip=true;
+                                        isSkip = true;
                                     }
-                                }else{
-                                    Cursor dirCursor=mDirDao.select("parent_id=?",new String[]{String.valueOf(dev_id)},null);
-                                    if(dirCursor.getCount()>0){
-                                        List<Directory> directories=mDirDao.parseList(dirCursor);
+                                } else {
+                                    Cursor dirCursor = mDirDao.select("parent_id=?", new String[]{String.valueOf(dev_id)}, null);
+                                    if (dirCursor.getCount() > 0) {
+                                        List<Directory> directories = mDirDao.parseList(dirCursor);
                                         buffer.append("(");
-                                        for(Directory t_dir:directories){
-                                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                        for (Directory t_dir : directories) {
+                                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                                         }
-                                        buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                        buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), ") and ");
                                     }
                                 }
 
-                            }else{
+                            } else {
                                 //代表设备筛选条件为全部
-                                if(!isShowEncrypted){
+                                if (!isShowEncrypted) {
                                     //没有显示隐藏目录时
-                                    Cursor dirCursor=mDirDao.select("is_encrypted=?",new String[]{"0"},null);
-                                    if(dirCursor.getCount()>0){
-                                        List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    Cursor dirCursor = mDirDao.select("is_encrypted=?", new String[]{"0"}, null);
+                                    if (dirCursor.getCount() > 0) {
+                                        List<Directory> directories = mDirDao.parseList(dirCursor);
                                         buffer.append("(");
-                                        for(Directory t_dir:directories){
-                                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                        for (Directory t_dir : directories) {
+                                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                                         }
-                                        buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
-                                    }else{
+                                        buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), ") and ");
+                                    } else {
                                         //一个非隐私目录都没有则不允许查询
-                                        isSkip=true;
+                                        isSkip = true;
                                     }
                                 }
                             }
                         }
-                        if(!isSkip) {
+                        if (!isSkip) {
                             buffer.append("id=?");
                             for (Movie movie : movies) {
                                 Cursor wrapperCursor = mWrapperDao.select(buffer.toString(), new String[]{String.valueOf(movie.getWrapperId())}, null);
@@ -232,7 +237,7 @@ public class HomePageFragment extends Fragment {
                     }
                     //2=====>没有筛选条件才显示未匹配电影
                     if (isShowUnMatched) {
-                    buffer = new StringBuffer();
+                        buffer = new StringBuffer();
                         //特定目录查询条件
                         if (dir_id != -1) {
                             buffer.append("dir_ids like '%" + dir_id + "%' and ");
@@ -240,60 +245,60 @@ public class HomePageFragment extends Fragment {
                             //特点设备查询条件
                             if (dev_id != -1) {
                                 //不显示私密
-                                if(!isShowEncrypted){
+                                if (!isShowEncrypted) {
                                     //获取属于特定设备并且是公开的目录
-                                    Cursor dirCursor=mDirDao.select("is_encrypted=? and parent_id=?",new String[]{"0", String.valueOf(dev_id)},null);
-                                    if(dirCursor.getCount()>0){
-                                        List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    Cursor dirCursor = mDirDao.select("is_encrypted=? and parent_id=?", new String[]{"0", String.valueOf(dev_id)}, null);
+                                    if (dirCursor.getCount() > 0) {
+                                        List<Directory> directories = mDirDao.parseList(dirCursor);
                                         buffer.append("(");
-                                        for(Directory t_dir:directories){
-                                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                        for (Directory t_dir : directories) {
+                                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                                         }
-                                        buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
-                                    }else{
+                                        buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), ") and ");
+                                    } else {
                                         //一个非隐私目录都没有则不允许查询
-                                        isSkip=true;
+                                        isSkip = true;
                                     }
-                                }else{
-                                    Cursor dirCursor=mDirDao.select("parent_id=?",new String[]{String.valueOf(dev_id)},null);
-                                    if(dirCursor.getCount()>0){
-                                        List<Directory> directories=mDirDao.parseList(dirCursor);
+                                } else {
+                                    Cursor dirCursor = mDirDao.select("parent_id=?", new String[]{String.valueOf(dev_id)}, null);
+                                    if (dirCursor.getCount() > 0) {
+                                        List<Directory> directories = mDirDao.parseList(dirCursor);
                                         buffer.append("(");
-                                        for(Directory t_dir:directories){
-                                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                        for (Directory t_dir : directories) {
+                                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                                         }
-                                        buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
+                                        buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), ") and ");
                                     }
                                 }
 
-                            }else{
+                            } else {
                                 //代表设备筛选条件为全部
-                                if(!isShowEncrypted){
+                                if (!isShowEncrypted) {
                                     //没有显示隐藏目录时
-                                    Cursor dirCursor=mDirDao.select("is_encrypted=?",new String[]{"0"},null);
-                                    if(dirCursor.getCount()>0){
-                                        List<Directory> directories=mDirDao.parseList(dirCursor);
+                                    Cursor dirCursor = mDirDao.select("is_encrypted=?", new String[]{"0"}, null);
+                                    if (dirCursor.getCount() > 0) {
+                                        List<Directory> directories = mDirDao.parseList(dirCursor);
                                         buffer.append("(");
-                                        for(Directory t_dir:directories){
-                                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                                        for (Directory t_dir : directories) {
+                                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                                         }
-                                        buffer.replace(buffer.lastIndexOf(" or"),buffer.length(),") and ");
-                                    }else{
+                                        buffer.replace(buffer.lastIndexOf(" or"), buffer.length(), ") and ");
+                                    } else {
                                         //一个非隐私目录都没有则不允许查询
-                                        isSkip=true;
+                                        isSkip = true;
                                     }
                                 }
                             }
                         }
-                        if(!isSkip) {
+                        if (!isSkip) {
                             //修改buffer即可
 
-                                buffer.append("scraper_infos=?");
-                                String asc = ac.isSortByAsc() ? " asc" : " desc";
-                                Cursor wrapperCursor = mWrapperDao.select(null, buffer.toString(), new String[]{"null"}, null, null, "title_pinyin " + asc + ",title " + asc, null);
-                                if (wrapperCursor.getCount() > 0) {
-                                    mWrapperList.addAll(mWrapperDao.parseList(wrapperCursor));
-                                }
+                            buffer.append("scraper_infos=?");
+                            String asc = ac.isSortByAsc() ? " asc" : " desc";
+                            Cursor wrapperCursor = mWrapperDao.select(null, buffer.toString(), new String[]{"null"}, null, null, "title_pinyin " + asc + ",title " + asc, null);
+                            if (wrapperCursor.getCount() > 0) {
+                                mWrapperList.addAll(mWrapperDao.parseList(wrapperCursor));
+                            }
                         }
                     }
                     mLibraryAdapter.setData(mWrapperList);
