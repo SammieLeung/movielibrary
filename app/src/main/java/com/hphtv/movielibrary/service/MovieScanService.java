@@ -819,7 +819,8 @@ public class MovieScanService extends Service {
             }
             //获取一个新的文件路径数组
             long currentTime = System.currentTimeMillis();
-            movie.setApi(api);
+            if (api != ConstData.Scraper.UNKNOW)
+                movie.setApi(api);
             movie.setUptime(String.valueOf(currentTime));
             if (TextUtils.isEmpty(movie.getAddtime())) {
                 movie.setAddtime(String.valueOf(currentTime));
