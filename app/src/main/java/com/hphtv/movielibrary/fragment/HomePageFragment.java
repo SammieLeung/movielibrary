@@ -153,8 +153,16 @@ public class HomePageFragment extends Fragment {
                             buffer.append("genres like '%\"" + id + "\"%' and ");
                         }
                         if (!year.equals(ac.ALL)) {
-                            buffer.append("year=? and");
-                            argList.add(year);
+                            String[] sortYears=year.split(" - ");
+                            if(sortYears.length>1){
+                                buffer.append("year<=? and year >=? and");
+                                argList.add(sortYears[1]);
+                                argList.add(sortYears[0]);
+                            }else{
+                                buffer.append("year=? and");
+                                argList.add(year);
+                            }
+
                         }
                     }
 
