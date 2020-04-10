@@ -58,7 +58,7 @@ public class MovieLibraryAdapter extends
     // 将数据与界面进行绑定的操作
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
-        MovieWrapper wrapper=list.get(position);
+        MovieWrapper wrapper = list.get(position);
         String photo;
         if (wrapper != null) {
             //将数据保存在itemView的Tag中，以便点击时进行获取
@@ -67,9 +67,13 @@ public class MovieLibraryAdapter extends
             photo = wrapper.getPoster();
 
             Glide.with(context).load(photo).apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(viewHolder.mImage);
-
-            float average = Float.parseFloat(wrapper.getAverage());
-            if (average <=0) {
+            float average=0;
+            try {
+                average = Float.parseFloat(wrapper.getAverage());
+            } catch (NumberFormatException e) {
+                average=-1;
+            }
+            if (average <= 0) {
                 viewHolder.mRatingLayout.setVisibility(View.GONE);
             } else {
                 viewHolder.mRating.setText(String.valueOf(average));
@@ -133,8 +137,8 @@ public class MovieLibraryAdapter extends
         this.mOnItemClickListener = listener;
     }
 
-    public void setData(List<MovieWrapper> movieWrappers){
-        list=movieWrappers;
+    public void setData(List<MovieWrapper> movieWrappers) {
+        list = movieWrappers;
     }
 
     @Override
