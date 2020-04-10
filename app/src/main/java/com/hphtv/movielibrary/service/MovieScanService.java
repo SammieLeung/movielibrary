@@ -81,6 +81,8 @@ public class MovieScanService extends Service {
 
     ThreadPoolExecutor mMovieInfoSearchService;
     ThreadPoolExecutor mScannerWorkers;
+    Object mSync = new Object();
+    Object mMovSync=new Object();
 
     private List<Directory> mDirectories = new ArrayList<>();
 
@@ -247,10 +249,9 @@ public class MovieScanService extends Service {
         }
         List<ParseFile> parseFileList = new ArrayList<>();
         Log.v(TAG, "cursor.getCount " + cursor.getCount());
-        Log.v(TAG, "Thread.interrupted() " + Thread.interrupted());
         final int fileCount = cursor.getCount();
         if (cursor.getCount() > 0) {
-            while (cursor != null && cursor.moveToNext() && !Thread.interrupted()) {
+            while (cursor != null && cursor.moveToNext() && !Thread.currentThread().isInterrupted()) {
                 if (!isRunning) {
                     break;
                 }
@@ -344,16 +345,17 @@ public class MovieScanService extends Service {
      * @param fileCount
      */
     private void searchByName(ParseFile parseFile, int fileCount) {
-
-        String name = getSeasonAndEpisode(parseFile);
-
-        SimpleMovie simpleMovie = MtimeApi.SearchAMovieByApi(name);
+        SimpleMovie simpleMovie = null;
         Movie mtimeMovie = null;
+        Movie imdbMovie = null;
+        String name = getSeasonAndEpisode(parseFile);
+        if (name != null)
+            simpleMovie = MtimeApi.SearchAMovieByApi(name);
+
         if (simpleMovie != null) {
             mtimeMovie = searchMovieInfo(simpleMovie, parseFile, ConstData.Scraper.MTIME, fileCount);
         }
 
-        Movie imdbMovie = null;
 //         TODO 目前已经无法使用该API
 //
 //        simpleMovie = ImdbApi.SearchAMovieByName(name);
@@ -363,16 +365,20 @@ public class MovieScanService extends Service {
 
         MovieWrapper movieWrapper = null;
         if (mtimeMovie == null && imdbMovie == null) {
-            movieWrapper = wrapData(null, parseFile);
-            onFailed(movieWrapper, parseFile, fileCount);
+            synchronized (mSync) {
+                movieWrapper = wrapData(null, parseFile);
+                onFailed(movieWrapper, parseFile, fileCount);
+            }
         } else {
-            if (mtimeMovie != null) {
-                movieWrapper = wrapData(mtimeMovie, parseFile);
+            synchronized (mSync) {
+                if (mtimeMovie != null) {
+                    movieWrapper = wrapData(mtimeMovie, parseFile);
+                }
+                if (imdbMovie != null) {
+                    movieWrapper = wrapData(imdbMovie, parseFile);
+                }
+                onSuccess(movieWrapper, parseFile, fileCount);
             }
-            if (imdbMovie != null) {
-                movieWrapper = wrapData(imdbMovie, parseFile);
-            }
-            onSuccess(movieWrapper, parseFile, fileCount);
         }
 
     }
@@ -428,7 +434,6 @@ public class MovieScanService extends Service {
             int match_num = directory.getMatched_video();
             directory.setMatchedVideo(++match_num);
         }
-        Log.v(TAG, "Thread " + Thread.currentThread().getName() + " dir.videoNum=" + video_num);
 
         if (fileCount == directory.getVideo_number()) {
             directory.setScanState(ConstData.DirectoryState.SCANNED);
@@ -450,6 +455,7 @@ public class MovieScanService extends Service {
         long dir_id = videoFile.getDir_id();
 
         if (movie != null) {
+
             long wrapper_id = movie.getWrapperId() != -1 ? movie.getWrapperId() : (videoFile.getWrapper_id() != -1 ? videoFile.getWrapper_id() : -1);
             if (wrapper_id != -1) {
                 Cursor cursor = mMovieWrapperDao.select("id=?", new String[]{String.valueOf(wrapper_id)}, "0,1");
@@ -546,59 +552,6 @@ public class MovieScanService extends Service {
                         movieWrapper.setDirIds(dir_id_list.toArray(new Long[0]));
                     }
 
-//                    //获取设备id集合,更新
-//                    Long[] dev_ids = movieWrapper.getDevIds();
-//                    List<Long> dev_id_list;
-//                    if (dev_ids == null) {
-//                        dev_id_list = new ArrayList<>();
-//                        dev_id_list.add(device_id);
-//                        dev_ids = dev_id_list.toArray(new Long[0]);
-//                        movieWrapper.setDevIds(dev_ids);
-//                    } else {
-//                        boolean isExsit = false;
-//                        for (long t_id : dev_ids) {
-//                            if (t_id == device_id) {
-//                                isExsit = true;
-//                                break;
-//                            }
-//                        }
-//                        if (!isExsit) {
-//                            dev_id_list = new ArrayList<>(dev_ids.length);
-//                            Collections.addAll(dev_id_list, dev_ids);
-//                            dev_id_list.add(device_id);
-//                            dev_ids = dev_id_list.toArray(new Long[0]);
-//                            movieWrapper.setDevIds(dev_ids);
-//                        }
-//
-//
-//                    }
-//
-//
-//                    //获取目录id集合,更新
-//                    Long[] dir_ids = movieWrapper.getDirIds();
-//                    List<Long> dir_id_list;
-//                    if (dir_ids == null) {
-//                        dir_id_list = new ArrayList<>();
-//                        dir_id_list.add(dir_id);
-//                        dir_ids = dir_id_list.toArray(new Long[0]);
-//                        movieWrapper.setDirIds(dir_ids);
-//                    } else {
-//                        boolean isExsit = false;
-//                        for (long t_id : dir_ids) {
-//                            if (t_id==dir_id) {
-//                                isExsit = true;
-//                                break;
-//                            }
-//                        }
-//                        if (!isExsit) {
-//                            dir_id_list = new ArrayList<>(dir_ids.length);
-//                            Collections.addAll(dir_id_list, dir_ids);
-//                            dir_id_list.add(dir_id);
-//                            dir_ids = dir_id_list.toArray(new Long[0]);
-//                            movieWrapper.setDirIds(dir_ids);
-//                        }
-//                    }
-
 
                     int num = mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(movieWrapper), "id=?", new String[]{String.valueOf(movieWrapper.getId())});
                     if (num > 0) {
@@ -621,6 +574,7 @@ public class MovieScanService extends Service {
                     }
                 }
             } else {
+                Cursor cursor = mMovieWrapperDao.select("id=?", new String[]{String.valueOf(wrapper_id)}, "0,1");
 
                 //1.创建一个Wrapper并保存到数据库
                 movieWrapper = new MovieWrapper();
@@ -727,7 +681,7 @@ public class MovieScanService extends Service {
      * @param mode
      * @return
      */
-    public Movie getMovie(String id, String search_url, boolean isUpgradeAddTime, @Mode int mode, @Api int api) {
+    public synchronized Movie getMovie(String id, String search_url, boolean isUpgradeAddTime, @Mode int mode, @Api int api) {
         if (mMovieDao == null)
             mMovieDao = new MovieDao(MovieScanService.this);
         Movie movie = null;
@@ -774,92 +728,92 @@ public class MovieScanService extends Service {
                 }
             }
 
-
-            switch (api) {
-                case ConstData.Scraper.DOUBAN:
-                    if (search_url == null && movie != null)
-                        search_url = movie.getAlt();
-                    if (TextUtils.isEmpty(search_url))
-                        return null;
-                    movie = DoubanApi
-                            .parserMovieInfo(search_url);// 解析电影信息(耗时几秒)
-                    break;
-                case ConstData.Scraper.IMDB:
-                    if (mode == MODE_GETINFO) {
-                        if (!TextUtils.isEmpty(exist_movie_id))
-                            movie = ImdbApi.parserMovieInfoById(exist_movie_id);
-                        else
+                switch (api) {
+                    case ConstData.Scraper.DOUBAN:
+                        if (search_url == null && movie != null)
+                            search_url = movie.getAlt();
+                        if (TextUtils.isEmpty(search_url))
                             return null;
-                    } else {
-                        if (TextUtils.isEmpty(id)) {
-                            return null;
+                        movie = DoubanApi
+                                .parserMovieInfo(search_url);// 解析电影信息(耗时几秒)
+                        break;
+                    case ConstData.Scraper.IMDB:
+                        if (mode == MODE_GETINFO) {
+                            if (!TextUtils.isEmpty(exist_movie_id))
+                                movie = ImdbApi.parserMovieInfoById(exist_movie_id);
+                            else
+                                return null;
+                        } else {
+                            if (TextUtils.isEmpty(id)) {
+                                return null;
+                            }
+                            movie = ImdbApi.parserMovieInfoById(id);
                         }
-                        movie = ImdbApi.parserMovieInfoById(id);
-                    }
 
-                    break;
-                case ConstData.Scraper.MTIME:
-                    if (mode == MODE_GETINFO) {
-                        if (!TextUtils.isEmpty(exist_movie_id))
-                            movie = MtimeApi.parserMovieInfoFromHtmlById(exist_movie_id);
-                        else
-                            return null;
-                    } else {
-                        if (TextUtils.isEmpty(id)) {
-                            return null;
+                        break;
+                    case ConstData.Scraper.MTIME:
+                        if (mode == MODE_GETINFO) {
+                            if (!TextUtils.isEmpty(exist_movie_id))
+                                movie = MtimeApi.parserMovieInfoFromHtmlById(exist_movie_id);
+                            else
+                                return null;
+                        } else {
+                            if (TextUtils.isEmpty(id)) {
+                                return null;
+                            }
+                            movie = MtimeApi.parserMovieInfoFromHtmlById(id);
                         }
-                        movie = MtimeApi.parserMovieInfoFromHtmlById(id);
+
+                        break;
+                }
+                //电影为空的话就发送广播并退出
+                if (movie == null) {
+                    return null;
+                }
+                //获取一个新的文件路径数组
+                long currentTime = System.currentTimeMillis();
+                if (api != ConstData.Scraper.UNKNOW)
+                    movie.setApi(api);
+                movie.setUptime(String.valueOf(currentTime));
+                if (TextUtils.isEmpty(movie.getAddtime())) {
+                    movie.setAddtime(String.valueOf(currentTime));
+                }
+                String titlepinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle());
+                movie.setTitlePinyin(titlepinyin);
+                movie.setWrapper_id(exist_wrapper_id);
+                ContentValues contentValues = mMovieDao
+                        .parseContentValues(movie);// 将movie对象转换为ContentValues对象
+                final long rowId;
+                //添加或更新电影信息
+                if (mode == MODE_GETINFO) {
+                    if (!TextUtils.isEmpty(exist_movie_id)) {
+                        rowId = mMovieDao.update(contentValues, "id=?",
+                                new String[]{id});
+                        movie.setId(Long.parseLong(id));
+                    } else {
+                        rowId = mMovieDao.insert(contentValues);
+                        movie.setId(rowId);
                     }
-
-                    break;
-            }
-            //电影为空的话就发送广播并退出
-            if (movie == null) {
-                return null;
-            }
-            //获取一个新的文件路径数组
-            long currentTime = System.currentTimeMillis();
-            if (api != ConstData.Scraper.UNKNOW)
-                movie.setApi(api);
-            movie.setUptime(String.valueOf(currentTime));
-            if (TextUtils.isEmpty(movie.getAddtime())) {
-                movie.setAddtime(String.valueOf(currentTime));
-            }
-            String titlepinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle());
-            movie.setTitlePinyin(titlepinyin);
-            movie.setWrapper_id(exist_wrapper_id);
-            ContentValues contentValues = mMovieDao
-                    .parseContentValues(movie);// 将movie对象转换为ContentValues对象
-            final long rowId;
-            //添加或更新电影信息
-            if (mode == MODE_GETINFO) {
-                if (!TextUtils.isEmpty(exist_movie_id)) {
-                    rowId = mMovieDao.update(contentValues, "id=?",
-                            new String[]{id});
-                    movie.setId(Long.parseLong(id));
+                    if (rowId > 0) {
+                        return movie;
+                    }
                 } else {
-                    rowId = mMovieDao.insert(contentValues);
-                    movie.setId(rowId);
-                }
-                if (rowId > 0) {
-                    return movie;
-                }
-            } else {
-                if (!TextUtils.isEmpty(exist_movie_id)) {
-                    rowId = mMovieDao.update(contentValues, "movie_id=?",
-                            new String[]{id});
-                    movie.setId(Long.parseLong(id));
-                } else {
-                    rowId = mMovieDao.insert(contentValues);
-                    movie.setId(rowId);
-                }
-                if (rowId > 0) {
-                    return movie;
+                    if (!TextUtils.isEmpty(exist_movie_id)) {
+                        rowId = mMovieDao.update(contentValues, "movie_id=?",
+                                new String[]{id});
+                        movie.setId(Long.parseLong(id));
+                    } else {
+                        rowId = mMovieDao.insert(contentValues);
+                        movie.setId(rowId);
+                    }
+                    if (rowId > 0) {
+                        return movie;
+                    }
                 }
             }
 
-        }
         return movie;
+
     }
 
 
