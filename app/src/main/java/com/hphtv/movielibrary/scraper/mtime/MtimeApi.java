@@ -13,6 +13,7 @@ import com.hphtv.movielibrary.sqlite.bean.scraperBean.Photo;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Rating;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
 import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.util.EditorDistance;
 import com.hphtv.movielibrary.util.OkHttpUtil;
 
 import org.jsoup.Jsoup;
@@ -34,24 +35,31 @@ public class MtimeApi {
 
     public static SimpleMovie SearchAMovieByApi(String keyword) {
         try {
+            keyword=keyword.trim();
             JSONArray movieAry = SearchMovies(keyword);
             if (movieAry != null && movieAry.size() > 0) {
-                int idx=0;
-                for(int i=0;i<movieAry.size();i++){
-                    JSONObject movieObj=movieAry.getJSONObject(i);
-                    String name=movieObj.getString("titlecn");
-                    String nameEn=movieObj.getString("titleen");
-                    if(name.contains(keyword)||nameEn.contains(keyword)){
-                        idx=i;
-                        if(name.equalsIgnoreCase(keyword)||nameEn.equalsIgnoreCase(keyword)){
-                            break;
-                        }
+                int idx = 0;
+                float maxSimilarity = 0;
+                for (int i = 0; i < movieAry.size(); i++) {
+                    JSONObject movieObj = movieAry.getJSONObject(i);
+                    String name = movieObj.getString("titlecn");
+                    String nameEn = movieObj.getString("titleen");
+                    float similarity = EditorDistance.checkLevenshtein(name, keyword);
+                    float similarityEn = EditorDistance.checkLevenshtein(nameEn, keyword);
+                    float tmpSimilarity = Math.max(similarity, similarityEn);
+                    if (tmpSimilarity == 1) {
+                        idx = i;
+                        break;
+                    }
+                    if (tmpSimilarity > maxSimilarity) {
+                        idx = i;
+                        maxSimilarity=tmpSimilarity;
                     }
                 }
                 JSONObject movieObj = movieAry.getJSONObject(idx);
                 Rating rating = new Rating();
                 rating.max = 10;
-                rating.average =0;
+                rating.average = 0;
                 String title = movieObj.getString("titlecn");
                 String year = movieObj.getString("year");
                 String cover = movieObj.getString("cover");
@@ -111,7 +119,7 @@ public class MtimeApi {
                 des1 += movieObj.getString("titleen");
                 String des2 = "";
                 String director = movieObj.getString("director");
-                des2+=director;
+                des2 += director;
 
                 String[] abstracts = {des1, des2};
                 SimpleMovie simpleMovie = new SimpleMovie();
@@ -128,10 +136,10 @@ public class MtimeApi {
     }
 
     public static Movie parserMovieInfoFromHtmlById(String id) {
-            Movie movie = parseMovie(id);
-            movie.setAlt(String.format(MtimeURL.MOVIE_PAGE, id));
-            movie.setMovieId(id);
-            return movie;
+        Movie movie = parseMovie(id);
+        movie.setAlt(String.format(MtimeURL.MOVIE_PAGE, id));
+        movie.setMovieId(id);
+        return movie;
     }
 
     private static Movie parseMovie(String id) {
@@ -225,7 +233,7 @@ public class MtimeApi {
     }
 
 
-    public static void parseMovieTrailerInfo(long id,String movieId, List<MovieTrailer> list) {
+    public static void parseMovieTrailerInfo(long id, String movieId, List<MovieTrailer> list) {
         String content;
         try {
             Response response = OkHttpUtil.getResponseFromServer(String.format(MtimeURL.MOVIE_TRAILER_PAGE, movieId));

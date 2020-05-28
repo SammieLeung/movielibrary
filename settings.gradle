@@ -1,1 +1,1 @@
-include ':app', ':CircleRecyclerView', ':service', ':dlna'
+include ':app', ':CircleRecyclerView', ':service', ':dlna', ':VideoNameParser'

@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
@@ -78,6 +79,7 @@ public class MovieScanService extends Service {
     MovieDao mMovieDao;
     MovieWrapperDao mMovieWrapperDao;
     DirectoryDao mDirectoryDao;
+    MediaMetadataRetriever mMediaMetadataRetriever;
 
     ThreadPoolExecutor mMovieInfoSearchService;
     ThreadPoolExecutor mScannerWorkers;
@@ -114,6 +116,7 @@ public class MovieScanService extends Service {
         mMovieDao = new MovieDao(this);
         mMovieWrapperDao = new MovieWrapperDao(this);
         mDirectoryDao = new DirectoryDao(this);
+        mMediaMetadataRetriever=new MediaMetadataRetriever();
         Log.i(TAG, "onCreate方法被调用!");
         if (searchHelper == null) {
             searchHelper = ((MovieApplication) getApplication()).getSearchHelper();
@@ -262,10 +265,15 @@ public class MovieScanService extends Service {
                 int type_index = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE);
                 String filename = cursor.getString(name_index);
                 String path = cursor.getString(path_index);
+                mMediaMetadataRetriever.setDataSource(path);
+                String MetadataRetrieverTitle=mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String type = (cursor.getString(type_index));
                 String extension = type.substring(type.lastIndexOf("/") + 1, type.length());
                 LogUtil.v(TAG, "原名 filename:" + filename);
-                MovieNameInfo mni = FileScanUtil.simpleParse(filename);
+                LogUtil.v(TAG, "MetadataRetrieverTitle:" + MetadataRetrieverTitle);
+                LogUtil.v(TAG,"path "+path);
+                LogUtil.v(TAG,"type "+type);
+                MovieNameInfo mni = FileScanUtil.simpleParse(MetadataRetrieverTitle==null?filename:MetadataRetrieverTitle);
                 VideoFile videoFile = new VideoFile();
                 videoFile.setFilename(filename);
                 videoFile.setUri(path);
@@ -348,9 +356,20 @@ public class MovieScanService extends Service {
         SimpleMovie simpleMovie = null;
         Movie mtimeMovie = null;
         Movie imdbMovie = null;
-        String name = getSeasonAndEpisode(parseFile);
-        if (name != null)
+//        String name = getSeasonAndEpisode(parseFile);
+        String name=parseFile.getMni().getName();
+        if (name != null) {
             simpleMovie = MtimeApi.SearchAMovieByApi(name);
+            if(simpleMovie==null){
+                String[] nameSplits=name.split(" |_|\\.|-");
+                for(int i=1;i<nameSplits.length-1;i++){
+                    String newSearchKey=name.substring(0,name.indexOf(nameSplits[nameSplits.length-i]));
+                    simpleMovie = MtimeApi.SearchAMovieByApi(newSearchKey);
+                    if(simpleMovie!=null)
+                        break;
+                }
+            }
+        }
 
         if (simpleMovie != null) {
             mtimeMovie = searchMovieInfo(simpleMovie, parseFile, ConstData.Scraper.MTIME, fileCount);

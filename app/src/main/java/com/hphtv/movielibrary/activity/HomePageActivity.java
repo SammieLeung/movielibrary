@@ -50,13 +50,13 @@ import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.service.DlnaControlService;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.util.DensityUtil;
+import com.hphtv.movielibrary.util.EditorDistance;
 import com.hphtv.movielibrary.util.LanguageUtil;
 import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.MovieSharedPreferences;
@@ -171,6 +171,8 @@ public class HomePageActivity extends AppBaseActivity {
         mPreferences = MovieSharedPreferences.getInstance();
         mPreferences.setContext(mContext);
         requestPermission();
+//        Intent intent=new Intent(HomePageActivity.this, MainActivity.class);
+//        startActivity(intent);
     }
 
 
