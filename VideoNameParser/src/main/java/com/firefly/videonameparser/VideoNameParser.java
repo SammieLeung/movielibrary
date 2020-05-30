@@ -590,6 +590,18 @@ public class VideoNameParser {
 		return false;
 	}
 
+	public static boolean isOnlyChinese(String word){
+		if (word == null)
+			return false;
+		for (char c : word.toCharArray()) {
+			if (c >= 0x4E00 && c <= 0x9FA5)	// 根据字节码判断
+				continue;
+			else
+				return false;
+		}
+		return true;
+	}
+
 	public static boolean contain(String[] array,String str)
 	{
 		if(array == null || array.length ==0) return false;

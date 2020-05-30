@@ -16,6 +16,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.firefly.videonameparser.MovieNameInfo;
+import com.firefly.videonameparser.VideoNameParser;
+import com.firefly.videonameparser.utils.StringUtils;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.bean.Device;
@@ -84,7 +86,7 @@ public class MovieScanService extends Service {
     ThreadPoolExecutor mMovieInfoSearchService;
     ThreadPoolExecutor mScannerWorkers;
     Object mSync = new Object();
-    Object mMovSync=new Object();
+    Object mMovSync = new Object();
 
     private List<Directory> mDirectories = new ArrayList<>();
 
@@ -116,7 +118,7 @@ public class MovieScanService extends Service {
         mMovieDao = new MovieDao(this);
         mMovieWrapperDao = new MovieWrapperDao(this);
         mDirectoryDao = new DirectoryDao(this);
-        mMediaMetadataRetriever=new MediaMetadataRetriever();
+        mMediaMetadataRetriever = new MediaMetadataRetriever();
         Log.i(TAG, "onCreate方法被调用!");
         if (searchHelper == null) {
             searchHelper = ((MovieApplication) getApplication()).getSearchHelper();
@@ -266,14 +268,14 @@ public class MovieScanService extends Service {
                 String filename = cursor.getString(name_index);
                 String path = cursor.getString(path_index);
                 mMediaMetadataRetriever.setDataSource(path);
-                String MetadataRetrieverTitle=mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                String MetadataRetrieverTitle = mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String type = (cursor.getString(type_index));
                 String extension = type.substring(type.lastIndexOf("/") + 1, type.length());
                 LogUtil.v(TAG, "原名 filename:" + filename);
                 LogUtil.v(TAG, "MetadataRetrieverTitle:" + MetadataRetrieverTitle);
-                LogUtil.v(TAG,"path "+path);
-                LogUtil.v(TAG,"type "+type);
-                MovieNameInfo mni = FileScanUtil.simpleParse(MetadataRetrieverTitle==null?filename:MetadataRetrieverTitle);
+                LogUtil.v(TAG, "path " + path);
+                LogUtil.v(TAG, "type " + type);
+                MovieNameInfo mni = FileScanUtil.simpleParse(MetadataRetrieverTitle == null ? filename : MetadataRetrieverTitle);
                 VideoFile videoFile = new VideoFile();
                 videoFile.setFilename(filename);
                 videoFile.setUri(path);
@@ -357,16 +359,28 @@ public class MovieScanService extends Service {
         Movie mtimeMovie = null;
         Movie imdbMovie = null;
 //        String name = getSeasonAndEpisode(parseFile);
-        String name=parseFile.getMni().getName();
+        String name = parseFile.getMni().getName();
         if (name != null) {
             simpleMovie = MtimeApi.SearchAMovieByApi(name);
-            if(simpleMovie==null){
-                String[] nameSplits=name.split(" |_|\\.|-");
-                for(int i=1;i<nameSplits.length-1;i++){
-                    String newSearchKey=name.substring(0,name.indexOf(nameSplits[nameSplits.length-i]));
-                    simpleMovie = MtimeApi.SearchAMovieByApi(newSearchKey);
-                    if(simpleMovie!=null)
-                        break;
+            if (simpleMovie == null) {
+                if (VideoNameParser.isChinese(name)) {
+                    name = StringUtils.ChineseToEnglish(name);
+                    simpleMovie = MtimeApi.SearchAMovieByApi(name);
+                    if (simpleMovie == null)
+                        for (int i = 1; i < name.length(); i++) {
+                            String newSearchKey = name.substring(0, name.length() - i);
+                            simpleMovie = MtimeApi.SearchAMovieByApi(newSearchKey,name);
+                            if (simpleMovie != null)
+                                break;
+                        }
+                } else {
+                    String[] nameSplits = name.split(" |_|\\.|-");
+                    for (int i = 1; i < nameSplits.length - 1; i++) {
+                        String newSearchKey = name.substring(0, name.indexOf(nameSplits[nameSplits.length - i]));
+                        simpleMovie = MtimeApi.SearchAMovieByApi(newSearchKey);
+                        if (simpleMovie != null)
+                            break;
+                    }
                 }
             }
         }
@@ -747,89 +761,89 @@ public class MovieScanService extends Service {
                 }
             }
 
-                switch (api) {
-                    case ConstData.Scraper.DOUBAN:
-                        if (search_url == null && movie != null)
-                            search_url = movie.getAlt();
-                        if (TextUtils.isEmpty(search_url))
+            switch (api) {
+                case ConstData.Scraper.DOUBAN:
+                    if (search_url == null && movie != null)
+                        search_url = movie.getAlt();
+                    if (TextUtils.isEmpty(search_url))
+                        return null;
+                    movie = DoubanApi
+                            .parserMovieInfo(search_url);// 解析电影信息(耗时几秒)
+                    break;
+                case ConstData.Scraper.IMDB:
+                    if (mode == MODE_GETINFO) {
+                        if (!TextUtils.isEmpty(exist_movie_id))
+                            movie = ImdbApi.parserMovieInfoById(exist_movie_id);
+                        else
                             return null;
-                        movie = DoubanApi
-                                .parserMovieInfo(search_url);// 解析电影信息(耗时几秒)
-                        break;
-                    case ConstData.Scraper.IMDB:
-                        if (mode == MODE_GETINFO) {
-                            if (!TextUtils.isEmpty(exist_movie_id))
-                                movie = ImdbApi.parserMovieInfoById(exist_movie_id);
-                            else
-                                return null;
-                        } else {
-                            if (TextUtils.isEmpty(id)) {
-                                return null;
-                            }
-                            movie = ImdbApi.parserMovieInfoById(id);
-                        }
-
-                        break;
-                    case ConstData.Scraper.MTIME:
-                        if (mode == MODE_GETINFO) {
-                            if (!TextUtils.isEmpty(exist_movie_id))
-                                movie = MtimeApi.parserMovieInfoFromHtmlById(exist_movie_id);
-                            else
-                                return null;
-                        } else {
-                            if (TextUtils.isEmpty(id)) {
-                                return null;
-                            }
-                            movie = MtimeApi.parserMovieInfoFromHtmlById(id);
-                        }
-
-                        break;
-                }
-                //电影为空的话就发送广播并退出
-                if (movie == null) {
-                    return null;
-                }
-                //获取一个新的文件路径数组
-                long currentTime = System.currentTimeMillis();
-                if (api != ConstData.Scraper.UNKNOW)
-                    movie.setApi(api);
-                movie.setUptime(String.valueOf(currentTime));
-                if (TextUtils.isEmpty(movie.getAddtime())) {
-                    movie.setAddtime(String.valueOf(currentTime));
-                }
-                String titlepinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle());
-                movie.setTitlePinyin(titlepinyin);
-                movie.setWrapper_id(exist_wrapper_id);
-                ContentValues contentValues = mMovieDao
-                        .parseContentValues(movie);// 将movie对象转换为ContentValues对象
-                final long rowId;
-                //添加或更新电影信息
-                if (mode == MODE_GETINFO) {
-                    if (!TextUtils.isEmpty(exist_movie_id)) {
-                        rowId = mMovieDao.update(contentValues, "id=?",
-                                new String[]{id});
-                        movie.setId(Long.parseLong(id));
                     } else {
-                        rowId = mMovieDao.insert(contentValues);
-                        movie.setId(rowId);
+                        if (TextUtils.isEmpty(id)) {
+                            return null;
+                        }
+                        movie = ImdbApi.parserMovieInfoById(id);
                     }
-                    if (rowId > 0) {
-                        return movie;
+
+                    break;
+                case ConstData.Scraper.MTIME:
+                    if (mode == MODE_GETINFO) {
+                        if (!TextUtils.isEmpty(exist_movie_id))
+                            movie = MtimeApi.parserMovieInfoFromHtmlById(exist_movie_id);
+                        else
+                            return null;
+                    } else {
+                        if (TextUtils.isEmpty(id)) {
+                            return null;
+                        }
+                        movie = MtimeApi.parserMovieInfoFromHtmlById(id);
                     }
+
+                    break;
+            }
+            //电影为空的话就发送广播并退出
+            if (movie == null) {
+                return null;
+            }
+            //获取一个新的文件路径数组
+            long currentTime = System.currentTimeMillis();
+            if (api != ConstData.Scraper.UNKNOW)
+                movie.setApi(api);
+            movie.setUptime(String.valueOf(currentTime));
+            if (TextUtils.isEmpty(movie.getAddtime())) {
+                movie.setAddtime(String.valueOf(currentTime));
+            }
+            String titlepinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle());
+            movie.setTitlePinyin(titlepinyin);
+            movie.setWrapper_id(exist_wrapper_id);
+            ContentValues contentValues = mMovieDao
+                    .parseContentValues(movie);// 将movie对象转换为ContentValues对象
+            final long rowId;
+            //添加或更新电影信息
+            if (mode == MODE_GETINFO) {
+                if (!TextUtils.isEmpty(exist_movie_id)) {
+                    rowId = mMovieDao.update(contentValues, "id=?",
+                            new String[]{id});
+                    movie.setId(Long.parseLong(id));
                 } else {
-                    if (!TextUtils.isEmpty(exist_movie_id)) {
-                        rowId = mMovieDao.update(contentValues, "movie_id=?",
-                                new String[]{id});
-                        movie.setId(Long.parseLong(id));
-                    } else {
-                        rowId = mMovieDao.insert(contentValues);
-                        movie.setId(rowId);
-                    }
-                    if (rowId > 0) {
-                        return movie;
-                    }
+                    rowId = mMovieDao.insert(contentValues);
+                    movie.setId(rowId);
+                }
+                if (rowId > 0) {
+                    return movie;
+                }
+            } else {
+                if (!TextUtils.isEmpty(exist_movie_id)) {
+                    rowId = mMovieDao.update(contentValues, "movie_id=?",
+                            new String[]{id});
+                    movie.setId(Long.parseLong(id));
+                } else {
+                    rowId = mMovieDao.insert(contentValues);
+                    movie.setId(rowId);
+                }
+                if (rowId > 0) {
+                    return movie;
                 }
             }
+        }
 
         return movie;
 

@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.scraper.mtime;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
@@ -33,19 +34,24 @@ import okhttp3.Response;
 public class MtimeApi {
     public static final String TAG = MtimeApi.class.getSimpleName();
 
-    public static SimpleMovie SearchAMovieByApi(String keyword) {
+    public static SimpleMovie SearchAMovieByApi(String keyword){
+        return SearchAMovieByApi(keyword,null);
+    }
+
+    public static SimpleMovie SearchAMovieByApi(String keyword,String originStr) {
         try {
             keyword=keyword.trim();
             JSONArray movieAry = SearchMovies(keyword);
             if (movieAry != null && movieAry.size() > 0) {
                 int idx = 0;
                 float maxSimilarity = 0;
+                String compareStr= TextUtils.isEmpty(originStr)?keyword:originStr;
                 for (int i = 0; i < movieAry.size(); i++) {
                     JSONObject movieObj = movieAry.getJSONObject(i);
                     String name = movieObj.getString("titlecn");
                     String nameEn = movieObj.getString("titleen");
-                    float similarity = EditorDistance.checkLevenshtein(name, keyword);
-                    float similarityEn = EditorDistance.checkLevenshtein(nameEn, keyword);
+                    float similarity = EditorDistance.checkLevenshtein(name, compareStr);
+                    float similarityEn = EditorDistance.checkLevenshtein(nameEn, compareStr);
                     float tmpSimilarity = Math.max(similarity, similarityEn);
                     if (tmpSimilarity == 1) {
                         idx = i;

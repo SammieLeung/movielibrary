@@ -13,7 +13,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main_2);
 //		debug("Death.Note.TV.2006.DVDRip.Ep03.Rev2.x264.AC3-Jina");
 //		debug("[dmhy][Death_Note][32].mp4");
-        debug("[Death_Note][06].mkv");
+//        debug("[Death_Note][06].mkv");
+//		debug("西部世界第三季.mp4");
+		debug("新世纪福音战士：终.mp4");
 //        debug("[Death_Note][32][ms32].mp4");
 //        debug("Death.Note.TV.2006.DVDRip.e03.Rev2.x264.AC3-Jina");
 //        debug("Death.Note.TV.2006.DVDRip.ep03.Rev2.x264.AC3-Jina");
@@ -44,13 +46,9 @@ public class MainActivity extends Activity {
  
 
 	private void debug(String name){
-
-
-		
 		Log.v(TAG, "Parser :"+name);
 
 //		VideoNameParser mParser = new VideoNameParser();
-//
 //		MovieNameInfo info = mParser.parseVideoName(name);
 //		Log.v(TAG, "ParseName :"+info.toString());
 //		Log.v(TAG, "********************");
