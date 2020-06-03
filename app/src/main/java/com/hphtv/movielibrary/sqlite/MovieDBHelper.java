@@ -379,7 +379,7 @@ public class MovieDBHelper extends SQLiteOpenHelper {
 
     private void presetData(SQLiteDatabase sqLiteDatabase) {
         String insertDeviceSql = "INSERT OR IGNORE INTO " + TABLE_DEVICE + " VALUES (1,-1,'本地存储','/storage/emulated/0',0)";
-        String insertDirSql = "INSERT OR IGNORE INTO " + TABLE_DIRECTORY + " VALUES (1,'Movies',1,0,'content://com.firefly.filepicker/local/L3N0b3JhZ2UvZW11bGF0ZWQvMC9Nb3ZpZXM%3D%0A/4/0','/storage/emulated/0/Movies',0,0,0)";
+        String insertDirSql = "INSERT OR IGNORE INTO " + TABLE_DIRECTORY + " VALUES (1,'Movies',1,6,'content://com.firefly.filepicker/local/L3N0b3JhZ2UvZW11bGF0ZWQvMC9Nb3ZpZXM%3D%0A/4/0','/storage/emulated/0/Movies',6,0,0)";
         sqLiteDatabase.execSQL(insertDeviceSql);
         sqLiteDatabase.execSQL(insertDirSql);
         String wrapper_1_sql = "INSERT OR IGNORE INTO " + TABLE_MOVIEWRAPPER + " VALUES ('1','[{\"api\":2,\"id\":1}]','[2]','[1]','[1]','灰猎犬号','h|l|q|h','http://img5.mtime.cn/mt/2020/03/06/053554.70956930_1280X720X2.jpg','0.0')";
@@ -493,7 +493,6 @@ public class MovieDBHelper extends SQLiteOpenHelper {
         Log.v(TAG, "db==========>:dropTable TABLE " + tbName);
         String sql = "DROP TABLE IF EXISTS " + tbName;
         sqLiteDatabase.execSQL(sql);
-
     }
 
     private void dropColmun(SQLiteDatabase sqLiteDatabase, String table, String[] Clomuns) {
