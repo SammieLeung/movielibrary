@@ -164,6 +164,7 @@ public class DLNAScan extends AbstractScanFiles {
             long size = res.getSize() == null ? 0 : res.getSize();
             String thumb = null;
             String date = "-";
+            int fileSource=FileItem.DLNA;
 
             List<DIDLObject.Property> properties = item.getProperties();
             for (DIDLObject.Property property : properties) {
@@ -181,7 +182,8 @@ public class DLNAScan extends AbstractScanFiles {
                     thumb,
                     mimeType,
                     date,
-                    size));
+                    size,
+                    fileSource));
         }
     }
 

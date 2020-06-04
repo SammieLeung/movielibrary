@@ -11,12 +11,21 @@ import android.support.annotation.NonNull;
 
 public class FileItem implements Parcelable {
     @IntDef({OTHER, AUDIO, IMAGE, TEXT, VIDEO})
-    public @interface FileType {}
+    public @interface FileType {
+    }
+
+    @IntDef({EXTERNAL, DLNA, SMB})
+    public @interface FileSource {
+    }
+
     public static final int OTHER = 0;
     public static final int AUDIO = 1;
     public static final int IMAGE = 2;
     public static final int TEXT = 3;
     public static final int VIDEO = 4;
+    public static final int EXTERNAL = 0;
+    public static final int DLNA = 1;
+    public static final int SMB = 2;
 
     @FileType
     private int type;
@@ -26,6 +35,8 @@ public class FileItem implements Parcelable {
     private String mimeType;
     private String date;
     private long size;
+    @FileSource
+    private int fileSource;
 
     public static final Creator<FileItem> CREATOR = new Creator<FileItem>() {
         @Override
@@ -44,7 +55,7 @@ public class FileItem implements Parcelable {
     }
 
     public FileItem(@FileType int type, String name, String path,
-                    String thumb, String mimeType, String date, long size) {
+                    String thumb, String mimeType, String date, long size, @FileSource int fileSource) {
         this.type = type;
         this.name = name;
         this.path = path;
@@ -52,6 +63,7 @@ public class FileItem implements Parcelable {
         this.mimeType = mimeType;
         this.date = date;
         this.size = size;
+        this.fileSource = fileSource;
     }
 
     protected FileItem(Parcel in) {
@@ -62,6 +74,7 @@ public class FileItem implements Parcelable {
         mimeType = in.readString();
         date = in.readString();
         size = in.readLong();
+        fileSource = in.readInt();
     }
 
     public int getType() {
@@ -120,6 +133,14 @@ public class FileItem implements Parcelable {
         this.size = size;
     }
 
+    public int getFileSource() {
+        return fileSource;
+    }
+
+    public void setFileSource(int fileSource) {
+        this.fileSource = fileSource;
+    }
+
     public static int mimeTypeToType(@NonNull String mimeType) {
         if (mimeType.startsWith("audio")) {
             return AUDIO;
@@ -148,6 +169,7 @@ public class FileItem implements Parcelable {
         dest.writeString(mimeType);
         dest.writeString(date);
         dest.writeLong(size);
+        dest.writeInt(fileSource);
     }
 
     @Override
@@ -170,6 +192,6 @@ public class FileItem implements Parcelable {
             return true;
         }
 
-       return true;
+        return true;
     }
 }

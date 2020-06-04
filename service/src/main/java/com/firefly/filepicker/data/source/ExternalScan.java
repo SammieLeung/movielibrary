@@ -7,9 +7,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import com.firefly.filepicker.data.Constants;
 import com.firefly.filepicker.data.bean.FileItem;
-import com.firefly.filepicker.utils.Utils;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -50,62 +48,62 @@ public class ExternalScan extends AbstractScanFiles {
                     break;
             }
         } else { */
-            if (mFilterType != -1 || mFilterArg != null) {
-                mFileFilter = new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        if (file.isDirectory()) {
-                            return true;
-                        }
+        if (mFilterType != -1 || mFilterArg != null) {
+            mFileFilter = new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    if (file.isDirectory()) {
+                        return true;
+                    }
 
-                        if (mFilterArg != null && !file.getPath().contains(mFilterArg)) {
+                    if (mFilterArg != null && !file.getPath().contains(mFilterArg)) {
+                        return false;
+                    }
+
+                    if (mFilterType != -1) {
+
+                        String mimeType = getMimeType(file);
+                        if (mimeType == null) {
                             return false;
                         }
 
-                        if (mFilterType != -1) {
-
-                            String mimeType = getMimeType(file);
-                            if (mimeType == null) {
+                        switch (mFilterType) {
+                            case FileItem.AUDIO:
+                                return mimeType.startsWith("audio");
+                            case FileItem.IMAGE:
+                                return mimeType.startsWith("image");
+                            case FileItem.VIDEO:
+                                return mimeType.startsWith("video");
+                            case FileItem.TEXT:
+                                return mimeType.startsWith("text");
+                            default:
                                 return false;
-                            }
-
-                            switch (mFilterType) {
-                                case FileItem.AUDIO:
-                                    return mimeType.startsWith("audio");
-                                case FileItem.IMAGE:
-                                    return mimeType.startsWith("image");
-                                case FileItem.VIDEO:
-                                    return mimeType.startsWith("video");
-                                case FileItem.TEXT:
-                                    return mimeType.startsWith("text");
-                                default:
-                                    return false;
-                            }
                         }
-
-                        return true;
                     }
-                };
-            }
 
-            File file = new File(mNode.getId());
+                    return true;
+                }
+            };
+        }
 
-            if (file.isDirectory()) {
-                scanRecursive(file);
-                finish();
-            }
+        File file = new File(mNode.getId());
+
+        if (file.isDirectory()) {
+            scanRecursive(file);
+            finish();
+        }
 //        }
     }
 
     private void scanAudio() {
-        String selection = MediaStore.Audio.Media.DATA +" like?";
-        String[] selectionArgs = new String[]{"%" + mNode.getId() +"%"};
+        String selection = MediaStore.Audio.Media.DATA + " like?";
+        String[] selectionArgs = new String[]{"%" + mNode.getId() + "%"};
         Cursor cursor = mContext.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null,
                 selection,
                 selectionArgs,
-                MediaStore.Audio.Media.DISPLAY_NAME+ " DESC");
+                MediaStore.Audio.Media.DISPLAY_NAME + " DESC");
 
         while (cursor != null && cursor.moveToNext() && !isCancel) {
             int path_index = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA);
@@ -121,7 +119,8 @@ public class ExternalScan extends AbstractScanFiles {
                     null,
                     cursor.getString(mime_index),
                     cursor.getString(date_index),
-                    cursor.getLong(size_index));
+                    cursor.getLong(size_index),
+                    FileItem.EXTERNAL);
 
             addResultItem(item);
         }
@@ -136,8 +135,8 @@ public class ExternalScan extends AbstractScanFiles {
     }
 
     private void scanImage() {
-        String selection = MediaStore.Images.Media.DATA +" like?";
-        String[] selectionArgs = new String[]{"%" + mNode.getId() +"%"};
+        String selection = MediaStore.Images.Media.DATA + " like?";
+        String[] selectionArgs = new String[]{"%" + mNode.getId() + "%"};
         Cursor cursor = mContext.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 null,
@@ -160,7 +159,8 @@ public class ExternalScan extends AbstractScanFiles {
                     cursor.getString(thumb_index),
                     cursor.getString(mime_index),
                     cursor.getString(date_index),
-                    cursor.getLong(size_index));
+                    cursor.getLong(size_index),
+                    FileItem.EXTERNAL);
 
             addResultItem(item);
         }
@@ -175,8 +175,8 @@ public class ExternalScan extends AbstractScanFiles {
     }
 
     private void scanVideo() {
-        String selection = MediaStore.Video.Media.DATA +" like?";
-        String[] selectionArgs = new String[]{"%" + mNode.getId() +"%"};
+        String selection = MediaStore.Video.Media.DATA + " like?";
+        String[] selectionArgs = new String[]{"%" + mNode.getId() + "%"};
         Cursor cursor = mContext.getContentResolver().query(
                 MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 null,
@@ -199,7 +199,8 @@ public class ExternalScan extends AbstractScanFiles {
                     cursor.getString(thumb_index),
                     cursor.getString(mime_index),
                     cursor.getString(date_index),
-                    cursor.getLong(size_index));
+                    cursor.getLong(size_index),
+                    FileItem.EXTERNAL);
 
             addResultItem(item);
         }
@@ -246,7 +247,8 @@ public class ExternalScan extends AbstractScanFiles {
                 null,
                 mimeType,
                 "-",
-                file.length());
+                file.length(),
+                FileItem.EXTERNAL);
 
         addResultItem(item);
     }

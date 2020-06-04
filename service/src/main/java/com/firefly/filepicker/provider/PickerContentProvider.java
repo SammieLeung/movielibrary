@@ -43,6 +43,7 @@ public class PickerContentProvider extends ContentProvider {
     private static UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     private static final String COLUMN_PATH = "path";
+    private static final String COLUMN_FILESOURCE="file_source";
 
     private static final String DEVICE_TYPE_DLNA = "dlna";
     private static final String DEVICE_TYPE_LOCAL = "local";
@@ -54,7 +55,8 @@ public class PickerContentProvider extends ContentProvider {
             DocumentsContract.Document.COLUMN_DISPLAY_NAME,
             DocumentsContract.Document.COLUMN_LAST_MODIFIED,
             DocumentsContract.Document.COLUMN_SIZE,
-            COLUMN_PATH
+            COLUMN_PATH,
+            COLUMN_FILESOURCE
     };
 
     private static final String COLUMN_DEVICE_ID = "device_id";
@@ -238,6 +240,9 @@ public class PickerContentProvider extends ContentProvider {
                     break;
                 case DocumentsContract.Document.COLUMN_ICON:
                     row[i] = fileItem.getThumb();
+                    break;
+                case COLUMN_FILESOURCE:
+                    row[i]=fileItem.getFileSource();
                     break;
             }
         }

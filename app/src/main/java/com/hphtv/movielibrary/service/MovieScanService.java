@@ -15,6 +15,8 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.firefly.filepicker.data.bean.FileItem;
+import com.firefly.filepicker.provider.PickerContentProvider;
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
 import com.firefly.videonameparser.utils.StringUtils;
@@ -262,20 +264,25 @@ public class MovieScanService extends Service {
                 }
                 int name_index = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME);
                 int path_index = cursor.getColumnIndexOrThrow("path");
-                int date_index = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED);
-                int size_index = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_SIZE);
                 int type_index = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE);
+                int filesource_index = cursor.getColumnIndexOrThrow("file_source");
                 String filename = cursor.getString(name_index);
                 String path = cursor.getString(path_index);
-                mMediaMetadataRetriever.setDataSource(path);
-                String MetadataRetrieverTitle = mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                String metadataRetrieverTitle = null;
+                int fileSource=cursor.getInt(filesource_index);
+                Log.v(TAG, "path=" + path);
+                Log.v(TAG, "file_source = " + filesource_index);
                 String type = (cursor.getString(type_index));
                 String extension = type.substring(type.lastIndexOf("/") + 1, type.length());
                 LogUtil.v(TAG, "原名 filename:" + filename);
-                LogUtil.v(TAG, "MetadataRetrieverTitle:" + MetadataRetrieverTitle);
                 LogUtil.v(TAG, "path " + path);
                 LogUtil.v(TAG, "type " + type);
-                MovieNameInfo mni = FileScanUtil.simpleParse(MetadataRetrieverTitle == null ? filename : MetadataRetrieverTitle);
+                if(fileSource==FileItem.EXTERNAL) {
+                    mMediaMetadataRetriever.setDataSource(path);
+                    metadataRetrieverTitle = mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                    LogUtil.v(TAG, "MetadataRetrieverTitle:" + metadataRetrieverTitle);
+                }
+                MovieNameInfo mni = FileScanUtil.simpleParse(metadataRetrieverTitle == null ? filename : metadataRetrieverTitle);
                 VideoFile videoFile = new VideoFile();
                 videoFile.setFilename(filename);
                 videoFile.setUri(path);
@@ -369,7 +376,7 @@ public class MovieScanService extends Service {
                     if (simpleMovie == null)
                         for (int i = 1; i < name.length(); i++) {
                             String newSearchKey = name.substring(0, name.length() - i);
-                            simpleMovie = MtimeApi.SearchAMovieByApi(newSearchKey,name);
+                            simpleMovie = MtimeApi.SearchAMovieByApi(newSearchKey, name);
                             if (simpleMovie != null)
                                 break;
                         }

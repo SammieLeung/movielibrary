@@ -114,7 +114,8 @@ public class SmbScan extends AbstractScanFiles {
                             null,
                             contentType,
                             String.valueOf(smbFile.getLastModified()),
-                            file.getContentLength());
+                            file.getContentLength(),
+                            FileItem.SMB);
 
                     addResultItem(item);
                 }
