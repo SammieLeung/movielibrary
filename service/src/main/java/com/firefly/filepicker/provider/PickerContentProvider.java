@@ -24,6 +24,7 @@ import com.firefly.filepicker.utils.StorageHelper;
 import org.fourthline.cling.model.meta.Device;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import jcifs.Config;
+import jcifs.context.SingletonContext;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -284,7 +286,7 @@ public class PickerContentProvider extends ContentProvider {
 
         for (SaveItem saveItem : saveItems) {
             try {
-                SmbFile smbFile = new SmbFile(saveItem.getDir());
+                SmbFile smbFile = new SmbFile(saveItem.getDir(),SingletonContext.getInstance().withAnonymousCredentials());
                 URL url = new URL("smb", smbFile.getServer(),  smbFile.getShare());
 
                 urls.add(url);
@@ -294,7 +296,12 @@ public class PickerContentProvider extends ContentProvider {
         }
 
         for (URL url : urls) {
-            SmbFile smbFile = new SmbFile(url);
+            SmbFile smbFile = null;
+            try {
+                smbFile=new SmbFile(url, SingletonContext.getInstance().withAnonymousCredentials());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
             try {
                 smbFile.exists();
             } catch (SmbException e) {

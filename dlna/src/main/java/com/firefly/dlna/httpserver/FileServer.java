@@ -12,6 +12,7 @@ import java.net.URLConnection;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
+import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -97,11 +98,11 @@ public class FileServer extends NanoHTTPD implements IServer {
                     } else {
                         try {
                             smbFile = new SmbFile(cacheValue.uri,
-                                    NtlmPasswordAuthentication.ANONYMOUS);
+                                    SingletonContext.getInstance().withAnonymousCredentials());
                             smbFile.connect();
                         } catch (SmbException e) {
                             smbFile = new SmbFile(cacheValue.uri,
-                                    new NtlmPasswordAuthentication("?", "GUEST", ""));
+                                  SingletonContext.getInstance().withGuestCrendentials());
                             smbFile.connect();
                         }
 

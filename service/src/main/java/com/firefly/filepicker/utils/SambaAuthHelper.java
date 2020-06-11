@@ -13,6 +13,8 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import jcifs.CIFSContext;
+import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -23,13 +25,12 @@ import jcifs.smb.SmbFile;
 
 public class SambaAuthHelper {
     private static String SAVE_DIR = "samba/";
-    public static final NtlmPasswordAuthentication GUEST =
-            new NtlmPasswordAuthentication("", "GUEST", "");
+    public static final CIFSContext GUEST = SingletonContext.getInstance().withGuestCrendentials();
 
-    public static void save(Context context, Map<String, NtlmPasswordAuthentication> maps) {
+    public static void save(Context context, Map<String, CIFSContext> maps) {
         File filesDir = context.getFilesDir();
 
-        for (Map.Entry<String, NtlmPasswordAuthentication> entry : maps.entrySet()) {
+        for (Map.Entry<String, CIFSContext> entry : maps.entrySet()) {
             try {
                 File outFile = new File(filesDir, SAVE_DIR + entry.getKey());
                 if (!outFile.exists()) {
@@ -48,8 +49,8 @@ public class SambaAuthHelper {
         }
     }
 
-    public static Map<String, NtlmPasswordAuthentication> readAll(Context context) {
-        Map<String, NtlmPasswordAuthentication> maps = new HashMap<>();
+    public static Map<String, CIFSContext> readAll(Context context) {
+        Map<String, CIFSContext> maps = new HashMap<>();
         File fileDir = new File(context.getFilesDir(), SAVE_DIR);
         File[] files = fileDir.listFiles();
 
@@ -61,9 +62,9 @@ public class SambaAuthHelper {
             try {
                 FileInputStream inputStream = new FileInputStream(inFile);
                 ObjectInputStream ois = new ObjectInputStream(inputStream);
-                NtlmPasswordAuthentication authentication =
-                        (NtlmPasswordAuthentication) ois.readObject();
-                maps.put(inFile.getName(), authentication);
+                CIFSContext cifsContext =
+                        (CIFSContext) ois.readObject();
+                maps.put(inFile.getName(), cifsContext);
                 ois.close();
                 inputStream.close();
             } catch (IOException | ClassNotFoundException e) {
@@ -74,25 +75,25 @@ public class SambaAuthHelper {
         return maps;
     }
 
-    public static NtlmPasswordAuthentication read(Context context, String key) {
-        NtlmPasswordAuthentication authentication = NtlmPasswordAuthentication.ANONYMOUS;
+    public static CIFSContext read(Context context, String key) {
+        CIFSContext cifsContext = SingletonContext.getInstance().withAnonymousCredentials();
         File inFile = new File(context.getFilesDir(), SAVE_DIR + key);
 
         if (!inFile.exists()) {
-            return authentication;
+            return cifsContext;
         }
 
         try {
             FileInputStream inputStream = new FileInputStream(inFile);
             ObjectInputStream ois = new ObjectInputStream(inputStream);
-            authentication = (NtlmPasswordAuthentication) ois.readObject();
+            cifsContext = (CIFSContext) ois.readObject();
             ois.close();
             inputStream.close();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
 
-        return authentication;
+        return cifsContext;
     }
 
     public static String getSmbAuthKey(final SmbFile smbFile) {

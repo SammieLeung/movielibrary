@@ -9,7 +9,7 @@ import com.firefly.filepicker.utils.SambaAuthHelper;
 import java.net.MalformedURLException;
 import java.net.URLConnection;
 
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.CIFSContext;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -51,9 +51,9 @@ public class SmbScan extends AbstractScanFiles {
             SmbFile smbFile = new SmbFile(mNode.getId());
 
             if (smbFile.getURL().getUserInfo() == null) {
-                NtlmPasswordAuthentication authentication =
+                CIFSContext cifsContext =
                         SambaAuthHelper.read(mContext, SambaAuthHelper.getSmbAuthKey(smbFile));
-                smbFile = new SmbFile(smbFile.getURL(), authentication);
+                smbFile = new SmbFile(smbFile.getURL(), cifsContext);
             }
 
             scan(smbFile, DEPTH);

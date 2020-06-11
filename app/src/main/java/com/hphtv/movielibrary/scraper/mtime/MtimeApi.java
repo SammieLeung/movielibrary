@@ -34,18 +34,18 @@ import okhttp3.Response;
 public class MtimeApi {
     public static final String TAG = MtimeApi.class.getSimpleName();
 
-    public static SimpleMovie SearchAMovieByApi(String keyword){
-        return SearchAMovieByApi(keyword,null);
+    public static SimpleMovie SearchAMovieByApi(String keyword) {
+        return SearchAMovieByApi(keyword, null);
     }
 
-    public static SimpleMovie SearchAMovieByApi(String keyword,String originStr) {
+    public static SimpleMovie SearchAMovieByApi(String keyword, String originStr) {
         try {
-            keyword=keyword.trim();
+            keyword = keyword.trim();
             JSONArray movieAry = SearchMovies(keyword);
             if (movieAry != null && movieAry.size() > 0) {
                 int idx = 0;
                 float maxSimilarity = 0;
-                String compareStr= TextUtils.isEmpty(originStr)?keyword:originStr;
+                String compareStr = TextUtils.isEmpty(originStr) ? keyword : originStr;
                 for (int i = 0; i < movieAry.size(); i++) {
                     JSONObject movieObj = movieAry.getJSONObject(i);
                     String name = movieObj.getString("titlecn");
@@ -59,7 +59,7 @@ public class MtimeApi {
                     }
                     if (tmpSimilarity > maxSimilarity) {
                         idx = i;
-                        maxSimilarity=tmpSimilarity;
+                        maxSimilarity = tmpSimilarity;
                     }
                 }
                 JSONObject movieObj = movieAry.getJSONObject(idx);
@@ -215,21 +215,15 @@ public class MtimeApi {
             //剧照
             JSONArray images = JSON.parseArray(content);
 
-            Photo[] photo_set = new Photo[10];
-            int count = 0;
+            Photo[] photo_set = new Photo[images.size()];
             for (int i = 0; i < images.size(); i++) {
-                if (count < 10) {
-                    JSONObject _image = images.getJSONObject(i);
-                    String src = _image.getString("image");
-                    Photo photo = new Photo();
-                    photo.setImageUrl(src);
-                    photo.setThumb(src);
-                    photo.setIcon(src);
-                    photo_set[count] = photo;
-                    count++;
-                } else {
-                    break;
-                }
+                JSONObject _image = images.getJSONObject(i);
+                String src = _image.getString("image");
+                Photo photo = new Photo();
+                photo.setImageUrl(src);
+                photo.setThumb(src);
+                photo.setIcon(src);
+                photo_set[i] = photo;
             }
             movie.setPhotos(photo_set);
 

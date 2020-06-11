@@ -41,7 +41,6 @@ public abstract class AppBaseActivity extends Activity {
         mServiceConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                Log.v(TAG,"onServiceConneted "+name );
                 DeviceMonitorService.MonitorBinder binder = (DeviceMonitorService.MonitorBinder) service;
                 mService = binder.getService();
                 mService.setOnDevcieChangeListener(new DeviceMonitorService.OnDeviceChange() {
@@ -63,16 +62,12 @@ public abstract class AppBaseActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-//        LocalBroadcastManager.getInstance(AppBaseActivity.this).unregisterReceiver(mDeviceReceiver);
         unBindServices();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        IntentFilter deviceListIntentFilter = new IntentFilter();
-//        deviceListIntentFilter.addAction(ConstData.BoardCastMsg.ACTION_DEVICE_LIST_REFRESH);
-//        LocalBroadcastManager.getInstance(AppBaseActivity.this).registerReceiver(mDeviceReceiver, deviceListIntentFilter);
         attachServices();
     }
 
@@ -81,25 +76,13 @@ public abstract class AppBaseActivity extends Activity {
     public abstract void OnDeviceChange(Context context,List<Device> deviceList);
     public abstract void OnDeviceMonitorServiceConnect(DeviceMonitorService service);
 
-//    private class DeviceListReceiver extends BroadcastReceiver {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            Log.v(TAG, "LocalBroadCastMsg intent.getAction() " + intent.getAction());
-//           List<Device> deviceList = (List<Device>) intent.getSerializableExtra(ConstData.MapKey.KEY_DEVICE_LIST);
-//            OnDeviceChange(context, deviceList);
-//        }
-//    }
-
-//    private DeviceListReceiver mDeviceReceiver = new DeviceListReceiver();
 
     private void attachServices() {
-        Log.v(TAG,"attachServices");
         Intent intent = new Intent(this, DeviceMonitorService.class);
         bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
     }
 
     private void unBindServices() {
-        Log.v(TAG,"unBindServices");
         unbindService(mServiceConnection);
     }
 

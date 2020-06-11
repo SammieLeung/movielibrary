@@ -47,7 +47,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.CIFSContext;
+import jcifs.context.SingletonContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -78,7 +80,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     private SparseArray<Node> mCancelTasks = new SparseArray<>();
 
-    private Map<String, NtlmPasswordAuthentication> mSmbAuthMap;
+    private Map<String, CIFSContext> mSmbAuthMap;
 
     private BroadcastReceiver mDeviceChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -412,18 +414,18 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     private String createSmbBasicAuthUrl(SmbFile smbFile) {
         StringBuilder builder = new StringBuilder(DEFAULT_ADDRESS);
-        NtlmPasswordAuthentication authentication =
+        CIFSContext cifsContext =
                 mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
 
         MediaDirHelper.addAndSave(mContext, new SaveItem(SaveItem.TYPE_SMB, smbFile.getCanonicalPath()));
-        if (authentication == null || authentication == NtlmPasswordAuthentication.ANONYMOUS) {
+        if (cifsContext == null || cifsContext.getCredentials().isAnonymous()) {
             return smbFile.getCanonicalPath();
         }
 
-        if (!TextUtils.isEmpty(authentication.getName())) {
-            builder.append(authentication.getName().replace('\\', ';'));
+        if (!TextUtils.isEmpty(((NtlmPasswordAuthenticator)cifsContext.getCredentials()).getName())) {
+            builder.append(((NtlmPasswordAuthenticator)cifsContext.getCredentials()).getName().replace('\\', ';'));
             builder.append(':');
-            builder.append(authentication.getPassword());
+            builder.append(((NtlmPasswordAuthenticator)cifsContext.getCredentials()).getPassword());
             builder.append('@');
         }
 
@@ -431,12 +433,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     }
 
     private void checkSmbAuthData(final Node node, Bundle data) {
-        NtlmPasswordAuthentication authentication = null;
+        CIFSContext cifsContext = null;
         boolean isAnonymous = data.getBoolean("anonymous");
         boolean checkOnly = data.getBoolean("checkOnly");
 
         if (isAnonymous) {
-            authentication = NtlmPasswordAuthentication.ANONYMOUS;
+            cifsContext = SingletonContext.getInstance().withAnonymousCredentials();
         } else {
             String username = data.getString("username");
             String password = data.getString("password");
@@ -448,25 +450,30 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                 username = username.substring( i + 1 );
             }
 
-            authentication = new NtlmPasswordAuthentication(domain, username, password);
+            cifsContext =SingletonContext.getInstance().withCredentials(new NtlmPasswordAuthenticator(domain, username, password));
         }
 
         SmbFile smbFile = null;
         if (node.getItem() instanceof SmbFile) {
             SmbFile f = (SmbFile) node.getItem();
-            smbFile = new SmbFile(f.getURL(), authentication);
-            node.setItem(smbFile);
+            try {
+                smbFile = new SmbFile(f.getURL(), cifsContext);
+                node.setItem(smbFile);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+
         }
 
         if (checkOnly) {
-            smbAuth(node, authentication, data);
+            smbAuth(node, cifsContext, data);
         } else {
-            sambaGetPath(node, authentication);
+            sambaGetPath(node, cifsContext);
         }
     }
 
     private void smbAuth(final Node node,
-                         final NtlmPasswordAuthentication authentication,
+                         final CIFSContext cifsContext,
                          final Bundle data) {
         new Thread(new Runnable() {
             @Override
@@ -510,8 +517,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         case SmbException.NT_STATUS_ACCOUNT_DISABLED:
                         case SmbException.NT_STATUS_ACCOUNT_LOCKED_OUT:
                         case SmbException.NT_STATUS_ACCESS_DENIED:
-                            if (authentication == NtlmPasswordAuthentication.ANONYMOUS) {
-                                node.setItem(new SmbFile(smbFile.getURL(), SambaAuthHelper.GUEST));
+                            if (cifsContext.getCredentials().isAnonymous()) {
+                                try {
+                                    node.setItem(new SmbFile(smbFile.getURL(), SambaAuthHelper.GUEST));
+                                } catch (MalformedURLException ex) {
+                                    ex.printStackTrace();
+                                }
                                 smbAuth(node, SambaAuthHelper.GUEST, data);
                             } else {
                                 showError(node, mContext.getString(R.string.login_failed_try_again));
@@ -528,7 +539,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                     showAuthDialog(node, data);
                     return;
                 }
-                mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), authentication);
+                mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), cifsContext);
                 if (mSelectType == SELECT_DIR) {
                     showSetPrivateDialog(node);
                 } else {
@@ -691,16 +702,16 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
         switch (node.getType()) {
             case Node.SAMBA_DEVICE:
-                sambaGetPath(node, NtlmPasswordAuthentication.ANONYMOUS);
+                sambaGetPath(node, SingletonContext.getInstance().withAnonymousCredentials());
                 break;
             default:
-                NtlmPasswordAuthentication authentication = null;
+                CIFSContext cifsContext = null;
                 if (node.getItem() instanceof SmbFile) {
                     smbFile = (SmbFile) node.getItem();
-                    authentication = mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
+                    cifsContext = mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
 
                     try {
-                        if (authentication == null
+                        if (cifsContext == null
                                 && SmbFileHelper.getType(smbFile) == SmbFile.TYPE_SHARE) {
                             showAuthDialog(node, false);
                             return;
@@ -709,12 +720,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         e.printStackTrace();
                     }
                 }
-                sambaGetPath(node, authentication);
+                sambaGetPath(node, cifsContext);
                 break;
         }
     }
 
-    private void sambaGetPath(final Node node, final NtlmPasswordAuthentication authentication) {
+    private void sambaGetPath(final Node node, final CIFSContext cifsContext) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -729,11 +740,11 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                 try {
                     int type = Node.SAMBA_DEVICE;
 
-                    if (authentication != null) {
-                        smbFile = new SmbFile(url, authentication);
-                        mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), authentication);
+                    if (cifsContext != null) {
+                        smbFile = new SmbFile(url, cifsContext);
+                        mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), cifsContext);
                     } else {
-                        smbFile = new SmbFile(url, NtlmPasswordAuthentication.ANONYMOUS);
+                        smbFile = new SmbFile(url,SingletonContext.getInstance().withAnonymousCredentials());
                     }
 
                     if (node.getType() != Node.SAMBA_CATEGORY) {
@@ -777,8 +788,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         case SmbException.NT_STATUS_ACCOUNT_DISABLED:
                         case SmbException.NT_STATUS_ACCOUNT_LOCKED_OUT:
                         case SmbException.NT_STATUS_ACCESS_DENIED:
-                            if (authentication == NtlmPasswordAuthentication.ANONYMOUS
-                                    || authentication == null) {
+                            if (cifsContext==null||cifsContext.getCredentials().isAnonymous()) {
                                 // 尝试使用GUEST帐号
                                 sambaGetPath(node, SambaAuthHelper.GUEST);
                             } else {

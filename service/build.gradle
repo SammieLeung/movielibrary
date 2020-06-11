@@ -20,23 +20,22 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation fileTree(dir: '../libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation support["appcompat-v7"]
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation support["design"]
     testImplementation 'junit:junit:4.12'
-
     implementation 'org.fourthline.cling:cling-core:2.1.1'
     implementation 'org.fourthline.cling:cling-support:2.1.1'
     implementation 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
     implementation 'org.eclipse.jetty:jetty-servlet:8.1.18.v20150929'
     implementation 'org.eclipse.jetty:jetty-client:8.1.18.v20150929'
     implementation 'org.slf4j:slf4j-jdk14:1.7.14'
-
-    implementation('org.simpleframework:simple-xml:2.7.1'){
+    implementation('org.simpleframework:simple-xml:2.7.1') {
         exclude module: 'stax'
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
+    implementation group: 'eu.agno3.jcifs',name:'jcifs-ng',version:'2.1.4'
+
 }

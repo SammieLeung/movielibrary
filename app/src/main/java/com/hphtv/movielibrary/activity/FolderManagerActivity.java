@@ -99,7 +99,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_setting);
-        Log.v(TAG, "onCreate");
         this.mApp = (MovieApplication) getApplication();
         this.mContext = FolderManagerActivity.this;
         mPreferences = MovieSharedPreferences.getInstance();
@@ -113,7 +112,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
 
     @Override
     protected void onResume() {
-        Log.v(TAG, "onResume()");
         super.onResume();
         Intent intent = new Intent(this, MovieScanService.class);
         bindService(intent, connection, Service.BIND_AUTO_CREATE);
@@ -121,14 +119,12 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
 
     @Override
     protected void onPause() {
-        Log.v(TAG, "onPause()");
         unbindService(connection);
         super.onPause();
     }
 
 
     private void initData() {
-        Log.v(TAG, "initData()");
         mHashMapList.clear();
 
         new Thread(new Runnable() {
@@ -142,7 +138,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                     mVideoFileDao = new VideoFileDao(mContext);
 
                 SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss");
-                Log.v(TAG, "begin search connectdevice; " + format.format(System.currentTimeMillis()));
                 Cursor dir_cursor;
                 if (mCheckBoxPrivate.isChecked()) {
                     dir_cursor = mDirectoryDao.selectAll();
@@ -150,7 +145,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                     dir_cursor = mDirectoryDao.select("is_encrypted=?", new String[]{String.valueOf(0)}, null);
                 }
                 List<Directory> dirList = mDirectoryDao.parseList(dir_cursor);
-                Log.v(TAG, "begin search end; " + format.format(System.currentTimeMillis()));
                 for (Directory dir : dirList) {
                     final HashMap<String, Object> map = new HashMap<String, Object>();
                     int videoCount = dir.getVideo_number();
@@ -193,7 +187,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                             setWidgetEnableWhenScanning(false);
                             showFooterResult();
                         } else {
-                            Log.v(TAG, "run1");
                             mBtnScan.setText(getResources().getString(R.string.scan_begin));
                             setWidgetEnableWhenScanning(true);
                             hideFooterResult();
