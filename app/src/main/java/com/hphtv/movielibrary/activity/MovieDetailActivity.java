@@ -7,16 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images;
-import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.text.TextUtils;
@@ -70,7 +63,6 @@ import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
 import com.hphtv.movielibrary.util.StrUtils;
-import com.hphtv.movielibrary.util.UriParseUtil;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
@@ -79,13 +71,9 @@ import com.hphtv.movielibrary.view.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.view.DrawTopButton;
 import com.hphtv.movielibrary.view.MovieEditFragment;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import me.khrystal.library.widget.CircleRecyclerView;
 import me.khrystal.library.widget.ItemViewMode;
@@ -108,23 +96,24 @@ public class MovieDetailActivity extends AppBaseActivity {
     private TextView mLanguagesTv;// 语言
     private TextView mPubArea;//出品地区
     private TextView mActorsTv;// 演员
-    private LinearLayout mActorsGroup;
+    private LinearLayout mViewActors;
     private TextView mGenresTv;// 电影/类型
     //    TextView mPathTv;// 路径
     private TextView mDetailTv;// 影片简介
 
-    private CircleRecyelerViewWithMouseScroll mTrailerCircleRecyelerView;
+    private CircleRecyelerViewWithMouseScroll mCircleRVforTrailer;
     private ItemViewMode mItemViewMode;
     private LinearLayoutManager mLayoutManager;
-    private MovieTrailerAdapter movieTrailerAdapter;
-    private RelativeLayout mMovieTrailerRL;
+    private MovieTrailerAdapter mMovieTrailerAdapter;
+    private RelativeLayout mViewMovieTrailer;
 
-    private ScrollView mDetialSV;
+    private ScrollView mSVSummery;
     private DrawTopButton mBtnPlay;// 播放
     private DrawTopButton mBtnFavorite;//收藏
     private DrawTopButton mBtnRemove;// 删除
     private DrawTopButton mBtnEdit;// 搜索按钮
-    private DrawTopButton mTrailerBtn;// 预告片
+    private DrawTopButton mBtnTrailer;// 预告片
+    private DrawTopButton mBtnBack;//返回
     public static final int SEARCH_SUCCESS = 1;
     public static final int SEARCH_BEGIN = 0;
     public static final int SEARCH_ERROR = -1;
@@ -138,14 +127,15 @@ public class MovieDetailActivity extends AppBaseActivity {
     boolean isExistButNeedUpdate;
     boolean isChangeMovie;
     private int random;
-    private List<MovieTrailer> trailers_list = new ArrayList<MovieTrailer>();
+    private List<MovieTrailer> mMovieTrailerList = new ArrayList<MovieTrailer>();
     private CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
+    private CustomRadioDialogFragment checkGroupDialogFragment;
     private MovieScanService mScanService;
 
     private MovieWrapper mCurrentWrapper;
     private Movie mCurrentMovie;
-    private int currentMode;
-    List<VideoFile> videoFileList;
+    private int mCurrentMode;
+    List<VideoFile> mVideoFileList;
 
 
     MovieWrapperDao mMovieWrapperDao;
@@ -227,22 +217,24 @@ public class MovieDetailActivity extends AppBaseActivity {
         mGenresTv = (TextView) findViewById(R.id.tv_genres);
 //        mPathTv = (TextView) findViewById(R.id.tv_path);
         mDetailTv = (TextView) findViewById(R.id.tv_detail);
-        mDetialSV = (ScrollView) findViewById(R.id.sv_detail);
+        mSVSummery = (ScrollView) findViewById(R.id.sv_detail);
         mPubArea = (TextView) findViewById(R.id.pub_area);
-        mBtnPlay = (DrawTopButton) findViewById(R.id.bt_play);
-        mBtnRemove = (DrawTopButton) findViewById(R.id.bt_remove);
-        mBtnEdit = (DrawTopButton) findViewById(R.id.bt_edit);
-        mTrailerBtn = (DrawTopButton) findViewById(R.id.btn_trailer);
+        mBtnPlay = (DrawTopButton) findViewById(R.id.btn_play);
+        mBtnRemove = (DrawTopButton) findViewById(R.id.btn_remove);
+        mBtnEdit = (DrawTopButton) findViewById(R.id.btb_edit);
+        mBtnTrailer = (DrawTopButton) findViewById(R.id.btn_trailer);
         mBtnFavorite = (DrawTopButton) findViewById(R.id.btn_favorite);
+        mBtnBack = findViewById(R.id.btn_exit);
         mBtnEdit.setOnClickListener(mClickListener);
-        mTrailerBtn.setOnClickListener(mClickListener);
+        mBtnTrailer.setOnClickListener(mClickListener);
         mBtnPlay.setOnClickListener(mClickListener);
         mBtnRemove.setOnClickListener(mClickListener);
         mBtnFavorite.setOnClickListener(mClickListener);
-        mMovieTrailerRL = (RelativeLayout) findViewById(R.id.rl_trailer);
+        mBtnBack.setOnClickListener(mClickListener);
+        mViewMovieTrailer = (RelativeLayout) findViewById(R.id.rl_trailer);
 
-        mTrailerCircleRecyelerView = (CircleRecyelerViewWithMouseScroll) findViewById(R.id.rv_trailer);
-        mTrailerCircleRecyelerView.setOnCenterItemFocusListener(new CircleRecyclerView.OnCenterItemFocusListener() {
+        mCircleRVforTrailer = (CircleRecyelerViewWithMouseScroll) findViewById(R.id.rv_trailer);
+        mCircleRVforTrailer.setOnCenterItemFocusListener(new CircleRecyclerView.OnCenterItemFocusListener() {
             @Override
             public void onCenterItemFocus(View v, boolean isViewOnCenter) {
                 if (isViewOnCenter) {
@@ -253,10 +245,10 @@ public class MovieDetailActivity extends AppBaseActivity {
             }
         });
 
-        mActorsGroup = (LinearLayout) findViewById(R.id.actors_group);
+        mViewActors = (LinearLayout) findViewById(R.id.actors_group);
         initMovieTrailerList();
         mBtnPlay.requestFocus();
-        mDetialSV.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mSVSummery.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
@@ -275,39 +267,27 @@ public class MovieDetailActivity extends AppBaseActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mLayoutManager.setOrientation(OrientationHelper.HORIZONTAL);
 
-        mTrailerCircleRecyelerView.setLayoutManager(mLayoutManager);
+        mCircleRVforTrailer.setLayoutManager(mLayoutManager);
 
         mItemViewMode = new ScaleXCenterViewMode();
-        mTrailerCircleRecyelerView.setViewMode(mItemViewMode);
-        mTrailerCircleRecyelerView.setNeedCenterForce(true);
-        mTrailerCircleRecyelerView.setNeedLoop(true);
+        mCircleRVforTrailer.setViewMode(mItemViewMode);
+        mCircleRVforTrailer.setNeedCenterForce(true);
+        mCircleRVforTrailer.setNeedLoop(true);
         // 如果可以确定每个item的高度是固定的，设置这个选项可以提高性能
-        mTrailerCircleRecyelerView.setHasFixedSize(true);
+        mCircleRVforTrailer.setHasFixedSize(true);
         // 创建并设置Adapter
-        movieTrailerAdapter = new MovieTrailerAdapter(MovieDetailActivity.this,
-                trailers_list);
-        mTrailerCircleRecyelerView.setAdapter(movieTrailerAdapter);
-        movieTrailerAdapter
+        mMovieTrailerAdapter = new MovieTrailerAdapter(MovieDetailActivity.this,
+                mMovieTrailerList);
+        mCircleRVforTrailer.setAdapter(mMovieTrailerAdapter);
+        mMovieTrailerAdapter
                 .setOnItemClickListener(mCenterItemClickListener);
+        mViewMovieTrailer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideMovieTrailer();
+            }
+        });
 //        new CenterLinearSnapHelper().attachToRecyclerView(mTrailerCircleRecyelerView);
-    }
-
-
-    private void startLoading() {
-        LogUtil.v(TAG, "startLoading");
-        if (mLoadingCircleViewDialogFragment == null) {
-            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
-            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
-        }
-
-    }
-
-    private void stopLoading() {
-        LogUtil.v(TAG, "stopLoading");
-        if (mLoadingCircleViewDialogFragment != null) {
-            mLoadingCircleViewDialogFragment.dismiss();
-            mLoadingCircleViewDialogFragment = null;
-        }
     }
 
     private void refreshMovieInfo(Intent intent) {
@@ -315,22 +295,16 @@ public class MovieDetailActivity extends AppBaseActivity {
         isExist = false;
         isExistButNeedUpdate = false;
         isChangeMovie = false;
-//        if (videoFileList == null) {
-//            videoFileList = new ArrayList<>();
-//        }
-
         try {
             int mode = intent.getIntExtra("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-
-            currentMode = mode;
-
-            switch (currentMode) {
+            mCurrentMode = mode;
+            switch (mCurrentMode) {
                 case ConstData.MovieDetailMode.MODE_EDIT:
-                    ButtonEnable(mBtnEdit, true);
+                    buttonEnable(mBtnEdit, true);
                     getMovie((SimpleMovie) intent.getSerializableExtra("simplemovie"));
                     break;
                 case ConstData.MovieDetailMode.MODE_OUTSIDE:
-                    ButtonEnable(mBtnEdit, false);
+                    buttonEnable(mBtnEdit, false);
                     getMovieNotSave((SimpleMovie) intent.getSerializableExtra("simplemovie"), (Movie) intent.getSerializableExtra("mCurrentMovie"), (VideoFile) intent.getSerializableExtra("videoFile"));
                     break;
                 case ConstData.MovieDetailMode.MODE_WRAPPER:
@@ -345,7 +319,7 @@ public class MovieDetailActivity extends AppBaseActivity {
         }
     }
 
-    private void ButtonEnable(View v, boolean b) {
+    private void buttonEnable(View v, boolean b) {
         v.setEnabled(b);
         v.setFocusable(b);
     }
@@ -355,9 +329,9 @@ public class MovieDetailActivity extends AppBaseActivity {
 
         Cursor cursor = mVideoFileDao.select("wrapper_id=?", new String[]{String.valueOf(wrapper.getId())}, null);
         if (cursor.getCount() > 0) {
-            videoFileList = mVideoFileDao.parseList(cursor);
+            mVideoFileList = mVideoFileDao.parseList(cursor);
         }
-        VideoFile videoFile = videoFileList.get(0);
+        VideoFile videoFile = mVideoFileList.get(0);
         LogUtil.v(TAG, "file name=" + videoFile.getFilename());
         int end = videoFile.getFilename().lastIndexOf(".");
         String filename = videoFile.getFilename();
@@ -372,7 +346,6 @@ public class MovieDetailActivity extends AppBaseActivity {
         mCurrentMovie.setApi(ConstData.Scraper.MTIME);
     }
 
-
     private void getMovieByWrapperId(final MovieWrapper wrapper) {
         startLoading();
         new Thread(new Runnable() {
@@ -382,7 +355,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                 long id = wrapper.getId();
                 Cursor videoFileCursor = mVideoFileDao.select("wrapper_id=?", new String[]{String.valueOf(id)}, null);
                 if (videoFileCursor.getCount() > 0) {
-                    videoFileList = mVideoFileDao.parseList(videoFileCursor);
+                    mVideoFileList = mVideoFileDao.parseList(videoFileCursor);
                 }
 
                 if (Scrapers != null && Scrapers.length > 0) {
@@ -413,214 +386,10 @@ public class MovieDetailActivity extends AppBaseActivity {
     }
 
     /**
-     * 根据VideoFileId id查询电影
-     *
-     * @param id
-     */
-    private void getMovieByVid(final String id) {
-//        Log.v(TAG, "getMovieByVid() id=" + id);
-//        startLoading();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //1.清空播放文件列表
-//                videoFileList.clear();
-//                //2.数据库查找当前文件信息,获取电影id
-//                VideoFileDao vDao = new VideoFileDao(MovieDetailActivity.this);
-//                Cursor vcursor = vDao.select("id=?", new String[]{id},
-//                        "0,1");
-//                if (vcursor.getCount() > 0) {//根据id查找到videofile
-//                    VideoFile videoFile = vDao.parseList(vcursor).get(0);
-//                    String movieId = null; //获取videofile对应的电影。
-//                    String baseclause = null;
-//
-////                    switch (api_version) {
-////                        case ConstData.Scraper.DOUBAN:
-////                            movieId = videoFile.getMovieId();
-////                            baseclause = "movie_id=?";
-////                            break;
-////                        case ConstData.Scraper.IMDB:
-////                            movieId = videoFile.getImdb_movie_id();
-////                            baseclause = "imdb_movie_id=?";
-////                            break;
-////                        case ConstData.Scraper.MTIME:
-////                            movieId = videoFile.getMtime_movie_id();
-////                            baseclause = "mtime_movie_id=?";
-////                            break;
-////                    }
-//                    //3.电影id为空或者为-1,则表示没有匹配的电影
-//                    if (!TextUtils.isEmpty(movieId) && !movieId.equals("-1")) {
-//                        //4.有匹配电影则查找出该电影所关联的所有文件
-//                        Cursor videoFilesCursor = vDao.select(baseclause, new String[]{movieId}, null);
-//                        videoFileList = vDao.parseList(videoFilesCursor);
-//                    }
-//                    //5.根据电影ID获取电影
-//                    if (mScanService != null)
-//                        mCurrentMovie = mScanService.getMovie(movieId);
-//                    else
-//                        Log.v(TAG, "mScanService fail!");
-//                    //6.如果获取到的电影为null,则建立一个空白的电影界面
-//                    if (mCurrentMovie == null) {
-//                        buildNullMovie(videoFile);
-//                    }
-//                    //7.允许打开预告片,并刷新界面
-//                    isParseOver = true;
-//                    mHandler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            refresh(mCurrentMovie, videoFileList);
-//                        }
-//                    });
-//                } else {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            stopLoading();
-//                        }
-//                    });
-//                }
-//            }
-//        }).start();
-
-    }
-
-
-    /**
-     * 根据电影ID获取电影
-     *
-     * @param id 电影在数据库的索引id
-     */
-    private void getMovieByMovieId(final String id) {
-//        Log.v(TAG, "getMovieByMovieId()");
-//        startLoading();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                //1.清空播放文件列表
-//                videoFileList.clear();
-//
-//                if (!TextUtils.isEmpty(id) && !id.equals("-1")) {
-//                    //2.有匹配电影则查找出该电影所关联的所有文件
-//                    VideoFileDao vDao = new VideoFileDao(MovieDetailActivity.this);
-//                    String baseclause = "";
-//                    switch (api_version) {
-//                        case ConstData.Scraper.DOUBAN:
-//                            baseclause = "movie_id=?";
-//                            break;
-//                        case ConstData.Scraper.IMDB:
-//                            baseclause = "imdb_movie_id=?";
-//                            break;
-//                        case ConstData.Scraper.MTIME:
-//                            baseclause = "mtime_movie_id=?";
-//                            break;
-//                    }
-//                    Cursor videoFilesCursor = vDao.select(baseclause, new String[]{id}, null);
-//                    videoFileList = vDao.parseVideoFiles(videoFilesCursor);
-//                }
-//                //3.根据电影ID获取电影
-//                if (mScanService != null)
-//                    mCurrentMovie = mScanService.getMovie(id);
-//                else
-//                    Log.v(TAG, "mScanService fail!");
-//                //4.允许打开预告片,并刷新界面
-//                isParseOver = true;
-//                mHandler.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        refresh(mCurrentMovie, videoFileList);
-//                    }
-//                });
-//            }
-//
-//
-////                videoFileList.clear();
-////                MovieDao dao = new MovieDao(MovieDetailActivity.this);
-////                VideoFileDao vDao = new VideoFileDao(MovieDetailActivity.this);
-////
-////
-////                if (!TextUtils.isEmpty(movieId) && !movieId.equals("-1")) {
-////                    Cursor cursor = dao.select("id=?", new String[]{movieId},
-////                            "0,1");
-////                    if (cursor.getCount() > 0) {//根据id查找到Movie
-////                        mCurrentMovie = dao.parseMovies(cursor).get(0);
-////                        Cursor videoFilesCursor = vDao.select("movie_id=?", new String[]{movieId}, null);
-////                        videoFileList = vDao.parseVideoFiles(videoFilesCursor);
-////                        String uptime = mCurrentMovie.getUptime();
-////                        long currentTime = System.currentTimeMillis();
-////
-////                        if (TextUtils.isEmpty(uptime)) {
-////                            uptime = String.valueOf(currentTime);
-////                            mCurrentMovie.setUptime(uptime);
-////                            ContentValues contentValues = dao
-////                                    .parseContentValues(mCurrentMovie);
-////                            dao.update(contentValues, "id=?",
-////                                    new String[]{mCurrentMovie.getId()});
-////                        }
-////                        long updateTime = Long.valueOf(uptime);
-////                        if (currentTime - updateTime > MovieDao.DEFAULT_TIME) {
-////                            isExistButNeedUpdate = true;
-////                            Log.v(TAG, "isExistButNeedUpdate " + isExistButNeedUpdate);
-////                        }
-////
-////                        isParseOver = true;
-////                        mHandler.post(new Runnable() {
-////                            @Override
-////                            public void run() {
-////                                refresh(mCurrentMovie, videoFileList);
-////                            }
-////                        });//先给用户显示.
-////                        if (isExistButNeedUpdate) {
-////
-////                            String url = mCurrentMovie.getAlt();//上面设置过，获取自己的路径
-////                            if (url != null && !url.equals("") && !url.equals("null")) {
-////                                Movie movie = DoubanApi.parserMovieInfo(url);
-////                                if (movie == null) {
-////                                    mHandler.post(new Runnable() {
-////                                        @Override
-////                                        public void run() {
-////                                            stopLoading();
-////                                            Toast.makeText(MovieDetailActivity.this, "获取电影信息失败！" + MovieLibraryError.SERVICE_UNAVAILABLE, Toast.LENGTH_LONG).show();
-////                                        }
-////                                    });
-////                                    return;
-////                                }
-////
-////                                String titlepinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie);
-////
-////                /*--------获取不到的属性重新赋值-------*/
-////                                movie.setUptime(String.valueOf(System
-////                                        .currentTimeMillis()));
-////                                movie.setTitlePinyin(titlepinyin);
-////                                ContentValues contentValues = dao
-////                                        .parseContentValues(movie);// 将movie对象转换为ContentValues对象
-////                                long rowId = -1;
-////                                rowId = dao.update(contentValues, "id=?",
-////                                        new String[]{mCurrentMovie.getId()});
-////                                movie.setId(mCurrentMovie.getId());
-////                                mCurrentMovie = movie;
-////                                isParseOver = true;
-////                                mHandler.post(new Runnable() {
-////                                    @Override
-////                                    public void run() {
-////                                        refresh(mCurrentMovie, videoFileList);
-////                                    }
-////                                });
-////                            }
-////                        }
-////                    }
-////                }
-//
-//        }).start();
-
-    }
-
-    /**
      * for MODE_EDIT
      *
      * @param simpleMovie
      */
-
     private void getMovie(final SimpleMovie simpleMovie) {
         Log.v(TAG, "getMovie for MODE_EDIT");
         startLoading();
@@ -699,12 +468,9 @@ public class MovieDetailActivity extends AppBaseActivity {
 
                 } else {
                     isParseOver = true;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            setResult(1);
-                            refresh(mCurrentMovie);
-                        }
+                    runOnUiThread(() -> {
+                        setResult(1);
+                        refresh(mCurrentMovie);
                     });
                 }
             }
@@ -712,14 +478,13 @@ public class MovieDetailActivity extends AppBaseActivity {
 
     }
 
-
     private void getMovieNotSave(final SimpleMovie simpleMovie, final Movie movie, final VideoFile videoFile) {
         Log.v(TAG, "getMovieNotSave");
         startLoading();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                videoFileList.clear();
+                mVideoFileList.clear();
                 Movie basemovie = DoubanApi
                         .parserBaseMovieInfo(simpleMovie);// 解析基本电影信息
                 Movie newMovie = DoubanApi
@@ -734,7 +499,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                     });
                     return;
                 }
-                videoFileList.add(videoFile);
+                mVideoFileList.add(videoFile);
                 mCurrentMovie = newMovie;
                 isParseOver = true;
                 runOnUiThread(new Runnable() {
@@ -748,7 +513,6 @@ public class MovieDetailActivity extends AppBaseActivity {
 
 
     }
-
 
     private void refresh(Movie movie) {
         Rating rating = movie.getRating();
@@ -818,10 +582,10 @@ public class MovieDetailActivity extends AppBaseActivity {
 
         String casts = StrUtils.arrayToString(movie.getCasts());
         if (TextUtils.isEmpty(casts)) {
-            mActorsGroup.setVisibility(View.GONE);
+            mViewActors.setVisibility(View.GONE);
         } else {
             mActorsTv.setText(casts);
-            mActorsGroup.setVisibility(View.VISIBLE);
+            mViewActors.setVisibility(View.VISIBLE);
         }
 
         String genres = StrUtils.arrayToString(movie.getGenres());
@@ -869,237 +633,55 @@ public class MovieDetailActivity extends AppBaseActivity {
         stopLoading();
     }
 
+    /**
+     * 编辑封面信息
+     */
+    private void editVideoInfo() {
+        final MovieEditFragment movieEditFragment = MovieEditFragment.newInstance();
+        final Movie movie = mCurrentMovie;
 
-    public OnClickListener mClickListener = new OnClickListener() {
+        String title = movie.getTitle();
+        Rating rating = movie.getRating();
+        String score = "";
+        if (rating == null || rating.average == -1) {
+            score = getResources().getString(R.string.rate_not);
+        } else {
+            score = String.valueOf(rating.average);
+        }
+        String img = null;
+        if (movie.getImages() != null) {
+            img = movie.getImages().large;
+        }
+        List<String> pathlist = new ArrayList<>();
+        for (VideoFile videoFile : mVideoFileList) {
+            pathlist.add(videoFile.getUri());
+        }
+        String[] paths = pathlist.toArray(new String[0]);
+        String[] genres = movie.getGenres();
 
-        @Override
-        public void onClick(final View view) {
-            if (view == mBtnEdit) {
-                final MovieEditFragment movieEditFragment = MovieEditFragment.newInstance();
-                final Movie movie = mCurrentMovie;
-                final HashMap<String, Object> map = new HashMap<>();
+        movieEditFragment.setPositiveListener(new MovieEditFragment.PositiveListener() {
+            @Override
+            public void OnPositivePress(View v) {
+                movie.setTitle(movieEditFragment.getKeyword());
 
-                String title = movie.getTitle();
-                Rating rating = movie.getRating();
-                String score = "";
-                if (rating == null || rating.average == -1) {
-                    score = getResources().getString(R.string.rate_not);
+                mCurrentMovie = movie;
+                if (mScanService != null && mScanService.isRunning()) {
+                    showIsScanningDialog();
                 } else {
-                    score = String.valueOf(rating.average);
-                }
-                String img = null;
-                if (movie.getImages() != null) {
-                    img = movie.getImages().large;
-                }
-                List<String> pathlist = new ArrayList<>();
-                for (VideoFile videoFile : videoFileList) {
-                    pathlist.add(videoFile.getUri());
-                }
-                String[] paths = pathlist.toArray(new String[0]);
-                String[] genres = movie.getGenres();
-                map.put(MovieEditFragment.TITLE, title);
-                map.put(MovieEditFragment.SCORE, score);
-                map.put(MovieEditFragment.IMG, img);
-                map.put(MovieEditFragment.PATH, paths);
-                map.put(MovieEditFragment.GENRES, genres);
-
-                movieEditFragment.setPositiveListener(new MovieEditFragment.PositiveListener() {
-                    @Override
-                    public void OnPositivePress(View v) {
-                        movie.setTitle(movieEditFragment.getFilename());
-
-                        mCurrentMovie = movie;
-                        if (mScanService != null && mScanService.isRunning()) {
-                            showIsScanningDialog();
-                        } else {
-                            Intent intent = new Intent(MovieDetailActivity.this,
-                                    MovieSearchResultActivity.class);
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("mode", ConstData.MovieDetailMode.MODE_EDIT);
-                            bundle.putString("keyword", movieEditFragment.getFilename());
-                            bundle.putInt("api", mCurrentMovie.getApi());
-                            intent.putExtras(bundle);
-                            startActivityForResult(intent, 0);
-                        }
-
-                    }
-                });
-                movieEditFragment.setInfo(map).show(getFragmentManager(), TAG);
-
-            } else if (view == mTrailerBtn && isParseOver) {// 需要等待电影解析完毕才能解析预告片
-                startLoading();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Movie movie = mCurrentMovie;
-                        long id = movie.getId();
-                        if (id > 0) {
-                            Cursor cursor = mMovietrailerDao.select(null, "movie_id=?",
-                                    new String[]{String.valueOf(id)});
-                            if (cursor.getCount() > 0) {
-                                movieTrailerAdapter.removeAll();
-                                trailers_list = mMovietrailerDao.parseList(cursor);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        showMovieTrailer();
-                                        movieTrailerAdapter.addItems(trailers_list);
-                                    }
-                                });
-                                return;//返回
-                            }
-                            int api = mCurrentMovie.getApi();
-                            switch (api) {
-                                case ConstData.Scraper.DOUBAN:
-                                    DoubanApi.parseMovieTrailerInfo(
-                                            mCurrentMovie, trailers_list);
-                                    break;
-                                case ConstData.Scraper.MTIME:
-                                    MtimeApi.parseMovieTrailerInfo(mCurrentMovie.getId(), mCurrentMovie.getMovieId(), trailers_list);
-                                    break;
-                            }
-
-                            Log.v(TAG,
-                                    "trailers_list.size()="
-                                            + trailers_list.size());
-                            if (trailers_list.size() > 0) {
-                                try {
-                                    Log.v(TAG, "time ===>save data begin ");
-                                    for (MovieTrailer movieTrailer : trailers_list) {
-                                        ContentValues contentValues = mMovietrailerDao
-                                                .parseContentValues(movieTrailer);
-                                        mMovietrailerDao.insert(contentValues);
-                                    }
-                                    Log.v(TAG, "time ===>save data end ");
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        movieTrailerAdapter.notifyDataSetChanged();
-                                        showMovieTrailer();
-                                    }
-                                });
-
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(MovieDetailActivity.this, "找不到预告片", Toast.LENGTH_SHORT).show();
-                                        stopLoading();
-                                    }
-                                });
-                            }
-                        }
-
-                    }
-
-                }).start();
-
-
-            } else if (view == mBtnPlay) {
-
-                if (mCurrentWrapper != null) {
-                    if (videoFileList.size() == 1) {
-                        startLoading();
-                        playingVideo(videoFileList.get(0));
-                    } else if (videoFileList.size() > 1) {
-                        showRadioDialog(new CustomRadioDialogFragment.DialogSetting() {
-                            @Override
-                            public void doPositiveClick(Object obj) {
-                                startLoading();
-                                VideoFile file = (VideoFile) obj;
-                                playingVideo(file);
-                            }
-
-                            @Override
-                            public void doItemSelect(Object obj) {
-                                this.doPositiveClick(obj);
-                            }
-
-                            @Override
-                            public VideoFile[] getVideoFiles() {
-                                List<VideoFile> tmplist = new ArrayList<>();
-                                for (int i = 0; i < videoFileList.size(); i++) {
-                                    tmplist.add(videoFileList.get(i));
-                                }
-                                return tmplist.toArray(new VideoFile[0]);
-                            }
-                        });
-                    }
+                    Intent intent = new Intent(MovieDetailActivity.this,
+                            MovieSearchResultActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("mode", ConstData.MovieDetailMode.MODE_EDIT);
+                    bundle.putString("keyword", movieEditFragment.getKeyword());
+                    bundle.putInt("api", mCurrentMovie.getApi());
+                    intent.putExtras(bundle);
+                    startActivityForResult(intent, 0);
                 }
 
-
-            } else if (view == mBtnRemove) {
-                ConfirmDialogFragment confirmDialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
-                confirmDialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
-                    @Override
-                    public void OnPositivePress(Button button) {
-                        removeMovie();
-                    }
-                }, true).setMessage(getResources().getString(R.string.remove_confirm)).show(getFragmentManager(), TAG);
-
-            } else if (view == mBtnFavorite) {
-                toggleFavroite();
             }
-        }
-
-    };
-
-
-    OnRecyclerViewItemClickListener mCenterItemClickListener = new OnRecyclerViewItemClickListener() {
-        @Override
-        public void onItemClick(View view, MovieTrailer data) {
-            final String pageUrl = data.getAlt();
-            startLoading();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    String videoUrl = "";
-                    switch (mCurrentMovie.getApi()) {
-                        case ConstData.Scraper.DOUBAN:
-                            videoUrl = DoubanApi.parseTrailerUrl(pageUrl);
-                            break;
-                        case ConstData.Scraper.MTIME:
-                            videoUrl = pageUrl;
-                            break;
-                    }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            stopLoading();
-                        }
-                    });
-                    if (videoUrl != null && !videoUrl.equals("")) {
-//                        Intent intent = new Intent(MovieDetailActivity.this,
-//                                MovieTrailerPlayerActivity.class);
-//                        intent.putExtra("url", videoUrl);
-//                        startActivity(intent);
-
-                        Intent intent = new Intent();
-                        intent.setAction("firefly.intent.action.PLAY_VIDEO");
-                        intent.setDataAndType(Uri.parse(videoUrl), "video/*");
-                        try {
-                            if (intent.resolveActivity(getPackageManager()) != null) {
-                                Log.v(TAG, "----");
-                                startActivity(intent);
-                                stopLoading();
-                            } else {
-                                startActivity(intent);
-                                Log.v(TAG, "2----");
-                                stopLoading();
-                            }
-                        } catch (Exception e) {
-                            stopLoading();
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-
-        }
-    };
+        });
+        movieEditFragment.setInfo(title,score,img,paths,genres,"").show(getFragmentManager(), TAG);
+    }
 
     /**
      * 播放视频
@@ -1215,202 +797,6 @@ public class MovieDetailActivity extends AppBaseActivity {
 
     }
 
-
-    ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mScanService = ((MovieScanService.ScanBinder) service).getService();
-            refreshMovieInfo(getIntent());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mScanService = null;
-        }
-    };
-
-
-    private int backclik = 0;
-
-    /**
-     * 显示电影预告片
-     */
-    private void showMovieTrailer() {
-        stopLoading();
-        mMovieTrailerRL.setVisibility(RelativeLayout.VISIBLE);
-    }
-
-    /**
-     * 隐藏电影预告片
-     */
-    private void hideMovieTrailer() {
-        movieTrailerAdapter.removeAll();
-        mMovieTrailerRL.setVisibility(RelativeLayout.GONE);
-    }
-
-    /**
-     * 判断预告片弹出框是否显示
-     *
-     * @return
-     */
-    private boolean isMovieTrailerShowing() {
-        return mMovieTrailerRL.getVisibility() == RelativeLayout.VISIBLE;
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
-                if (isMovieTrailerShowing())
-                    if (mTrailerCircleRecyelerView.findFocus() == null) {
-                        mTrailerCircleRecyelerView.getChildAt(0).requestFocus();
-                        return true;
-                    } else {
-                        if (mTrailerCircleRecyelerView.getChildAt(0).isFocused()) {
-                            return false;
-                        }
-                    }
-
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                if (isMovieTrailerShowing()) {
-                    int postion = mTrailerCircleRecyelerView.getChildCount() - 1;
-                    if (mTrailerCircleRecyelerView.findFocus() == null) {
-                        mTrailerCircleRecyelerView.getChildAt(postion).requestFocus();
-                        return true;
-                    } else {
-
-                        if (mTrailerCircleRecyelerView.getChildAt(postion).isFocused()) {
-                            return false;
-                        }
-                    }
-                }
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                if (isMovieTrailerShowing()) {
-                    return true;
-                }
-
-            }
-        }
-
-
-        return super.dispatchKeyEvent(event);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (isMovieTrailerShowing())
-            hideMovieTrailer();
-        else {
-            finish();
-        }
-
-    }
-
-    private static Boolean isExit = false;
-
-    private void exitBy2Click() {
-        Timer tExit = null;
-
-        if (isExit == false) {
-
-            isExit = true; // 准备退出
-            Toast.makeText(MovieDetailActivity.this, "再按一次返回键退出程序",
-                    Toast.LENGTH_SHORT).show();
-            tExit = new Timer();
-            tExit.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    isExit = false; // 取消退出
-                }
-            }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
-
-        } else {
-            mApplication.exit();
-            // System.exit(0);直接 System.exit 导致destory函数未被调用
-        }
-    }
-
-    /**
-     * 通过url解析影片封面
-     */
-    private Bitmap createVideoThumbnail(String url, int width, int height) {
-        Bitmap bitmap = null;
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        int kind = MediaStore.Video.Thumbnails.MINI_KIND;
-        try {
-            if (Build.VERSION.SDK_INT >= 14) {
-                retriever.setDataSource(url, new HashMap<String, String>());
-            } else {
-                retriever.setDataSource(url);
-            }
-            bitmap = retriever.getFrameAtTime();
-        } catch (IllegalArgumentException ex) {
-            // Assume this is a corrupt video file
-        } catch (RuntimeException ex) {
-            // Assume this is a corrupt video file.
-        } finally {
-            try {
-                retriever.release();
-            } catch (RuntimeException ex) {
-                // Ignore failures while cleaning up.
-            }
-        }
-        if (kind == Images.Thumbnails.MICRO_KIND && bitmap != null) {
-            bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
-                    ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-        }
-        return bitmap;
-    }
-
-    public void showRadioDialog(CustomRadioDialogFragment.DialogSetting dialogSetting) {
-        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(dialogSetting);
-        dialogFragment.show(getFragmentManager(), "detail");
-    }
-
-    private CustomRadioDialogFragment checkGroupDialogFragment;
-
-    public void showCheckGroupDialog(CustomRadioDialogFragment.DialogSetting dialogSetting) {
-        checkGroupDialogFragment = CustomRadioDialogFragment.newInstance(dialogSetting, CustomRadioDialogFragment.TYPE_CHECKBOX);
-        checkGroupDialogFragment.setTitle(getResources().getString(R.string.tx_choose_video));
-        checkGroupDialogFragment.setConfirmText(getResources().getString(R.string.tx_choose_confirm));
-        checkGroupDialogFragment.show(getFragmentManager(), "edit_list");
-    }
-
-    public void showIsScanningDialog() {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
-        dialogFragment.setMessage(getResources().getString(R.string.dialog_is_scanning));
-        dialogFragment.show(getFragmentManager(), "MovieDetail");
-    }
-
-    public void showTipsDialog(String tips) {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
-        dialogFragment.setMessage(tips);
-        dialogFragment.show(getFragmentManager(), "MovieDetail");
-    }
-
-    /**
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == 1) {
-            int mode = data.getIntExtra("mode", ConstData.MovieDetailMode.NORMAL_FOR_V_ID);
-            currentMode = mode;
-
-            if (currentMode == ConstData.MovieDetailMode.MODE_EDIT) {
-                ButtonEnable(mBtnEdit, true);
-                getMovie((SimpleMovie) data.getSerializableExtra("simplemovie"));
-            }
-
-
-        } else {
-
-        }
-    }
-
     /**
      * 刷新详情页面收藏状态。
      */
@@ -1441,6 +827,9 @@ public class MovieDetailActivity extends AppBaseActivity {
 
     }
 
+    /**
+     * 切换收藏状态
+     */
     private void toggleFavroite() {
         startLoading();
         new Thread(new Runnable() {
@@ -1492,5 +881,333 @@ public class MovieDetailActivity extends AppBaseActivity {
 
     }
 
+    /**
+     * 显示电影预告片
+     */
+    private void showMovieTrailer() {
+        stopLoading();
+        mViewMovieTrailer.setVisibility(RelativeLayout.VISIBLE);
+    }
 
+    /**
+     * 隐藏电影预告片
+     */
+    private void hideMovieTrailer() {
+        mMovieTrailerAdapter.removeAll();
+        mViewMovieTrailer.setVisibility(RelativeLayout.GONE);
+    }
+
+    /**
+     * 判断预告片弹出框是否显示
+     *
+     * @return
+     */
+    private boolean isMovieTrailerShowing() {
+        return mViewMovieTrailer.getVisibility() == RelativeLayout.VISIBLE;
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
+                if (isMovieTrailerShowing())
+                    if (mCircleRVforTrailer.findFocus() == null) {
+                        mCircleRVforTrailer.getChildAt(0).requestFocus();
+                        return true;
+                    } else {
+                        if (mCircleRVforTrailer.getChildAt(0).isFocused()) {
+                            return false;
+                        }
+                    }
+
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                if (isMovieTrailerShowing()) {
+                    int postion = mCircleRVforTrailer.getChildCount() - 1;
+                    if (mCircleRVforTrailer.findFocus() == null) {
+                        mCircleRVforTrailer.getChildAt(postion).requestFocus();
+                        return true;
+                    } else {
+
+                        if (mCircleRVforTrailer.getChildAt(postion).isFocused()) {
+                            return false;
+                        }
+                    }
+                }
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                if (isMovieTrailerShowing()) {
+                    return true;
+                }
+
+            }
+        }
+
+
+        return super.dispatchKeyEvent(event);
+    }
+
+    public void showRadioDialog(CustomRadioDialogFragment.DialogSetting dialogSetting) {
+        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(dialogSetting);
+        dialogFragment.show(getFragmentManager(), "detail");
+    }
+
+    public void showIsScanningDialog() {
+        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
+        dialogFragment.setMessage(getResources().getString(R.string.dialog_is_scanning));
+        dialogFragment.show(getFragmentManager(), "MovieDetail");
+    }
+
+    public void showTipsDialog(String tips) {
+        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
+        dialogFragment.setMessage(tips);
+        dialogFragment.show(getFragmentManager(), "MovieDetail");
+    }
+
+    private void startLoading() {
+        LogUtil.v(TAG, "startLoading");
+        if (mLoadingCircleViewDialogFragment == null) {
+            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
+            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
+        }
+    }
+
+    private void stopLoading() {
+        LogUtil.v(TAG, "stopLoading");
+        if (mLoadingCircleViewDialogFragment != null) {
+            mLoadingCircleViewDialogFragment.dismiss();
+            mLoadingCircleViewDialogFragment = null;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isMovieTrailerShowing())
+            hideMovieTrailer();
+        else {
+            finish();
+        }
+
+    }
+
+    /**
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == 1) {
+            int mode = data.getIntExtra("mode", ConstData.MovieDetailMode.NORMAL_FOR_V_ID);
+            mCurrentMode = mode;
+
+            if (mCurrentMode == ConstData.MovieDetailMode.MODE_EDIT) {
+                buttonEnable(mBtnEdit, true);
+                getMovie((SimpleMovie) data.getSerializableExtra("simplemovie"));
+            }
+
+
+        } else {
+
+        }
+    }
+
+    ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mScanService = ((MovieScanService.ScanBinder) service).getService();
+            refreshMovieInfo(getIntent());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mScanService = null;
+        }
+    };
+
+    public OnClickListener mClickListener = new OnClickListener() {
+
+        @Override
+        public void onClick(final View view) {
+
+            switch (view.getId()) {
+                case R.id.btb_edit:
+                    editVideoInfo();
+                    break;
+                case R.id.btn_trailer:
+                    if (isParseOver) {
+                        startLoading();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Movie movie = mCurrentMovie;
+                                long id = movie.getId();
+                                if (id > 0) {
+                                    Cursor cursor = mMovietrailerDao.select(null, "movie_id=?",
+                                            new String[]{String.valueOf(id)});
+                                    if (cursor.getCount() > 0) {
+                                        mMovieTrailerAdapter.removeAll();
+                                        mMovieTrailerList = mMovietrailerDao.parseList(cursor);
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                showMovieTrailer();
+                                                mMovieTrailerAdapter.addItems(mMovieTrailerList);
+                                            }
+                                        });
+                                        return;//返回
+                                    }
+                                    int api = mCurrentMovie.getApi();
+                                    switch (api) {
+                                        case ConstData.Scraper.DOUBAN:
+                                            DoubanApi.parseMovieTrailerInfo(
+                                                    mCurrentMovie, mMovieTrailerList);
+                                            break;
+                                        case ConstData.Scraper.MTIME:
+                                            MtimeApi.parseMovieTrailerInfo(mCurrentMovie.getId(), mCurrentMovie.getMovieId(), mMovieTrailerList);
+                                            break;
+                                    }
+
+                                    Log.v(TAG, "trailers_list.size()="
+                                            + mMovieTrailerList.size());
+                                    if (mMovieTrailerList.size() > 0) {
+                                        try {
+                                            Log.v(TAG, "time ===>save data begin ");
+                                            for (MovieTrailer movieTrailer : mMovieTrailerList) {
+                                                ContentValues contentValues = mMovietrailerDao
+                                                        .parseContentValues(movieTrailer);
+                                                mMovietrailerDao.insert(contentValues);
+                                            }
+                                            Log.v(TAG, "time ===>save data end ");
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                mMovieTrailerAdapter.notifyDataSetChanged();
+                                                showMovieTrailer();
+                                            }
+                                        });
+
+                                    } else {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(MovieDetailActivity.this, "找不到预告片", Toast.LENGTH_SHORT).show();
+                                                stopLoading();
+                                            }
+                                        });
+                                    }
+                                }
+
+                            }
+
+                        }).start();
+                    }
+                    break;
+                case R.id.btn_play:
+                    if (mCurrentWrapper != null) {
+                        if (mVideoFileList.size() == 1) {
+                            startLoading();
+                            playingVideo(mVideoFileList.get(0));
+                        } else if (mVideoFileList.size() > 1) {
+                            showRadioDialog(new CustomRadioDialogFragment.DialogSetting() {
+                                @Override
+                                public void doPositiveClick(Object obj) {
+                                    startLoading();
+                                    VideoFile file = (VideoFile) obj;
+                                    playingVideo(file);
+                                }
+
+                                @Override
+                                public void doItemSelect(Object obj) {
+                                    this.doPositiveClick(obj);
+                                }
+
+                                @Override
+                                public VideoFile[] getVideoFiles() {
+                                    List<VideoFile> tmplist = new ArrayList<>();
+                                    for (int i = 0; i < mVideoFileList.size(); i++) {
+                                        tmplist.add(mVideoFileList.get(i));
+                                    }
+                                    return tmplist.toArray(new VideoFile[0]);
+                                }
+                            });
+                        }
+                    }
+                    break;
+                case R.id.btn_remove:
+                    ConfirmDialogFragment confirmDialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
+                    confirmDialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+                        @Override
+                        public void OnPositivePress(Button button) {
+                            removeMovie();
+                        }
+                    }, true).setMessage(getResources().getString(R.string.remove_confirm)).show(getFragmentManager(), TAG);
+
+                    break;
+                case R.id.btn_favorite:
+                    toggleFavroite();
+                    break;
+                case R.id.btn_exit:
+                    finish();
+                    break;
+
+            }
+        }
+
+    };
+
+    OnRecyclerViewItemClickListener mCenterItemClickListener = new OnRecyclerViewItemClickListener() {
+        @Override
+        public void onItemClick(View view, MovieTrailer data) {
+            final String pageUrl = data.getAlt();
+            startLoading();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String videoUrl = "";
+                    switch (mCurrentMovie.getApi()) {
+                        case ConstData.Scraper.DOUBAN:
+                            videoUrl = DoubanApi.parseTrailerUrl(pageUrl);
+                            break;
+                        case ConstData.Scraper.MTIME:
+                            videoUrl = pageUrl;
+                            break;
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            stopLoading();
+                        }
+                    });
+                    if (videoUrl != null && !videoUrl.equals("")) {
+//                        Intent intent = new Intent(MovieDetailActivity.this,
+//                                MovieTrailerPlayerActivity.class);
+//                        intent.putExtra("url", videoUrl);
+//                        startActivity(intent);
+
+                        Intent intent = new Intent();
+                        intent.setAction("firefly.intent.action.PLAY_VIDEO");
+                        intent.setDataAndType(Uri.parse(videoUrl), "video/*");
+                        try {
+                            if (intent.resolveActivity(getPackageManager()) != null) {
+                                Log.v(TAG, "----");
+                                startActivity(intent);
+                                stopLoading();
+                            } else {
+                                startActivity(intent);
+                                Log.v(TAG, "2----");
+                                stopLoading();
+                            }
+                        } catch (Exception e) {
+                            stopLoading();
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
+
+        }
+    };
 }

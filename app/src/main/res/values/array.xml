@@ -6,6 +6,7 @@
         <item>@string/left_menu_item_1_3</item>
         <item>@string/left_menu_item_1_4</item>
         <item>@string/left_menu_item_1_5</item>
+        <item>@string/left_menu_item_1_6</item>
     </string-array>
 
     <string-array name="menu_item_icon_group_1"  translatable="false">
@@ -14,7 +15,9 @@
         <item>@drawable/ic_favorite</item>
         <item>@drawable/ic_setting</item>
         <item>@drawable/ic_abouts</item>
+        <item>@drawable/ic_exit</item>
     </string-array>
+
     <string-array name="menu_item_group_2"  translatable="false">
         <item>@string/left_menu_item_2_1</item>
         <item>@string/left_menu_item_2_2</item>

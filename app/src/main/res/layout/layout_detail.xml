@@ -8,6 +8,7 @@
     tools:context=".activity.MovieDetailActivity">
 
 
+
     <ImageView
         android:id="@+id/iv_poster"
         android:layout_width="match_parent"
@@ -63,100 +64,61 @@
             android:layout_height="match_parent"
             android:layout_toRightOf="@id/ln_part1"
             android:orientation="vertical"
-            android:paddingBottom="68dp"
-            android:paddingRight="63.3dip">
+            android:paddingRight="63.3dip"
+            android:paddingBottom="68dp">
 
             <LinearLayout
                 android:id="@+id/ln_part_of_btn"
                 android:layout_width="wrap_content"
-                android:layout_height="110dp"
-                android:layout_alignParentBottom="true"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_marginBottom="271dp"
+                android:layout_alignParentBottom="true"
                 android:layout_marginLeft="10.0dip"
+                android:layout_marginBottom="271dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <com.hphtv.movielibrary.view.DrawTopButton
-                    android:id="@+id/bt_play"
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
-                    android:layout_marginRight="13.3dp"
-                    android:background="@drawable/st_bg_layout_setting_btn"
-                    android:drawablePadding="-28dp"
-                    android:gravity="center"
-                    android:paddingTop="18dp"
+                    android:id="@+id/btn_play"
+                    style="@style/DrawTopButtonStyle"
                     android:text="@string/play"
-                    android:textColor="@color/selector_category_text"
-                    android:textSize="18.6sp"
-                    app:dtbDrawableTop="@drawable/ic_detial_play"
-                    app:dtbDrawableTopSize="46dp" />
+                    app:dtbDrawableTop="@drawable/ic_detial_play" />
 
                 <com.hphtv.movielibrary.view.DrawTopButton
                     android:id="@+id/btn_trailer"
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
-                    android:layout_marginRight="13.3dp"
-                    android:background="@drawable/st_bg_layout_setting_btn"
-                    android:drawablePadding="-28dp"
-                    android:gravity="center"
-                    android:paddingTop="18dp"
+                    style="@style/DrawTopButtonStyle"
                     android:text="@string/pic_vedio"
-                    android:textColor="@color/selector_category_text"
-                    android:textSize="18.6sp"
-                    app:dtbDrawableTop="@drawable/ic_detail_trailer"
-                    app:dtbDrawableTopSize="46dp" />
+                    app:dtbDrawableTop="@drawable/ic_detail_trailer" />
 
                 <com.hphtv.movielibrary.view.DrawTopButton
                     android:id="@+id/btn_favorite"
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
-                    android:layout_marginRight="13.3dp"
-                    android:background="@drawable/st_bg_layout_setting_btn"
-                    android:drawablePadding="-28dp"
-                    android:gravity="center"
-                    android:paddingTop="18dp"
+                    style="@style/DrawTopButtonStyle"
                     android:text="@string/tx_favorite"
-                    android:textColor="@color/selector_category_text"
-                    android:textSize="18.6sp"
-                    app:dtbDrawableTop="@drawable/ic_detial_star"
-                    app:dtbDrawableTopSize="46dp" />
+                    app:dtbDrawableTop="@drawable/ic_detial_star" />
 
                 <com.hphtv.movielibrary.view.DrawTopButton
-                    android:id="@+id/bt_edit"
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
-                    android:layout_marginRight="13.3dp"
-                    android:background="@drawable/st_bg_layout_setting_btn"
-                    android:drawablePadding="-28dp"
-                    android:gravity="center"
-                    android:paddingTop="18dp"
+                    android:id="@+id/btb_edit"
+                    style="@style/DrawTopButtonStyle"
                     android:text="@string/edit"
-                    android:textColor="@color/selector_category_text"
-                    android:textSize="18.6sp"
-                    app:dtbDrawableTop="@drawable/ic_detail_edit"
-                    app:dtbDrawableTopSize="46dp" />
+                    app:dtbDrawableTop="@drawable/ic_detail_edit" />
 
                 <com.hphtv.movielibrary.view.DrawTopButton
-                    android:id="@+id/bt_remove"
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
-                    android:background="@drawable/st_bg_layout_setting_btn"
-                    android:drawablePadding="-28dp"
-                    android:gravity="center"
-                    android:paddingTop="18dp"
+                    android:id="@+id/btn_remove"
+                    style="@style/DrawTopButtonStyle"
                     android:text="@string/remove"
-                    android:textColor="@color/selector_category_text"
-                    android:textSize="18.6sp"
-                    app:dtbDrawableTop="@drawable/ic_detail_del"
-                    app:dtbDrawableTopSize="46dp" />
+                    app:dtbDrawableTop="@drawable/ic_detail_del" />
+                <com.hphtv.movielibrary.view.DrawTopButton
+                    android:id="@+id/btn_exit"
+                    style="@style/DrawTopButtonStyle"
+                    android:text="@string/filelist_back"
+                    app:dtbDrawableTop="@drawable/ic_detail_exit" />
             </LinearLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignParentRight="true"
                 android:layout_alignTop="@id/ln_part_of_btn"
+                android:layout_alignParentRight="true"
                 android:layout_marginTop="126dp">
 
                 <RelativeLayout
@@ -287,11 +249,11 @@
                         android:layout_height="match_parent"
                         android:layout_marginRight="15dp"
                         android:background="@color/c70000000"
+                        android:ellipsize="end"
                         android:gravity="center"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
                         android:singleLine="true"
-                        android:ellipsize="end"
                         android:textColor="@color/tx_fff"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -329,8 +291,8 @@
                     android:layout_marginTop="14dp"
                     android:background="@drawable/st_detail_scroll_bg"
                     android:focusable="false"
-                    android:paddingBottom="8dp"
                     android:paddingTop="5dp"
+                    android:paddingBottom="8dp"
                     android:scrollbarStyle="insideInset"
                     android:scrollbarThumbVertical="@mipmap/img_scroll_thumb">
 
@@ -433,6 +395,5 @@
         </RelativeLayout>
 
     </RelativeLayout>
-
 
 </FrameLayout>

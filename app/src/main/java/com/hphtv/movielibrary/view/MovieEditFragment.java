@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,15 +20,13 @@ import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.util.StrUtils;
 
-import java.util.HashMap;
-
 /**
  * Created by tchip on 17-12-7.
  */
 
 public class MovieEditFragment extends DialogFragment {
     public static final String TAG = "MovieEditFragment";
-    private TextView  tv_genres, tv_score, tv_imdbid, tv_path;
+    private TextView tv_genres, tv_score, tv_imdbid, tv_path;
     private EditText et_imdbid, et_filename;
     private ImageView iv_img;
     private Button btn_yes, btn_no;
@@ -38,13 +37,12 @@ public class MovieEditFragment extends DialogFragment {
     public static final String GENRES = "genres";
     public static final String IMDBID = "imdbid";
     public static final String SCORE = "score";
-    private String title;
-    private String score;
-    private String s_genres;
-    private String s_path;
-    private String filename;
-    private String img;
-    private String imdb_id;
+    private String mTitle;
+    private String mScore;
+    private String mGenresStr;
+    private String mPathsStr;
+    private String mKeyword;
+    private String mImage;
 
 
     public MovieEditFragment() {
@@ -62,7 +60,6 @@ public class MovieEditFragment extends DialogFragment {
         layout = inflater.inflate(R.layout.component_my_edit_dialog_fragment, null);
         tv_genres = (TextView) layout.findViewById(R.id.movie_genres);
         tv_score = (TextView) layout.findViewById(R.id.movie_rate);
-        tv_imdbid = (TextView) layout.findViewById(R.id.movie_imdb_id);
         tv_path = (TextView) layout.findViewById(R.id.movie_path);
 
         et_imdbid = (EditText) layout.findViewById(R.id.et_imdb_id);
@@ -111,16 +108,14 @@ public class MovieEditFragment extends DialogFragment {
         Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(layout);
 
-        tv_genres.setText(s_genres);
-        tv_score.setText(score);
-        tv_path.setText(s_path);
-        tv_imdbid.setText(imdb_id);
-        et_filename.setText(title);
-        et_imdbid.setText(imdb_id);
+        tv_genres.setText(mGenresStr);
+        tv_score.setText(mScore);
+        tv_path.setText(mPathsStr);
+        et_filename.setText(mTitle);
 
         try {
-            if (img != null) {
-                Glide.with(getActivity()).load(img).apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(iv_img);
+            if (mImage != null) {
+                Glide.with(getActivity()).load(mImage).apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(iv_img);
             } else {
                 Glide.with(getActivity()).load(R.mipmap.ic_poster_default).apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(iv_img);
             }
@@ -130,29 +125,23 @@ public class MovieEditFragment extends DialogFragment {
         return dialog;
     }
 
-    public MovieEditFragment setInfo(HashMap<String, Object> map) {
-        title = (String) map.get(TITLE);
-        title=title.replaceAll("\\."," ");
-        score = (String) map.get(SCORE);
-        img = (String) map.get(IMG);
-        String[] paths = (String[]) map.get(PATH);
-        String[] genres = (String[]) map.get(GENRES);
-        imdb_id = (String) map.get(IMDBID);
-        filename = title;
-        s_genres = StrUtils.arrayToString(genres);
-        s_path = StrUtils.arrayToString(paths);
+    public MovieEditFragment setInfo(String title, String score, String image, String[] paths, String[] genres, String keyword) {
+        mTitle = title;
+        mTitle = mTitle.replaceAll("\\.", " ");
+        mScore = score;
+        mImage = image;
+        mKeyword = TextUtils.isEmpty(keyword) ? title : keyword;
+        mGenresStr = StrUtils.arrayToString(genres);
+        mPathsStr = StrUtils.arrayToString(paths);
         return this;
     }
 
 
-    public String getFilename() {
+    public String getKeyword() {
         return et_filename.getText().toString();
     }
 
 
-    public String getImdbId() {
-        return et_imdbid.getText().toString();
-    }
 
     public interface PositiveListener {
         public void OnPositivePress(View v);

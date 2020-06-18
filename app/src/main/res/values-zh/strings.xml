@@ -118,6 +118,7 @@
     <string name="left_menu_item_1_3">收藏夹</string>
     <string name="left_menu_item_1_4">影库管理</string>
     <string name="left_menu_item_1_5">关于</string>
+    <string name="left_menu_item_1_6">退出</string>
     <string name="dm_btn_scan">重新扫描</string>
     <string name="setting_status_scanning">正在扫描...</string>
     <string name="device_manager_footer_bar_folder">"文件夹 : "</string>

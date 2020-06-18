@@ -10,10 +10,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.sqlite.bean.Device;
+import com.hphtv.movielibrary.util.LogUtil;
 
 import java.util.List;
 
@@ -94,4 +96,5 @@ public abstract class AppBaseActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
     }
+
 }

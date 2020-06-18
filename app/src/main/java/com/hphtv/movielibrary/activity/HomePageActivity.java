@@ -111,7 +111,6 @@ public class HomePageActivity extends AppBaseActivity {
     private String mFilterGenres;// 类型
     private String mSortType;// 排列顺序
     private boolean isSortByAsc = true;// 排列顺序升序
-
     private Context mContext;
 
     private LinearLayout mSortBox;
@@ -559,9 +558,11 @@ public class HomePageActivity extends AppBaseActivity {
         mLeftMenu.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                LogUtil.v(TAG, "[onItemSelected] position=" + position);
-                mVViewPager.setCurrentItem(position);
-                mTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
+                if(position<mFramentList.size()) {
+                    LogUtil.v(TAG, "[onItemSelected] position=" + position);
+                    mVViewPager.setCurrentItem(position);
+                    mTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
+                }
             }
 
             @Override
@@ -574,9 +575,13 @@ public class HomePageActivity extends AppBaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LogUtil.v(TAG, "[onItemClick] position=" + position);
-                mVViewPager.setCurrentItem(position);
-                mTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
-                mDrawerLayout.closeDrawer(Gravity.START);
+                if(position<mFramentList.size()) {
+                    mVViewPager.setCurrentItem(position);
+                    mTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
+                    mDrawerLayout.closeDrawer(Gravity.START);
+                }else{
+                    finish();
+                }
             }
         });
 

@@ -122,6 +122,7 @@
     <string name="left_menu_item_1_3">Favorites</string>
     <string name="left_menu_item_1_4">Video Manage</string>
     <string name="left_menu_item_1_5">Abouts</string>
+    <string name="left_menu_item_1_6">Exit</string>
     <string name="dm_btn_scan">Re-Scan</string>
     <string name="setting_status_scanning">Scanning...</string>
     <string name="device_manager_footer_bar_folder">"folder : "</string>
