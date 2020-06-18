@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:focusable="false" />
 
+
     <RelativeLayout
         android:id="@+id/rl_search_dialog"
         android:layout_width="1093.3dp"
@@ -45,16 +46,15 @@
                 android:textSize="15sp" />
         </FrameLayout>
 
-
         <com.hphtv.movielibrary.view.RefreshLayout
             android:id="@+id/id_srl"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/fl_et"
-            android:layout_marginBottom="26.7dp"
             android:layout_marginLeft="60dip"
+            android:layout_marginTop="6.7dip"
             android:layout_marginRight="60dip"
-            android:layout_marginTop="6.7dip">
+            android:layout_marginBottom="26.7dp">
 
             <ListView
                 android:id="@+id/lv_search_content"
@@ -67,4 +67,12 @@
 
     </RelativeLayout>
 
+    <ImageButton
+        android:id="@+id/ibtn_back"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="26dp"
+        android:background="@drawable/round_button_bg"
+        android:src="@drawable/ic_back"></ImageButton>
 </RelativeLayout>

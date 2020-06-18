@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -46,14 +47,15 @@ public class MovieSearchActivity extends Activity {
     public static final String TAG = "MovieSearchActivity";
 
     private Context mContext;
-    EditText mEditTextSearch;
-    RecyclerView mRVKeyBoard;
-    TextView mTextViewTips;
-    RecyclerViewWithMouseScroll mRVMovies;
-    List<MovieWrapper> mWrapperList = new ArrayList<>();
-    FloatKeyboard mRVFloatFastBoard;
-    MovieLibraryAdapter movieLibraryAdapter;
-    CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
+    private EditText mEditTextSearch;
+    private RecyclerView mRVKeyBoard;
+    private TextView mTextViewTips;
+    private ImageButton mImageButtonExit;
+    private RecyclerViewWithMouseScroll mRVMovies;
+    private List<MovieWrapper> mWrapperList = new ArrayList<>();
+    private FloatKeyboard mRVFloatFastBoard;
+    private MovieLibraryAdapter movieLibraryAdapter;
+    private CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
     private MovieApplication mApp;
 
     private MovieWrapperDao mMovieWrapperDao;
@@ -74,6 +76,13 @@ public class MovieSearchActivity extends Activity {
     private void initView() {
         mTextViewTips = (TextView) findViewById(R.id.tv_empty_tips);
         mEditTextSearch = (EditText) findViewById(R.id.et_search);
+        mImageButtonExit=findViewById(R.id.ibtn_back);
+        mImageButtonExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         mEditTextSearch.setFocusable(false);
         mEditTextSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -257,13 +266,13 @@ public class MovieSearchActivity extends Activity {
                     Cursor dirCursor = mDirDao.select("is_encrypted=?", new String[]{"0"}, null);
                     if (dirCursor.getCount() > 0) {
                         List<Directory> directories = mDirDao.parseList(dirCursor);
-                        StringBuffer buffer=new StringBuffer();
+                        StringBuffer buffer = new StringBuffer();
                         buffer.append("(");
-                        for(Directory t_dir:directories){
-                            buffer.append("(dir_ids like '%"+t_dir.getId()+"%' or dir_ids like '%"+t_dir.getId()+"]%') or ");
+                        for (Directory t_dir : directories) {
+                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
                         }
-                        buffer.replace(buffer.lastIndexOf("or"),buffer.length(),")");
-                        cursor=mMovieWrapperDao.select(buffer.toString(),null,null);
+                        buffer.replace(buffer.lastIndexOf("or"), buffer.length(), ")");
+                        cursor = mMovieWrapperDao.select(buffer.toString(), null, null);
                     }
                 }
                 if (cursor != null && cursor.getCount() > 0) {

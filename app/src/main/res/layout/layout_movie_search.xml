@@ -64,10 +64,14 @@
 
             </FrameLayout>
 
-            <Button
+            <ImageButton
+                android:id="@+id/ibtn_back"
+                android:src="@drawable/ic_back"
+                android:background="@drawable/round_button_bg"
                 android:layout_alignParentBottom="true"
                 android:layout_width="100dp"
-                android:layout_height="50dp"></Button>
+                android:layout_margin="26dp"
+                android:layout_height="40dp"></ImageButton>
         </RelativeLayout>
 
 

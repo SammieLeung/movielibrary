@@ -64,6 +64,14 @@ public class MovieEditFragment extends DialogFragment {
 
         et_imdbid = (EditText) layout.findViewById(R.id.et_imdb_id);
         et_filename = (EditText) layout.findViewById(R.id.et_filename);
+        et_filename.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    et_filename.setSelection(0,et_filename.getText().length());
+                }
+            }
+        });
 
         iv_img = (ImageView) layout.findViewById(R.id.info_img);
 

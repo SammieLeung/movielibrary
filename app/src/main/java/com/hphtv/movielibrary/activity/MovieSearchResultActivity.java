@@ -154,6 +154,7 @@ public class MovieSearchResultActivity extends Activity {
         // 搜索输入
         mEditTextKeyword = (EditText) findViewById(R.id.et_box_name);
         mEditTextKeyword.setOnEditorActionListener(mOnEditorActionListener);
+        mEditTextKeyword.setOnFocusChangeListener(mOnFocusChangeListener);
         // webview
         // initWebView();
 
@@ -257,6 +258,15 @@ public class MovieSearchResultActivity extends Activity {
                 mOnRefreshListener.onRefresh();
             }
             return true;
+        }
+    };
+
+    View.OnFocusChangeListener mOnFocusChangeListener=new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View v, boolean hasFocus) {
+            if(v.getId()==R.id.et_box_name&&hasFocus){
+                mEditTextKeyword.setSelection(0,mEditTextKeyword.getText().length());
+            }
         }
     };
 
@@ -368,7 +378,6 @@ public class MovieSearchResultActivity extends Activity {
         }
     };
 
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() != KeyEvent.ACTION_DOWN) {
@@ -398,13 +407,9 @@ public class MovieSearchResultActivity extends Activity {
 
                 }
 
-
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
-                mEditTextKeyword.requestFocus();
-
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                int index = mSearchResultLv.getSelectedItemPosition();
-                mSearchResultLv.smoothScrollToPosition(index);
+                    int index = mSearchResultLv.getSelectedItemPosition();
+                    mSearchResultLv.smoothScrollToPosition(index);
             }
         }
 
