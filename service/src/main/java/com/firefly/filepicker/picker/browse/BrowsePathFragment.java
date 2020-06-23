@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -55,6 +56,7 @@ public class BrowsePathFragment extends Fragment
     private RecyclerView mTypeContainer;
     private TextView mFocusedDirView;
     private TextView mFocusedLastModifiedView;
+    private ImageButton mIbtnBack;
     private ProgressBar mProgressBar;
     private RelativeLayout mEmptyView;
     private boolean mEnableProgressBar = true;
@@ -75,6 +77,7 @@ public class BrowsePathFragment extends Fragment
         mTreeContainer = (RecyclerView) view.findViewById(R.id.container);
         mTypeContainer = (RecyclerView) view.findViewById(R.id.type_container);
         mFocusedDirView = (TextView) view.findViewById(R.id.focused_dir);
+        mIbtnBack=view.findViewById(R.id.ibtn_back);
         mFocusedLastModifiedView = (TextView) view.findViewById(R.id.last_modified);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         mEmptyView = (RelativeLayout) view.findViewById(R.id.empty_view);
@@ -332,6 +335,12 @@ public class BrowsePathFragment extends Fragment
 
         mFocusedDirView.setText(getString(R.string.selected, "-"));
         mFocusedLastModifiedView.setText(getString(R.string.last_modify_date, "-"));
+        mIbtnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
     }
 
     private void createChildrenNode(Node node) {

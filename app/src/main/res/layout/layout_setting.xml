@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:background="@drawable/background_corners_for_dialog_head"
         android:paddingLeft="20dp"
-        android:paddingRight="31dp">
+        android:paddingRight="20dp">
 
         <TextView
             android:id="@+id/lb_title"
@@ -23,6 +23,16 @@
             android:textColor="@color/tx_fff"
             android:textSize="22sp" />
 
+        <ImageButton
+            android:id="@+id/ibtn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleType="centerInside"
+            android:background="@drawable/dialog_button_selector_2"
+            android:src="@drawable/ic_back"></ImageButton>
 
     </RelativeLayout>
 

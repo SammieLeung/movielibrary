@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -74,6 +75,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
     private Button mBtnDel;
     private Button mBtnClean;
     private Button mBtnScan;
+    private ImageButton mIBtnBack;
 
     private TextView mTextViewLocation;
     private TextView mTextViewScanResult;
@@ -174,7 +176,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                 for (int j = 0; j < mHashMapList.size(); j++) {
                                     HashMap<String, Object> map = mHashMapList.get(j);
                                     Directory directory = (Directory) map.get(ConstData.DIRECTORY);
-                                    if (directory.getId()==scanDirectories.get(i).getId()){
+                                    if (directory.getId() == scanDirectories.get(i).getId()) {
                                         directory.setScanState(ConstData.DirectoryState.SCANNING);
                                         scanDirectories.remove(i);
                                         i = 0;
@@ -234,11 +236,11 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                         setFooter(deviceName, location);
                         break;
                     case ConstData.DeviceType.DEVICE_TYPE_DLNA:
-                        location=device.getPath()+":"+dirPath;
+                        location = device.getPath() + ":" + dirPath;
                         setFooter(deviceName, location);
                         break;
                     case ConstData.DeviceType.DEVICE_TYPE_SMB:
-                        setFooter("smb", "//"+dirPath);
+                        setFooter("smb", "//" + dirPath);
                         break;
                 }
 
@@ -260,21 +262,22 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         mBtnClean = (Button) findViewById(R.id.clear);
         mBtnDel = (Button) findViewById(R.id.delete);
         mBtnScan = (Button) findViewById(R.id.scan);
+        mIBtnBack = findViewById(R.id.ibtn_back);
 
         mBtnDel.setOnClickListener(this);
         mBtnClean.setOnClickListener(this);
         mBtnScan.setOnClickListener(this);
+        mIBtnBack.setOnClickListener(this);
 
         mTextViewLocation = (TextView) findViewById(R.id.footer_locaction);
         mTextViewScanResult = (TextView) findViewById(R.id.footer_scan_result);
         mFooterGroup = (RelativeLayout) findViewById(R.id.statusbar_group_2);
         mFooterGroup2 = (RelativeLayout) findViewById(R.id.statusbar_group_3);
 
-        if(mApp.isShowEncrypted()){
+        if (mApp.isShowEncrypted()) {
             mCheckBoxPrivate.setChecked(true);
         }
     }
-
 
     private void setWidgetEnableWhenScanning(Boolean bool) {
         mBtnClean.setEnabled(bool);
@@ -308,7 +311,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                 break;
             case R.id.privatedevice:
                 if (isChecked == true) {
-                    if(!mApp.isShowEncrypted()) {
+                    if (!mApp.isShowEncrypted()) {
                         mMd5EncodePwd = mPreferences.getPassword();
                         if (!TextUtils.isEmpty(mMd5EncodePwd)) {
                             final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
@@ -412,6 +415,8 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                     }
                 }
                 break;
+            case R.id.ibtn_back:
+                finish();
         }
     }
 
@@ -578,7 +583,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         setWidgetEnableWhenScanning(true);
         isConfirm = false;
         mTextViewScanResult.setText(getResources().getString(R.string.tx_scan_completed));
-        if(mApp.isShowEncrypted()){
+        if (mApp.isShowEncrypted()) {
             showHideEncryptedFolderDialog();
         }
     }
@@ -587,7 +592,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         for (int i = 0; i < mHashMapList.size(); i++) {
             HashMap<String, Object> map = mHashMapList.get(i);
             Directory directory = (Directory) map.get(ConstData.DIRECTORY);
-            if (directory.getId()==dirId) {
+            if (directory.getId() == dirId) {
                 directory.setScanState(status);
                 map.put(ConstData.DEVICE_VIDEO_COUNT, total);
                 map.put(ConstData.DEVICE_MATCHED_VIDEO, match);
@@ -630,6 +635,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             }
         }).setMessage(getResources().getString(R.string.setting_confirm_hide_encrypted_video)).show(getFragmentManager(), TAG);
     }
+
     private void showDialog() {
         ConfirmDialogFragment dialog = new ConfirmDialogFragment(FolderManagerActivity.this);
         dialog.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
@@ -672,7 +678,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             for (int i = 0; i < mHashMapList.size(); i++) {
                 HashMap<String, Object> map = mHashMapList.get(i);
                 Directory dir = (Directory) map.get(ConstData.DIRECTORY);
-                if (dir.getId()==directory.getId()) {
+                if (dir.getId() == directory.getId()) {
                     dir.setScanState(ConstData.DirectoryState.SCANNING);
                 }
             }

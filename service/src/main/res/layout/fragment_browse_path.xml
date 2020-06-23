@@ -17,8 +17,8 @@
             android:layout_weight="1"
             android:background="#38383b"
             android:gravity="center_vertical"
-            android:paddingEnd="20dp"
             android:paddingStart="20dp"
+            android:paddingEnd="20dp"
             tools:layout_editor_absoluteX="8dp"
             tools:layout_editor_absoluteY="8dp">
 
@@ -39,12 +39,17 @@
                 android:text="@string/add_directory"
                 android:textColor="@color/textColor"
                 android:textSize="22sp" />
+
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
+                android:id="@+id/ibtn_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="10dp"
                 android:layout_alignParentRight="true"
-                android:src="@mipmap/dlna"></ImageButton>
+                android:layout_centerVertical="true"
+                android:scaleType="centerInside"
+                android:background="@drawable/dialog_button_selector_2"
+                android:src="@drawable/ic_back_service"></ImageButton>
         </RelativeLayout>
 
         <LinearLayout
@@ -66,8 +71,8 @@
                     android:layout_height="match_parent"
                     android:background="@color/colorPrimaryDark"
                     android:focusable="true"
-                    android:paddingBottom="0dp"
-                    android:paddingTop="18dp" />
+                    android:paddingTop="18dp"
+                    android:paddingBottom="0dp" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -92,8 +97,8 @@
                         android:layout_height="wrap_content"
                         android:fadeScrollbars="false"
                         android:focusable="true"
-                        android:paddingBottom="0dp"
                         android:paddingTop="18dp"
+                        android:paddingBottom="0dp"
                         android:scrollbarAlwaysDrawVerticalTrack="false"
                         android:scrollbars="vertical"
                         android:visibility="visible" />
@@ -110,10 +115,10 @@
                     android:id="@+id/empty_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="0dp"
-                    android:layout_marginEnd="0dp"
                     android:layout_marginStart="14dp"
                     android:layout_marginTop="26dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="0dp"
                     android:visibility="gone">
 
                     <TextView
@@ -122,8 +127,8 @@
                         android:layout_height="40dp"
                         android:layout_centerInParent="true"
                         android:gravity="center"
-                        android:paddingEnd="0dp"
                         android:paddingStart="12dp"
+                        android:paddingEnd="0dp"
                         android:text="@string/no_files"
                         android:textSize="16sp" />
                 </RelativeLayout>
@@ -136,10 +141,10 @@
                     android:baselineAligned="true"
                     android:elevation="1dp"
                     android:orientation="horizontal"
-                    android:paddingBottom="12dp"
-                    android:paddingEnd="26dp"
                     android:paddingStart="26dp"
-                    android:paddingTop="12dp">
+                    android:paddingTop="12dp"
+                    android:paddingEnd="26dp"
+                    android:paddingBottom="12dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -203,7 +208,6 @@
         </LinearLayout>
 
     </LinearLayout>
-
 
 
 </android.support.constraint.ConstraintLayout>
