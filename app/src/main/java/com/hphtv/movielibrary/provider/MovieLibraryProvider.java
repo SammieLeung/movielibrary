@@ -12,15 +12,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.PosterProviderBean;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.MovieDBHelper;
+import com.hphtv.movielibrary.sqlite.bean.scraperBean.Genres;
 import com.hphtv.movielibrary.sqlite.dao.HistoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
@@ -32,6 +37,7 @@ import com.hphtv.movielibrary.util.VideoPlayTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by tchip on 18-5-15.
@@ -49,6 +55,7 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int MOVIE_INFO = 2;
     public static final int FILE_LIST = 4;
     public static final int PLAYVIDEO = 3;
+    public static final int GENRES=5;
 
     private int api_version;
 
@@ -64,6 +71,7 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(prefix, "movie_info/#", MOVIE_INFO);
         matcher.addURI(prefix, "file/wrapper_id/#", FILE_LIST);
         matcher.addURI(prefix, "play/vid/#", PLAYVIDEO);
+        matcher.addURI(prefix,"genres",GENRES);
         return false;
     }
 
@@ -74,11 +82,11 @@ public class MovieLibraryProvider extends ContentProvider {
         api_version = ConstData.Scraper.MTIME;
         if (code == MOVIE_WRAPPER) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
+            String asc="asc";
             db.beginTransaction();
-            Cursor cursor = mWrapperDao.select(null, null, null, null, null, "scraper_infos asc", null);
+            Cursor cursor = mWrapperDao.select(null, null, null, null, null, "title_pinyin " + asc + ",title " + asc, null);
             db.setTransactionSuccessful();
             db.endTransaction();
-            Log.v("TAG", "count=" + cursor.getCount());
             return cursor;
         } else if (code == FILE_LIST) {
             long id = ContentUris.parseId(uri);
@@ -86,8 +94,20 @@ public class MovieLibraryProvider extends ContentProvider {
             return cursor;
         } else if (code == MOVIE_INFO) {
             long id = ContentUris.parseId(uri);
-            Cursor cursor = mMovieDao.select("id=?", new String[]{String.valueOf(id)}, null);
-            return cursor;
+            Cursor wrapperCursor=mWrapperDao.select("id=?", new String[]{String.valueOf(id)},null);
+            if(wrapperCursor!=null&&wrapperCursor.getCount()>0&&wrapperCursor.moveToNext()){
+                String scrpaer_infos=wrapperCursor.getString(wrapperCursor.getColumnIndex("scraper_infos"));
+                if(!TextUtils.isEmpty(scrpaer_infos)&&!scrpaer_infos.equalsIgnoreCase("null")) {
+                    JSONArray jsonArray = JSON.parseArray(scrpaer_infos);
+                    if (jsonArray.size() > 0) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                        int movie_id = jsonObject.getInteger("id");
+                        Cursor cursor = mMovieDao.select("id=?", new String[]{String.valueOf(movie_id)}, null);
+                        return cursor;
+                    }
+                }
+            }
+
         } else if (code == PLAYVIDEO) {
             long id = ContentUris.parseId(uri);
             Cursor cursor = mVideoFileDao.select("id=?", new String[]{String.valueOf(id)}, null);
@@ -155,6 +175,13 @@ public class MovieLibraryProvider extends ContentProvider {
                 }
             }
             VideoPlayTools.play(getContext(),file);
+            return cursor;
+        }else if(code==GENRES){
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.beginTransaction();
+            Cursor cursor = db.query(MovieDBHelper.TABLE_GENRES,new String[]{"name"},selection,selectionArgs,null,null,null);
+            db.setTransactionSuccessful();
+            db.endTransaction();
             return cursor;
         }
         return null;
