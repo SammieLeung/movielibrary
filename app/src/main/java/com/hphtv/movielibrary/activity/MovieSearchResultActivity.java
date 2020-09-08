@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -125,15 +126,14 @@ public class MovieSearchResultActivity extends Activity {
 //                currentMode = ConstData.MovieDetailMode.MODE_OUTSIDE;
 //                // TODO
 //            } else {//编辑电影信息
-            int mode =bundle.getInt("mode");
-            switch (mode)
-            {
+            int mode = bundle.getInt("mode");
+            switch (mode) {
                 case ConstData.MovieDetailMode.MODE_EDIT:
                     currentMode = ConstData.MovieDetailMode.MODE_EDIT;
-                        mFileName =  bundle.getString("keyword");
-                        api_version=bundle.getInt("api");
-                        if (mFileName != null && mFileName != "")
-                            mEditTextKeyword.setText(mFileName);
+                    mFileName = bundle.getString("keyword");
+                    api_version = bundle.getInt("api");
+                    if (mFileName != null && mFileName != "")
+                        mEditTextKeyword.setText(mFileName);
                     break;
             }
             Log.v(TAG, "编辑电影信息");
@@ -183,7 +183,6 @@ public class MovieSearchResultActivity extends Activity {
     }
 
 
-
     //webview 组件回调
     private WebviewListener mWebviewListener = new WebviewListener() {
         @Override
@@ -212,11 +211,7 @@ public class MovieSearchResultActivity extends Activity {
             mFileName = mEditTextKeyword.getText().toString().trim();
             Log.v(TAG, "onRefresh====>" + mFileName);
             // 电影名不为空则搜索
-            if (mFileName != null && !mFileName.equals("")) {
-                InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                im.hideSoftInputFromWindow(getCurrentFocus()
-                                .getApplicationWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+            if (!TextUtils.isEmpty(mFileName)) {
                 switch (api_version) {
                     case ConstData.Scraper.DOUBAN:
                         searchHelper.SearchMovieByName(mFileName);//通过webview进行搜索
@@ -261,11 +256,11 @@ public class MovieSearchResultActivity extends Activity {
         }
     };
 
-    View.OnFocusChangeListener mOnFocusChangeListener=new View.OnFocusChangeListener() {
+    View.OnFocusChangeListener mOnFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
-            if(v.getId()==R.id.et_box_name&&hasFocus){
-                mEditTextKeyword.setSelection(0,mEditTextKeyword.getText().length());
+            if (v.getId() == R.id.et_box_name && hasFocus) {
+                mEditTextKeyword.setSelection(0, mEditTextKeyword.getText().length());
             }
         }
     };
@@ -408,8 +403,8 @@ public class MovieSearchResultActivity extends Activity {
                 }
 
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                    int index = mSearchResultLv.getSelectedItemPosition();
-                    mSearchResultLv.smoothScrollToPosition(index);
+                int index = mSearchResultLv.getSelectedItemPosition();
+                mSearchResultLv.smoothScrollToPosition(index);
             }
         }
 
@@ -458,13 +453,11 @@ public class MovieSearchResultActivity extends Activity {
     }
 
 
-
     protected void onPause() {
         Log.v(TAG, "onPause()被调用");
         searchHelper.setSearch_data_list(null);
         super.onPause();
     }
-
 
 
     @Override
