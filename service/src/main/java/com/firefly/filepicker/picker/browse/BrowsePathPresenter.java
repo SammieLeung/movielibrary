@@ -70,6 +70,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @SelectType
     private int mSelectType = SELECT_DIR;
     private boolean mSupportNet;
+    private boolean mEnableSelectConfirm;
 
     private BrowsePathContract.View mView;
     private Context mContext;
@@ -229,10 +230,14 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @Override
     public void onSelect(Node node, boolean isPrivate, boolean confirm) {
         if (mSelectType == SELECT_DIR) {
-            if (confirm) {
-                onSelectDir(node, isPrivate);
-            } else {
-                mView.showOnSelectConfirm(node);
+            if(!mEnableSelectConfirm){//设置是否开启确认选择窗口
+                onSelectDir(node, false);
+            }else {
+                if (confirm) {
+                    onSelectDir(node, isPrivate);
+                } else {
+                    mView.showOnSelectConfirm(node);
+                }
             }
         } else {
             onSelectFile(node);
@@ -251,6 +256,11 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @Override
     public void setSupportNet(boolean supportNet) {
         mSupportNet = supportNet;
+    }
+
+    @Override
+    public void setEnableSelectConfirm(boolean enableSelectConfirm) {
+        mEnableSelectConfirm = enableSelectConfirm;
     }
 
     @Override

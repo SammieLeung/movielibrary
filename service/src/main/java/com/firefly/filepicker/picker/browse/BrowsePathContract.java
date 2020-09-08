@@ -37,6 +37,7 @@ public interface BrowsePathContract {
         void onSelect(Node node, boolean isPrivate, boolean confirm);
         void setBrowseType(int type);
         void setSupportNet(boolean supportNet);
+        void setEnableSelectConfirm(boolean enableSelectConfirm);
         void cancelTask(Node node);
     }
 }
