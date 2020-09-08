@@ -21,7 +21,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -50,7 +52,7 @@ import org.jsoup.select.Elements;
 public class MovieSearchResultActivity extends Activity {
     public static final String TAG = "MovieSearchResult";
     public static final int LIMIT = 10;
-
+    private ImageButton mBtnBack;
     private ListView mSearchResultLv;// 搜索结果列表
 
     private ImageView ivSearchDialogBg;// 搜索结果页面背景
@@ -87,6 +89,13 @@ public class MovieSearchResultActivity extends Activity {
         mApplication = (MovieApplication) getApplicationContext();
         mActivity = MovieSearchResultActivity.this;
         mApplication.addActivity(MovieSearchResultActivity.this);
+        mBtnBack=findViewById(R.id.ibtn_back);
+        mBtnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         searchHelper = mApplication.getSearchHelper();
 
         initOthers();
