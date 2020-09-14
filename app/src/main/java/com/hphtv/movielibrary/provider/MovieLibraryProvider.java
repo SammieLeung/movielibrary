@@ -56,6 +56,7 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int FILE_LIST = 4;
     public static final int PLAYVIDEO = 3;
     public static final int GENRES=5;
+    public static final int MOVIE_NUMBERS=6;
 
     private int api_version;
 
@@ -72,6 +73,7 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(prefix, "file/wrapper_id/#", FILE_LIST);
         matcher.addURI(prefix, "play/vid/#", PLAYVIDEO);
         matcher.addURI(prefix,"genres",GENRES);
+        matcher.addURI(prefix,"movie_numbers",MOVIE_NUMBERS);
         return false;
     }
 
@@ -179,7 +181,14 @@ public class MovieLibraryProvider extends ContentProvider {
         }else if(code==GENRES){
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             db.beginTransaction();
-            Cursor cursor = db.query(MovieDBHelper.TABLE_GENRES,new String[]{"name"},selection,selectionArgs,null,null,null);
+            Cursor cursor = db.query(MovieDBHelper.TABLE_GENRES,null,selection,selectionArgs,null,null,null);
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            return cursor;
+        }else if(code==MOVIE_NUMBERS){
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.beginTransaction();
+            Cursor cursor=db.rawQuery("select count(id) from "+MovieDBHelper.TABLE_MOVIEWRAPPER,null);
             db.setTransactionSuccessful();
             db.endTransaction();
             return cursor;
