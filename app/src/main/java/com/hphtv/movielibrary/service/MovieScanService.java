@@ -277,10 +277,14 @@ public class MovieScanService extends Service {
                 LogUtil.v(TAG, "原名 filename:" + filename);
                 LogUtil.v(TAG, "path " + path);
                 LogUtil.v(TAG, "type " + type);
-                if(fileSource==FileItem.EXTERNAL) {
-                    mMediaMetadataRetriever.setDataSource(path);
-                    metadataRetrieverTitle = mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                    LogUtil.v(TAG, "MetadataRetrieverTitle:" + metadataRetrieverTitle);
+                if(fileSource==FileItem.EXTERNAL&&path!=null) {
+                    try {
+                        mMediaMetadataRetriever.setDataSource(path);
+                        metadataRetrieverTitle = mMediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                        LogUtil.v(TAG, "MetadataRetrieverTitle:" + metadataRetrieverTitle);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
                 MovieNameInfo mni = FileScanUtil.simpleParse(metadataRetrieverTitle == null ? filename : metadataRetrieverTitle);
                 VideoFile videoFile = new VideoFile();

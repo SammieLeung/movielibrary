@@ -156,7 +156,7 @@ public class DeviceUtil {
             StringBuffer whereClauseBuffer = new StringBuffer();
             List<String> whereArgsList = new ArrayList<>();
 
-            if (cursor.getCount() > 0) {
+            if (cursor!=null&&cursor.getCount() > 0) {
 //                if (isEncrypted == ConstData.EncryptState.UNENCRYPTED) {
 //                    whereClauseBuffer.append("isEncrypted=? and ");
 //                    whereArgsList.add(String.valueOf(isEncrypted));
