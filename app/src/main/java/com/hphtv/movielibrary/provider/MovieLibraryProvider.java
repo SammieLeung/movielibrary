@@ -55,9 +55,9 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int MOVIE_INFO = 2;
     public static final int FILE_LIST = 4;
     public static final int PLAYVIDEO = 3;
-    public static final int GENRES=5;
-    public static final int MOVIE_NUMBERS=6;
-
+    public static final int GENRES = 5;
+    public static final int MOVIE_NUMBERS = 6;
+    public static final int GET_WRAPPER_TITLE = 7;
     private int api_version;
 
     @Override
@@ -72,8 +72,10 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(prefix, "movie_info/#", MOVIE_INFO);
         matcher.addURI(prefix, "file/wrapper_id/#", FILE_LIST);
         matcher.addURI(prefix, "play/vid/#", PLAYVIDEO);
-        matcher.addURI(prefix,"genres",GENRES);
-        matcher.addURI(prefix,"movie_numbers",MOVIE_NUMBERS);
+        matcher.addURI(prefix, "genres", GENRES);
+        matcher.addURI(prefix, "movie_numbers", MOVIE_NUMBERS);
+        matcher.addURI(prefix, "wrapper_title", GET_WRAPPER_TITLE);
+
         return false;
     }
 
@@ -84,7 +86,7 @@ public class MovieLibraryProvider extends ContentProvider {
         api_version = ConstData.Scraper.MTIME;
         if (code == MOVIE_WRAPPER) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
-            String asc="asc";
+            String asc = "asc";
             db.beginTransaction();
             Cursor cursor = mWrapperDao.select(null, null, null, null, null, "title_pinyin " + asc + ",title " + asc, null);
             db.setTransactionSuccessful();
@@ -96,10 +98,10 @@ public class MovieLibraryProvider extends ContentProvider {
             return cursor;
         } else if (code == MOVIE_INFO) {
             long id = ContentUris.parseId(uri);
-            Cursor wrapperCursor=mWrapperDao.select("id=?", new String[]{String.valueOf(id)},null);
-            if(wrapperCursor!=null&&wrapperCursor.getCount()>0&&wrapperCursor.moveToNext()){
-                String scrpaer_infos=wrapperCursor.getString(wrapperCursor.getColumnIndex("scraper_infos"));
-                if(!TextUtils.isEmpty(scrpaer_infos)&&!scrpaer_infos.equalsIgnoreCase("null")) {
+            Cursor wrapperCursor = mWrapperDao.select("id=?", new String[]{String.valueOf(id)}, null);
+            if (wrapperCursor != null && wrapperCursor.getCount() > 0 && wrapperCursor.moveToNext()) {
+                String scrpaer_infos = wrapperCursor.getString(wrapperCursor.getColumnIndex("scraper_infos"));
+                if (!TextUtils.isEmpty(scrpaer_infos) && !scrpaer_infos.equalsIgnoreCase("null")) {
                     JSONArray jsonArray = JSON.parseArray(scrpaer_infos);
                     if (jsonArray.size() > 0) {
                         JSONObject jsonObject = jsonArray.getJSONObject(0);
@@ -176,22 +178,35 @@ public class MovieLibraryProvider extends ContentProvider {
                     historyDao.insert(contentValues);
                 }
             }
-            VideoPlayTools.play(getContext(),file);
+            VideoPlayTools.play(getContext(), file);
             return cursor;
-        }else if(code==GENRES){
+        } else if (code == GENRES) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             db.beginTransaction();
-            Cursor cursor = db.query(MovieDBHelper.TABLE_GENRES,null,selection,selectionArgs,null,null,null);
+            Cursor cursor = db.query(MovieDBHelper.TABLE_GENRES, null, selection, selectionArgs, null, null, null);
             db.setTransactionSuccessful();
             db.endTransaction();
             return cursor;
-        }else if(code==MOVIE_NUMBERS){
+        } else if (code == MOVIE_NUMBERS) {
             SQLiteDatabase db = dbHelper.getWritableDatabase();
             db.beginTransaction();
-            Cursor cursor=db.rawQuery("select count(id) from "+MovieDBHelper.TABLE_MOVIEWRAPPER,null);
+            Cursor cursor = db.rawQuery("select count(id) from " + MovieDBHelper.TABLE_MOVIEWRAPPER, null);
             db.setTransactionSuccessful();
             db.endTransaction();
             return cursor;
+        } else if (code == GET_WRAPPER_TITLE) {
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            db.beginTransaction();
+            Cursor cursor = db.query(MovieDBHelper.TABLE_VIDEOFILE, new String[]{"wrapper_id"}, selection, selectionArgs, null, null, null);
+            Cursor wrapperCursor = null;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                int wrapper_id = cursor.getInt(cursor.getColumnIndex("wrapper_id"));
+                wrapperCursor = db.query(MovieDBHelper.TABLE_MOVIEWRAPPER, new String[]{"title","poster"}, "id=?", new String[]{String.valueOf(wrapper_id)}, null, null, null);
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            return wrapperCursor;
         }
         return null;
     }
