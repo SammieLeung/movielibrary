@@ -36,8 +36,8 @@ public class MovieApplication extends Application {
         helper.setmWebview(webview);
         //开启数据缓存
         helper.initWebView(true, cachePath);
-        Intent service = new Intent(MovieApplication.this, MovieScanService.class);
-        startService(service);
+//        Intent service = new Intent(MovieApplication.this, MovieScanService.class);
+//        startService(service);
         //友盟统计
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
     }
