@@ -91,6 +91,7 @@ public class VideoPlayTools {
             intent.putExtras(bundle);
         }
         intent.setDataAndType(fileUri, "video/*");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Log.v(TAG, "fileUri==" + fileUri.toString());
         try {
             if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)&&intent.resolveActivity(context.getPackageManager()) != null) {
