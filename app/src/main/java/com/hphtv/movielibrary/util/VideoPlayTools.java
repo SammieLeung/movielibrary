@@ -66,7 +66,7 @@ public class VideoPlayTools {
             if (path.startsWith("/")) {
                 File tFile = new File(path);
                 fileUri = FileProvider.getUriForFile(context, ConstData.AUTHORITIES, tFile);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
             } else if (path != null) {
                 fileUri = Uri.parse(path);
             }
@@ -92,6 +92,7 @@ public class VideoPlayTools {
             intent.putExtras(bundle);
         }
         intent.setDataAndType(fileUri, "video/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Log.v(TAG, "fileUri==" + fileUri.toString());
         try {
@@ -105,4 +106,5 @@ public class VideoPlayTools {
             e.printStackTrace();
         }
     }
+
 }
