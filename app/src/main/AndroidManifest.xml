@@ -56,6 +56,14 @@
         <service android:name=".service.MovieScanService"></service>
         <service android:name=".service.DeviceMonitorService"></service>
         <service android:name=".service.DlnaControlService"></service>
+        <service android:name=".service.DeviceControlService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.hphtv.movielibrary.DEVICE_CONTROL"></action>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
         <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>
