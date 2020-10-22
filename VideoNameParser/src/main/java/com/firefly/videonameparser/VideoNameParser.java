@@ -33,7 +33,7 @@ public class VideoNameParser {
 	 * * http://wiki.xbmc.org/index.php?title=Advancedsettings.xml#.3Ctvshowmatching.3E
 	 */
 	private final static int maxSegments = 3;
-	private final static String[] movieKeywords = {"1080p", "720p", "480p", "blurayrip", "brrip", "divx", "dvdrip", "hdrip", "hdtv", "tvrip", "xvid", "camrip"};
+	private final static String[] movieKeywords = {"1080p", "720p", "480p", "blurayrip", "brrip", "divx", "dvdrip", "hdrip", "hdtv", "tvrip", "xvid", "camrip","hd","4k","2k","bd"};
     private static final String[]  SEASON_WORDS = {
             "s",
             "season",
@@ -206,7 +206,7 @@ public class VideoNameParser {
 		 * TODO: WARNING: this assumes it's in the filename segment
 		 * 
 		 * */
-		String[] diskNumberMatch = matcher("[ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck]|d)[ _.-]*(\\d{1,2})[^\\d]", segments[0]);/* weird regexp? */
+		String[] diskNumberMatch = matcher("[ _.-]*(?:cd|dvd|p(?:ar)?t|dis[ck]|d)[ _.-]*(\\d{1,2})[^\\d]*", segments[0]);/* weird regexp? */
 		if(diskNumberMatch != null && diskNumberMatch.length>0)
 		{
 			int diskNumber = Integer.parseInt(diskNumberMatch[1]);
@@ -325,11 +325,37 @@ public class VideoNameParser {
 						continue;
 					}
 				}
-			} 
-			 
+			}
+
+			//排除
+			//      阳光电影www.ygdy8.com.
+			//		阳光电影www.ygdy8.com
+			//		阳光电影_www.ygdy8.com
+			//		阳光电影-www.ygdy8.com
+			//		阳光电影.www.ygdy8.com
+			//		阳光电影|www.ygdy8.com
+			if(!TextUtils.isEmpty(seg)){
+				String regex = "^[\u4e00-\u9fa5]+[-_\\|\\.]?"
+						+ "(((https|http|ftp|rtsp|mms)?://)"
+						+ "?(([0-9a-z_!~*'().&=+$%-]+: )?[0-9a-z_!~*'().&=+$%-]+@)?" //ftp的user@
+						+ "(([0-9]{1,3}\\.){3}[0-9]{1,3}" // IP形式的URL- 199.194.52.184
+						+ "|" // 允许IP和DOMAIN（域名）
+						+ "([0-9a-z_!~*'()-]+\\.)*" // 域名- www.
+						+ "([0-9a-z][0-9a-z-]{0,61})?[0-9a-z]\\." // 二级域名
+						+ "[a-z]{2,6})" // first level domain- .com or .museum
+						+ "(:[0-9]{1,4})?" // 端口- :80
+						+ "((/?)|" // a slash isn't required if there is no file name
+						+ "(/[0-9a-z_!~*'().;?:@&=+$,%#-]+)+/?))\\.?";
+
+				String[] httpPreTests= matcher(regex,seg);
+				if(httpPreTests.length>0){
+					removeWords.add(httpPreTests[0]);
+				}
+			}
+
 			seg = StringUtils.removeAll(seg, removeWords).trim();
 			Log.v("sjfq","seg:"+seg);
-			
+
 			sourcePrefix = matcher("\\[.*?\\]", seg);
 			if(sourcePrefix != null && sourcePrefix.length >1)// Keep only first title from this filepart, as other ones are most likely release group.
 			{
@@ -367,6 +393,7 @@ public class VideoNameParser {
 				
 
 			Log.v(TAG, "seg3:"+seg);
+
 
 			//String[] segSplit = seg.split("\\.| |-|;|_");
 			String[] segSplit = seg.split(SEGMENTS_SPLIT);
@@ -435,7 +462,7 @@ public class VideoNameParser {
 			mInfo.setType(MovieNameInfo.TYPE_OTHER);
 		}
 		
-	    if (filePath.matches("(.*)1080(p|P)(.*)")) { 
+	    if (filePath.matches("(.*)1080(p|P)(.*)")) {
 	    	mInfo.pushTag("hd");
 	    	mInfo.pushTag("1080p");
 	    }else if (filePath.matches("(.*)720(p|P)(.*)")) { 
