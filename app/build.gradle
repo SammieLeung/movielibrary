@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply from: "../config.gradle"
 def getTime() {
-    return new Date().format("yyyyMMdd", TimeZone.getDefault());
+    return new Date().format("yyyyMMdd-hhmm", TimeZone.getDefault());
 }
 android {
     signingConfigs {
