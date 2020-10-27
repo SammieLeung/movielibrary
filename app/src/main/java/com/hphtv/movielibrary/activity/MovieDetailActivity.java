@@ -203,27 +203,27 @@ public class MovieDetailActivity extends AppBaseActivity {
 
     public void initView() {
         mApplication = (MovieApplication) getApplicationContext();
-        mPosterIv = (ImageView) findViewById(R.id.iv_poster);
-        mRateBar = (RatingBar) findViewById(R.id.rb_rate);
-        mRateTv = (TextView) findViewById(R.id.tv_rate);
-        mRateCountTv = (TextView) findViewById(R.id.tv_rate_count);
+        mPosterIv = findViewById(R.id.iv_poster);
+        mRateBar = findViewById(R.id.rb_rate);
+        mRateTv = findViewById(R.id.tv_rate);
+        mRateCountTv = findViewById(R.id.tv_rate_count);
 
-        mTitleTv = (TextView) findViewById(R.id.tv_title);
-        mCoverIv = (ImageView) findViewById(R.id.iv_cover);
-        mPubDatesTv = (TextView) findViewById(R.id.tv_pub_dates);
-        mDuration = (TextView) findViewById(R.id.tv_duration);
-        mLanguagesTv = (TextView) findViewById(R.id.tv_spoken_languages);
-        mActorsTv = (TextView) findViewById(R.id.tv_actors);
-        mGenresTv = (TextView) findViewById(R.id.tv_genres);
+        mTitleTv = findViewById(R.id.tv_title);
+        mCoverIv = findViewById(R.id.iv_cover);
+        mPubDatesTv = findViewById(R.id.tv_pub_dates);
+        mDuration = findViewById(R.id.tv_duration);
+        mLanguagesTv = findViewById(R.id.tv_spoken_languages);
+        mActorsTv = findViewById(R.id.tv_actors);
+        mGenresTv = findViewById(R.id.tv_genres);
 //        mPathTv = (TextView) findViewById(R.id.tv_path);
-        mDetailTv = (TextView) findViewById(R.id.tv_detail);
-        mSVSummery = (ScrollView) findViewById(R.id.sv_detail);
-        mPubArea = (TextView) findViewById(R.id.pub_area);
-        mBtnPlay = (DrawTopButton) findViewById(R.id.btn_play);
-        mBtnRemove = (DrawTopButton) findViewById(R.id.btn_remove);
-        mBtnEdit = (DrawTopButton) findViewById(R.id.btb_edit);
-        mBtnTrailer = (DrawTopButton) findViewById(R.id.btn_trailer);
-        mBtnFavorite = (DrawTopButton) findViewById(R.id.btn_favorite);
+        mDetailTv = findViewById(R.id.tv_detail);
+        mSVSummery = findViewById(R.id.sv_detail);
+        mPubArea = findViewById(R.id.pub_area);
+        mBtnPlay = findViewById(R.id.btn_play);
+        mBtnRemove = findViewById(R.id.btn_remove);
+        mBtnEdit = findViewById(R.id.btb_edit);
+        mBtnTrailer = findViewById(R.id.btn_trailer);
+        mBtnFavorite = findViewById(R.id.btn_favorite);
         mBtnBack = findViewById(R.id.btn_exit);
         mBtnEdit.setOnClickListener(mClickListener);
         mBtnTrailer.setOnClickListener(mClickListener);
@@ -231,9 +231,9 @@ public class MovieDetailActivity extends AppBaseActivity {
         mBtnRemove.setOnClickListener(mClickListener);
         mBtnFavorite.setOnClickListener(mClickListener);
         mBtnBack.setOnClickListener(mClickListener);
-        mViewMovieTrailer = (RelativeLayout) findViewById(R.id.rl_trailer);
+        mViewMovieTrailer = findViewById(R.id.rl_trailer);
 
-        mCircleRVforTrailer = (CircleRecyelerViewWithMouseScroll) findViewById(R.id.rv_trailer);
+        mCircleRVforTrailer = findViewById(R.id.rv_trailer);
         mCircleRVforTrailer.setOnCenterItemFocusListener(new CircleRecyclerView.OnCenterItemFocusListener() {
             @Override
             public void onCenterItemFocus(View v, boolean isViewOnCenter) {
@@ -245,7 +245,7 @@ public class MovieDetailActivity extends AppBaseActivity {
             }
         });
 
-        mViewActors = (LinearLayout) findViewById(R.id.actors_group);
+        mViewActors = findViewById(R.id.actors_group);
         initMovieTrailerList();
         mBtnPlay.requestFocus();
         mSVSummery.setOnFocusChangeListener(new View.OnFocusChangeListener() {
