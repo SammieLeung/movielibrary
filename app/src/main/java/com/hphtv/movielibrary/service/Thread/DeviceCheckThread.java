@@ -15,6 +15,14 @@ import java.util.List;
 public class DeviceCheckThread extends AsyncTask<Object, Integer, Integer> {
     private List<Device> mConnectedDeviceList;
     private Callback mCallback;
+    private Context mContext;
+    private int isEncryted;
+
+    public DeviceCheckThread(Context context,Callback callback,int isEncryted){
+        mContext=context;
+        mCallback=callback;
+        this.isEncryted=isEncryted;
+    }
 
     public interface Callback {
         public void onFinish(List<Device> list);
@@ -26,9 +34,7 @@ public class DeviceCheckThread extends AsyncTask<Object, Integer, Integer> {
 
     @Override
     protected Integer doInBackground(Object... objects) {
-        Context context = (Context) objects[0];
-        int isEncryted = (int) objects[1];
-        mConnectedDeviceList = DeviceUtil.getConnectedDevices(context, isEncryted);
+        mConnectedDeviceList = DeviceUtil.getConnectedDevices(mContext, isEncryted);
         return 0;
     }
 

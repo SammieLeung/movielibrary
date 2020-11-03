@@ -178,7 +178,7 @@ public class MovieDetailActivity extends AppBaseActivity {
     }
 
     @Override
-    public void OnDeviceChange(Context context, List<Device> deviceList) {
+    public void OnDeviceChange(List<Device> deviceList) {
     }
 
     @Override

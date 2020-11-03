@@ -12,6 +12,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -42,15 +43,8 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.MovieSearchResultActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"
-            android:configChanges="orientation|keyboardHidden"
-            >
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"></action>
-            </intent-filter>
-        </activity>
+        <activity android:name=".activity.MovieSearchResultActivity"></activity>
+
         <activity android:name=".activity.MovieTrailerPlayerActivity"></activity>
 
         <service android:name=".service.MovieScanService"></service>

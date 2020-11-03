@@ -3,19 +3,15 @@ package com.hphtv.movielibrary.activity;
 import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.MotionEvent;
 
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.sqlite.bean.Device;
-import com.hphtv.movielibrary.util.LogUtil;
 
 import java.util.List;
 
@@ -25,7 +21,7 @@ import java.util.List;
  */
 public abstract class AppBaseActivity extends Activity {
     public static final String TAG = AppBaseActivity.class.getSimpleName();
-    protected DeviceMonitorService mService;
+    protected DeviceMonitorService mDeviceMonitorService;
     private AppBaseActivity mContext;
     private ServiceConnection mServiceConnection;
 
@@ -44,19 +40,14 @@ public abstract class AppBaseActivity extends Activity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 DeviceMonitorService.MonitorBinder binder = (DeviceMonitorService.MonitorBinder) service;
-                mService = binder.getService();
-                mService.setOnDevcieChangeListener(new DeviceMonitorService.OnDeviceChange() {
-                    @Override
-                    public void OnDeviceChange(List list) {
-                        mContext.OnDeviceChange(mContext, list);
-                    }
-                });
-                OnDeviceMonitorServiceConnect(mService);
+                mDeviceMonitorService = binder.getService();
+                mDeviceMonitorService.setOnDevcieChangeListener(list -> OnDeviceChange(list));
+                OnDeviceMonitorServiceConnect(mDeviceMonitorService);
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                mService=null;
+                mDeviceMonitorService =null;
             }
         };
     }
@@ -75,7 +66,7 @@ public abstract class AppBaseActivity extends Activity {
 
 
 
-    public abstract void OnDeviceChange(Context context,List<Device> deviceList);
+    public abstract void OnDeviceChange(List<Device> deviceList);
     public abstract void OnDeviceMonitorServiceConnect(DeviceMonitorService service);
 
 
@@ -89,7 +80,7 @@ public abstract class AppBaseActivity extends Activity {
     }
 
     public MovieApplication getApp(){
-        return (MovieApplication) getApplication();
+        return MovieApplication.getInstance();
     }
 
     @Override
