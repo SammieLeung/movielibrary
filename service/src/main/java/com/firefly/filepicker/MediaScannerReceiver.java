@@ -22,7 +22,8 @@ public class MediaScannerReceiver extends BroadcastReceiver {
         if (uri == null) {
             return;
         }
-
+        if (Constants.newDevices == null)
+            Constants.init();
         if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)
                 || Intent.ACTION_MEDIA_MOUNTED.equals(action)) {
             Constants.newDevices.put(getDeviceId(uri), Constants.DEVICE_NOT_SCAN);

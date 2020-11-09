@@ -56,7 +56,8 @@ public class TestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Node node = new Node("0", "title", Node.DLNA, null);
-
+                if (Constants.deviceHashMap == null)
+                    Constants.init();
 //                for (Device device : Constants.devices) {
 //
 //                    Service service = device.findService(new UDAServiceType("ContentDirectory"));

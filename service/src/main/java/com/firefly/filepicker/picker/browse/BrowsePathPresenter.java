@@ -230,9 +230,9 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @Override
     public void onSelect(Node node, boolean isPrivate, boolean confirm) {
         if (mSelectType == SELECT_DIR) {
-            if(!mEnableSelectConfirm){//设置是否开启确认选择窗口
+            if (!mEnableSelectConfirm) {//设置是否开启确认选择窗口
                 onSelectDir(node, false);
-            }else {
+            } else {
                 if (confirm) {
                     onSelectDir(node, isPrivate);
                 } else {
@@ -432,10 +432,10 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             return smbFile.getCanonicalPath();
         }
 
-        if (!TextUtils.isEmpty(((NtlmPasswordAuthenticator)cifsContext.getCredentials()).getName())) {
-            builder.append(((NtlmPasswordAuthenticator)cifsContext.getCredentials()).getName().replace('\\', ';'));
+        if (!TextUtils.isEmpty(((NtlmPasswordAuthenticator) cifsContext.getCredentials()).getName())) {
+            builder.append(((NtlmPasswordAuthenticator) cifsContext.getCredentials()).getName().replace('\\', ';'));
             builder.append(':');
-            builder.append(((NtlmPasswordAuthenticator)cifsContext.getCredentials()).getPassword());
+            builder.append(((NtlmPasswordAuthenticator) cifsContext.getCredentials()).getPassword());
             builder.append('@');
         }
 
@@ -455,12 +455,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             String domain = "";
             int i = 0;
 
-            if(( i = username.indexOf( '\\' )) != -1 ) {
-                domain = username.substring( 0, i );
-                username = username.substring( i + 1 );
+            if ((i = username.indexOf('\\')) != -1) {
+                domain = username.substring(0, i);
+                username = username.substring(i + 1);
             }
 
-            cifsContext =SingletonContext.getInstance().withCredentials(new NtlmPasswordAuthenticator(domain, username, password));
+            cifsContext = SingletonContext.getInstance().withCredentials(new NtlmPasswordAuthenticator(domain, username, password));
         }
 
         SmbFile smbFile = null;
@@ -629,6 +629,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     }
 
     private void DLNADevice(Node parent) {
+        if (Constants.devices == null)
+            Constants.init();
         for (Device device : Constants.devices) {
             Service service = device.findService(new UDAServiceType("ContentDirectory"));
             if (service == null) {
@@ -754,7 +756,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         smbFile = new SmbFile(url, cifsContext);
                         mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), cifsContext);
                     } else {
-                        smbFile = new SmbFile(url,SingletonContext.getInstance().withAnonymousCredentials());
+                        smbFile = new SmbFile(url, SingletonContext.getInstance().withAnonymousCredentials());
                     }
 
                     if (node.getType() != Node.SAMBA_CATEGORY) {
@@ -798,7 +800,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         case SmbException.NT_STATUS_ACCOUNT_DISABLED:
                         case SmbException.NT_STATUS_ACCOUNT_LOCKED_OUT:
                         case SmbException.NT_STATUS_ACCESS_DENIED:
-                            if (cifsContext==null||cifsContext.getCredentials().isAnonymous()) {
+                            if (cifsContext == null || cifsContext.getCredentials().isAnonymous()) {
                                 // 尝试使用GUEST帐号
                                 sambaGetPath(node, SambaAuthHelper.GUEST);
                             } else {
@@ -823,10 +825,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             message.sendToTarget();
         }
     }
+
     private void setLoadingViewVisible(boolean show) {
         Message message = mHandler.obtainMessage(MSG_SET_LOADING_VIEW, show);
         message.sendToTarget();
     }
+
     private void showError(Node node, String msg) {
         if (isAvailable(node)) {
             Message message = mHandler.obtainMessage(MSG_ERROR, msg);
@@ -834,6 +838,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         }
 
     }
+
     private void showAuthDialog(Node node, @NonNull Bundle bundle) {
         if (isAvailable(node)) {
             Message message = mHandler.obtainMessage(MSG_SHOW_AUTH_DIALOG);
@@ -844,6 +849,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             message.sendToTarget();
         }
     }
+
     private void showAuthDialog(Node node, boolean checkOnly) {
         if (isAvailable(node)) {
             Bundle bundle = new Bundle();
@@ -851,6 +857,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             showAuthDialog(node, bundle);
         }
     }
+
     private void showSetPrivateDialog(Node node) {
         if (isAvailable(node)) {
             Message message = mHandler.obtainMessage(MSG_SHOW_SET_PRIVATE_DIALOG, node);

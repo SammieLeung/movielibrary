@@ -323,6 +323,8 @@ public class PickerContentProvider extends ContentProvider {
     }
 
     private void getDLNADevices(Uri uri, String[] projection, MatrixCursor result) {
+        if (Constants.devices == null)
+            Constants.init();
         for (Device device : Constants.devices) {
             result.addRow(getDLNADeviceValue(projection, device));
         }
