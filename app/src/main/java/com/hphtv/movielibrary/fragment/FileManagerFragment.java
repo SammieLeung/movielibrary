@@ -420,9 +420,14 @@ public class FileManagerFragment extends Fragment {
                                             }
                                         });
                                         mApp.setShowEncrypted(true);
-                                        scanService.initScanService();
-                                        scanService.addToScanQueue(t_device, t_dir, isEncrypted);
+//                                        scanService.initScanService();
+//                                        scanService.addToScanQueue(t_device, t_dir, isEncrypted);
                                         Intent intent = new Intent(getActivity(), FolderManagerActivity.class);
+                                        Bundle bundle=new Bundle();
+                                        bundle.putSerializable("device",t_device);
+                                        bundle.putSerializable("dir",t_dir);
+                                        bundle.putInt("is_encrypted",isEncrypted);
+                                        intent.putExtras(bundle);
                                         startActivityForResult(intent, REQUEST_CODE_MANAGER);
                                     }
                                 }
@@ -464,9 +469,14 @@ public class FileManagerFragment extends Fragment {
                                             }
                                         });
                                         mApp.setShowEncrypted(true);
-                                        scanService.initScanService();
-                                        scanService.addToScanQueue(t_device, t_dir, isEncrypted);
+//                                        scanService.initScanService();
+//                                        scanService.addToScanQueue(t_device, t_dir, isEncrypted);
                                         Intent intent = new Intent(getActivity(), FolderManagerActivity.class);
+                                        Bundle bundle=new Bundle();
+                                        bundle.putSerializable("device",t_device);
+                                        bundle.putSerializable("dir",t_dir);
+                                        bundle.putInt("is_encrypted",isEncrypted);
+                                        intent.putExtras(bundle);
                                         startActivityForResult(intent, REQUEST_CODE_MANAGER);
                                     }
                                 }
@@ -479,9 +489,14 @@ public class FileManagerFragment extends Fragment {
                         fragment.SetPassword().show(getFragmentManager(), TAG);
                     }
                 } else {
-                    scanService.initScanService();
-                    scanService.addToScanQueue(t_device, t_dir, isEncrypted);
+//                    scanService.initScanService();
+//                    scanService.addToScanQueue(t_device, t_dir, isEncrypted);
                     Intent intent = new Intent(getActivity(), FolderManagerActivity.class);
+                    Bundle bundle=new Bundle();
+                    bundle.putSerializable("device",t_device);
+                    bundle.putSerializable("dir",t_dir);
+                    bundle.putInt("is_encrypted",isEncrypted);
+                    intent.putExtras(bundle);
                     startActivityForResult(intent, REQUEST_CODE_MANAGER);
 
                     context.runOnUiThread(new Runnable() {

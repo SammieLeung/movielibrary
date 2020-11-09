@@ -728,8 +728,17 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             Log.v(TAG, "on serviceIntent " + name + " connected");
             initView();
             initData();
-
-
+            Intent intent=getIntent();
+            Bundle bundle = intent.getExtras();
+            if(bundle!=null) {
+                Device device = (Device) bundle.getSerializable("device");
+                Directory directory = (Directory) bundle.getSerializable("dir");
+                int isEncrypted = bundle.getInt("is_encrypted");
+                if (device != null && directory != null) {
+                    mScanService.initScanService();
+                    mScanService.addToScanQueue(device, directory, isEncrypted);
+                }
+            }
         }
 
         @Override

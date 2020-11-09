@@ -1,10 +1,12 @@
 package com.hphtv.movielibrary.sqlite.bean;
 
+import java.io.Serializable;
+
 /**
  * @author lxp
  * @date 19-3-28
  */
-public class Directory {
+public class Directory implements Serializable {
     private long id;
     private String name;
     private long parent_id;//device 的id
