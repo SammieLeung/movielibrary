@@ -74,6 +74,7 @@ public class FileManagerFragment extends Fragment {
 
     public static final int REQUEST_CODE_MANAGER = 1;
     public static final int REQUEST_CODE_ADD = 2;
+    private boolean isFilePickerOn=false;
     View.OnClickListener mOnClicklistener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -83,13 +84,18 @@ public class FileManagerFragment extends Fragment {
                     startActivityForResult(intent, REQUEST_CODE_MANAGER);
                     break;
                 case R.id.setting_folder_add:
-                    try {
-                        Intent picker_intent = new Intent(ConstData.ACTION_FILE_PICKER);
-                        startActivityForResult(picker_intent, REQUEST_CODE_ADD);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Toast.makeText(context, "can't open the file picker!", Toast.LENGTH_SHORT).show();
+                    if(!isFilePickerOn){
+                        isFilePickerOn=!isFilePickerOn;
+                        try {
+                            Intent picker_intent = new Intent(ConstData.ACTION_FILE_PICKER);
+                            startActivityForResult(picker_intent, REQUEST_CODE_ADD);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            isFilePickerOn=false;
+                            Toast.makeText(context, "can't open the file picker!", Toast.LENGTH_SHORT).show();
+                        }
                     }
+
                     break;
                 case R.id.private_setting:
                     md5Password = preferences.getPassword();
@@ -258,11 +264,14 @@ public class FileManagerFragment extends Fragment {
         Log.v(TAG, "onActivityResult " + resultCode);
         if (requestCode == REQUEST_CODE_MANAGER && resultCode == RESULT_OK) {
 
-        } else if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
-            final Uri uri = data.getData();
-            if (scanService == null)
-                scanService = context.getMovieSearchService();
-            addFolderAndMatchMovie(uri);
+        } else if (requestCode == REQUEST_CODE_ADD ) {
+            isFilePickerOn=false;
+            if(resultCode == RESULT_OK) {
+                final Uri uri = data.getData();
+                if (scanService == null)
+                    scanService = context.getMovieSearchService();
+                addFolderAndMatchMovie(uri);
+            }
         }
     }
 
