@@ -89,7 +89,7 @@ public class MovieSearchResultActivity extends Activity {
         mApplication = (MovieApplication) getApplicationContext();
         mActivity = MovieSearchResultActivity.this;
         mApplication.addActivity(MovieSearchResultActivity.this);
-        mBtnBack=findViewById(R.id.ibtn_back);
+        mBtnBack = findViewById(R.id.ibtn_back);
         mBtnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -308,7 +308,7 @@ public class MovieSearchResultActivity extends Activity {
                             @Override
                             public void run() {
                                 handler.sendEmptyMessage(SEARCH_BEGIN);
-                                JSONArray tmp = MtimeApi.SearchMoviesByName(mMovieList, (JSONArray) cacheDatas, mFileName, cacheOffset, LIMIT);
+                                JSONArray tmp = MtimeApi.SearchMoviesByName(mMovieList, null, mFileName, cacheOffset, LIMIT);
                                 if (tmp == null) {
                                     handler.sendEmptyMessage(SEARCH_ERROR);
                                 } else {
@@ -421,7 +421,7 @@ public class MovieSearchResultActivity extends Activity {
 
     }
 
-    private static class MyHandler extends Handler {
+    private class MyHandler extends Handler {
         private WeakReference<MovieSearchResultActivity> reference;
 
         public MyHandler(MovieSearchResultActivity activity) {
@@ -432,11 +432,12 @@ public class MovieSearchResultActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SEARCH_SUCCESS:
-                    if (reference.get().myMovieSearchAdapter != null)
+                    if (reference.get().myMovieSearchAdapter != null) {
                         reference.get().myMovieSearchAdapter.notifyDataSetChanged();
-                    reference.get().mRefreshLayout.setLoading(false);
-                    if (reference.get().api_version != ConstData.Scraper.DOUBAN)
-                        reference.get().cacheOffset += LIMIT;
+                        reference.get().mRefreshLayout.setLoading(false);
+                        if (reference.get().api_version != ConstData.Scraper.DOUBAN)
+                            reference.get().cacheOffset += 1;
+                    }
                     break;
                 case SEARCH_ERROR:
                     Toast.makeText(reference.get().mActivity, "搜索不到了~", Toast.LENGTH_SHORT).show();
