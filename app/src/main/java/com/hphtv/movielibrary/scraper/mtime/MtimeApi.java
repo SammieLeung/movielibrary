@@ -41,42 +41,45 @@ public class MtimeApi {
     public static SimpleMovie SearchAMovieByApi(String keyword, String originStr) {
         try {
             keyword = keyword.trim();
-            JSONArray movieAry = SearchMovies(keyword);
-            if (movieAry != null && movieAry.size() > 0) {
-                int idx = 0;
-                float maxSimilarity = 0;
-                String compareStr = TextUtils.isEmpty(originStr) ? keyword : originStr;
-                for (int i = 0; i < movieAry.size(); i++) {
-                    JSONObject movieObj = movieAry.getJSONObject(i);
-                    String name = movieObj.getString("titlecn");
-                    String nameEn = movieObj.getString("titleen");
-                    float similarity = EditorDistance.checkLevenshtein(name, compareStr);
-                    float similarityEn = EditorDistance.checkLevenshtein(nameEn, compareStr);
-                    float tmpSimilarity = Math.max(similarity, similarityEn);
-                    if (tmpSimilarity == 1) {
-                        idx = i;
-                        break;
+            JSONObject data = SearchMovies(keyword, 1);
+            if (data != null) {
+                JSONArray movieAry = data.getJSONArray("movies");
+                if (movieAry != null && movieAry.size() > 0) {
+                    int idx = 0;
+                    float maxSimilarity = 0;
+                    String compareStr = TextUtils.isEmpty(originStr) ? keyword : originStr;
+                    for (int i = 0; i < movieAry.size(); i++) {
+                        JSONObject movieObj = movieAry.getJSONObject(i);
+                        String name = movieObj.getString("name");
+                        String nameEn = movieObj.getString("nameEn");
+                        float similarity = EditorDistance.checkLevenshtein(name, compareStr);
+                        float similarityEn = EditorDistance.checkLevenshtein(nameEn, compareStr);
+                        float tmpSimilarity = Math.max(similarity, similarityEn);
+                        if (tmpSimilarity == 1) {
+                            idx = i;
+                            break;
+                        }
+                        if (tmpSimilarity > maxSimilarity) {
+                            idx = i;
+                            maxSimilarity = tmpSimilarity;
+                        }
                     }
-                    if (tmpSimilarity > maxSimilarity) {
-                        idx = i;
-                        maxSimilarity = tmpSimilarity;
-                    }
+                    JSONObject movieObj = movieAry.getJSONObject(idx);
+                    Rating rating = new Rating();
+                    rating.max = 10;
+                    rating.average = movieObj.getInteger("rating");
+                    String title = movieObj.getString("name");
+                    String year = movieObj.getString("year");
+                    String cover = movieObj.getString("img");
+                    String id = String.valueOf(movieObj.getInteger("movieId"));
+                    SimpleMovie simpleMovie = new SimpleMovie();
+                    simpleMovie.setId(id);
+                    simpleMovie.setRating(rating);
+                    simpleMovie.setTitle(title);
+                    simpleMovie.setYear(year);
+                    simpleMovie.setImages(new Images("", "", cover));
+                    return simpleMovie;
                 }
-                JSONObject movieObj = movieAry.getJSONObject(idx);
-                Rating rating = new Rating();
-                rating.max = 10;
-                rating.average = 0;
-                String title = movieObj.getString("titlecn");
-                String year = movieObj.getString("year");
-                String cover = movieObj.getString("cover");
-                String id = String.valueOf(movieObj.getInteger("id"));
-                SimpleMovie simpleMovie = new SimpleMovie();
-                simpleMovie.setId(id);
-                simpleMovie.setRating(rating);
-                simpleMovie.setTitle(title);
-                simpleMovie.setYear(year);
-                simpleMovie.setImages(new Images("", "", cover));
-                return simpleMovie;
             }
 
         } catch (Exception e) {
@@ -85,47 +88,52 @@ public class MtimeApi {
         return null;
     }
 
-    private static JSONArray SearchMovies(String keyword) {
+    private static JSONObject SearchMovies(String keyword, int offset) {
         try {
-            Response response = OkHttpUtil.getResponse(String.format(MtimeURL.SEARCH_NEW_URL, keyword));
+            Response response = OkHttpUtil.getResponse(String.format(MtimeURL.SEARCH_NEW_URL2, keyword, offset));
             String content = response.body().string();
             JSONObject contentObj = JSON.parseObject(content);
-            JSONArray movieAry = contentObj.getJSONArray("suggestions");
+            JSONObject data = contentObj.getJSONObject("data");
 
-            return movieAry;
+            return data;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static JSONArray SearchMoviesByName(List<SimpleMovie> dataList, JSONArray jsonArray, String keyword, int offset, int limit) {
+    public static JSONArray SearchMoviesByName(List<SimpleMovie> dataList, JSONArray jsonArray, String keyword, int pageIndex, int limit) {
         JSONArray movie_array = null;
         if (jsonArray != null)
             movie_array = jsonArray;
-        else
-            movie_array = SearchMovies(keyword);
+        else {
+            JSONObject data = SearchMovies(keyword, pageIndex);
+            if (data != null) {
+                movie_array = data.getJSONArray("movies");
+            }
+        }
         if (movie_array != null && movie_array.size() > 0) {
-            if (offset >= movie_array.size())
-                return null;
-            for (int i = offset; i < offset + limit && i < movie_array.size(); i++) {
+            for (int i = 0; i < movie_array.size(); i++) {
                 JSONObject movieObj = movie_array.getJSONObject(i);
                 Rating rating = new Rating();
                 rating.max = 10;
                 rating.average = 0;
-                String title = movieObj.getString("titlecn");
-                String cover = movieObj.getString("cover");
-                String id = String.valueOf(movieObj.getInteger("id"));
+                String title = movieObj.getString("name");
+                String cover = movieObj.getString("img");
+                String id = String.valueOf(movieObj.getInteger("movieId"));
                 String des1 = "";
 
                 String subtypeStr = movieObj.getString("movieType");
                 if (subtypeStr != null && subtypeStr.length() > 0) {
                     des1 += subtypeStr + " | ";
                 }
-                des1 += movieObj.getString("titleen");
+                des1 += movieObj.getString("nameEn");
                 String des2 = "";
-                String director = movieObj.getString("director");
-                des2 += director;
+                JSONArray directors = movieObj.getJSONArray("directors");
+                for (int j = 0; j < directors.size(); j++) {
+                    String director = (String) directors.get(j);
+                    des2 += director + " ";
+                }
 
                 String[] abstracts = {des1, des2};
                 SimpleMovie simpleMovie = new SimpleMovie();
@@ -140,6 +148,7 @@ public class MtimeApi {
         }
         return movie_array;
     }
+
 
     public static Movie parserMovieInfoFromHtmlById(String id) {
         Movie movie = parseMovie(id);
@@ -166,38 +175,43 @@ public class MtimeApi {
                 Log.w(TAG, "httpget failed!");
             }
             String content = response.body().string();
-            JSONObject movieObj = JSON.parseObject(content);
+            JSONObject contentJson=JSON.parseObject(content);
+            JSONObject data=contentJson.getJSONObject("data");
+            if(data==null)
+                return;
+            JSONObject movieObj = data.getJSONObject("basic");
 
-            movie.setImages(new Images(null, null, movieObj.getString("image")));
-            movie.setTitle(movieObj.getString("titleCn"));
-            movie.setOriginalTitle(movieObj.getString("titleEn"));
+            movie.setImages(new Images(null, null, movieObj.getString("img")));
+            movie.setTitle(movieObj.getString("name"));
+            movie.setOriginalTitle(movieObj.getString("nameEn"));
             Rating rating = new Rating();
-            rating.average = Float.valueOf(movieObj.getString("rating") != null && movieObj.getString("rating").equals("") ? "-1" : movieObj.getString("rating"));
+            rating.average = Float.valueOf(movieObj.getString("overallRating") != null && movieObj.getString("overallRating").equals("") ? "-1" : movieObj.getString("overallRating"));
             movie.setRating(rating);
-            movie.setRatingsCount(Integer.valueOf(movieObj.getString("scoreCount") != null && movieObj.getString("scoreCount").equals("") ? "0" : movieObj.getString("scoreCount")));
+            movie.setRatingsCount(Integer.valueOf(movieObj.getString("personCount") != null && movieObj.getString("personCount").equals("") ? "0" : movieObj.getString("personCount")));
             movie.setYear(movieObj.getString("year"));
-            movie.setSummary(movieObj.getString("content"));
+            movie.setSummary(movieObj.getString("story"));
             JSONArray typeArry = movieObj.getJSONArray("type");
             String[] genres = new String[typeArry.size()];
             for (int i = 0; i < genres.length; i++) {
                 genres[i] = typeArry.getString(i);
             }
             movie.setGenres(genres);
-            movie.setDurations(new String[]{movieObj.getString("runTime")});
+            movie.setDurations(new String[]{movieObj.getString("mins")});
             Celebrity[] celebrities = new Celebrity[1];
             Celebrity celebrity = new Celebrity();
-            celebrity.setName(movieObj.getJSONObject("director").getString("directorName"));
+            celebrity.setName(movieObj.getJSONObject("director").getString("name"));
             celebrities[0] = celebrity;
             movie.setDirectors(celebrities);
 
-            JSONArray actorList = movieObj.getJSONArray("actorList");
+            JSONArray actorList = movieObj.getJSONArray("actors");
             Celebrity[] actors = new Celebrity[actorList.size() > 10 ? 10 : actorList.size()];
             for (int i = 0; i < actorList.size() && i < 10; i++) {
                 Celebrity actor = new Celebrity();
-                actor.setName(actorList.getJSONObject(i).getString("actor"));
+                actor.setName(actorList.getJSONObject(i).getString("name"));
                 actors[i] = actor;
             }
             movie.setCasts(actors);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -213,7 +227,8 @@ public class MtimeApi {
             }
             content = response.body().string();
             //剧照
-            JSONArray images = JSON.parseArray(content);
+            JSONObject data=JSON.parseObject(content);
+            JSONArray images = data.getJSONArray("imageInfos");
 
             Photo[] photo_set = new Photo[images.size()];
             for (int i = 0; i < images.size(); i++) {
@@ -236,14 +251,16 @@ public class MtimeApi {
     public static void parseMovieTrailerInfo(long id, String movieId, List<MovieTrailer> list) {
         String content;
         try {
-            Response response = OkHttpUtil.getResponseFromServer(String.format(MtimeURL.MOVIE_TRAILER_PAGE, movieId));
+            Response response = OkHttpUtil.getResponseFromServer(String.format(MtimeURL.MOVIE_DETAIL, movieId));
             if (!response.isSuccessful()) {
                 Log.w(TAG, "httpget failed!");
             }
             content = response.body().string();
             Log.v(TAG, "content= " + content);
-            JSONObject jsonObject = JSON.parseObject(content);
-            JSONArray videoList = jsonObject.getJSONArray("videoList");
+            JSONObject contentJson=JSON.parseObject(content);
+            JSONObject data=contentJson.getJSONObject("data");
+            JSONObject basic=data.getJSONObject("basic");
+            JSONArray videoList = basic.getJSONArray("videos");
             for (int i = 0; i < videoList.size(); i++) {
                 JSONObject video = videoList.getJSONObject(i);
                 MovieTrailer movieTrailer = new MovieTrailer();
@@ -251,8 +268,8 @@ public class MtimeApi {
                 String href = video.getString("hightUrl");
                 String duration = "";
                 String title = video.getString("title");
-                String photo = video.getString("image");
-                int mId = video.getInteger("id");
+                String photo = video.getString("img");
+                int mId = video.getInteger("videoId");
                 String pub_date = "";
                 long movie_id = id;
 

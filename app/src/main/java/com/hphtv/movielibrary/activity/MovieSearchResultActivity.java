@@ -243,7 +243,7 @@ public class MovieSearchResultActivity extends Activity {
                             public void run() {
                                 handler.sendEmptyMessage(SEARCH_BEGIN);
                                 mMovieList.clear();
-                                cacheOffset = 0;
+                                cacheOffset = 1;
                                 cacheDatas = MtimeApi.SearchMoviesByName(mMovieList, null, mFileName, cacheOffset, LIMIT);
                                 handler.sendEmptyMessage(SEARCH_SUCCESS);
                             }
