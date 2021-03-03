@@ -40,6 +40,7 @@ import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
+import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.LogUtil;
@@ -257,8 +258,8 @@ public class MovieScanService extends Service {
         List<ParseFile> parseFileList = new ArrayList<>();
         Log.v(TAG, "cursor.getCount " + cursor.getCount());
         final int fileCount = cursor.getCount();
-        if (cursor.getCount() > 0) {
-            while (cursor != null && cursor.moveToNext() && !Thread.currentThread().isInterrupted()) {
+        if (cursor != null &&cursor.getCount() > 0) {
+            while (cursor.moveToNext() && !Thread.currentThread().isInterrupted()) {
                 if (!isRunning) {
                     break;
                 }
@@ -614,6 +615,7 @@ public class MovieScanService extends Service {
                             LogUtil.e(TAG, "insert vfile faild");
                             return null;
                         }
+                        BroadcastHelper.sendBroadcastMovieUpdateSync(MovieScanService.this, movieWrapper.getId());
                         return movieWrapper;
                     }
                 }
@@ -660,10 +662,11 @@ public class MovieScanService extends Service {
                     videoFile.setWrapper_id(rowId);
                     ContentValues v_values = mVideoFileDao.parseContentValues(videoFile);
                     num = mVideoFileDao.update(v_values, "id=?", new String[]{String.valueOf(videoFile.getId())});
-                    if (num <= 0) {
+                                      if (num <= 0) {
                         LogUtil.e(TAG, "insert vfile faild");
                         return null;
                     }
+                    BroadcastHelper.sendBroadcastMovieAddSync(MovieScanService.this,  rowId);
                 }
                 return movieWrapper;
             }
@@ -688,6 +691,7 @@ public class MovieScanService extends Service {
                         LogUtil.e(TAG, "insert vfile faild");
                         return null;
                     }
+                    BroadcastHelper.sendBroadcastMovieAddSync(MovieScanService.this, rowId);
                 }
             } else {
                 Cursor wrapperCursor = mMovieWrapperDao.select("id=?", new String[]{String.valueOf(wrapper_id)}, null);
@@ -696,6 +700,7 @@ public class MovieScanService extends Service {
                     wrapper.setDirIds(new Long[]{dir_id});
                     wrapper.setDevIds(new Long[]{device_id});
                     mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(wrapper), "id=?", new String[]{String.valueOf(wrapper.getId())});
+                    BroadcastHelper.sendBroadcastMovieUpdateSync(MovieScanService.this, wrapper_id);
                 }
             }
 

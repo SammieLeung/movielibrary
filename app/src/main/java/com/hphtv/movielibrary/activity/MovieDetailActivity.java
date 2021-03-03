@@ -58,6 +58,7 @@ import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.MovietrailerDao;
 import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
+import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
@@ -456,6 +457,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                         mCurrentWrapper.setAverage(getString(R.string.rate_not));
 
                     mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(mCurrentWrapper), "id=?", new String[]{String.valueOf(mCurrentWrapper.getId())});
+                    BroadcastHelper.sendBroadcastMovieUpdateSync(MovieDetailActivity.this, mCurrentWrapper.getId());
                     mCurrentMovie = movie;
                     isParseOver = true;
                     runOnUiThread(new Runnable() {
@@ -680,7 +682,7 @@ public class MovieDetailActivity extends AppBaseActivity {
 
             }
         });
-        movieEditFragment.setInfo(title,score,img,paths,genres,"").show(getFragmentManager(), TAG);
+        movieEditFragment.setInfo(title, score, img, paths, genres, "").show(getFragmentManager(), TAG);
     }
 
     /**
@@ -739,62 +741,27 @@ public class MovieDetailActivity extends AppBaseActivity {
                 ScraperInfo[] scraperInfos = mCurrentWrapper.getScraperInfos();
                 long wrapper_id = mCurrentWrapper.getId();
                 if (scraperInfos != null && scraperInfos.length > 0) {
-                    int rowId = mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
-                    if (rowId > 0) {
-                        mCurrentWrapper.setScraperInfos(null);
-                        Cursor cursor = mVideoFileDao.select("wrapper_id=?", new String[]{String.valueOf(wrapper_id)}, null);
-                        if (cursor.getCount() > 0) {
-                            int size = cursor.getCount();
-                            Long[] f_ids = new Long[size];
-                            List<VideoFile> videoFiles = mVideoFileDao.parseList(cursor);
-                            if (videoFiles.size() > 0) {
-                                for (int i = 0; i < size; i++) {
-                                    f_ids[i] = videoFiles.get(i).getId();
-                                }
-                                VideoFile file = videoFiles.get(0);
-                                MovieNameInfo mni = FileScanUtil.simpleParse(file.getFilename());
-                                mCurrentWrapper.setTitle(mni.getName());
-                                mCurrentWrapper.setPoster(null);
-                                mCurrentWrapper.setAverage("-1");
-                                mMovieWrapperDao.update(mMovieWrapperDao.parseContentValues(mCurrentWrapper), "id=?", new String[]{String.valueOf(wrapper_id)});
-                            }
-                        }
-
-                    }
-                    setResult(1);
-                    buildNullMovie(mCurrentWrapper);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            refresh(mCurrentMovie);
-                            Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
-
-                        }
-                    });
-                } else {
-                    long rowId = mVideoFileDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
-                    if (rowId > 0) {
-                        mFavoriteDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
-                        mHistoryDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
-                        rowId = mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
-                        if (rowId > 0) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                            setResult(1);
-                            finish();
-                        }
-                    }
-
+                    mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
                 }
-
+                long rowId = mVideoFileDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
+                if (rowId > 0) {
+                    mFavoriteDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
+                    mHistoryDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
+                    rowId = mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
+                    if (rowId > 0) {
+                        BroadcastHelper.sendBroadcastMovieRemoveSync(MovieDetailActivity.this, wrapper_id);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        setResult(1);
+                        finish();
+                    }
+                }
             }
-        }).start();
-
-
+        }). start();
     }
 
     /**

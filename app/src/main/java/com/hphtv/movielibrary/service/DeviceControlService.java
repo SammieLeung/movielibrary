@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.service;
 
 import android.app.Service;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -10,8 +9,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
@@ -25,7 +22,7 @@ import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 
 public class DeviceControlService extends Service {
-    public static final int MSG_PLAY_VIDEO = 0;
+    public static final int CMD_PLAY_VIDEO = 0;
     public static final String TAG = DeviceControlService.class.getSimpleName();
     private MyHandler mMyHandler = new MyHandler();
     VideoFileDao mVideoFileDao;
@@ -53,9 +50,9 @@ public class DeviceControlService extends Service {
         public void handleMessage(Message msgFromClient) {
             Message msgToClient = Message.obtain(msgFromClient);
             switch (msgFromClient.what) {
-                case MSG_PLAY_VIDEO:
-                    LogUtil.v(TAG, "MSG_PLAY_VIDEO");
-                    msgToClient.what = MSG_PLAY_VIDEO;
+                case CMD_PLAY_VIDEO:
+                    LogUtil.v(TAG, "CMD_PLAY_VIDEO");
+                    msgToClient.what = CMD_PLAY_VIDEO;
                     try {
                         playVideo(msgFromClient.arg1);
                         msgFromClient.replyTo.send(msgToClient);
