@@ -16,12 +16,14 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.PosterProviderBean;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.MovieDBHelper;
+import com.hphtv.movielibrary.sqlite.dao.FavoriteDao;
 import com.hphtv.movielibrary.sqlite.dao.HistoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
@@ -39,6 +41,7 @@ public class MovieLibraryProvider extends ContentProvider {
     MovieDao mMovieDao;
     VideoFileDao mVideoFileDao;
     MovieWrapperDao mWrapperDao;
+    FavoriteDao mFavoriteDao;
     UriMatcher matcher;
     private String prefix = "com.hphtv.movielibrary.movieprovider";
 
@@ -49,7 +52,9 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int GENRES = 5;
     public static final int MOVIE_NUMBERS = 6;
     public static final int WRAPPER_TITLE = 7;
-    public static final int MOVIE_WRAPPER =8;
+    public static final int MOVIE_WRAPPER = 8;
+    public static final int FAVORITE = 9;
+
     private int api_version;
 
     @Override
@@ -58,6 +63,7 @@ public class MovieLibraryProvider extends ContentProvider {
         mMovieDao = new MovieDao(getContext());
         mVideoFileDao = new VideoFileDao(getContext());
         mWrapperDao = new MovieWrapperDao(getContext());
+        mFavoriteDao = new FavoriteDao(getContext());
         MovieSharedPreferences.getInstance().setContext(getContext());
         matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(prefix, "wrapper", ALL_MOVIE_WRAPPER);
@@ -67,8 +73,8 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(prefix, "genres", GENRES);
         matcher.addURI(prefix, "movie_numbers", MOVIE_NUMBERS);
         matcher.addURI(prefix, "wrapper_title", WRAPPER_TITLE);
-        matcher.addURI(prefix,"wrapper/#", MOVIE_WRAPPER);
-
+        matcher.addURI(prefix, "wrapper/#", MOVIE_WRAPPER);
+        matcher.addURI(prefix, "favorite/#", FAVORITE);
         return false;
     }
 
@@ -93,17 +99,21 @@ public class MovieLibraryProvider extends ContentProvider {
                 reslut = playVideo(uri);
                 break;
             case GENRES:
-                reslut = getGenres(selection,selectionArgs);
+                reslut = getGenres(selection, selectionArgs);
                 break;
             case MOVIE_NUMBERS:
-                reslut=getMovieCount();
+                reslut = getMovieCount();
                 break;
             case WRAPPER_TITLE:
-                reslut=getMovieWrapperTitle(selection,selectionArgs);
+                reslut = getMovieWrapperTitle(selection, selectionArgs);
                 break;
             case MOVIE_WRAPPER:
-                reslut=getMovieWrapper(uri);
+                reslut = getMovieWrapper(uri);
                 break;
+            case FAVORITE:
+                reslut = getFavorite(uri);
+                break;
+
         }
         return reslut;
     }
@@ -140,11 +150,11 @@ public class MovieLibraryProvider extends ContentProvider {
         return cursor;
     }
 
-    private Cursor getMovieWrapper(Uri uri){
+    private Cursor getMovieWrapper(Uri uri) {
         long id = ContentUris.parseId(uri);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
-        Cursor cursor=mWrapperDao.select("id=?",new String[]{String.valueOf(id)},null);
+        Cursor cursor = mWrapperDao.select("id=?", new String[]{String.valueOf(id)}, null);
         db.setTransactionSuccessful();
         db.endTransaction();
         return cursor;
@@ -248,7 +258,7 @@ public class MovieLibraryProvider extends ContentProvider {
         return cursor;
     }
 
-    private Cursor getGenres(String selection,String[] selectionArgs) {
+    private Cursor getGenres(String selection, String[] selectionArgs) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         Cursor cursor = db.query(MovieDBHelper.TABLE_GENRES, null, selection, selectionArgs, null, null, null);
@@ -257,7 +267,7 @@ public class MovieLibraryProvider extends ContentProvider {
         return cursor;
     }
 
-    private Cursor getMovieCount(){
+    private Cursor getMovieCount() {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         Cursor cursor = db.rawQuery("select count(id) from " + MovieDBHelper.TABLE_MOVIEWRAPPER, null);
@@ -266,7 +276,7 @@ public class MovieLibraryProvider extends ContentProvider {
         return cursor;
     }
 
-    private Cursor getMovieWrapperTitle(String selection,String[] selectionArgs){
+    private Cursor getMovieWrapperTitle(String selection, String[] selectionArgs) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
         Cursor cursor = db.query(MovieDBHelper.TABLE_VIDEOFILE, new String[]{"wrapper_id"}, selection, selectionArgs, null, null, null);
@@ -280,4 +290,12 @@ public class MovieLibraryProvider extends ContentProvider {
         db.endTransaction();
         return wrapperCursor;
     }
+
+    private Cursor getFavorite(Uri uri) {
+        long id = ContentUris.parseId(uri);
+        Cursor cursor = mFavoriteDao.select("wrapper_id=?", new String[]{String.valueOf(id)}, null);
+        return cursor;
+    }
+
+
 }

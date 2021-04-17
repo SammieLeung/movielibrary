@@ -1,15 +1,18 @@
 package com.hphtv.movielibrary.activity;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.OrientationHelper;
 import android.text.TextUtils;
@@ -175,6 +178,9 @@ public class MovieDetailActivity extends AppBaseActivity {
         Log.v(TAG, "onResume()被调用");
         Intent intent = new Intent(this, MovieScanService.class);
         bindService(intent, connection, Service.BIND_AUTO_CREATE);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
         super.onResume();
     }
 
@@ -190,7 +196,7 @@ public class MovieDetailActivity extends AppBaseActivity {
     @Override
     protected void onPause() {
         Log.v(TAG, "onPause()被调用");
-//        unbindService(connection);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
 
@@ -761,7 +767,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                     }
                 }
             }
-        }). start();
+        }).start();
     }
 
     /**
@@ -785,6 +791,13 @@ public class MovieDetailActivity extends AppBaseActivity {
                                 }
                             });
                         }
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mBtnFavorite.setFavoriteState(false);
+                            }
+                        });
                     }
                 } else {
 
@@ -819,6 +832,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                                         mBtnFavorite.setFavoriteState(false);
                                     }
                                 });
+                                BroadcastHelper.sendBroadcastMovieUpdateSync(MovieDetailActivity.this, id);
                             }
                         } else {
                             Favorite favorite = new Favorite();
@@ -832,6 +846,7 @@ public class MovieDetailActivity extends AppBaseActivity {
                                         mBtnFavorite.setFavoriteState(true);
                                     }
                                 });
+                                BroadcastHelper.sendBroadcastMovieUpdateSync(MovieDetailActivity.this, id);
                             }
                         }
                     }
@@ -974,9 +989,20 @@ public class MovieDetailActivity extends AppBaseActivity {
 
 
         } else {
-
+            refreshFavroite();
         }
     }
+
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConstData.ACTION_FAVORITE_MOVIE_CHANGE)) {
+                long id = intent.getLongExtra("id", -1);
+                if (id == mCurrentWrapper.getId())
+                    refreshFavroite();
+            }
+        }
+    };
 
     ServiceConnection connection = new ServiceConnection() {
         @Override
