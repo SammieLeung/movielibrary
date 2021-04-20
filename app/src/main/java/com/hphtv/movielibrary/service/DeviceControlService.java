@@ -76,7 +76,7 @@ public class DeviceControlService extends Service {
                     msgToClient.what = CMD_SET_FAVORITE;
                     try {
                         Bundle bundle = msgFromClient.getData();
-                        boolean isFavorite = bundle.getBoolean("favorite");
+                        int isFavorite = bundle.getInt("favorite");
                         boolean res = setFavorite(msgFromClient.arg1, isFavorite);
                         msgToClient.arg1 = msgFromClient.arg1;
                         bundle.putBoolean("res", res);
@@ -155,17 +155,17 @@ public class DeviceControlService extends Service {
         VideoPlayTools.play(this, file);
     }
 
-    private synchronized boolean setFavorite(long id, boolean isFavorite) {
+    private synchronized boolean setFavorite(long id, int isFavorite) {
         Cursor cursor = mFavoriteDao.select("wrapper_id=?", new String[]{String.valueOf(id)}, null);
 
         if (cursor != null) {
             try {
-                if (cursor.getCount() > 0 && !isFavorite) {
+                if (cursor.getCount() > 0 && isFavorite==0) {
                     int res = mFavoriteDao.delete("wrapper_id=?", new String[]{String.valueOf(id)});
                     if (res > 0) {
                         return true;
                     }
-                } else if (cursor.getCount() == 0 && isFavorite) {
+                } else if (cursor.getCount() == 0 && isFavorite==1) {
                     Favorite favorite = new Favorite();
                     favorite.setWrapper_id(id);
                     ContentValues values = mFavoriteDao.parseContentValues(favorite);
