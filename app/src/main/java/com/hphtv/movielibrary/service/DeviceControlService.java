@@ -20,17 +20,20 @@ import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.PosterProviderBean;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
+import com.hphtv.movielibrary.sqlite.bean.scraperBean.Movie;
 import com.hphtv.movielibrary.sqlite.dao.FavoriteDao;
 import com.hphtv.movielibrary.sqlite.dao.HistoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.LogUtil;
+import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 
 public class DeviceControlService extends Service {
     public static final int CMD_PLAY_VIDEO = 0;
     public static final int CMD_SET_FAVORITE = 1;
+    public static final int CMD_CHECK_MOVIEDB = 2;
 
     public static final String TAG = DeviceControlService.class.getSimpleName();
     private MyHandler mMyHandler = new MyHandler();
@@ -85,6 +88,19 @@ public class DeviceControlService extends Service {
                     } catch (RemoteException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                    }
+                    break;
+                case CMD_CHECK_MOVIEDB:
+                    MovieSharedPreferences movieSharedPreferences = MovieSharedPreferences.getInstance();
+                    movieSharedPreferences.setContext(DeviceControlService.this);
+                    boolean isMovieDbUpdate = movieSharedPreferences.isMovieDBUpdate();
+                    if (isMovieDbUpdate) {
+                        msgToClient.what = CMD_CHECK_MOVIEDB;
+                        try {
+                            msgFromClient.replyTo.send(msgToClient);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
                     }
                     break;
             }
@@ -160,12 +176,12 @@ public class DeviceControlService extends Service {
 
         if (cursor != null) {
             try {
-                if (cursor.getCount() > 0 && isFavorite==0) {
+                if (cursor.getCount() > 0 && isFavorite == 0) {
                     int res = mFavoriteDao.delete("wrapper_id=?", new String[]{String.valueOf(id)});
                     if (res > 0) {
                         return true;
                     }
-                } else if (cursor.getCount() == 0 && isFavorite==1) {
+                } else if (cursor.getCount() == 0 && isFavorite == 1) {
                     Favorite favorite = new Favorite();
                     favorite.setWrapper_id(id);
                     ContentValues values = mFavoriteDao.parseContentValues(favorite);
@@ -175,10 +191,10 @@ public class DeviceControlService extends Service {
                 } else {
                     return true;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
                 return false;
-            }finally {
+            } finally {
                 sendRefreshFavoriteBroadcast(id);
                 cursor.close();
                 return true;
@@ -188,7 +204,7 @@ public class DeviceControlService extends Service {
     }
 
     private void sendRefreshFavoriteBroadcast(long id) {
-        LogUtil.v(TAG,"sendRefreshFavoriteBroadcast "+id);
+        LogUtil.v(TAG, "sendRefreshFavoriteBroadcast " + id);
         Intent intent = new Intent();
         intent.setAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
         intent.putExtra("id", id);

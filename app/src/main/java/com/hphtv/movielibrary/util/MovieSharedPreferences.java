@@ -15,9 +15,10 @@ public class MovieSharedPreferences {
     public static final String DIRECTORY_ID = "directoryId";
     public static final String SUB_TYPE = "subType";
     public static final String PASSWORD = "password";
+    public static final String IS_MOVIE_DB_UPDATE="is_movie_db_update";
 
     public static final String MODE = "mode";
-    private static MovieSharedPreferences movieSharedPreferencesUtil = new MovieSharedPreferences();
+    private static MovieSharedPreferences movieSharedPreferencesUtil;
     private SharedPreferences sharedPreferences;
     private int searchAPI;
     private String year;
@@ -29,6 +30,7 @@ public class MovieSharedPreferences {
     private String subType;
     private String password;
     private long directoryId;
+    private boolean isMovieDBUpdate;
 
     private Context context;
 
@@ -52,6 +54,7 @@ public class MovieSharedPreferences {
         this.deviceName = sharedPreferences.getString(DEVICE_NAME, "");
         this.subType = sharedPreferences.getString(SUB_TYPE, "");
         this.password = sharedPreferences.getString(PASSWORD, "");
+        this.isMovieDBUpdate=sharedPreferences.getBoolean(IS_MOVIE_DB_UPDATE,true);
     }
 
     public void setSearchAPI(int searchAPI) {
@@ -124,6 +127,13 @@ public class MovieSharedPreferences {
         this.password = password;
     }
 
+    public void setMovieDBUpdate(boolean movieDBUpdate) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(IS_MOVIE_DB_UPDATE, movieDBUpdate);
+        editor.commit();
+        isMovieDBUpdate = movieDBUpdate;
+    }
+
     public String getYear() {
         return year;
     }
@@ -161,4 +171,8 @@ public class MovieSharedPreferences {
     }
 
     public long getDirectoryId(){return directoryId;}
+
+    public boolean isMovieDBUpdate() {
+        return isMovieDBUpdate;
+    }
 }
