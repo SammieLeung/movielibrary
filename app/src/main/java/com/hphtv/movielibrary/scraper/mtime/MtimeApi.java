@@ -192,17 +192,21 @@ public class MtimeApi {
             movie.setYear(movieObj.getString("year"));
             movie.setSummary(movieObj.getString("story"));
             JSONArray typeArry = movieObj.getJSONArray("type");
-            String[] genres = new String[typeArry.size()];
-            for (int i = 0; i < genres.length; i++) {
-                genres[i] = typeArry.getString(i);
+            if(typeArry!=null) {
+                String[] genres = new String[typeArry.size()];
+                for (int i = 0; i < genres.length; i++) {
+                    genres[i] = typeArry.getString(i);
+                }
+                movie.setGenres(genres);
             }
-            movie.setGenres(genres);
             movie.setDurations(new String[]{movieObj.getString("mins")});
-            Celebrity[] celebrities = new Celebrity[1];
-            Celebrity celebrity = new Celebrity();
-            celebrity.setName(movieObj.getJSONObject("director").getString("name"));
-            celebrities[0] = celebrity;
-            movie.setDirectors(celebrities);
+            if(movieObj.getJSONObject("director")!=null) {
+                Celebrity[] celebrities = new Celebrity[1];
+                Celebrity celebrity = new Celebrity();
+                celebrity.setName(movieObj.getJSONObject("director").getString("name"));
+                celebrities[0] = celebrity;
+                movie.setDirectors(celebrities);
+            }
 
             JSONArray actorList = movieObj.getJSONArray("actors");
             Celebrity[] actors = new Celebrity[actorList.size() > 10 ? 10 : actorList.size()];
@@ -230,19 +234,19 @@ public class MtimeApi {
             //剧照
             JSONObject data=JSON.parseObject(content);
             JSONArray images = data.getJSONArray("imageInfos");
-
-            Photo[] photo_set = new Photo[images.size()];
-            for (int i = 0; i < images.size(); i++) {
-                JSONObject _image = images.getJSONObject(i);
-                String src = _image.getString("image");
-                Photo photo = new Photo();
-                photo.setImageUrl(src);
-                photo.setThumb(src);
-                photo.setIcon(src);
-                photo_set[i] = photo;
+            if(images!=null) {
+                Photo[] photo_set = new Photo[images.size()];
+                for (int i = 0; i < images.size(); i++) {
+                    JSONObject _image = images.getJSONObject(i);
+                    String src = _image.getString("image");
+                    Photo photo = new Photo();
+                    photo.setImageUrl(src);
+                    photo.setThumb(src);
+                    photo.setIcon(src);
+                    photo_set[i] = photo;
+                }
+                movie.setPhotos(photo_set);
             }
-            movie.setPhotos(photo_set);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
