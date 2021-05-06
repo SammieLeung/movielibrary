@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,7 +21,9 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,7 +52,7 @@ import org.jsoup.select.Elements;
 public class MovieSearchResultActivity extends Activity {
     public static final String TAG = "MovieSearchResult";
     public static final int LIMIT = 10;
-
+    private ImageButton mBtnBack;
     private ListView mSearchResultLv;// 搜索结果列表
 
     private ImageView ivSearchDialogBg;// 搜索结果页面背景
@@ -86,6 +89,13 @@ public class MovieSearchResultActivity extends Activity {
         mApplication = (MovieApplication) getApplicationContext();
         mActivity = MovieSearchResultActivity.this;
         mApplication.addActivity(MovieSearchResultActivity.this);
+        mBtnBack = findViewById(R.id.ibtn_back);
+        mBtnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         searchHelper = mApplication.getSearchHelper();
 
         initOthers();
@@ -125,15 +135,14 @@ public class MovieSearchResultActivity extends Activity {
 //                currentMode = ConstData.MovieDetailMode.MODE_OUTSIDE;
 //                // TODO
 //            } else {//编辑电影信息
-            int mode =bundle.getInt("mode");
-            switch (mode)
-            {
+            int mode = bundle.getInt("mode");
+            switch (mode) {
                 case ConstData.MovieDetailMode.MODE_EDIT:
                     currentMode = ConstData.MovieDetailMode.MODE_EDIT;
-                        mFileName =  bundle.getString("keyword");
-                        api_version=bundle.getInt("api");
-                        if (mFileName != null && mFileName != "")
-                            mEditTextKeyword.setText(mFileName);
+                    mFileName = bundle.getString("keyword");
+                    api_version = bundle.getInt("api");
+                    if (mFileName != null && mFileName != "")
+                        mEditTextKeyword.setText(mFileName);
                     break;
             }
             Log.v(TAG, "编辑电影信息");
@@ -183,7 +192,6 @@ public class MovieSearchResultActivity extends Activity {
     }
 
 
-
     //webview 组件回调
     private WebviewListener mWebviewListener = new WebviewListener() {
         @Override
@@ -212,11 +220,7 @@ public class MovieSearchResultActivity extends Activity {
             mFileName = mEditTextKeyword.getText().toString().trim();
             Log.v(TAG, "onRefresh====>" + mFileName);
             // 电影名不为空则搜索
-            if (mFileName != null && !mFileName.equals("")) {
-                InputMethodManager im = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                im.hideSoftInputFromWindow(getCurrentFocus()
-                                .getApplicationWindowToken(),
-                        InputMethodManager.HIDE_NOT_ALWAYS);
+            if (!TextUtils.isEmpty(mFileName)) {
                 switch (api_version) {
                     case ConstData.Scraper.DOUBAN:
                         searchHelper.SearchMovieByName(mFileName);//通过webview进行搜索
@@ -239,7 +243,7 @@ public class MovieSearchResultActivity extends Activity {
                             public void run() {
                                 handler.sendEmptyMessage(SEARCH_BEGIN);
                                 mMovieList.clear();
-                                cacheOffset = 0;
+                                cacheOffset = 1;
                                 cacheDatas = MtimeApi.SearchMoviesByName(mMovieList, null, mFileName, cacheOffset, LIMIT);
                                 handler.sendEmptyMessage(SEARCH_SUCCESS);
                             }
@@ -261,11 +265,11 @@ public class MovieSearchResultActivity extends Activity {
         }
     };
 
-    View.OnFocusChangeListener mOnFocusChangeListener=new View.OnFocusChangeListener() {
+    View.OnFocusChangeListener mOnFocusChangeListener = new View.OnFocusChangeListener() {
         @Override
         public void onFocusChange(View v, boolean hasFocus) {
-            if(v.getId()==R.id.et_box_name&&hasFocus){
-                mEditTextKeyword.setSelection(0,mEditTextKeyword.getText().length());
+            if (v.getId() == R.id.et_box_name && hasFocus) {
+                mEditTextKeyword.setSelection(0, mEditTextKeyword.getText().length());
             }
         }
     };
@@ -304,7 +308,7 @@ public class MovieSearchResultActivity extends Activity {
                             @Override
                             public void run() {
                                 handler.sendEmptyMessage(SEARCH_BEGIN);
-                                JSONArray tmp = MtimeApi.SearchMoviesByName(mMovieList, (JSONArray) cacheDatas, mFileName, cacheOffset, LIMIT);
+                                JSONArray tmp = MtimeApi.SearchMoviesByName(mMovieList, null, mFileName, cacheOffset, LIMIT);
                                 if (tmp == null) {
                                     handler.sendEmptyMessage(SEARCH_ERROR);
                                 } else {
@@ -408,8 +412,8 @@ public class MovieSearchResultActivity extends Activity {
                 }
 
             } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                    int index = mSearchResultLv.getSelectedItemPosition();
-                    mSearchResultLv.smoothScrollToPosition(index);
+                int index = mSearchResultLv.getSelectedItemPosition();
+                mSearchResultLv.smoothScrollToPosition(index);
             }
         }
 
@@ -417,7 +421,7 @@ public class MovieSearchResultActivity extends Activity {
 
     }
 
-    private static class MyHandler extends Handler {
+    private class MyHandler extends Handler {
         private WeakReference<MovieSearchResultActivity> reference;
 
         public MyHandler(MovieSearchResultActivity activity) {
@@ -428,11 +432,12 @@ public class MovieSearchResultActivity extends Activity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SEARCH_SUCCESS:
-                    if (reference.get().myMovieSearchAdapter != null)
+                    if (reference.get().myMovieSearchAdapter != null) {
                         reference.get().myMovieSearchAdapter.notifyDataSetChanged();
-                    reference.get().mRefreshLayout.setLoading(false);
-                    if (reference.get().api_version != ConstData.Scraper.DOUBAN)
-                        reference.get().cacheOffset += LIMIT;
+                        reference.get().mRefreshLayout.setLoading(false);
+                        if (reference.get().api_version != ConstData.Scraper.DOUBAN)
+                            reference.get().cacheOffset += 1;
+                    }
                     break;
                 case SEARCH_ERROR:
                     Toast.makeText(reference.get().mActivity, "搜索不到了~", Toast.LENGTH_SHORT).show();
@@ -458,13 +463,11 @@ public class MovieSearchResultActivity extends Activity {
     }
 
 
-
     protected void onPause() {
         Log.v(TAG, "onPause()被调用");
         searchHelper.setSearch_data_list(null);
         super.onPause();
     }
-
 
 
     @Override

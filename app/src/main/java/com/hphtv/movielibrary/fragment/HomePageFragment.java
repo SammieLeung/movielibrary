@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,12 +29,7 @@ import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -139,20 +133,20 @@ public class HomePageFragment extends Fragment {
                     List<String> argList = new ArrayList<>();
 
                     if (genres.isEmpty()) {
-                        genres = ac.ALL;
+                        genres = ac.mTagAll;
                     }
                     if (year.isEmpty()) {
-                        year = ac.ALL;
+                        year = ac.mTagAll;
                     }
-                    if (genres.equals(ac.ALL) && year.equals(ac.ALL)) {
+                    if (genres.equals(ac.mTagAll) && year.equals(ac.mTagAll)) {
                         isShowUnMatched = true;
                     } else {
                         isShowUnMatched = false;
-                        if (!genres.equals(ac.ALL)) {
+                        if (!genres.equals(ac.mTagAll)) {
                             String id = mMovieDao.getGenresId(genres);
                             buffer.append("genres like '%\"" + id + "\"%' and ");
                         }
-                        if (!year.equals(ac.ALL)) {
+                        if (!year.equals(ac.mTagAll)) {
                             String[] sortYears=year.split(" - ");
                             if(sortYears.length>1){
                                 buffer.append("year<=? and year >=? and");

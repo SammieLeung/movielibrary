@@ -5,12 +5,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -23,6 +23,7 @@ public class BrowsePathActivity extends AppCompatActivity {
     public final static String ARG_SELECT_TYPE = "selectType";
     public final static String ARG_FRAGMENT_TITLE = "title";
     public final static String ARG_SUPPORT_NET = "supportNet";
+    public static final String ARG_ENABLE_CONFIRM_DIALOG ="enableConfrimDialog";
 
     private static final int REQUEST_CODE_CHECK_PERMISSION = 1000;
     private BrowsePathPresenter mPresenter;
@@ -81,7 +82,7 @@ public class BrowsePathActivity extends AppCompatActivity {
         int browseType = getIntent().getIntExtra(ARG_SELECT_TYPE, SELECT_DIR);
         String fragmentTitle = getIntent().getStringExtra(ARG_FRAGMENT_TITLE);
         boolean supportNet = getIntent().getBooleanExtra(ARG_SUPPORT_NET, true);
-
+        boolean enableConfirm=getIntent().getBooleanExtra(ARG_ENABLE_CONFIRM_DIALOG,true);
         mFragment = new BrowsePathFragment();
         mFragment.setTitle(fragmentTitle);
 
@@ -91,6 +92,7 @@ public class BrowsePathActivity extends AppCompatActivity {
         mPresenter = new BrowsePathPresenter(mFragment, this);
         mPresenter.setBrowseType(browseType);
         mPresenter.setSupportNet(supportNet);
+        mPresenter.setEnableSelectConfirm(enableConfirm);
     }
 
     @Override
@@ -118,6 +120,11 @@ public class BrowsePathActivity extends AppCompatActivity {
         if (!mFragment.onBackPressed()) {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override

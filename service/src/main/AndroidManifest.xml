@@ -60,6 +60,7 @@
             android:name=".picker.browse.BrowsePathActivity"
             android:exported="true"
             android:label="@string/title_activity_browse_path"
+            android:configChanges="keyboard"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="com.firefly.FILE_PICKER" />

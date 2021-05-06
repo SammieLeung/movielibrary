@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 apply from: "../config.gradle"
+def getTime() {
+    return new Date().format("yyyyMMdd-hhmm", TimeZone.getDefault());
+}
 android {
     signingConfigs {
         config {
@@ -44,6 +47,14 @@ android {
     packagingOptions {
         exclude 'META-INF/beans.xml'
     }
+    applicationVariants.all {
+        variant ->
+            variant.outputs.all {
+                //在这里修改apk文件名，引号内的字符串都可以随便定义
+                outputFileName = "MovieLibrary-${variant.name}-v${variant.versionName}-${getTime()}.apk"
+            }
+    }
+
 }
 
 dependencies {

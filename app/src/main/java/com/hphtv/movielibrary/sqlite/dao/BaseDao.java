@@ -103,7 +103,22 @@ public abstract class BaseDao<T> {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cursor = db.query(mTable, fields,
                 whereClause, whereArgs, groupBy, having, orderBy, limit);
+        return cursor;
+    }
 
+    /**
+     * @param fields      列名称数组
+     * @param whereClause 条件字句
+     * @param whereArgs   条件字句，参数数组
+     * @param groupBy     分组列
+     * @param having      分组条件
+     * @param orderBy     排序列
+     */
+    public Cursor select(String[] fields, String whereClause,
+                         String[] whereArgs, String groupBy, String having, String orderBy) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor = db.query(mTable, fields,
+                whereClause, whereArgs, groupBy, having, orderBy);
         return cursor;
     }
 

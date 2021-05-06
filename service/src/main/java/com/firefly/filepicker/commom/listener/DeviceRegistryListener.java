@@ -13,6 +13,8 @@ import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import static com.firefly.filepicker.provider.DLNADocumentsProvider.AUTHORITY;
 
 /**
@@ -31,7 +33,8 @@ public class DeviceRegistryListener extends DefaultRegistryListener {
 
     public void deviceAdded(Registry registry, final Device device) {
         Log.d(TAG, "Device added: " + device.toString());
-
+        if (Constants.devices == null || Constants.deviceHashMap == null)
+            Constants.init();
         Constants.devices.add(device);
         Constants.deviceHashMap.put(device.getIdentity().getUdn().getIdentifierString(), device);
 
@@ -43,14 +46,15 @@ public class DeviceRegistryListener extends DefaultRegistryListener {
     }
 
     public void deviceRemoved(Registry registry, Device device) {
-        Log.d(TAG, "Device removed: " + device.toString());
+        if (Constants.devices != null && Constants.deviceHashMap != null) {
+            Log.d(TAG, "Device removed: " + device.toString());
+            Constants.devices.remove(device);
+            Constants.deviceHashMap.remove(device.getIdentity().getUdn().getIdentifierString());
 
-        Constants.devices.remove(device);
-        Constants.deviceHashMap.remove(device.getIdentity().getUdn().getIdentifierString());
-
-        mContext.getContentResolver().notifyChange(DocumentsContract.buildRootsUri
-                (AUTHORITY), null, false);
-        sendDeviceChangedBroadcast();
+            mContext.getContentResolver().notifyChange(DocumentsContract.buildRootsUri
+                    (AUTHORITY), null, false);
+            sendDeviceChangedBroadcast();
+        }
     }
 
     public void beforeShutdown(Registry registry) {

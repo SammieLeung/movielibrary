@@ -2,11 +2,8 @@ package com.hphtv.movielibrary;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Intent;
-import android.util.Log;
 import android.webkit.WebView;
 
-import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.umeng.analytics.MobclickAgent;
@@ -16,35 +13,29 @@ import java.util.List;
 
 public class MovieApplication extends Application {
     public static final boolean DEBUG = true;
-    public static final String TAG =MovieApplication.class.getSimpleName();
+    public static final String TAG = MovieApplication.class.getSimpleName();
     private boolean isShowEncrypted = false;
     private DoubanMovieSearchHelper helper;
     private WebView webview;
     private String cachePath;
     private static final String APP_CACHE_DIRNAME = "/webcache";
     private List<Activity> activitys = new LinkedList<Activity>();
-
+    private static MovieApplication sMovieApplication;
     @Override
     public void onCreate() {
         super.onCreate();
+        sMovieApplication =this;
         webview = new WebView(MovieApplication.this);
         MovieSharedPreferences.getInstance().setContext(MovieApplication.this);
         cachePath = getFilesDir().getAbsolutePath()
                 + APP_CACHE_DIRNAME;
         helper = DoubanMovieSearchHelper.getInstance();
-        helper.setContext(MovieApplication.this);
+        helper.setContext(sMovieApplication);
         helper.setmWebview(webview);
         //开启数据缓存
         helper.initWebView(true, cachePath);
-        Intent service = new Intent(MovieApplication.this, MovieScanService.class);
-        startService(service);
         //友盟统计
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
     }
 
     public DoubanMovieSearchHelper getSearchHelper() {
@@ -71,7 +62,6 @@ public class MovieApplication extends Application {
     }
 
 
-
     // 遍历所有Activity并finish
     public void exit() {
         if (activitys != null && activitys.size() > 0) {
@@ -92,5 +82,9 @@ public class MovieApplication extends Application {
 
     public void setShowEncrypted(boolean showEncrypted) {
         isShowEncrypted = showEncrypted;
+    }
+
+    public static MovieApplication getInstance(){
+        return sMovieApplication;
     }
 }

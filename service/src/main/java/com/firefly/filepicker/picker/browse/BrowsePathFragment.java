@@ -95,14 +95,17 @@ public class BrowsePathFragment extends Fragment
     @Override
     public void onResume() {
         super.onResume();
-
-        mPresenter.init();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.init();
+            }
+        }).start();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
         mPresenter.deinit();
     }
 

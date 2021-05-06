@@ -87,7 +87,8 @@ public class DLNADocumentsProvider extends DocumentsProvider {
         // cursor is returned to the Android system picker UI and used to display all roots from
         // this provider.
         final MatrixCursor result = new MatrixCursor(resolveRootProjection(projection));
-
+        if (Constants.devices == null)
+            Constants.init();
         if (Constants.devices.isEmpty()) {
             return result;
         }
@@ -140,6 +141,8 @@ public class DLNADocumentsProvider extends DocumentsProvider {
     @Override
     public Cursor queryDocument(String documentId, String[] projection) throws FileNotFoundException {
         final MatrixCursor result = new MatrixCursor(resolveDocumentProjection(projection));
+        if (Constants.deviceHashMap == null)
+            Constants.init();
         String deviceId = getDeviceId(documentId);
         Device device = Constants.deviceHashMap.get(deviceId);
         String type = MIME_TYPE_DIR;
@@ -168,6 +171,8 @@ public class DLNADocumentsProvider extends DocumentsProvider {
         Bundle bundle = new Bundle();
         List<DocumentMetadata> documents = mCache.get(parentDocumentId);
         boolean loading = false;
+        if (Constants.deviceHashMap == null)
+            Constants.init();
         Device device = Constants.deviceHashMap.get(getDeviceId(parentDocumentId));
         Service service = null;
         final Uri parentDocumentUri = DocumentsContract.buildDocumentUri(

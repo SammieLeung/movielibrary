@@ -12,6 +12,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -21,6 +22,7 @@
         android:name=".MovieApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true"
         android:label="@string/app_name"
         android:theme="@style/MyTheme">
 
@@ -41,18 +43,21 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.MovieSearchResultActivity"
-            android:windowSoftInputMode="stateUnchanged">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW"></action>
-            </intent-filter>
-        </activity>
+        <activity android:name=".activity.MovieSearchResultActivity"></activity>
+
         <activity android:name=".activity.MovieTrailerPlayerActivity"></activity>
 
         <service android:name=".service.MovieScanService"></service>
         <service android:name=".service.DeviceMonitorService"></service>
         <service android:name=".service.DlnaControlService"></service>
+        <service android:name=".service.DeviceControlService"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="com.hphtv.movielibrary.DEVICE_CONTROL"></action>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
         <receiver android:name=".BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"></action>

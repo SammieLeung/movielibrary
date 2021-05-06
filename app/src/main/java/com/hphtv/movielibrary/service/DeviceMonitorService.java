@@ -15,7 +15,6 @@ import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.hphtv.movielibrary.MovieApplication;
-import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.service.Thread.DeviceCheckThread;
 
@@ -60,21 +59,17 @@ public class DeviceMonitorService extends Service {
      * 搜索设备
      */
     public void checkDevices() {
-        DeviceCheckThread deviceCheckThread = new DeviceCheckThread();
-        deviceCheckThread.setCallback(new DeviceCheckThread.Callback() {
-            @Override
-            public void onFinish(List<Device> list) {
-                if (deviceChangeListener != null)
-                    deviceChangeListener.OnDeviceChange(list);
-            }
-        });
         int isEncrypted;
         if (((MovieApplication) getApplication()).isShowEncrypted()) {
             isEncrypted = ConstData.EncryptState.ENCRYPTED;
         } else {
             isEncrypted = ConstData.EncryptState.UNENCRYPTED;
         }
-        deviceCheckThread.execute(DeviceMonitorService.this, isEncrypted);
+        DeviceCheckThread deviceCheckThread = new DeviceCheckThread(this, list -> {
+            if (mDeviceChangeListener != null)
+                mDeviceChangeListener.OnDeviceChange(list);
+        }, isEncrypted);
+        deviceCheckThread.execute();
     }
 
     @Override
@@ -146,12 +141,12 @@ public class DeviceMonitorService extends Service {
     }
 
     public interface OnDeviceChange {
-        public void OnDeviceChange(List list);
+         void OnDeviceChange(List list);
     }
 
-    private OnDeviceChange deviceChangeListener;
+    private OnDeviceChange mDeviceChangeListener;
 
     public void setOnDevcieChangeListener(OnDeviceChange listener) {
-        deviceChangeListener = listener;
+        mDeviceChangeListener = listener;
     }
 }

@@ -36,6 +36,8 @@ dependencies {
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
-    implementation group: 'eu.agno3.jcifs',name:'jcifs-ng',version:'2.1.4'
+    implementation "org.codelibs:jcifs:2.1.19"
+
+//    implementation group: 'eu.agno3.jcifs',name:'jcifs-ng',version:'2.1.4'
 
 }

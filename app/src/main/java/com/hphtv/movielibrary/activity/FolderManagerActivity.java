@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.activity;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -43,6 +44,7 @@ import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.Base64Helper;
+import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.Md5Util;
 import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
@@ -473,6 +475,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                 }
                 mCheckedSet.clear();
                 setResult(RESULT_OK);
+                BroadcastHelper.sendBroadcastMovieAllSync(FolderManagerActivity.this);
                 initData();
             }
         }).start();
@@ -530,6 +533,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                 }
                 mCheckedSet.clear();
                 setResult(RESULT_OK);
+                BroadcastHelper.sendBroadcastMovieAllSync(FolderManagerActivity.this);
                 initData();
             }
         }).start();
@@ -728,8 +732,17 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             Log.v(TAG, "on serviceIntent " + name + " connected");
             initView();
             initData();
-
-
+            Intent intent=getIntent();
+            Bundle bundle = intent.getExtras();
+            if(bundle!=null) {
+                Device device = (Device) bundle.getSerializable("device");
+                Directory directory = (Directory) bundle.getSerializable("dir");
+                int isEncrypted = bundle.getInt("is_encrypted");
+                if (device != null && directory != null) {
+                    mScanService.initScanService();
+                    mScanService.addToScanQueue(device, directory, isEncrypted);
+                }
+            }
         }
 
         @Override

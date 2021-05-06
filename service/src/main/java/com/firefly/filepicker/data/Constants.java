@@ -23,4 +23,14 @@ public class Constants {
     public static List<Device> devices = new CopyOnWriteArrayList<>();
     public static Map<String, Device> deviceHashMap = new ConcurrentHashMap<>();
     public static Map<String, Integer> newDevices = new HashMap<>();
+
+    static {
+      init();
+    }
+
+    public static void init(){
+        devices = new CopyOnWriteArrayList<>();
+        deviceHashMap = new ConcurrentHashMap<>();
+        newDevices = new HashMap<>();
+    }
 }
