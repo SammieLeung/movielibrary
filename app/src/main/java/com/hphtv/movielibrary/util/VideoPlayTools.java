@@ -88,6 +88,7 @@ public class VideoPlayTools {
             intent.setAction("firefly.intent.action.PLAY_VIDEO");
             Bundle bundle = new Bundle();
             bundle.putSerializable("playlist", video_list);
+            bundle.putString("name", name);
             intent.putExtras(bundle);
         }
         intent.setDataAndType(fileUri, "video/*");
