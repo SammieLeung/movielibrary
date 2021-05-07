@@ -76,26 +76,19 @@ public class VideoPlayTools {
             }
         }
 
-
         if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)) {
             intent.setAction(Intent.ACTION_VIEW);
+            intent.setDataAndType(fileUri, "video/*");
         } else {
-            ArrayList<HashMap<String, Object>> video_list = new ArrayList<>();
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("uri", fileUri);
-            map.put("name", name);
-            map.put("play_url", path);
-            video_list.add(map);
             intent.setAction("firefly.intent.action.PLAY_VIDEO");
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("playlist", video_list);
-            bundle.putString("name", name);
-            intent.putExtras(bundle);
+            intent.putExtra("name", name);
+            intent.putExtra("play_url", path);
         }
-        intent.setDataAndType(fileUri, "video/*");
+
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Log.v(TAG, "fileUri==" + fileUri.toString());
+
         try {
             if (Build.MODEL.equalsIgnoreCase(ConstData.DeviceModel.TRV9)&&intent.resolveActivity(context.getPackageManager()) != null) {
                 Log.v(TAG, "----");
