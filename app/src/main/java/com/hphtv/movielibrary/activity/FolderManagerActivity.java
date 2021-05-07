@@ -461,9 +461,11 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                         wrapper.setFileIds(file_ids);
                                         ContentValues contentValues = mMovieWrapperDao.parseContentValues(wrapper);
                                         mMovieWrapperDao.update(contentValues, "id=?", new String[]{String.valueOf(wrapper_id)});
+                                        BroadcastHelper.sendBroadcastMovieUpdateSync(FolderManagerActivity.this,wrapper_id);
                                     } else {
                                         mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
                                         mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
+                                        BroadcastHelper.sendBroadcastMovieRemoveSync(FolderManagerActivity.this,wrapper_id);
                                     }
                                 }
                             }
@@ -475,7 +477,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                 }
                 mCheckedSet.clear();
                 setResult(RESULT_OK);
-                BroadcastHelper.sendBroadcastMovieAllSync(FolderManagerActivity.this);
                 initData();
             }
         }).start();
@@ -520,20 +521,22 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                         wrapper.setFileIds(file_ids);
                                         ContentValues contentValues = mMovieWrapperDao.parseContentValues(wrapper);
                                         mMovieWrapperDao.update(contentValues, "id=?", new String[]{String.valueOf(wrapper_id)});
+                                        BroadcastHelper.sendBroadcastMovieUpdateSync(FolderManagerActivity.this,wrapper_id);
                                     } else {
                                         mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
                                         mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
+                                        BroadcastHelper.sendBroadcastMovieRemoveSync(FolderManagerActivity.this,wrapper_id);
                                     }
                                 }
                             }
                         }
+
                     }
                     //删除相关videofile
                     mVideoFileDao.delete("dir_id=?", new String[]{String.valueOf(id)});
                 }
                 mCheckedSet.clear();
                 setResult(RESULT_OK);
-                BroadcastHelper.sendBroadcastMovieAllSync(FolderManagerActivity.this);
                 initData();
             }
         }).start();

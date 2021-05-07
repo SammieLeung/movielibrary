@@ -230,4 +230,8 @@ public class ConstData {
         public static final String HISTORY = "history";
         public static final String ALL = "all";
     }
+
+
+    /*---------------------本地广播-----------------------------*/
+    public static final String ACTION_FAVORITE_MOVIE_CHANGE="action.favorite.movie.change";
 }

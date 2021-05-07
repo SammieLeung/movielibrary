@@ -68,16 +68,9 @@ public class FavoriteFragment extends Fragment {
     public void onResume() {
         Log.v(TAG, "onResume");
         super.onResume();
-        initMovie();
-    }
-
-    /**
-     * 初始化电影
-     */
-    public void initMovie() {
-        Log.v(TAG, "initMovie");
         getFavoritMovie();
     }
+
 
     /**
      * 初始化
@@ -112,7 +105,7 @@ public class FavoriteFragment extends Fragment {
     /**
      *
      */
-    private void getFavoritMovie() {
+    public void getFavoritMovie() {
         if (!atomicBoolean.get()) {
             atomicBoolean.set(true);
             new Thread(new Runnable() {

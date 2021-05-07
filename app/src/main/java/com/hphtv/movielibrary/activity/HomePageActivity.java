@@ -3,9 +3,11 @@ package com.hphtv.movielibrary.activity;
 import android.Manifest;
 import android.app.Fragment;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
@@ -16,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -174,12 +177,16 @@ public class HomePageActivity extends AppBaseActivity {
         super.onResume();
         LogUtil.v(TAG, "onResume()");
         Intent intent = new Intent(this, MovieScanService.class);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
         bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         unbindService(mServiceConnection);
         LogUtil.v(TAG, "onPause()");
     }
@@ -298,7 +305,7 @@ public class HomePageActivity extends AppBaseActivity {
     public void initMovie() {
         mHomePageFragment.initMovie();
         mHistoryFragment.initMovie();
-        mFavoriteFragment.initMovie();
+        mFavoriteFragment.getFavoritMovie();
     }
 
     public MovieScanService getMovieSearchService() {
@@ -1163,6 +1170,13 @@ public class HomePageActivity extends AppBaseActivity {
             mScanService = null;
         }
     };
-
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(ConstData.ACTION_FAVORITE_MOVIE_CHANGE)) {
+                mFavoriteFragment.getFavoritMovie();
+            }
+        }
+    };
 
 }
