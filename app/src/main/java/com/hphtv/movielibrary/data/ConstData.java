@@ -1,5 +1,8 @@
 package com.hphtv.movielibrary.data;
 
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Created by tchip on 18-3-1.
  */
@@ -7,6 +10,10 @@ package com.hphtv.movielibrary.data;
 public class ConstData {
 
     public static final String AUTHORITIES = "com.hphtv.movielibrary.fileprovider";
+    /**
+     * 设备路径与id映射
+     */
+    public static final ConcurrentHashMap<String,Object> devicePathIDs=new ConcurrentHashMap<>();
 
     //--------------HashMap keys------------
     //1.for LeftMenuListAdapter and HomePageActivity
@@ -56,6 +63,11 @@ public class ConstData {
         int DOUBAN = 0;
         int IMDB = 1;
         int MTIME = 2;
+    }
+
+    public interface ScraperSource{
+        String MTIME="mtime";
+        String OMDB="omdb";
     }
 
     public interface DirectoryState {
@@ -124,6 +136,15 @@ public class ConstData {
 
     }
 
+    // 视频格式后缀
+    public static final String[] VIDEO_SUFFIX = {"avi", "wmv", "mp4", "rmvb", "kkv", "3gp", "ts", "mpeg", "mpg", "mkv", "m3u8", "mov",
+            "m2ts", "flv", "m2t", "mts", "vob", /*"dat",*/ "m4v", "asf", "f4v", "3g2", "m1v", "m2v", "tp", "trp", "m2p", "rm",
+            "avc", "dv", "divx", "mjpg", "mjpeg", "mpe", "mp2p", "mp2t", "mpg2", "mpeg2", "m4p", "mp4ps", "ogm", "hdmov",
+            "qt", "iso", "webm"};
+
+    static {
+        Arrays.sort(VIDEO_SUFFIX);
+    }
 
     //4.------------for filepicker---------------
     public static final String PACKAGE_FILE_PICKER = "com.firefly.filepicker";
@@ -234,4 +255,17 @@ public class ConstData {
 
     /*---------------------本地广播-----------------------------*/
     public static final String ACTION_FAVORITE_MOVIE_CHANGE="action.favorite.movie.change";
+
+    public interface BroadCastMsg {
+        /**
+         * 设备挂载/卸载广播
+         */
+        String DEVICE_UP = "action_mounted";
+        String DEVICE_DOWN = "action_unmounted";
+
+        /**
+         * 重新扫描设备
+         */
+        String RESCAN_DEVICE="com.rockchips.mediacenter.rescan_device";
+    }
 }

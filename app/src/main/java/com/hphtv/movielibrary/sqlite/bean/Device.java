@@ -1,11 +1,14 @@
 package com.hphtv.movielibrary.sqlite.bean;
 
+import androidx.room.Entity;
+
 import java.io.Serializable;
 
 /**
  * Created by tchip on 17-12-5.
  */
 
+@Entity
 public class Device implements Serializable {
     private long id;
     private int type;//设备类型

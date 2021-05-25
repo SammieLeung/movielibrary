@@ -44,7 +44,5 @@ public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecorati
                outRect.set(mItemOffset/2,0,mItemOffset,mItemOffset);
            }
        }
-
-
     }
 }

@@ -55,13 +55,13 @@ public abstract class AppBaseActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        unBindServices();
+//        unBindServices();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        attachServices();
+//        attachServices();
     }
 
 

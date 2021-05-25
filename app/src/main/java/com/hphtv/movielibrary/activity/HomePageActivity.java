@@ -28,7 +28,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -51,6 +50,7 @@ import com.hphtv.movielibrary.fragment.FavoriteFragment;
 import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.sqlite.bean.Device;
@@ -61,6 +61,9 @@ import com.hphtv.movielibrary.util.DensityUtil;
 import com.hphtv.movielibrary.util.LanguageUtil;
 import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.MovieSharedPreferences;
+import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
+import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
+import com.hphtv.movielibrary.util.retrofit.MtimeAPIRequest;
 import com.hphtv.movielibrary.view.CategoryView;
 import com.hphtv.movielibrary.view.CategoryView.OnClickCategoryListener;
 import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
@@ -74,6 +77,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomePageActivity extends AppBaseActivity {
     public static final String TAG = HomePageActivity.class.getSimpleName();
@@ -176,6 +183,7 @@ public class HomePageActivity extends AppBaseActivity {
     protected void onResume() {
         super.onResume();
         LogUtil.v(TAG, "onResume()");
+//
         Intent intent = new Intent(this, MovieScanService.class);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);

@@ -15,7 +15,10 @@ public class MainActivity extends Activity {
 //		debug("[dmhy][Death_Note][32].mp4");
 //        debug("[Death_Note][06].mkv");
 //		debug("西部世界第三季.mp4");
-		debug("新世纪福音战士：终.mp4");
+//		debug("新世纪福音战士：终.mp4");
+		debug("[迅雷下载www.xiamp4.com]铁血孤儿[第05话].mp4");
+//		debug("[www.domp4.com]跛豪.1991.BD1080p.国粤双语.mp4");
+//		debug("/storage/emulated/0/Download/[www.domp4.com]跛豪.1991.BD1080p.国粤双语/[www.domp4.com]跛豪.1991.BD1080p.国粤双语.mp4");
 //        debug("[Death_Note][32][ms32].mp4");
 //        debug("Death.Note.TV.2006.DVDRip.e03.Rev2.x264.AC3-Jina");
 //        debug("Death.Note.TV.2006.DVDRip.ep03.Rev2.x264.AC3-Jina");

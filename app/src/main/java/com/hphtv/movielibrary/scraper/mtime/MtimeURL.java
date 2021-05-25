@@ -15,7 +15,7 @@ public class MtimeURL {
     public static final String MOVIE_TRAILER_PAGE="http://front-gateway.mtime.com/library/movie/category/video.api?movieId=%1s&type=0&pageIndex=-1";
     public static final String MOVIE_POSTER_PAGE="http://front-gateway.mtime.com/library/movie/image.api?movieId=%1s&locationId=290";
     public static final String MOVIE_DETAIL="http://front-gateway.mtime.com/library/movie/detail.api?movieId=%1s";
-
+    public static final String BASE_URL="http://front-gateway.mtime.com/";
     /**
      * post 方式
      * param t 20194210461333802

@@ -162,7 +162,6 @@ public class MovieScanService extends Service {
                 }
             }
         }
-
     }
 
 
@@ -185,7 +184,6 @@ public class MovieScanService extends Service {
         }
         if (mScanProgressListener != null)
             mScanProgressListener.onStart();
-
     }
 
     public void stopScan() {

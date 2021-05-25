@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.Locale;
 
@@ -14,7 +15,7 @@ import java.util.Locale;
 
 public class LanguageUtil {
 
-
+    private static boolean isZh;
     private static final String LAST_LANGUAGE = "lastLanguage";
 
     /**
@@ -63,4 +64,24 @@ public class LanguageUtil {
         System.exit(0);
     }
 
+    public static void test() {
+        Locale locale = Locale.getDefault();
+        Log.v("lxp  =", "is " + locale.getLanguage().contains("zh"));
+    }
+
+    public static void init() {
+        Locale locale = Locale.getDefault();
+        if (locale.getLanguage().contains("zh")) {
+            isZh = true;
+        } else {
+            isZh = false;
+        }
+    }
+
+    public static boolean isUseMTimeApi() {
+        if (isZh)
+            return true;
+        else
+            return false;
+    }
 }

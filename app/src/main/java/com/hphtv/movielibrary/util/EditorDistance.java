@@ -28,6 +28,8 @@ public class EditorDistance {
      * @return
      */
     public static float checkLevenshtein(String strA, String strB, boolean isMatchCase) {
+        if(strA==null||strB==null)
+            return 0;
         if (!isMatchCase) {
             strA = strA.toLowerCase();
             strB = strB.toLowerCase();

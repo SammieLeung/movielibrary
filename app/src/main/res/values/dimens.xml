@@ -19,4 +19,8 @@
     <!--For movie library item-->
     <dimen name="movie_item_margin_left">-22dp</dimen>
     <dimen name="movie_item_margin_left_2">-12dp</dimen>
+
+    <dimen name="btn_common_w">240dp</dimen>
+    <dimen name="btn_common_h">100dp</dimen>
+
 </resources>

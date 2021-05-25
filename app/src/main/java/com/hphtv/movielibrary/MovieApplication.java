@@ -6,6 +6,7 @@ import android.webkit.WebView;
 
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.MovieSharedPreferences;
+import com.hphtv.movielibrary.util.StorageList;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ public class MovieApplication extends Application {
         helper.initWebView(true, cachePath);
         //友盟统计
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+        StorageList.getInstance().init(this);
     }
 
     public DoubanMovieSearchHelper getSearchHelper() {

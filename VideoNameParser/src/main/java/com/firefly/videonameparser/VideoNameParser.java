@@ -221,7 +221,7 @@ public class VideoNameParser {
 		 * */
 		boolean isSample = false;
 		for (String seg : segments) {
-			Log.v(TAG, "seg1:"+seg);
+			//Log.v(TAG, "seg1:"+seg);
 			/* Remove extension */
 			if(seg.lastIndexOf(".") > -1)
 			{
@@ -246,11 +246,11 @@ public class VideoNameParser {
 					
 					String key = sourcePrefix[ i*2 ];
 					String value = sourcePrefix[ i*2 + 1 ];
-					Log.v("sjfq", "key:"+key);
+					//Log.v("sjfq", "key:"+key);
 					
 					if(StringUtils.hasHttpUrl(value))
 					{
-						Log.v("sjfq", "hasHttpUrl removeWords:"+key);
+						//Log.v("sjfq", "hasHttpUrl removeWords:"+key);
 						removeWords.add(key);
 						continue;
 					}
@@ -258,7 +258,7 @@ public class VideoNameParser {
 					Country country = Country.parser(value);
 					if(country != null)
 					{
-						Log.v("sjfq", "setCountry removeWords:"+key);
+						//Log.v("sjfq", "setCountry removeWords:"+key);
 						mInfo.setCountry(country.code);
 						removeWords.add(key);
 						continue;
@@ -266,7 +266,7 @@ public class VideoNameParser {
 					
 					int year = Year.parser(value);
 					if(year > 0){
-						Log.v("sjfq", "Year removeWords:"+key);
+						//Log.v("sjfq", "Year removeWords:"+key);
 						mInfo.setYear(year);
 						removeWords.add(key);
 						continue;
@@ -274,7 +274,7 @@ public class VideoNameParser {
 					
 					Episode episode = Episode.parser(value);
 					if(episode != null){
-						Log.v("sjfq", "Episode removeWords:"+key);
+						//Log.v("sjfq", "Episode removeWords:"+key);
 						mInfo.setEpisode(episode.episode);
 						mInfo.setSeason(episode.season);
 						removeWords.add(key);
@@ -283,7 +283,7 @@ public class VideoNameParser {
 					
 					Resolution resolution = Resolution.parser(value);
 					if(resolution != null){
-						Log.v("sjfq", "resolution removeWords:"+key);
+						//Log.v("sjfq", "resolution removeWords:"+key);
 						mInfo.pushTag(resolution.tag);
 						removeWords.add(key);
 						continue;
@@ -313,7 +313,7 @@ public class VideoNameParser {
 					}
 					
 					if(SubTitle.parser(value)){
-						Log.v("sjfq", "SubTitle removeWords:"+key);
+						//Log.v("sjfq", "SubTitle removeWords:"+key);
 						removeWords.add(key);
 						continue;
 					}
@@ -354,7 +354,7 @@ public class VideoNameParser {
 			}
 
 			seg = StringUtils.removeAll(seg, removeWords).trim();
-			Log.v("sjfq","seg:"+seg);
+			//Log.v("sjfq","seg:"+seg);
 
 			sourcePrefix = matcher("\\[.*?\\]", seg);
 			if(sourcePrefix != null && sourcePrefix.length >1)// Keep only first title from this filepart, as other ones are most likely release group.
@@ -362,7 +362,7 @@ public class VideoNameParser {
 				seg = seg.replace( sourcePrefix[sourcePrefix.length-1],"");
 			}
 			
-			Log.v("sjfq","seg2:"+seg);
+			//Log.v("sjfq","seg2:"+seg);
 			
 			
 
@@ -392,7 +392,7 @@ public class VideoNameParser {
 			}
 				
 
-			Log.v(TAG, "seg3:"+seg);
+			//Log.v(TAG, "seg3:"+seg);
 
 
 			//String[] segSplit = seg.split("\\.| |-|;|_");
@@ -407,7 +407,7 @@ public class VideoNameParser {
 			for (int i = 0; i < segSplit.length; i++) {
 	
 				String word = segSplit[i];
-				Log.v(TAG, "word:"+word);
+				//Log.v(TAG, "word:"+word);
 				lastIndex = i;
 				/* words with basic punctuation and two-digit numbers; or numbers in the first position */
 				String[] x = {"ep", "episode", "season"};
@@ -417,14 +417,14 @@ public class VideoNameParser {
 					break;
 				nameParts.add(word);      
 			}
-			Log.v(TAG, "nameParts.size():"+nameParts.size());
+			//Log.v(TAG, "nameParts.size():"+nameParts.size());
 			if(nameParts.size()==0)
 				nameParts.add(seg);
 //			if (nameParts.size() == 1 && !isNaN(nameParts.get(0))) break; /* Only a number: unacceptable */ 
 
 			ArrayList<String> parts = new ArrayList<String>();
 			for (String part : nameParts) {
-				Log.v(TAG, "part:"+part);
+				//Log.v(TAG, "part:"+part);
 				if(part != null && part.length() > 0)
 				{
 					parts.add(part.substring(0,1).toUpperCase() + part.substring(1).toLowerCase());
