@@ -40,7 +40,6 @@ public class DeviceInitThread extends Thread {
     public void run() {
         super.run();
         //清除数据库设备
-        mVideoFileDao.deleteAll();
         mDeviceDao.deleteAll();
 //        String[] paths=StorageList.getInstance().getVolumnPaths();
 //        if(paths!=null){

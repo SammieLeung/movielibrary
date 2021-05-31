@@ -15,12 +15,12 @@ import java.util.List;
  */
 @Dao
 public interface MovieVideofileCrossRefDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertMovieVideofileCrossRef(MovieVideoFileCrossRef movieVideoFileCrossRef);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertMovieVideofileCrossRefs(MovieVideoFileCrossRef... movieVideoFileCrossRef);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertMovieVideofileCrossRefs(List<MovieVideoFileCrossRef> movieVideoFileCrossRef);
 }

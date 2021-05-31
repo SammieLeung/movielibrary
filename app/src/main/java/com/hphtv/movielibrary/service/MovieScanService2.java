@@ -161,6 +161,7 @@ public class MovieScanService2 extends Service {
         String raw = path;
         return FileScanUtil.simpleParse(raw);
     }
+
     private void startSearch(VideoFile videoFile) {
         MovieSupplier movieSupplier = new MovieSupplier(videoFile);
 
@@ -198,7 +199,7 @@ public class MovieScanService2 extends Service {
                 })
                 .observeOn(Schedulers.io())
                 .map((Function<String, MovieWrapper>) movieId -> {
-                    ;
+
                     MovieWrapper wrapper = MtimeApi2.getMovieDetail(movieId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                     saveMovieWrapper(wrapper, videoFile);
 
@@ -211,11 +212,12 @@ public class MovieScanService2 extends Service {
                         LogUtil.v("onNext " + Thread.currentThread().getName());
                         LogUtil.v("Result:origin" + videoFile.filename);
                         LogUtil.v("Result:==>" + movieWrapper.movie.title);
+
                     }
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                      e.printStackTrace();
+                        e.printStackTrace();
                     }
 
                     @Override
@@ -237,8 +239,10 @@ public class MovieScanService2 extends Service {
         List<Genre> genreList = movieWrapper.genres;
         Director director = movieWrapper.director;
         List<Actor> actorList = movieWrapper.actors;
-        //插入电影到数据库，获取id
-        long movie_id = mMovieDao.insertOrIgnoreMovie(movie);
+        //插入电影到数据库
+        mMovieDao.insertOrIgnoreMovie(movie);
+        //查询影片ID
+        long movie_id = mMovieDao.queryByMovieId(movie.movieId).id;
         long[] genre_ids = mGenreDao.insertGenres(genreList);
         long[] actor_ids = mActorDao.insertActors(actorList);
         long director_id = mDirectorDao.insertDirector(director);
@@ -246,37 +250,37 @@ public class MovieScanService2 extends Service {
         movieWrapper.movie.id = movie_id;
 
         for (long genre_id : genre_ids) {
-            MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
-            movieGenreCrossRef.genreId = genre_id;
-            movieGenreCrossRef.id = movie_id;
-            mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
+            if(genre_id!=-1) {
+                MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
+                movieGenreCrossRef.genreId = genre_id;
+                movieGenreCrossRef.id = movie_id;
+                mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
+            }
         }
 
         for (long actor_id : actor_ids) {
-            MovieActorCrossRef movieActorCrossRef = new MovieActorCrossRef();
-            movieActorCrossRef.actorId = actor_id;
-            movieActorCrossRef.id = movie_id;
-            mMovieActorCrossRefDao.insertMovieActorCrossRef(movieActorCrossRef);
+            if(actor_id!=-1) {
+                MovieActorCrossRef movieActorCrossRef = new MovieActorCrossRef();
+                movieActorCrossRef.actorId = actor_id;
+                movieActorCrossRef.id = movie_id;
+                mMovieActorCrossRefDao.insertMovieActorCrossRef(movieActorCrossRef);
+            }
         }
 
-        for (long actor_id : actor_ids) {
-            MovieActorCrossRef movieActorCrossRef = new MovieActorCrossRef();
-            movieActorCrossRef.actorId = actor_id;
-            movieActorCrossRef.id = movie_id;
-            mMovieActorCrossRefDao.insertMovieActorCrossRef(movieActorCrossRef);
+        if(director_id!=-1) {
+            MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
+            movieDirectorCrossRef.directorId = director_id;
+            movieDirectorCrossRef.id = movie_id;
+            mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
         }
-
-        MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
-        movieDirectorCrossRef.directorId = director_id;
-        movieDirectorCrossRef.id = movie_id;
-        mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
 
         MovieVideoFileCrossRef movieVideoFileCrossRef = new MovieVideoFileCrossRef();
         movieVideoFileCrossRef.id = movie_id;
-        movieVideoFileCrossRef.vid = videoFile.vid;
+        movieVideoFileCrossRef.path = videoFile.path;
         mMovieVideofileCrossRefDao.insertMovieVideofileCrossRef(movieVideoFileCrossRef);
 
-        videoFile.isScanned=1;
+        videoFile.isScanned = 1;
+        LogUtil.v("videofile " + videoFile.filename + " isScanned ");
         mVideoFileDao.update(videoFile);
 
     }

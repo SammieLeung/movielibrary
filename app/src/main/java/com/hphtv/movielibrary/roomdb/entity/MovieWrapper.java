@@ -20,7 +20,7 @@ public class MovieWrapper {
     public Movie movie;//实体父类
 
     @Relation(parentColumn = "id",
-            entityColumn = "vid",
+            entityColumn = "path",
             associateBy = @Junction(MovieVideoFileCrossRef.class))
     public List<VideoFile> videoFiles;//视频文件列表，一对多
 

@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.roomdb.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
@@ -19,6 +20,7 @@ import com.hphtv.movielibrary.roomdb.TABLE;
 public class VideoFile {
     @PrimaryKey(autoGenerate = true)
     public long vid;
+    @NonNull
     public String path;
     @ColumnInfo(name = "device_id")
     public String deviceId;

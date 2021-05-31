@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1e67d63087c9f3e8e170d0d9e6352dd0",
+    "identityHash": "8567a70e5a097c8a10078d636144f388",
     "entities": [
       {
         "tableName": "actor",
@@ -398,7 +398,7 @@
       },
       {
         "tableName": "movie_videofile_cross_ref",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `vid` INTEGER NOT NULL, PRIMARY KEY(`id`, `vid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `path` TEXT NOT NULL, PRIMARY KEY(`id`, `path`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -407,20 +407,29 @@
             "notNull": true
           },
           {
-            "fieldPath": "vid",
-            "columnName": "vid",
-            "affinity": "INTEGER",
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
             "id",
-            "vid"
+            "path"
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_movie_videofile_cross_ref_path",
+            "unique": false,
+            "columnNames": [
+              "path"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_videofile_cross_ref_path` ON `${TABLE_NAME}` (`path`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -457,7 +466,7 @@
       },
       {
         "tableName": "videofile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT, `device_id` TEXT, `filename` TEXT, `is_scanned` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT NOT NULL, `device_id` TEXT, `filename` TEXT, `is_scanned` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "vid",
@@ -469,7 +478,7 @@
             "fieldPath": "path",
             "columnName": "path",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "deviceId",
@@ -512,7 +521,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1e67d63087c9f3e8e170d0d9e6352dd0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8567a70e5a097c8a10078d636144f388')"
     ]
   }
 }
