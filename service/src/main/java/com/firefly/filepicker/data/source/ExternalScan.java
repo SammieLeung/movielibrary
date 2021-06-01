@@ -89,6 +89,7 @@ public class ExternalScan extends AbstractScanFiles {
         File file = new File(mNode.getId());
 
         if (file.isDirectory()) {
+            Log.e("lxptest", "is file.canRead() " + file.canRead());
             scanRecursive(file);
             finish();
         }
@@ -214,14 +215,14 @@ public class ExternalScan extends AbstractScanFiles {
 
     private void scanRecursive(File file) {
         File[] children = file.listFiles(mFileFilter);
-
-        for (File f : children) {
-            if (f.isFile()) {
-                processFile(f);
-            } else {
-                scanRecursive(f);
+        if (children != null)
+            for (File f : children) {
+                if (f.isFile()) {
+                    processFile(f);
+                } else {
+                    scanRecursive(f);
+                }
             }
-        }
     }
 
     private void processFile(File file) {
