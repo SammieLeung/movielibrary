@@ -234,7 +234,7 @@ public class DeviceMonitorService extends Service {
             List<Device> deviceList = mDeviceDao.querybyMountPath(mMountPath);
             if (deviceList != null && deviceList.size() > 0) {
                 for (Device device : deviceList) {
-                    mVideoFileDao.deleteByDeviceId(device.id);
+//                    mVideoFileDao.deleteByDeviceId(device.id);
                     mDeviceDao.deleteDevices(device);//删除设备
                 }
             }

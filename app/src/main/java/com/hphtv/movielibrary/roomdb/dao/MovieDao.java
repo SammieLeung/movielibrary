@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
@@ -33,6 +34,7 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE +" WHERE movie_id=:movie_id")
     public Movie queryByMovieId(String movie_id);
 
+    @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE)
     public List<MovieWrapper> queryAll();
 }

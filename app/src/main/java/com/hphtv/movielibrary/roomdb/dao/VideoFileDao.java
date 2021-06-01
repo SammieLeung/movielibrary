@@ -18,22 +18,31 @@ import java.util.List;
 @Dao
 public interface VideoFileDao {
 
-    @Query("SELECT * FROM "+TABLE.VIDEOFILE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public long insertOrIgnore(VideoFile videoFile);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public long[] insertOrIgnore(VideoFile... fileInfos);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public long[] insertOrIgnore(List<VideoFile> fileInfos);
+
+    @Update
+    public int update(VideoFile videoFile);
+
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insert(VideoFile... fileInfos);
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
+    public VideoFile queryByPath(String path);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insert(List<VideoFile> fileInfos);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    public void update(VideoFile videoFile);
-
-    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE vid=:deviceId")
+    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId")
     public void deleteByDeviceId(String deviceId);
 
-    @Query("DELETE FROM "+ TABLE.VIDEOFILE)
+    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId and path not in (:paths) ")
+    public void deleteByDeviceId(String deviceId, String[] paths);
+
+    @Query("DELETE FROM " + TABLE.VIDEOFILE)
     public void deleteAll();
 
 }

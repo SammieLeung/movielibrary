@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8567a70e5a097c8a10078d636144f388",
+    "identityHash": "f5d4b7371766b55598d2b0d799c7513d",
     "entities": [
       {
         "tableName": "actor",
@@ -339,7 +339,16 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_movie_actor_cross_ref_actor_id",
+            "unique": false,
+            "columnNames": [
+              "actor_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_actor_cross_ref_actor_id` ON `${TABLE_NAME}` (`actor_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -366,7 +375,16 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_movie_director_cross_ref_director_id",
+            "unique": false,
+            "columnNames": [
+              "director_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_director_cross_ref_director_id` ON `${TABLE_NAME}` (`director_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -393,7 +411,16 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_movie_genre_cross_ref_genre_id",
+            "unique": false,
+            "columnNames": [
+              "genre_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_genre_cross_ref_genre_id` ON `${TABLE_NAME}` (`genre_id`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -521,7 +548,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8567a70e5a097c8a10078d636144f388')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5d4b7371766b55598d2b0d799c7513d')"
     ]
   }
 }

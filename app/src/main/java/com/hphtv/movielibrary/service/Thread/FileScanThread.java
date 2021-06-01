@@ -114,7 +114,7 @@ public class FileScanThread extends Thread {
                         }
                     }
                 }
-                mDevice.fileCount=(videoCount);
+                mDevice.fileCount = (videoCount);
                 mDeviceDao.updateDevice(mDevice);
             }
         }
@@ -149,9 +149,9 @@ public class FileScanThread extends Thread {
         if (Arrays.binarySearch(ConstData.VIDEO_SUFFIX, tailEx) >= 0) {
             String fileName = file.getName();
             VideoFile videoFile = new VideoFile();
-            videoFile.deviceId=(device.id);
-            videoFile.filename=(fileName);
-            videoFile.path=(file.getPath());
+            videoFile.deviceId = (device.id);
+            videoFile.filename = (fileName);
+            videoFile.path = (file.getPath());
             return videoFile;
         }
         return null;
@@ -179,10 +179,24 @@ public class FileScanThread extends Thread {
      */
     private void saveVideoFileInfotoDB() {
         if (!mVideoFiles.isEmpty()) {
-            mVideoFileDao.insert(mVideoFiles);
+            String[] paths = new String[mVideoFiles.size()];
+            int i = 0;
+            for (VideoFile videoFile : mVideoFiles) {
+                VideoFile tVideoFile = mVideoFileDao.queryByPath(videoFile.path);
+                if (tVideoFile != null) {
+                    videoFile.vid = tVideoFile.vid;
+                    videoFile.isScanned=tVideoFile.isScanned;
+                }
+                int ret = mVideoFileDao.update(videoFile);
+                if (ret == 0)
+                    mVideoFileDao.insertOrIgnore(videoFile);
+                paths[i++] = videoFile.path;
+            }
+            mVideoFileDao.deleteByDeviceId(mDevice.id, paths);
             mVideoFiles.clear();
             LogUtil.v(">>>>>>>>>>>>saveVideoFileInfotoDB down<<<<<<<<<<<<");
         }
+
     }
 
 
