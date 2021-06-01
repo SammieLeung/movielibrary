@@ -254,9 +254,8 @@ public class MovieScanService extends Service {
             e.printStackTrace();
         }
         List<ParseFile> parseFileList = new ArrayList<>();
-        Log.v(TAG, "cursor.getCount " + cursor.getCount());
-        final int fileCount = cursor.getCount();
         if (cursor != null &&cursor.getCount() > 0) {
+            final int fileCount = cursor.getCount();
             while (cursor.moveToNext() && !Thread.currentThread().isInterrupted()) {
                 if (!isRunning) {
                     break;
@@ -312,7 +311,7 @@ public class MovieScanService extends Service {
             }
         } else {
 
-            updateDirectoryVideoNum(directory, false, fileCount);
+            updateDirectoryVideoNum(directory, false, 0);
             synchronized (mDirectories) {
                 if (mDirectories.size() == 0) {
                     onScanStop();
