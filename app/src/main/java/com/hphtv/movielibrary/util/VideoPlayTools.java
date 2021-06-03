@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
@@ -65,8 +66,8 @@ public class VideoPlayTools {
         if (fileUri == null) {
             if (path.startsWith("/")) {
                 File tFile = new File(path);
-                fileUri = FileProvider.getUriForFile(context, ConstData.AUTHORITIES, tFile);
-
+//                fileUri = FileProvider.getUriForFile(context, ConstData.AUTHORITIES, tFile);
+                fileUri=Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,path);
             } else if (path != null) {
                 fileUri = Uri.parse(path);
             }
