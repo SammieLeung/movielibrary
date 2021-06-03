@@ -6,9 +6,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.core.content.FileProvider;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firelfy.util.UriParseUtil;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 
@@ -57,8 +59,8 @@ public class VideoPlayTools {
         if (fileUri == null) {
             if (path.startsWith("/")) {
                 File tFile = new File(path);
-                fileUri = FileProvider.getUriForFile(context, ConstData.AUTHORITIES, tFile);
-
+//                fileUri = FileProvider.getUriForFile(context, ConstData.AUTHORITIES, tFile);
+                fileUri=Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,path);
             } else if (path != null) {
                 fileUri = Uri.parse(path);
             }

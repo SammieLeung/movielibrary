@@ -6,8 +6,8 @@ ext {
             applicationId    : "com.hphtv.movielibrary",
             minSdkVersion    : 25,
             targetSdkVersion : 30,
-            versionCode      : 20,
-            versionName      : "2.4.11",
+            versionCode      : 21,
+            versionName      : "2.4.12",
     ]
 
     //version配置
