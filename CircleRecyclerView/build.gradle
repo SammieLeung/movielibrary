@@ -33,6 +33,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation support["appcompat-v7"]
-    implementation support["recyclerview-v7"]
+    implementation support["appcompat"]
+    implementation support["recyclerview"]
 }

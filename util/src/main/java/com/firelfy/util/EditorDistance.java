@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.util;
+package com.firelfy.util;
 
 /**
  * 检测两个字符串相似度的算法

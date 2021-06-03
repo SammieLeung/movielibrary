@@ -1,18 +1,16 @@
 package com.hphtv.movielibrary.service;
 
 import android.app.Service;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.bean.Favorite;
@@ -20,14 +18,11 @@ import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.PosterProviderBean;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
-import com.hphtv.movielibrary.sqlite.bean.scraperBean.Movie;
 import com.hphtv.movielibrary.sqlite.dao.FavoriteDao;
 import com.hphtv.movielibrary.sqlite.dao.HistoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
-import com.hphtv.movielibrary.util.LogUtil;
-import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 
 public class DeviceControlService extends Service {

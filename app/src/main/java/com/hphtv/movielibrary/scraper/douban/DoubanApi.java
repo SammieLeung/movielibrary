@@ -27,7 +27,6 @@ import com.hphtv.movielibrary.sqlite.bean.scraperBean.Rating;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.scraper.Scraper;
-import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.OkHttpUtil;
 import com.hphtv.movielibrary.util.StrUtils;
 

@@ -16,10 +16,10 @@ ext {
     ]
     //support配置
     support = [
-            "design"         : "com.android.support:design:${versions["support-version"]}",
-            "support-v13"    : "com.android.support:support-v13:${versions["support-version"]}",
-            "recyclerview-v7": "com.android.support:recyclerview-v7:${versions["support-version"]}",
-            "appcompat-v7"   : "com.android.support:appcompat-v7:${versions["support-version"]}",
+            "design"         : 'com.google.android.material:material:1.0.0',
+            "legacy-support"    : 'androidx.legacy:legacy-support-v13:1.0.0',
+            "recyclerview": 'androidx.recyclerview:recyclerview:1.0.0',
+            "appcompat"   : 'androidx.appcompat:appcompat:1.0.0',
     ]
     //依赖第三方配置
     dependencies = [

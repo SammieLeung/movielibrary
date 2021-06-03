@@ -1,6 +1,6 @@
 package com.firefly.dlna.httpserver;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 public class CacheValue {
     @IntDef({

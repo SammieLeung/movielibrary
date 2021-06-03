@@ -21,8 +21,6 @@ import android.widget.TextView;
 
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.util.DensityUtil;
-import com.hphtv.movielibrary.util.LogUtil;
 
 import java.util.ArrayList;
 

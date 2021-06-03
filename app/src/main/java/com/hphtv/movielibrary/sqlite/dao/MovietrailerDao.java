@@ -6,7 +6,6 @@ import android.database.Cursor;
 
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.MovieTrailer;
 import com.hphtv.movielibrary.sqlite.MovieDBHelper;
-import com.hphtv.movielibrary.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;

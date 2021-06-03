@@ -29,14 +29,7 @@
                 android:textColor="@color/tx_fff"
                 android:textSize="24dp" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/lb_sort_directory"
-                android:textColor="@color/tx_fff"
-                android:textSize="24dp" />
+
 
             <TextView
                 android:layout_width="0dp"
@@ -107,7 +100,6 @@
 
             <include layout="@layout/movie_library_sort_layout_item" />
 
-            <include layout="@layout/movie_library_sort_layout_item" />
 
             <include layout="@layout/movie_library_sort_layout_item" />
 

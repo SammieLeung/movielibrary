@@ -1,12 +1,11 @@
 package com.firefly.filepicker.data.source;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.filepicker.data.bean.Node;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by rany on 18-1-9.

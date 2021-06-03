@@ -2,8 +2,8 @@ package com.firefly.filepicker.data.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 
 /**
  * Created by rany on 18-1-9.

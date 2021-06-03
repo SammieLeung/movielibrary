@@ -1,8 +1,9 @@
 package com.hphtv.movielibrary.adapter;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.support.v13.app.FragmentPagerAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+
 
 import java.util.List;
 
@@ -12,18 +13,18 @@ import java.util.List;
 
 public class QuickFragmentPageAdapter<T extends Fragment> extends FragmentPagerAdapter {
     private List<T> mList;
-    private String[] mStrings;
+    private String[] mTitles;
 
     /**
-     * @param fm
      * @param list
      * @param titles PageTitles
      */
-    public QuickFragmentPageAdapter(FragmentManager fm, List<T> list, String[] titles) {
+    public QuickFragmentPageAdapter(FragmentManager fm,List<T> list, String[] titles) {
         super(fm);
         mList = list;
-        mStrings = titles;
+        mTitles = titles;
     }
+
 
     @Override
     public Fragment getItem(int position) {
@@ -37,7 +38,7 @@ public class QuickFragmentPageAdapter<T extends Fragment> extends FragmentPagerA
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mStrings == null ? super.getPageTitle(position) : mStrings[position];
+        return mTitles == null ? super.getPageTitle(position) : mTitles[position];
     }
 
 

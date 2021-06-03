@@ -1,14 +1,10 @@
 package com.hphtv.movielibrary.service.Thread;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.StorageList;
 
 

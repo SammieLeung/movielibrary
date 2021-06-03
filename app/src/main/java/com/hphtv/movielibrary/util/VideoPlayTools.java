@@ -1,26 +1,18 @@
 package com.hphtv.movielibrary.util;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.sqlite.bean.History;
-import com.hphtv.movielibrary.sqlite.bean.PosterProviderBean;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 
 import java.io.File;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * @author lxp

@@ -4,12 +4,11 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.ConditionVariable;
 import android.os.Environment;
 import android.provider.DocumentsContract;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,16 +20,8 @@ import com.firefly.filepicker.data.source.DLNAScan;
 import com.firefly.filepicker.data.source.ExternalScan;
 import com.firefly.filepicker.data.source.IScanFiles;
 
-import org.fourthline.cling.model.meta.Device;
-import org.fourthline.cling.model.meta.Service;
-import org.fourthline.cling.model.types.UDAServiceType;
-
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-
-import jcifs.smb.SmbException;
-import jcifs.smb.SmbFile;
 
 public class TestActivity extends AppCompatActivity {
 

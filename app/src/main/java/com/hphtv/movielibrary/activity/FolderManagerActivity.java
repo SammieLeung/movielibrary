@@ -2,18 +2,16 @@ package com.hphtv.movielibrary.activity;
 
 import android.app.Activity;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -43,10 +41,7 @@ import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
-import com.hphtv.movielibrary.util.Base64Helper;
 import com.hphtv.movielibrary.util.BroadcastHelper;
-import com.hphtv.movielibrary.util.Md5Util;
-import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
 import com.hphtv.movielibrary.view.PasswordDialogFragment;
 import com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll;
@@ -172,7 +167,6 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                     @Override
                     public void run() {
                         if (mScanService != null && mScanService.isRunning()) {
-
                             List<Directory> scanDirectories = mScanService.getScanDirectories();
                             for (int i = 0; i < scanDirectories.size(); i++) {
                                 for (int j = 0; j < mHashMapList.size(); j++) {

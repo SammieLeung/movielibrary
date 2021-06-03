@@ -1,6 +1,6 @@
 package com.firefly.dlna.device.dmr;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import org.fourthline.cling.support.model.Channel;
 

@@ -32,8 +32,6 @@ import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
 import com.hphtv.movielibrary.util.EditorDistance;
 import com.hphtv.movielibrary.util.FileScanUtil;
-import com.hphtv.movielibrary.util.LogUtil;
-import com.hphtv.movielibrary.util.retrofit.MtimeDetailRespone;
 import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
 
 import java.util.List;
@@ -46,9 +44,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.functions.Supplier;
 import io.reactivex.rxjava3.observers.DisposableObserver;

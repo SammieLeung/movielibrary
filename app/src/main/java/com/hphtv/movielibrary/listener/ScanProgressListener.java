@@ -1,6 +1,6 @@
 package com.hphtv.movielibrary.listener;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.others.ParseFile;

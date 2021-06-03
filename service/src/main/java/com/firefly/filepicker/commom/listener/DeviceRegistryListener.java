@@ -2,9 +2,7 @@ package com.firefly.filepicker.commom.listener;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.provider.DocumentsContract;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.firefly.filepicker.data.Constants;
@@ -12,8 +10,6 @@ import com.firefly.filepicker.data.Constants;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
-
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.firefly.filepicker.provider.DLNADocumentsProvider.AUTHORITY;
 

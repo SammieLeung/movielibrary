@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.widget.Button;
 
 import com.hphtv.movielibrary.R;
 
@@ -13,7 +12,7 @@ import com.hphtv.movielibrary.R;
  * Created by tchip on 18-4-27.
  */
 
-public class DrawTopButton extends android.support.v7.widget.AppCompatButton {
+public class DrawTopButton extends androidx.appcompat.widget.AppCompatButton {
     private int drawableSize;
     private STATE_COLLECTION currentState=STATE_COLLECTION.FALSE;
 

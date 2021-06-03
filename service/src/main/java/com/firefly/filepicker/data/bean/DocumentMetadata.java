@@ -1,7 +1,7 @@
 package com.firefly.filepicker.data.bean;
 
 import android.provider.DocumentsContract;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import org.fourthline.cling.support.model.DIDLObject;
 import org.fourthline.cling.support.model.Res;

@@ -8,8 +8,6 @@ import com.firefly.videonameparser.MovieNameInfo;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Images;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Rating;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
-import com.hphtv.movielibrary.util.LogUtil;
-import com.hphtv.movielibrary.util.MovieSharedPreferences;
 
 import java.io.IOException;
 import java.util.List;

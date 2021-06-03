@@ -94,7 +94,7 @@
             android:authorities="com.hphtv.movielibrary.movieprovider"
             android:exported="true"></provider>
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.hphtv.movielibrary.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">

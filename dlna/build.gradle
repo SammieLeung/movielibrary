@@ -47,7 +47,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation support["appcompat-v7"]
+    implementation support["appcompat"]
 
     // Version 1.1.2 will cause exception
     api "org.seamless:seamless-util:1.1.1"

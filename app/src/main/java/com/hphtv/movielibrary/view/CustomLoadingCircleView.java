@@ -2,8 +2,8 @@ package com.hphtv.movielibrary.view;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.util.DensityUtil;
 
 /**
  * Created by tchip on 17-10-14.

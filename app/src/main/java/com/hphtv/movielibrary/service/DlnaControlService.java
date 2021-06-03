@@ -7,14 +7,10 @@ import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.firefly.dlna.DlnaManager;
 import com.firefly.dlna.device.dmr.DmrBuilder;

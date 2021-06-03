@@ -1,1 +1,2 @@
 include ':app', ':CircleRecyclerView', ':service', ':dlna', ':VideoNameParser'
+include ':util'

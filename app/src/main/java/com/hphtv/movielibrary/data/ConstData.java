@@ -268,4 +268,13 @@ public class ConstData {
          */
         String RESCAN_DEVICE="com.rockchips.mediacenter.rescan_device";
     }
+
+
+    public interface MovieSort{
+        String DEVICE="sort_device";
+        String YEAR="sort_year";
+        String GENRE="sort_genre";
+        String SORTTYPE="sort_type";
+        String SORT_BY_DESC="sort_desc";
+    }
 }

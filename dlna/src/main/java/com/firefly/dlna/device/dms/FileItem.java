@@ -1,6 +1,6 @@
 package com.firefly.dlna.device.dms;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.firefly.dlna.DlnaManager;
 import com.firefly.dlna.httpserver.Registration;

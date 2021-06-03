@@ -6,23 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.storage.StorageVolume;
-import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import com.hphtv.movielibrary.MovieApplication;
+import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
-import com.hphtv.movielibrary.service.Thread.DeviceCheckThread;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.FileScanThread;
-import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.StorageList;
 
 import java.io.File;
@@ -81,7 +77,12 @@ public class DeviceMonitorService extends Service {
         initDb();
         bindRegisterReceivers();
         initThreadPools();
-        scanDevices();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mDeviceMountReceiver);
     }
 
     private void initDb() {
@@ -108,8 +109,10 @@ public class DeviceMonitorService extends Service {
         mDeviceInitExecutor = Executors.newSingleThreadExecutor();
     }
 
-    //扫描全盘
-    private void scanDevices() {
+    /**
+     * 扫描本地所有挂载设备并扫描文件
+     */
+    public void scanDevices() {
         mDeviceInitExecutor.execute(new DeviceInitThread(this));
     }
 
@@ -127,65 +130,34 @@ public class DeviceMonitorService extends Service {
         mDeviceMountExecutor.execute(new DeviceMountThread(deviceName, deviceType, localPath, isFromNetwork, networkPath, mountState));
     }
 
-    /**
-     * 搜索设备
-     */
-    public void checkDevices() {
-        int isEncrypted;
-        if (((MovieApplication) getApplication()).isShowEncrypted()) {
-            isEncrypted = ConstData.EncryptState.ENCRYPTED;
-        } else {
-            isEncrypted = ConstData.EncryptState.UNENCRYPTED;
-        }
-        DeviceCheckThread deviceCheckThread = new DeviceCheckThread(this, list -> {
-            if (mDeviceChangeListener != null)
-                mDeviceChangeListener.OnDeviceChange(list);
-        }, isEncrypted);
-        deviceCheckThread.execute();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(mDeviceMountReceiver);
-    }
 
     /**
      * 接受设备挂载广播
      */
-    BroadcastReceiver mDeviceMountReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver mDeviceMountReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.v(TAG, intent.getAction());
-            switch (intent.getAction()) {
+            String action = intent.getAction();
+            switch (action) {
                 case Intent.ACTION_MEDIA_MOUNTED:
                 case Intent.ACTION_MEDIA_UNMOUNTED:
                     StorageVolume storageVolume = intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
-                    Log.v(TAG, "========storageVolume=========");
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        String state_txt = storageVolume.getState();
-                        int state = state_txt.equals(ConstData.DeviceMountState.MOUNTED_TEXT) ? ConstData.DeviceMountState.MOUNTED : ConstData.DeviceMountState.UNMOUNTED;
-
-
-                        try {
-                            Class clazz = storageVolume.getClass();
-                            Method meth = clazz.getDeclaredMethod("getPath");
-                            meth.setAccessible(true);
-                            String filepath = (String) meth.invoke(storageVolume);
-//                            if (deviceChangeListener != null)
-//                                deviceChangeListener.OnDeviceChange(storageVolume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, filepath, false, "", state);
-                            checkDevices();
-                        } catch (NoSuchMethodException e) {
-                            e.printStackTrace();
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
+                    String state_txt = storageVolume.getState();
+                    int state = state_txt.equals(ConstData.DeviceMountState.MOUNTED_TEXT) ? ConstData.DeviceMountState.MOUNTED : ConstData.DeviceMountState.UNMOUNTED;
+                    try {
+                        Class clazz = storageVolume.getClass();
+                        Method meth = clazz.getDeclaredMethod("getPath");
+                        meth.setAccessible(true);
+                        String filepath = (String) meth.invoke(storageVolume);
+                        executeOnMountThread(storageVolume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, filepath, false, "", state);
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     break;
 
@@ -234,7 +206,6 @@ public class DeviceMonitorService extends Service {
             List<Device> deviceList = mDeviceDao.querybyMountPath(mMountPath);
             if (deviceList != null && deviceList.size() > 0) {
                 for (Device device : deviceList) {
-//                    mVideoFileDao.deleteByDeviceId(device.id);
                     mDeviceDao.deleteDevices(device);//删除设备
                 }
             }
@@ -249,14 +220,12 @@ public class DeviceMonitorService extends Service {
 
                 broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_UP);
                 broadIntent.putExtra(ConstData.DeviceMountMsg.DEVICE_ID, device.id);
-//
-//
-//                //启动文件扫描线程。
+                //启动文件扫描线程。
                 mFileScanExecutor.execute(new FileScanThread(DeviceMonitorService.this, device));
             } else {
+                ConstData.devicePathIDs.remove(mMountPath);
                 broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_DOWN);
             }
-
             LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(broadIntent);
         }
 
@@ -281,20 +250,7 @@ public class DeviceMonitorService extends Service {
             } else {
                 device.type = (deviceType);
             }
-
-
             return device;
         }
-    }
-
-
-    public interface OnDeviceChange {
-        void OnDeviceChange(List list);
-    }
-
-    private OnDeviceChange mDeviceChangeListener;
-
-    public void setOnDevcieChangeListener(OnDeviceChange listener) {
-        mDeviceChangeListener = listener;
     }
 }

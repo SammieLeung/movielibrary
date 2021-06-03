@@ -5,7 +5,7 @@
     android:background="@color/c2b323e">
 
 
-    <android.support.v4.widget.DrawerLayout
+    <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -79,7 +79,7 @@
                 <!--android:divider="@null"-->
                 <!--android:listSelector="@drawable/st_episode_select"></ListView>-->
         <!--</LinearLayout>-->
-    </android.support.v4.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
     <!--<RelativeLayout-->
         <!--android:id="@+id/ml_head"-->

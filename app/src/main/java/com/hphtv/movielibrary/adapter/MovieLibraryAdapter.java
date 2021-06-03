@@ -2,8 +2,8 @@ package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 
 import java.util.List;
 
@@ -63,15 +63,15 @@ public class MovieLibraryAdapter extends
         if (wrapper != null) {
             //将数据保存在itemView的Tag中，以便点击时进行获取
             viewHolder.itemView.setTag(wrapper);
-            String title = wrapper.getTitle();
-            photo = wrapper.getPoster();
+            String title = wrapper.movie.title;
+            photo = wrapper.movie.poster;
 
             Glide.with(context).load(photo).apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(viewHolder.mImage);
             float average=0;
             try {
-                average = Float.parseFloat(wrapper.getAverage());
+                average = Float.parseFloat(wrapper.movie.ratings);
             } catch (NumberFormatException e) {
-                average=-1;
+                average=0;
             }
             if (average <= 0) {
                 viewHolder.mRatingLayout.setVisibility(View.GONE);

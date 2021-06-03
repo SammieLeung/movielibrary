@@ -2,7 +2,7 @@ package com.hphtv.movielibrary.view;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -19,7 +19,6 @@ import android.widget.TextView;
 import java.lang.reflect.Field;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.util.DensityUtil;
 
 /**
  * Created by tchip on 17-9-29.

@@ -2,19 +2,14 @@ package com.hphtv.movielibrary.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.icu.text.PluralRules;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.util.DensityUtil;
-
-import java.util.zip.Inflater;
 
 /**
  * Created by tchip on 17-12-21.

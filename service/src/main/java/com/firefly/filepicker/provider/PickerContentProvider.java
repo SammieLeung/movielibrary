@@ -8,7 +8,7 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.ConditionVariable;
 import android.provider.DocumentsContract;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.firefly.filepicker.data.Constants;

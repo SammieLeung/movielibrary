@@ -1,6 +1,6 @@
 package com.hphtv.movielibrary.listener;
 
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
 import com.hphtv.movielibrary.data.ConstData;

@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
@@ -20,7 +20,6 @@ import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService2;
-import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.retrofit.MtimeAPIRequest;
 import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;

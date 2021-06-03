@@ -5,7 +5,6 @@ import android.app.Application;
 import android.webkit.WebView;
 
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
-import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.util.StorageList;
 import com.umeng.analytics.MobclickAgent;
 

@@ -7,16 +7,14 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.CancellationSignal;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.PosterProviderBean;
@@ -29,7 +27,6 @@ import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
-import com.hphtv.movielibrary.util.MovieSharedPreferences;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 
 /**

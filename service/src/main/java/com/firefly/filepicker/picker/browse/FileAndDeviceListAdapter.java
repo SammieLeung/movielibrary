@@ -3,7 +3,7 @@ package com.firefly.filepicker.picker.browse;
 import android.content.Context;
 import android.os.ConditionVariable;
 import android.os.Environment;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,7 +21,6 @@ import org.fourthline.cling.support.model.item.Item;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;

@@ -2,11 +2,9 @@ package com.hphtv.movielibrary.view;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.support.v4.view.ViewPager;
+import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.FocusFinder;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;

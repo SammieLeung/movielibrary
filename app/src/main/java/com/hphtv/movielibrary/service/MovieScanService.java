@@ -10,13 +10,12 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.provider.DocumentsContract;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.firefly.filepicker.data.bean.FileItem;
-import com.firefly.filepicker.provider.PickerContentProvider;
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
 import com.firefly.videonameparser.utils.StringUtils;
@@ -43,7 +42,6 @@ import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.FileScanUtil;
-import com.hphtv.movielibrary.util.LogUtil;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
 
 import java.lang.annotation.Retention;

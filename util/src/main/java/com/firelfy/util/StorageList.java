@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.util;
+package com.firelfy.util;
 
 import android.content.Context;
 import android.os.Environment;

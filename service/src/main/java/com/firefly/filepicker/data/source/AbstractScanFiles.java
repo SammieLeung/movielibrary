@@ -1,13 +1,12 @@
 package com.firefly.filepicker.data.source;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.filepicker.data.bean.Node;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**

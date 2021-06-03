@@ -13,12 +13,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.util.DensityUtil;
-import com.hphtv.movielibrary.util.LogUtil;
-import com.hphtv.movielibrary.util.Md5Util;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,7 +12,6 @@ import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -194,7 +193,6 @@ public class FileScanThread extends Thread {
             }
             mVideoFileDao.deleteByDeviceId(mDevice.id, paths);
             mVideoFiles.clear();
-            LogUtil.v(">>>>>>>>>>>>saveVideoFileInfotoDB down<<<<<<<<<<<<");
         }
 
     }

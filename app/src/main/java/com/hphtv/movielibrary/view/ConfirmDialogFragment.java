@@ -11,12 +11,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.util.DensityUtil;
 
 /**
  * Created by tchip on 17-11-10.

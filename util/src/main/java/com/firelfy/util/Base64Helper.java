@@ -1,9 +1,8 @@
-package com.hphtv.movielibrary.util;
+package com.firelfy.util;
 
 import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
