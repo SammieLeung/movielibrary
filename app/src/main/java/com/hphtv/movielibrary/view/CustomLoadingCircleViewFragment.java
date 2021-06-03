@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.Window;
 import android.widget.ImageView;
 
+import com.firelfy.util.DensityUtil;
 import com.hphtv.movielibrary.R;
 
 /**

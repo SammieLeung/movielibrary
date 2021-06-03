@@ -1,21 +1,17 @@
 package com.hphtv.movielibrary.fragment;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.hphtv.movielibrary.activity.HomePageActivity;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.data.ConstData;
@@ -23,7 +19,6 @@ import com.hphtv.movielibrary.databinding.FLayoutFavoriteBinding;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 
 import java.util.ArrayList;
@@ -72,7 +67,7 @@ public class HomePageFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initView(view);
+        initView();
     }
 
     @Override
@@ -96,26 +91,25 @@ public class HomePageFragment extends Fragment {
     /**
      * 初始化
      */
-    private void initView(View view) {
+    private void initView() {
 
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), COLUMS, GridLayoutManager.VERTICAL, false);
         mFLayoutFavoriteBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mLibraryAdapter = new MovieLibraryAdapter(getContext(), mWrapperList);
         mFLayoutFavoriteBinding.rvMovies.setAdapter(mLibraryAdapter);
         mLibraryAdapter
-                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, MovieWrapper wrapper) {
+                .setOnItemClickListener((view, wrapper) -> {
 
-                        Intent intent = new Intent(getContext(),
-                                MovieDetailActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("movie_id", wrapper.movie.id);
-                        bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-                        intent.putExtras(bundle);
-                        startActivityForResult(intent, 0);
-                    }
-
+                    Intent intent = new Intent(getContext(),
+                            MovieDetailActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("movie_id", wrapper.movie.id);
+                    bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+                    intent.putExtras(bundle);
+                    ActivityResultContracts.StartActivityForResult startActivityForResult=new ActivityResultContracts.StartActivityForResult();
+                    registerForActivityResult(startActivityForResult, result -> {
+                        Log.v(TAG, "onActivityResult resultCode=" + result.getResultCode());
+                    }).launch(intent);
                 });
 
     }
@@ -130,9 +124,4 @@ public class HomePageFragment extends Fragment {
         mLibraryAdapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.v(TAG, "onActivityResult resultCode=" + resultCode);
-    }
 }

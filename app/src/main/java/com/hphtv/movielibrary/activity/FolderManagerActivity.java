@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -25,6 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firelfy.util.Md5Utils;
+import com.firelfy.util.SharePreferencesTools;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.DirectoryManagerAdapter;
@@ -58,7 +61,7 @@ import java.util.Set;
  * Created by tchip on 17-12-4.
  */
 
-public class FolderManagerActivity extends Activity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
+public class FolderManagerActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     public static final String TAG = FolderManagerActivity.class.getSimpleName();
     private RecyclerViewWithMouseScroll mDeviceRecyclerView;
@@ -83,7 +86,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
     private MovieScanService mScanService;
 
     private Set<Integer> mCheckedSet = new HashSet<Integer>();
-    private MovieSharedPreferences mPreferences;
+    private SharePreferencesTools mPreferences;
     private MovieApplication mApp;
     private String mMd5EncodePwd;
     private boolean isConfirm = true;
@@ -100,7 +103,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
         setContentView(R.layout.layout_setting);
         this.mApp = (MovieApplication) getApplication();
         this.mContext = FolderManagerActivity.this;
-        mPreferences = MovieSharedPreferences.getInstance();
+        mPreferences = SharePreferencesTools.getInstance(this);
         mDirectoryDao = new DirectoryDao(mContext);
         mDeviceDao = new DeviceDao(mContext);
         mVideoFileDao = new VideoFileDao(mContext);
@@ -308,7 +311,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
             case R.id.privatedevice:
                 if (isChecked == true) {
                     if (!mApp.isShowEncrypted()) {
-                        mMd5EncodePwd = mPreferences.getPassword();
+                        mMd5EncodePwd = mPreferences.readProperty(ConstData.SharePreferenceKeys.PASSWORD,"");
                         if (!TextUtils.isEmpty(mMd5EncodePwd)) {
                             final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
                             fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
@@ -320,7 +323,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                         if (psd.length() < 4) {
                                             fragment.showTips(0);
                                             editTextList.get(0).requestFocus();
-                                        } else if (!Md5Util.md5(psd).equals(mMd5EncodePwd)) {
+                                        } else if (!Md5Utils.digest(psd).equals(mMd5EncodePwd)) {
                                             fragment.showTips(1);
                                             editTextList.get(0).requestFocus();
                                         } else {
@@ -337,7 +340,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                     mCheckBoxPrivate.setChecked(false);
                                 }
                             });
-                            fragment.InputPassword().show(getFragmentManager(), TAG);
+                            fragment.InputPassword().show(getSupportFragmentManager(), TAG);
                         } else {
                             final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
                             fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
@@ -357,8 +360,8 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                             fragment.showTips(1);
                                             editTextList.get(1).requestFocus();
                                         } else {
-                                            mMd5EncodePwd = Md5Util.md5(psd2);
-                                            mPreferences.setPassword(mMd5EncodePwd);
+                                            mMd5EncodePwd = Md5Utils.digest(psd2);
+                                            mPreferences.saveProperty(ConstData.SharePreferenceKeys.PASSWORD,mMd5EncodePwd);
                                             mCheckedSet.clear();
                                             initData();
                                             mApp.setShowEncrypted(true);
@@ -374,7 +377,7 @@ public class FolderManagerActivity extends Activity implements CompoundButton.On
                                     mCheckBoxPrivate.setChecked(false);
                                 }
                             });
-                            fragment.SetPassword().show(getFragmentManager(), TAG);
+                            fragment.SetPassword().show(getSupportFragmentManager(), TAG);
 
                         }
 

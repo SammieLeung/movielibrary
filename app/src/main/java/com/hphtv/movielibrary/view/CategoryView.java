@@ -101,11 +101,11 @@ public class CategoryView extends LinearLayout implements
     }
 
     private void prepareCheckPosition() {
-        String devicePath = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.MovieSort.DEVICE, "");
-        String year = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.MovieSort.YEAR, "");
-        String genre = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.MovieSort.GENRE, "");
-        String sort_type = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.MovieSort.SORTTYPE, "");
-        boolean isDesc = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.MovieSort.SORT_BY_DESC, false);
+        String devicePath = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.DEVICE, "");
+        String year = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.YEAR, "");
+        String genre = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.GENRE, "");
+        String sort_type = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.SORTTYPE, getResources().getString(R.string.order_name));
+        boolean isDesc = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.SORT_BY_DESC, false);
         int i = 0;
         for (Device device : mDevices) {
             if (devicePath.equalsIgnoreCase(device.localPath)) {
@@ -223,10 +223,10 @@ public class CategoryView extends LinearLayout implements
      * 更新排序方式--需要UI线程执行
      */
     private void updateOrder() {
-        SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.MovieSort.SORTTYPE, mSortFilters.get(mCurGenrePos));
-        SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.MovieSort.SORT_BY_DESC, isDesc);
+        SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.SORTTYPE, mSortFilters.get(mCurSortPos));
+        SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.SORT_BY_DESC, isDesc);
         mUIHandler.post(() -> {
-            for (int i = 0; i > mSortRadioGroup.getChildCount(); i++) {
+            for (int i = 0; i < mSortRadioGroup.getChildCount(); i++) {
                 RadioButton radioButton = (RadioButton) mSortRadioGroup.getChildAt(i);
                 radioButton.setText(mSortFilters.get(i));
             }
@@ -290,9 +290,9 @@ public class CategoryView extends LinearLayout implements
                 genreStr = mGenres.get(mCurGenrePos);
             }
 
-            SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.MovieSort.DEVICE, devicePath);
-            SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.MovieSort.YEAR, year);
-            SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.MovieSort.GENRE, genreStr);
+            SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.DEVICE, devicePath);
+            SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.YEAR, year);
+            SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.GENRE, genreStr);
 
             mListener.onConditionChange(device, year, genreStr);
         }

@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.service.Thread;
 
 import android.util.Log;
 
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;

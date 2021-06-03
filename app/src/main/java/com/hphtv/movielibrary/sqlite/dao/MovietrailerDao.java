@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.MovieTrailer;
 import com.hphtv.movielibrary.sqlite.MovieDBHelper;
 

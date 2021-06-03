@@ -1,12 +1,13 @@
 package com.hphtv.movielibrary.fragment;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
+import androidx.fragment.app.Fragment;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firelfy.util.Base64Helper;
+import com.firelfy.util.Md5Utils;
+import com.firelfy.util.SharePreferencesTools;
 import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.activity.FolderManagerActivity;
 import com.hphtv.movielibrary.activity.HomePageActivity;
@@ -46,7 +50,7 @@ public class FileManagerFragment extends Fragment {
     private HomePageActivity context;
     private MovieApplication mApp;
     MovieScanService scanService;
-    private MovieSharedPreferences preferences;
+    private SharePreferencesTools preferences;
     private String md5Password;
 
     @Nullable
@@ -65,7 +69,7 @@ public class FileManagerFragment extends Fragment {
         rv_encrypted_setting.setOnFocusChangeListener(mOnFocusChangeListener);
         context = (HomePageActivity) getActivity();
         mApp = (MovieApplication) context.getApplication();
-        preferences = MovieSharedPreferences.getInstance();
+        preferences = SharePreferencesTools.getInstance(getContext());
         return view;
     }
 
@@ -95,7 +99,7 @@ public class FileManagerFragment extends Fragment {
 
                     break;
                 case R.id.private_setting:
-                    md5Password = preferences.getPassword();
+                    md5Password = preferences.readProperty(ConstData.SharePreferenceKeys.PASSWORD,"");;
                     if (TextUtils.isEmpty(md5Password)) {
                         final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(context);
                         fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
@@ -115,8 +119,8 @@ public class FileManagerFragment extends Fragment {
                                         fragment.showTips(1);
                                         editTextList.get(1).requestFocus();
                                     } else {
-                                        md5Password = Md5Util.md5(psd2);
-                                        preferences.setPassword(md5Password);
+                                        md5Password = Md5Utils.digest(psd2);
+                                        preferences.saveProperty(ConstData.SharePreferenceKeys.PASSWORD,md5Password);
 
                                         Toast.makeText(context, getResources().getString(R.string.psw_set_success), Toast.LENGTH_SHORT).show();
                                         fragment.dismiss();
@@ -146,7 +150,7 @@ public class FileManagerFragment extends Fragment {
                                         if (mApp.isShowEncrypted()) {
                                             mApp.setShowEncrypted(false);
                                             updateShowPrivateText((TextView) v, false);
-                                            context.checkConnectedDevices();
+//                                            context.checkConnectedDevices();
                                             context.initMovie();
                                             Toast.makeText(context, context.getResources().getString(R.string.tips_for_hide_private_videos), Toast.LENGTH_SHORT).show();
                                             return;
@@ -155,20 +159,20 @@ public class FileManagerFragment extends Fragment {
                                         fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
                                             @Override
                                             public void onConfirm(List<EditText> editTextList) {
-                                                md5Password = preferences.getPassword();
+                                                md5Password = preferences.readProperty(ConstData.SharePreferenceKeys.PASSWORD,"");;
                                                 if (editTextList.size() == 1) {
                                                     fragment.hideTips();
                                                     String psd = editTextList.get(0).getText().toString();
                                                     if (psd.length() < 4) {
                                                         fragment.showTips(0);
                                                         editTextList.get(0).requestFocus();
-                                                    } else if (!Md5Util.md5(psd).equals(md5Password)) {
+                                                    } else if (!Md5Utils.digest(psd).equals(md5Password)) {
                                                         fragment.showTips(1);
                                                         editTextList.get(0).requestFocus();
                                                     } else {//
                                                         mApp.setShowEncrypted(true);
                                                         updateShowPrivateText((TextView) v, true);
-                                                        context.checkConnectedDevices();
+//                                                        context.checkConnectedDevices();
                                                         context.initMovie();
                                                         Toast.makeText(context, context.getResources().getString(R.string.tips_for_show_private_videos), Toast.LENGTH_SHORT).show();
                                                         fragment.dismiss();
@@ -197,7 +201,7 @@ public class FileManagerFragment extends Fragment {
                                                     if (old_psd.length() < 4) {
                                                         fragment.showTips(0);
                                                         editTextList.get(0).requestFocus();
-                                                    } else if (!Md5Util.md5(old_psd).equals(md5Password)) {
+                                                    } else if (!Md5Utils.digest(old_psd).equals(md5Password)) {
                                                         fragment.showTips(2);
                                                         editTextList.get(0).requestFocus();
                                                     } else if (new_psd_1.length() < 4) {
@@ -210,8 +214,8 @@ public class FileManagerFragment extends Fragment {
                                                         fragment.showTips(1);
                                                         editTextList.get(2).requestFocus();
                                                     } else {
-                                                        md5Password = Md5Util.md5(new_psd_1);
-                                                        preferences.setPassword(md5Password);
+                                                        md5Password = Md5Utils.digest(new_psd_1);
+                                                        preferences.saveProperty(ConstData.SharePreferenceKeys.PASSWORD,md5Password);
                                                         Log.v(TAG, "new psw=" + md5Password);
                                                         Toast.makeText(context, getResources().getString(R.string.psw_set_success), Toast.LENGTH_SHORT).show();
                                                         fragment.dismiss();
@@ -402,7 +406,7 @@ public class FileManagerFragment extends Fragment {
                 final Directory t_dir = directory;
 
                 if (isEncrypted == ConstData.EncryptState.ENCRYPTED) {
-                    md5Password = preferences.getPassword();
+                    md5Password = preferences.readProperty(ConstData.SharePreferenceKeys.PASSWORD,"");;
                     if (!TextUtils.isEmpty(md5Password)) {
                         final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(context);
                         fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
@@ -414,7 +418,7 @@ public class FileManagerFragment extends Fragment {
                                     if (psd.length() < 4) {
                                         fragment.showTips(0);
                                         editTextList.get(0).requestFocus();
-                                    } else if (!Md5Util.md5(psd).equals(md5Password)) {
+                                    } else if (!Md5Utils.digest(psd).equals(md5Password)) {
                                         fragment.showTips(1);
                                         editTextList.get(0).requestFocus();
                                     } else {
@@ -444,7 +448,7 @@ public class FileManagerFragment extends Fragment {
                             }
 
                         });
-                        fragment.InputPassword().show(getFragmentManager(), TAG);
+                        fragment.InputPassword().show(getChildFragmentManager(), TAG);
                     } else {
                         final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(context);
                         fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
@@ -464,8 +468,8 @@ public class FileManagerFragment extends Fragment {
                                         fragment.showTips(1);
                                         editTextList.get(1).requestFocus();
                                     } else {
-                                        md5Password = Md5Util.md5(psd2);
-                                        preferences.setPassword(md5Password);
+                                        md5Password = Md5Utils.digest(psd2);
+                                        preferences.saveProperty(ConstData.SharePreferenceKeys.PASSWORD,md5Password);
                                         Toast.makeText(context, getResources().getString(R.string.psw_set_success), Toast.LENGTH_SHORT).show();
                                         fragment.dismiss();
                                         context.runOnUiThread(new Runnable() {

@@ -9,6 +9,8 @@ import android.text.TextUtils;
 import androidx.annotation.Nullable;
 
 import com.firefly.videonameparser.MovieNameInfo;
+import com.firelfy.util.EditorDistance;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
@@ -30,7 +32,6 @@ import com.hphtv.movielibrary.roomdb.entity.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
-import com.hphtv.movielibrary.util.EditorDistance;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
 

@@ -12,6 +12,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.firelfy.util.LogUtil;
+import com.firelfy.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.History;
@@ -86,9 +88,7 @@ public class DeviceControlService extends Service {
                     }
                     break;
                 case CMD_CHECK_MOVIEDB:
-                    MovieSharedPreferences movieSharedPreferences = MovieSharedPreferences.getInstance();
-                    movieSharedPreferences.setContext(DeviceControlService.this);
-                    boolean isMovieDbUpdate = movieSharedPreferences.isMovieDBUpdate();
+                    boolean isMovieDbUpdate = SharePreferencesTools.getInstance(DeviceControlService.this).readProperty(ConstData.SharePreferenceKeys.MOVIE_DB_UPDATE,false);
                     if (isMovieDbUpdate) {
                         msgToClient.what = CMD_CHECK_MOVIEDB;
                         try {

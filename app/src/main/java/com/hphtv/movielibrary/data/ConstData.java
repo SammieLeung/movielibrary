@@ -270,11 +270,15 @@ public class ConstData {
     }
 
 
-    public interface MovieSort{
+    public interface SharePreferenceKeys {
         String DEVICE="sort_device";
         String YEAR="sort_year";
         String GENRE="sort_genre";
         String SORTTYPE="sort_type";
         String SORT_BY_DESC="sort_desc";
+
+        String PASSWORD="password";
+        String MOVIE_DB_UPDATE="movie_db_update";
+
     }
 }

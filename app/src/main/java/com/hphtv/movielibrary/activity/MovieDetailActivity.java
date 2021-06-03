@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.activity;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -15,6 +16,8 @@ import android.os.IBinder;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.OrientationHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -32,6 +35,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.History;
@@ -80,7 +84,7 @@ import me.khrystal.library.widget.CircleRecyclerView;
 import me.khrystal.library.widget.ItemViewMode;
 import me.khrystal.library.widget.ScaleXCenterViewMode;
 
-public class MovieDetailActivity extends AppBaseActivity {
+public class MovieDetailActivity extends Activity {
     public static final String TAG = "MovieDetailActivity";
     private MovieApplication mApplication;
     private Context mContext;
@@ -181,14 +185,6 @@ public class MovieDetailActivity extends AppBaseActivity {
         super.onResume();
     }
 
-    @Override
-    public void OnDeviceChange(List<Device> deviceList) {
-    }
-
-    @Override
-    public void OnDeviceMonitorServiceConnect(DeviceMonitorService service) {
-
-    }
 
     @Override
     protected void onPause() {
@@ -269,7 +265,7 @@ public class MovieDetailActivity extends AppBaseActivity {
 
         // 创建默认的线性LayoutManager
         mLayoutManager = new LinearLayoutManager(this);
-        mLayoutManager.setOrientation(OrientationHelper.HORIZONTAL);
+        mLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
 
         mCircleRVforTrailer.setLayoutManager(mLayoutManager);
 

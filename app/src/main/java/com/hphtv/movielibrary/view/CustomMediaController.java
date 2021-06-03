@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
+import com.firelfy.util.DensityUtil;
 import com.hphtv.movielibrary.R;
 
 /**

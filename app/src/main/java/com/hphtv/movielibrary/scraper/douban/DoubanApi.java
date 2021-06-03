@@ -17,6 +17,7 @@ import org.jsoup.select.Elements;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Celebrity;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Images;

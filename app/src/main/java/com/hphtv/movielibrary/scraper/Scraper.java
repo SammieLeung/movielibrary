@@ -5,6 +5,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.firefly.videonameparser.MovieNameInfo;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Images;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Rating;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
@@ -92,17 +93,6 @@ public class Scraper {
         simpleMovie.setId(id);
         if (search_data_list != null)
             search_data_list.add(simpleMovie);
-    }
-    /**
-     * 语言为zh则使用豆瓣，否则使用IMDB
-     * @return
-     */
-    public static int getApiVersion() {
-        return MovieSharedPreferences.getInstance().getSearchAPI();
-    }
-
-    public static void setApiVersion(int api){
-        MovieSharedPreferences.getInstance().setSearchAPI(api);
     }
 
 }

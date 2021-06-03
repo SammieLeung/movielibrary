@@ -12,6 +12,7 @@ import android.view.View;
 
 import androidx.databinding.DataBindingUtil;
 
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ActivityTestBinding;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;

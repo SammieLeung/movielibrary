@@ -19,6 +19,7 @@ import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
 import com.firefly.videonameparser.utils.StringUtils;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.bean.Device;

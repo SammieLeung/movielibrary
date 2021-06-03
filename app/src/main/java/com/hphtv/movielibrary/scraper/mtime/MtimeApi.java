@@ -6,6 +6,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.firelfy.util.EditorDistance;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Celebrity;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Images;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Movie;
@@ -14,7 +15,6 @@ import com.hphtv.movielibrary.sqlite.bean.scraperBean.Photo;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.Rating;
 import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
 import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.util.EditorDistance;
 import com.hphtv.movielibrary.util.OkHttpUtil;
 
 import org.jsoup.select.Elements;

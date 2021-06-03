@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.webkit.WebView;
 
+import com.firelfy.util.StorageList;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
-import com.hphtv.movielibrary.util.StorageList;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.LinkedList;
@@ -26,7 +26,6 @@ public class MovieApplication extends Application {
         super.onCreate();
         sMovieApplication =this;
         webview = new WebView(MovieApplication.this);
-        MovieSharedPreferences.getInstance().setContext(MovieApplication.this);
         cachePath = getFilesDir().getAbsolutePath()
                 + APP_CACHE_DIRNAME;
         helper = DoubanMovieSearchHelper.getInstance();

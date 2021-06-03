@@ -37,4 +37,7 @@ public interface MovieDao {
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE)
     public List<MovieWrapper> queryAll();
+
+    @Query("SELECT year FROM "+TABLE.MOVIE+" GROUP BY year ORDER BY year DESC")
+    public List<String> qureyYearsGroup();
 }

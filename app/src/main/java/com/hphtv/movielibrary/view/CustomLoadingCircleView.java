@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.firelfy.util.DensityUtil;
 import com.hphtv.movielibrary.R;
 
 /**

@@ -32,6 +32,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -50,9 +51,14 @@ import com.hphtv.movielibrary.fragment.FavoriteFragment;
 import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
+import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService;
+import com.hphtv.movielibrary.service.MovieScanService2;
 import com.hphtv.movielibrary.util.LanguageUtil;
 import com.hphtv.movielibrary.view.CategoryView;
 import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
@@ -60,13 +66,17 @@ import com.hphtv.movielibrary.view.VerticalViewPager;
 import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class HomePageActivity extends AppBaseActivity<HomepageViewModel, ActivityHomepageBinding> {
     public static final String TAG = HomePageActivity.class.getSimpleName();
@@ -91,10 +101,10 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     public static final int ABOUTS_FRAGMENT = 4;
 
     //筛选条件数据
-    private List<String> mGenresData;// 电影类型数据
-    private List<String> mPubYearsData;
-    private List<Device> mDeviceList;//
-    private List<String> mSortTypeData;
+    private List<String> mConditionGenres;// 电影类型数据
+    private List<String> mConditionYears;
+    private List<Device> mConditionDevices;//
+    private List<String> mSortTypes;
     // 筛选条件
     private String mFilterDeviceName;
     private String mFilterDeviceId;
@@ -120,23 +130,25 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     private CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
 
-//    private DrawerLayout mDrawerLayout;
+    //    private DrawerLayout mDrawerLayout;
     private List<Fragment> mFramentList;
 
     private Device mCurrDevice;
     private QuickFragmentPageAdapter<Fragment> mPageAdapter;
     private VerticalViewPager mVViewPager;
-//    private FrameLayout mContentPanel;
+    //    private FrameLayout mContentPanel;
     private LeftMenuListAdapter mLeftMenuAdapter;
-    private ExecutorService mDevcieRefreshService;
+    private ExecutorService mSingleThreadPool;
 
-//    private ImageView mBackgroundImage;
+    //    private ImageView mBackgroundImage;
     private PopupWindow mPopupWindow;
     private CategoryView mCategoryView;
     private MovieScanService mScanService;
 
-
+    private DeviceDao mDeviceDao;
     private MovieDao mMovieDao;
+    private GenreDao mGenreDao;
+
     private boolean isDevChange = false;
 
     private Boolean isExit = false;
@@ -150,12 +162,12 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     @Override
     protected void processLogic() {
-        LogUtil.v(TAG,"processLogic==>OnCreate");
+        LogUtil.v(TAG, "processLogic==>OnCreate");
         if (LanguageUtil.isLanguageChanged(HomePageActivity.this, HomePageActivity.class))
             LanguageUtil.restartApp(HomePageActivity.this, HomePageActivity.class);
         mTagAll = getResources().getString(R.string.tx_all);
         mTitleArr = new String[]{getResources().getString(R.string.lb_title), getResources().getString(R.string.lb_sort_directory), getResources().getString(R.string.lb_setting)};
-        mDevcieRefreshService = Executors.newSingleThreadExecutor();
+        mSingleThreadPool = Executors.newSingleThreadExecutor();
         requestPermission();
     }
 
@@ -165,11 +177,11 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         super.onResume();
         LogUtil.v(TAG, "onResume()");
 //
-        Intent intent = new Intent(this, MovieScanService.class);
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
-        bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
+        bindService();
     }
 
     @Override
@@ -180,6 +192,15 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         LogUtil.v(TAG, "onPause()");
     }
 
+
+    private void bindService() {
+        Intent intent = new Intent(this, MovieScanService2.class);
+        bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
+
+        Intent intent2 = new Intent();
+        intent2.setClass(this, DeviceMonitorService.class);
+        bindService(intent2, mServiceConnection, Context.BIND_AUTO_CREATE);
+    }
 //    /**
 //     * 刷新设备列表成功后调用
 //     *
@@ -236,8 +257,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     @SuppressLint("WrongConstant")
     @Override
     public void onBackPressed() {
-        if (mBinding.drawlayout.isDrawerOpen(Gravity.START)) {
-            mBinding.drawlayout.closeDrawer(Gravity.START);
+        if (mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
+            mBinding.drawlayout.closeDrawer(GravityCompat.START);
         } else if (getCurrentFragment() != HOME_PAGE_FRAGMENT) {
             setCurrentFragment(HOME_PAGE_FRAGMENT);
         } else if (mScanService != null && mScanService.isRunning()) {
@@ -270,8 +291,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                 View view = getCurrentFocus();
                 LogUtil.v(TAG, "dispatchKeyEvent");
                 if (view instanceof ListView) {
-                    mBinding.drawlayout.closeDrawer(Gravity.START);
-                    mVViewPager.requestFocus();
+                    mBinding.drawlayout.closeDrawer(GravityCompat.START);
+                    mBinding.viewpager.requestFocus();
                     if (getCurrentFragment() == HOME_PAGE_FRAGMENT) {
 //                        mHomePageFragment.movieRequestFocus();
                     }
@@ -284,11 +305,33 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     private void permissionGrant() {
+        initDao();
         initView();
-        if (mDeviceList == null)
-            mDeviceList = new ArrayList<>();
-        prepareSortFilter();
-        initDevicePopUpWindow();
+//        if (mDeviceList == null)
+//            mDeviceList = new ArrayList<>();
+        Observable.just("")
+                .observeOn(Schedulers.from(mSingleThreadPool))
+                .doOnNext(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Throwable {
+                        prepareSortConditions();
+
+                    }
+                })
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Throwable {
+                        initDevicePopUpWindow();
+                    }
+                });
+    }
+
+    private void initDao() {
+        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(this);
+        mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
+        mMovieDao = movieLibraryRoomDatabase.getMovieDao();
+        mGenreDao = movieLibraryRoomDatabase.getGenreDao();
     }
 
     public void initMovie() {
@@ -306,12 +349,12 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     public List<Device> getDeviceList() {
-        return mDeviceList;
+        return mConditionDevices;
     }
 
 
     public int getCurrentFragment() {
-        return mVViewPager.getCurrentItem();
+        return mBinding.viewpager.getCurrentItem();
     }
 
     public String getFilterDeviceName() {
@@ -336,11 +379,11 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     public int getPosSortType() {
-        return mSortTypeData.indexOf(mSortType);
+        return mSortTypes.indexOf(mSortType);
     }
 
     public String getOrderBySqlStr() {
-        int pos_order = mSortTypeData.indexOf(mSortType);
+        int pos_order = mSortTypes.indexOf(mSortType);
         StringBuffer orderByBuffer = new StringBuffer();
         String asc = isSortByAsc ? "asc" : "desc";
         switch (pos_order) {
@@ -400,24 +443,23 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     /**
      * 初始化组件
      */
-    @SuppressLint("WrongConstant")
     private void initView() {
         LogUtil.v(TAG, "initView");
         mBinding.viewSortbox.setOnClickListener(v -> PopUpDeviceWindow(v));
         mBinding.openMenuBtn.setOnClickListener(v -> {
-            if (mBinding.drawlayout.isDrawerOpen(Gravity.START)) {
-                mBinding.drawlayout.closeDrawer(Gravity.START);
+            if (mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
+                mBinding.drawlayout.closeDrawer(GravityCompat.START);
             } else {
                 LogUtil.v(TAG, "mBtnMenu onClick");
-                mBinding.drawlayout.openDrawer(Gravity.START);
+                mBinding.drawlayout.openDrawer(GravityCompat.START);
             }
 
         });
 
         mBinding.openMenuBtn.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!mBinding.drawlayout.isDrawerOpen(Gravity.START)) {
+            if (!mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
                 if (hasFocus) {
-                    mBinding.drawlayout.openDrawer(Gravity.START);
+                    mBinding.drawlayout.openDrawer(GravityCompat.START);
                     mBinding.leftmenuListview.requestFocus();
                 }
             }
@@ -463,11 +505,10 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 //        mFramentList.add(mFileManagerFragment);
 //        mFramentList.add(mAboutsFragment);
 
-        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(),mFramentList, mTitleArr);
-        mVViewPager = (VerticalViewPager) findViewById(R.id.viewpager);
-        mVViewPager.setAdapter(mPageAdapter);
-        mVViewPager.setOffscreenPageLimit(4);
-        mVViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(), mFramentList, mTitleArr);
+        mBinding.viewpager.setAdapter(mPageAdapter);
+        mBinding.viewpager.setOffscreenPageLimit(4);
+        mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
@@ -515,17 +556,15 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     /**
      * 初始化菜单
      */
-    @SuppressLint("WrongConstant")
     private void initLeftMenu() {
-        List<HashMap<String, Object>> rawDataList = getLeftMenuData();
-        mLeftMenuAdapter = new LeftMenuListAdapter(HomePageActivity.this, rawDataList);
+        mLeftMenuAdapter = new LeftMenuListAdapter(HomePageActivity.this, prepareMenuData());
         mBinding.leftmenuListview.setAdapter(mLeftMenuAdapter);
         mBinding.leftmenuListview.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position < mFramentList.size()) {
                     LogUtil.v(TAG, "[onItemSelected] position=" + position);
-                    mVViewPager.setCurrentItem(position);
+                    mBinding.viewpager.setCurrentItem(position);
                     mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
                 }
             }
@@ -539,9 +578,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         mBinding.leftmenuListview.setOnItemClickListener((parent, view, position, id) -> {
             LogUtil.v(TAG, "[onItemClick] position=" + position);
             if (position < mFramentList.size()) {
-                mVViewPager.setCurrentItem(position);
+                mBinding.viewpager.setCurrentItem(position);
                 mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
-                mBinding.drawlayout.closeDrawer(Gravity.START);
+                mBinding.drawlayout.closeDrawer(GravityCompat.START);
             } else {
                 finish();
             }
@@ -549,22 +588,22 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
         mBinding.leftmenuListview.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                mBinding.drawlayout.closeDrawer(Gravity.START);
+                mBinding.drawlayout.closeDrawer(GravityCompat.START);
             }
             LogUtil.v(TAG, "[onItemClick] hasFocus=" + hasFocus);
         });
 
     }
 
-    private List<HashMap<String, Object>> getLeftMenuData() {
+    private List<HashMap<String, Object>> prepareMenuData() {
         ArrayList<HashMap<String, Object>> menuList = new ArrayList<>();
         String[] itemGroup1 = getResources().getStringArray(R.array.menu_item_group_1);
         TypedArray ta_1 = getResources().obtainTypedArray(R.array.menu_item_icon_group_1);
         for (int i = 0; i < itemGroup1.length; i++) {
-            HashMap<String, Object> tmpmap = new HashMap<>();
-            tmpmap.put(ConstData.TEXT, itemGroup1[i]);
-            tmpmap.put(ConstData.ICON, ta_1.getResourceId(i, 0));
-            menuList.add(tmpmap);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put(ConstData.TEXT, itemGroup1[i]);
+            map.put(ConstData.ICON, ta_1.getResourceId(i, 0));
+            menuList.add(map);
         }
         return menuList;
     }
@@ -581,93 +620,16 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             mPopupWindow.setWidth(LinearLayout.LayoutParams.MATCH_PARENT);
             mPopupWindow.setContentView(LayoutInflater.from(this).inflate(
                     R.layout.movie_library_sort_layout, null));
-            /*隐藏标题组*/
-//            View titleGroup = mPopupWindow.getContentView().findViewById(R.id.title_group);
-//            titleGroup.setVisibility(View.GONE);
-            if (mPubYearsData == null || mGenresData == null || mSortTypeData == null) {
-                prepareSortFilter();
-            }
-
-            int pos_years = mPubYearsData.indexOf(mFilterYear);
-            int pos_genres = mGenresData.indexOf(mFilterGenres);
-            int pos_order = mSortTypeData.indexOf(mSortType);
-            int pos_device = getCurrentSelectDevicePosition();
-            mCategoryView = (CategoryView) (mPopupWindow.getContentView().findViewById(R.id.categoryview));
-            mCategoryView.setDevices(mDeviceList).setYears(mPubYearsData).setGenres(mGenresData).create();
-            mCategoryView.setOnClickCategoryListener(mOnClickCategoryListener);
 
             mPopupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));
             mPopupWindow.setOutsideTouchable(false);
             mPopupWindow.setFocusable(true);
-
-        } else {
-            if (mCategoryView == null) {
-                mCategoryView = (CategoryView) mPopupWindow.getContentView().findViewById(R.id.categoryview);
-            }
-            Log.v(TAG, "updateCondition()");
-
-            int checkPosForGenres = mGenresData.indexOf(mFilterGenres);
-            int checkPosForDevice = getCurrentSelectDevicePosition();
-
-
-            mCategoryView.addConditionAt(mGenresData, getResources().getString(R.string.lb_sort_type), checkPosForGenres, SORT_GENRES);
-            mCategoryView.addConditionForDeviceAt(mDeviceList, getResources().getString(R.string.lb_sort_device), checkPosForDevice, SORT_DEVICE);
-
-
         }
-    }
-
-    /**
-     * 刷新设备和目录分类
-     */
-    private void refreshDeviceAndDirectoryPopUpWindow() {
-        if (mCategoryView != null) {
-            int checkPosForDevice = getCurrentSelectDevicePosition();
-            Log.v(TAG, "refreshDeviceAndDirectoryPopUpWindow +" + checkPosForDevice);
-
-            mCategoryView.addConditionForDeviceAt(mDeviceList, getResources().getString(R.string.lb_sort_device), checkPosForDevice, SORT_DEVICE);
-
-        }
+        mCategoryView = (CategoryView) (mPopupWindow.getContentView().findViewById(R.id.categoryview));
+        mCategoryView.setDevices(mConditionDevices).setYears(mConditionYears).setGenres(mConditionGenres).create();
+        mCategoryView.setOnClickCategoryListener(mOnClickCategoryListener);
 
     }
-
-
-    /**
-     * 筛选菜单点击事件
-     *
-     * @param group
-     * @param checkedId
-     */
-    private void CategeoryViewEvent(RadioGroup group, int checkedId) {
-        LogUtil.v(TAG, "mOnClickCategoryListener");
-        int gTag = (Integer) group.getTag();
-        RadioButton button = (RadioButton) group
-                .findViewById(checkedId);
-        int index = 0;
-        switch (gTag) {
-            case CategoryView.RADIOGROUP_SORT_SPECIAL_DIR:
-                getSortCondition();
-                if (isDevChange) {
-                    initMovie();
-                    isDevChange = false;
-                }
-                break;
-            case CategoryView.RADIOGROUP_SORT_CONDITION:
-                getSortCondition();
-                mHomePageFragment.initMovie();
-                break;
-            case CategoryView.RADIOGROUP_SORT_ORDER:
-                index = group.indexOfChild(button);//获取被点击排序条件的索引
-                if (mSortType.equals(button.getText().toString().substring(0, button.getText().toString().length() - 1))) {
-                    isSortByAsc = !isSortByAsc;
-                }//点击同一个排序条件则只切换排序方式
-                getSortWays(index);
-//                getSortCondition();
-                mHomePageFragment.initMovie();
-                break;
-        }
-    }
-
 
     /**
      * 初始化Fragment
@@ -696,159 +658,20 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0);
     }
 
-
-    /**
-     * 设置筛选条件
-     */
-    private void getSortCondition() {
-        //所属设备条件
-        RelativeLayout device_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_DEVICE);
-        RadioGroup device_group = (RadioGroup) device_ll
-                .findViewById(R.id.container);
-        RadioButton device_check_button = (RadioButton) device_ll
-                .findViewById(device_group.getCheckedRadioButtonId());
-        int device_index = device_group.indexOfChild(device_check_button);//获取备选条件的index
-        if (device_index == 0 && device_check_button.getText().equals(mTagAll)) {//0为全部，不做处理
-            mFilterDeviceName = null;
-            mFilterDeviceId = "";
-            if (mCurrDevice != null)
-                isDevChange = true;
-            mCurrDevice = null;
-        } else {//传递路径提供给数据库进行查询
-            mFilterDeviceId = mDeviceList.get(device_index - 1).id;
-            mFilterDeviceName = mDeviceList.get(device_index - 1).name;
-            if (mCurrDevice == null || !mCurrDevice.id.equals(mDeviceList.get(device_index - 1).id) )
-                isDevChange = true;
-            mCurrDevice = mDeviceList.get(device_index - 1);
-
-        }
-
-
-        //年份条件
-        RelativeLayout year_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_YEAR);
-        RadioGroup year_group = (RadioGroup) year_ll
-                .findViewById(R.id.container);
-        RadioButton year_check_button = (RadioButton) year_ll
-                .findViewById(year_group.getCheckedRadioButtonId());
-        mFilterYear = year_check_button.getText().toString();
-
-        RelativeLayout genres_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_GENRES);
-        RadioGroup genres_group = (RadioGroup) genres_ll
-                .findViewById(R.id.container);
-        RadioButton genres_check_button = (RadioButton) genres_ll
-                .findViewById(genres_group.getCheckedRadioButtonId());
-        mFilterGenres = genres_check_button.getText().toString();
-
-        mPreferences.setDeviceId(mFilterDeviceId);
-        mPreferences.setDeviceName(mFilterDeviceName);
-        mPreferences.setYear(mFilterYear);
-        mPreferences.setGenres(mFilterGenres);
-        //排序方式
-        getSortWays();
-    }
-
-    private void getSortWays() {
-        getSortWays(-1);
-    }
-
-
-    /**
-     * 获取排序条件
-     *
-     * @param i RadioGroup中被touch的子组件的索引 -1:没有改变order时填-1
-     */
-    private void getSortWays(int i) {
-        Log.v(TAG, "getSortWays(" + i + ")");
-        if (i >= 0) {//获取新的排序条件
-            mSortType = mSortTypeData.get(i);
-            Log.v(TAG, "getSortTag(String s)==" + mSortType + " asc=" + isSortByAsc);
-        } else {
-            // 排序方式没有改变时执行
-            RelativeLayout order_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_ORDER);
-            RadioGroup order_group = (RadioGroup) order_ll
-                    .findViewById(R.id.container);
-            RadioButton order_check_button = (RadioButton) order_ll
-                    .findViewById(order_group.getCheckedRadioButtonId());
-            i = order_group.indexOfChild(order_check_button);// 获取被选择的radiobutton的索引
-            if (i == -1) {
-                i = 0;
-            }
-            mSortType = mSortTypeData.get(i);
-        }
-
-
-        mPreferences.setSortType(mSortType);
-        mPreferences.setSortByAsc(isSortByAsc);
-        updateSortText(i);
-    }
-
-
     /**
      * 获取缓存分类条件和获取分类信息列表
      */
-    private void prepareSortFilter() {
-        if (mPreferences != null) {
-            isSortByAsc = mPreferences.isSortByAsc();
-            mSortType = mPreferences.getSortType();
-            mFilterGenres = mPreferences.getGenres();
-            mFilterYear = mPreferences.getYear();
-            mFilterDeviceId = mPreferences.getDeviceId();
-            mFilterDeviceName = mPreferences.getDeviceName();
-        }
-        if (mSortTypeData == null) {
-            mSortTypeData = new ArrayList<>();
-            mSortTypeData.add(getResources().getString(R.string.order_name));
-            mSortTypeData.add(getResources().getString(R.string.order_score));
-            mSortTypeData.add(getResources().getString(R.string.order_type));
-            mSortTypeData.add(getResources().getString(R.string.order_time));
-        }
-        if (mMovieDao == null)
-            mMovieDao = new MovieDao(this);
-        mGenresData = mMovieDao.getAllGenres();
-        mPubYearsData = fillYearsFilter();
+    private void prepareSortConditions() {
+            mConditionDevices = mDeviceDao.qureyAll();
+            mConditionGenres = mGenreDao.queryAllGenres();
+            mConditionYears = mMovieDao.qureyYearsGroup();
+            mSortTypes = new ArrayList<>();
+            mSortTypes.add(getResources().getString(R.string.order_name));
+            mSortTypes.add(getResources().getString(R.string.order_score));
+            mSortTypes.add(getResources().getString(R.string.order_type));
+            mSortTypes.add(getResources().getString(R.string.order_time));
     }
 
-    /**
-     * 获取筛选年份
-     *
-     * @return
-     */
-    private List<String> fillYearsFilter() {
-        List<String> years = new ArrayList<String>();
-
-        Calendar c = Calendar.getInstance();
-        int cY = c.get(Calendar.YEAR);
-//        int cY = 2020;
-        int tmp = 15;
-        int count = ((cY - 1990 + 1) / 5);
-        int remain = (cY - 1990 + 1) % 5;
-        //最近5-9年;
-        for (int i = 0; i < remain; i++) {
-            years.add(String.valueOf(cY - i));
-        }
-        //最近15年 每5年一组
-        for (int i = 0; i < 3; i++) {
-            int startYear = cY - remain + 1 - (i + 1) * 5;
-            int endYear = cY - remain + 1 - (i + 1) * 5 + 4;
-            years.add(startYear + " - " + endYear);
-        }
-
-        if ((cY - remain - tmp +1) % 10 > 0) {
-            int startYear = cY - remain + 1 - 4 * 5;
-            int endYear = cY - remain + 1 - 4 * 5 + 4;
-            years.add(startYear + " - " + endYear);
-            tmp += 5;
-        }
-
-        //每10年一组
-        for (int k = cY - remain - tmp; k >= 1990; k = k - 10) {
-            int startYear = k - 9;
-            int endYear = k;
-            years.add(startYear + " - " + endYear);
-        }
-
-        return years;
-    }
 
     /**
      * 更新筛选文字以及根据索引更新Order RadioGroup的子组件的文字.
@@ -887,7 +710,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                 .findViewById(R.id.container);
         for (int j = 0; j < order_group.getChildCount(); j++) {
             ((RadioButton) order_group.getChildAt(j))
-                    .setText(mSortTypeData.get(j));
+                    .setText(mSortTypes.get(j));
         }//重置排序条件的文字（清除排序方式的箭头）
         RadioButton order_check_button = (RadioButton) order_group
                 .getChildAt(i);
@@ -903,12 +726,12 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      */
     private int getCurrentSelectDevicePosition() {
         int pos = -1;
-        if (mFilterDeviceId .equals("") || mFilterDeviceName == null) {
+        if (mFilterDeviceId.equals("") || mFilterDeviceName == null) {
             mCurrDevice = null;
             return pos;
         }
-        for (int i = 0; i < mDeviceList.size(); i++) {
-            if (mDeviceList.get(i).id.equals(mFilterDeviceId)) {
+        for (int i = 0; i < mConditionDevices.size(); i++) {
+            if (mConditionDevices.get(i).id.equals(mFilterDeviceId)) {
                 pos = i;
                 break;
             }
@@ -917,14 +740,13 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
 
-
     /**
      * 切换Fragment
      *
      * @param pos
      */
     private void setCurrentFragment(int pos) {
-        mVViewPager.setCurrentItem(pos, true);
+        mBinding.viewpager.setCurrentItem(pos, true);
         mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[pos].toString());
     }
 
@@ -971,8 +793,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
 
-
-
     /**
      * 升级设备文字
      */
@@ -989,42 +809,28 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     CategoryView.OnClickCategoryListener mOnClickCategoryListener = new CategoryView.OnClickCategoryListener() {
         @Override
-        public void click(RadioGroup group, int checkedId) {
-            CategeoryViewEvent(group, checkedId);
+        public void onSortChange(String sortType, boolean isDesc) {
+
         }
 
         @Override
-        public void onKeyPress(KeyEvent event, CategoryView view) {
-            if ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    try {
-                        RadioGroup parent = (RadioGroup) view.getChildAt(SORT_ORDER).findViewById(R.id.container);
-                        for (int i = 0; i < parent.getChildCount(); i++) {
-                            RadioButton focus_button = (RadioButton) parent.getChildAt(i);
-                            if (focus_button.isFocused()) {
-                                CategeoryViewEvent(parent, focus_button.getId());
-                            }
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+        public void onConditionChange(Device device, String year, String genre) {
 
-                }
-            }
         }
+
     };
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mScanService = ((MovieScanService.ScanBinder) service).getService();
-            LogUtil.v(TAG, "on servcie" + name + " connected!!");
+            name.getClassName().equalsIgnoreCase(MovieScanService2.class.getCanonicalName());
+            LogUtil.v(TAG, "on servcie" + name.getClassName() + " connected!!");
+
+//            mScanService = ((MovieScanService.ScanBinder) service).getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            LogUtil.v(TAG, "on scan servcie disconnected!!");
-            mScanService = null;
         }
     };
 
@@ -1036,5 +842,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             }
         }
     };
+
 
 }

@@ -12,6 +12,8 @@ import android.os.storage.StorageVolume;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.firelfy.util.LogUtil;
+import com.firelfy.util.StorageList;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -19,7 +21,6 @@ import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.FileScanThread;
-import com.hphtv.movielibrary.util.StorageList;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

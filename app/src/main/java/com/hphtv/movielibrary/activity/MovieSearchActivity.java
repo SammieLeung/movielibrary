@@ -20,14 +20,14 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
-import com.hphtv.movielibrary.sqlite.bean.Directory;
-import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.LocalSearchAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.decoration.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
@@ -149,7 +149,7 @@ public class MovieSearchActivity extends Activity {
                 Intent intent = new Intent(mContext,
                         MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("wrapper", wrapper);
+//                bundle.putSerializable("wrapper", wrapper);
                 bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 0);
@@ -252,34 +252,34 @@ public class MovieSearchActivity extends Activity {
 
 
     private void initMovie() {
-        startLoading();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                boolean isShowEncrypted = mApp.isShowEncrypted();
-                mWrapperList = new ArrayList<>();
-                Cursor cursor = null;
-                if (isShowEncrypted) {
-                    cursor = mMovieWrapperDao.selectAll();
-                } else {
-                    Cursor dirCursor = mDirDao.select("is_encrypted=?", new String[]{"0"}, null);
-                    if (dirCursor.getCount() > 0) {
-                        List<Directory> directories = mDirDao.parseList(dirCursor);
-                        StringBuffer buffer = new StringBuffer();
-                        buffer.append("(");
-                        for (Directory t_dir : directories) {
-                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
-                        }
-                        buffer.replace(buffer.lastIndexOf("or"), buffer.length(), ")");
-                        cursor = mMovieWrapperDao.select(buffer.toString(), null, null);
-                    }
-                }
-                if (cursor != null && cursor.getCount() > 0) {
-                    mWrapperList = mMovieWrapperDao.parseList(cursor);
-                }
-                stopLoading();
-            }
-        }).start();
+//        startLoading();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                boolean isShowEncrypted = mApp.isShowEncrypted();
+//                mWrapperList = new ArrayList<>();
+//                Cursor cursor = null;
+//                if (isShowEncrypted) {
+//                    cursor = mMovieWrapperDao.selectAll();
+//                } else {
+//                    Cursor dirCursor = mDirDao.select("is_encrypted=?", new String[]{"0"}, null);
+//                    if (dirCursor.getCount() > 0) {
+//                        List<Directory> directories = mDirDao.parseList(dirCursor);
+//                        StringBuffer buffer = new StringBuffer();
+//                        buffer.append("(");
+//                        for (Directory t_dir : directories) {
+//                            buffer.append("(dir_ids like '%" + t_dir.getId() + "%' or dir_ids like '%" + t_dir.getId() + "]%') or ");
+//                        }
+//                        buffer.replace(buffer.lastIndexOf("or"), buffer.length(), ")");
+//                        cursor = mMovieWrapperDao.select(buffer.toString(), null, null);
+//                    }
+//                }
+//                if (cursor != null && cursor.getCount() > 0) {
+//                    mWrapperList = mMovieWrapperDao.parseList(cursor);
+//                }
+//                stopLoading();
+//            }
+//        }).start();
 
     }
 
@@ -289,13 +289,13 @@ public class MovieSearchActivity extends Activity {
         }
 
         //*
-        MyPinyinParseAndMatchUtil pinyinParseAndMatchUtil = MyPinyinParseAndMatchUtil.getInstance();
-        pinyinParseAndMatchUtil.initBaseDatas(mWrapperList);
-        return pinyinParseAndMatchUtil.match(keyword);
+//        MyPinyinParseAndMatchUtil pinyinParseAndMatchUtil = MyPinyinParseAndMatchUtil.getInstance();
+//        pinyinParseAndMatchUtil.initBaseDatas(mWrapperList);
+//        return pinyinParseAndMatchUtil.match(keyword);
         /*/
         return MyPinyinParseAndMatchUtil.match(keyword, MovieSearchActivity.this);
         //*/
-
+        return null;
     }
 
     private void refreshMovie(List<MovieWrapper> wrappers) {

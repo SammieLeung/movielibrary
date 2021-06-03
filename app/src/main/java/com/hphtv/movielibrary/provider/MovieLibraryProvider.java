@@ -61,7 +61,6 @@ public class MovieLibraryProvider extends ContentProvider {
         mVideoFileDao = new VideoFileDao(getContext());
         mWrapperDao = new MovieWrapperDao(getContext());
         mFavoriteDao = new FavoriteDao(getContext());
-        MovieSharedPreferences.getInstance().setContext(getContext());
         matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(prefix, "wrapper", ALL_MOVIE_WRAPPER);
         matcher.addURI(prefix, "movie_info/#", MOVIE_INFO);

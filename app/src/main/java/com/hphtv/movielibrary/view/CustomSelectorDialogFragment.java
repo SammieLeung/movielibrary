@@ -1,13 +1,14 @@
 package com.hphtv.movielibrary.view;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.fragment.app.DialogFragment;
 
 import com.hphtv.movielibrary.R;
 

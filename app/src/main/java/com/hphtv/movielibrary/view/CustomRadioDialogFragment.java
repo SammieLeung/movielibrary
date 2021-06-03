@@ -19,8 +19,10 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.hphtv.movielibrary.sqlite.bean.VideoFile;
+import com.firelfy.util.DensityUtil;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 
 import java.util.ArrayList;
 

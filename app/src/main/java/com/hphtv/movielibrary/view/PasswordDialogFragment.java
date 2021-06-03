@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.view;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -14,6 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.fragment.app.DialogFragment;
+
+import com.firelfy.util.DensityUtil;
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.R;
 
 import java.util.ArrayList;
