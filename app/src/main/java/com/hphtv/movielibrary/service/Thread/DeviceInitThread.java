@@ -47,6 +47,7 @@ public class DeviceInitThread extends Thread {
 //        }
         LogUtil.v(TAG, "=============>挂载设备:");
         String internelStorage = StorageList.getInstance().getFlashStoragePath();
+        LogUtil.v("internelStorage = "+internelStorage);
         List<String> allCardPaths = StorageList.getInstance().getSdCardPaths();
         List<String> allUsbPaths = StorageList.getInstance().getUSBPaths();
 

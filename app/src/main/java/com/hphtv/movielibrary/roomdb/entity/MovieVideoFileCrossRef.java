@@ -8,6 +8,7 @@ import androidx.room.Index;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
 /**
+ * 以后可能出现中、英两部电影对应一个视频。
  * author: Sam Leung
  * date:  2021/5/27
  */

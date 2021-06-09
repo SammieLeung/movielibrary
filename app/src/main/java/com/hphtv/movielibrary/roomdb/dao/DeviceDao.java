@@ -29,7 +29,7 @@ public interface DeviceDao {
     public void updateDevice(Device... devices);
 
     @Query("SELECT * FROM " + TABLE.DEVICE + " WHERE local_path =:mountpath")
-    public List<Device> querybyMountPath(String mountpath);
+    public Device querybyMountPath(String mountpath);
 
     @Query("SELECT * FROM "+TABLE.DEVICE)
     public List<Device> qureyAll();

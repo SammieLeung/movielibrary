@@ -33,8 +33,11 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE+" WHERE device_id in (:device_ids)")
-    public List<VideoFile> queryAllByIds(List<String> device_ids);
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_id in (:device_ids)")
+    public List<VideoFile> queryAllByIds(String[] device_ids);
+
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_id in (:device_ids) AND is_scanned=0")
+    public List<VideoFile> queryAllNotScanedByIds(String... device_ids);
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);

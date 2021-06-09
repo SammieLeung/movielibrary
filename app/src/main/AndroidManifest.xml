@@ -65,12 +65,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
-        <receiver android:name=".BootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-                <category android:name="android.intent.category.LAUNCHER"></category>
-            </intent-filter>
-        </receiver>
+<!--        <receiver android:name=".BootReceiver">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.BOOT_COMPLETED"></action>-->
+<!--                <category android:name="android.intent.category.LAUNCHER"></category>-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
 
         <activity
             android:name=".activity.FolderManagerActivity"

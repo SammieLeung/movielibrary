@@ -7,10 +7,12 @@ import android.os.IBinder;
 import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firelfy.util.EditorDistance;
 import com.firelfy.util.LogUtil;
+import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
@@ -34,6 +36,7 @@ import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
+import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -60,7 +63,6 @@ public class MovieScanService2 extends Service {
 
     private ExecutorService mSearchMovieExecutor;
     private ExecutorService mMovieDetailExecutor;
-    private final CompositeDisposable disposables = new CompositeDisposable();
 
     private MovieDao mMovieDao;
     private ActorDao mActorDao;
@@ -71,6 +73,9 @@ public class MovieScanService2 extends Service {
     private MovieGenreCrossRefDao mMovieGenreCrossRefDao;
     private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
     private VideoFileDao mVideoFileDao;
+    private boolean isScanning;
+    private int count;
+    private int offset;
 
     @Override
     public void onCreate() {
@@ -83,7 +88,6 @@ public class MovieScanService2 extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        disposables.clear();
     }
 
     private void init() {
@@ -124,15 +128,35 @@ public class MovieScanService2 extends Service {
         }
     }
 
-    public void start(VideoFile... videoFiles) {
-        for (VideoFile videoFile : videoFiles) {
-            startSearch(videoFile);
+    public boolean start(VideoFile... videoFiles) {
+        if (isScanning)
+            return false;
+        synchronized (this) {
+            if (isScanning)
+                return false;
+            isScanning = true;
+            count=videoFiles.length;
+            offset=0;
+            for (VideoFile videoFile : videoFiles) {
+                startSearch(videoFile);
+            }
+            return true;
         }
     }
 
-    public void start(List<VideoFile> videoFileList) {
-        for (VideoFile videoFile : videoFileList) {
-            startSearch(videoFile);
+    public boolean start(List<VideoFile> videoFileList) {
+        if (isScanning)
+            return false;
+        synchronized (this) {
+            if (isScanning)
+                return false;
+            isScanning = true;
+            count=videoFileList.size();
+            offset=0;
+            for (VideoFile videoFile : videoFileList) {
+                startSearch(videoFile);
+            }
+            return true;
         }
     }
 
@@ -161,8 +185,7 @@ public class MovieScanService2 extends Service {
 
     private void startSearch(VideoFile videoFile) {
         MovieSupplier movieSupplier = new MovieSupplier(videoFile);
-
-        disposables.add(Observable.defer(movieSupplier)
+        RxJavaGcManager.getInstance().addDisposable(Observable.defer(movieSupplier)
                 .subscribeOn(Schedulers.from(mSearchMovieExecutor))
                 .observeOn(Schedulers.from(mMovieDetailExecutor))
                 .flatMap((Function<MovieNameInfo, ObservableSource<MtimeSearchRespone>>) movieNameInfo -> {
@@ -209,7 +232,8 @@ public class MovieScanService2 extends Service {
                         LogUtil.v("onNext " + Thread.currentThread().getName());
                         LogUtil.v("Result:origin" + videoFile.filename);
                         LogUtil.v("Result:==>" + movieWrapper.movie.title);
-
+                        offset++;
+                        //TODO 发送广播
                     }
 
                     @Override
@@ -219,7 +243,12 @@ public class MovieScanService2 extends Service {
 
                     @Override
                     public void onComplete() {
-
+                        if(offset==count){
+                            //扫描结束
+                            Intent intent=new Intent();
+                            intent.setAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
+                            LocalBroadcastManager.getInstance(MovieScanService2.this).sendBroadcast(intent);
+                        }
                     }
                 })
         );
@@ -247,7 +276,7 @@ public class MovieScanService2 extends Service {
         movieWrapper.movie.id = movie_id;
 
         for (long genre_id : genre_ids) {
-            if(genre_id!=-1) {
+            if (genre_id != -1) {
                 MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
                 movieGenreCrossRef.genreId = genre_id;
                 movieGenreCrossRef.id = movie_id;
@@ -256,7 +285,7 @@ public class MovieScanService2 extends Service {
         }
 
         for (long actor_id : actor_ids) {
-            if(actor_id!=-1) {
+            if (actor_id != -1) {
                 MovieActorCrossRef movieActorCrossRef = new MovieActorCrossRef();
                 movieActorCrossRef.actorId = actor_id;
                 movieActorCrossRef.id = movie_id;
@@ -264,7 +293,7 @@ public class MovieScanService2 extends Service {
             }
         }
 
-        if(director_id!=-1) {
+        if (director_id != -1) {
             MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
             movieDirectorCrossRef.directorId = director_id;
             movieDirectorCrossRef.id = movie_id;

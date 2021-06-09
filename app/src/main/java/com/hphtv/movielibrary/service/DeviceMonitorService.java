@@ -5,10 +5,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
+import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -23,11 +28,14 @@ import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.FileScanThread;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -51,6 +59,7 @@ public class DeviceMonitorService extends Service {
 
     private DeviceDao mDeviceDao;
     private VideoFileDao mVideoFileDao;
+    private StorageManager mStorageManager;
 
 
     @Nullable
@@ -83,7 +92,8 @@ public class DeviceMonitorService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mDeviceMountReceiver);
+        unRegister();
+
     }
 
     private void initDb() {
@@ -96,11 +106,24 @@ public class DeviceMonitorService extends Service {
      * 注册广播
      */
     private void bindRegisterReceivers() {
-        IntentFilter newFilter = new IntentFilter();
-        newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        newFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
-        newFilter.addDataScheme("file");
-        registerReceiver(mDeviceMountReceiver, newFilter);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            mStorageManager = (StorageManager) getApplication().getSystemService(Context.STORAGE_SERVICE);
+            mStorageManager.registerStorageVolumeCallback(getMainExecutor(), mStorageVolumeCallback);
+        } else {
+            IntentFilter newFilter = new IntentFilter();
+            newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+            newFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
+            newFilter.addDataScheme("file");
+            registerReceiver(mDeviceMountReceiver, newFilter);
+        }
+    }
+
+    private void unRegister(){
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+            mStorageManager.unregisterStorageVolumeCallback(mStorageVolumeCallback);
+        } else {
+            unregisterReceiver(mDeviceMountReceiver);
+        }
     }
 
     //初始化线程池
@@ -131,7 +154,6 @@ public class DeviceMonitorService extends Service {
         mDeviceMountExecutor.execute(new DeviceMountThread(deviceName, deviceType, localPath, isFromNetwork, networkPath, mountState));
     }
 
-
     /**
      * 接受设备挂载广播
      */
@@ -139,18 +161,20 @@ public class DeviceMonitorService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            LogUtil.v(DeviceMonitorService.class.getSimpleName(), "mDeviceMountReceiver action:" + action);
             switch (action) {
                 case Intent.ACTION_MEDIA_MOUNTED:
                 case Intent.ACTION_MEDIA_UNMOUNTED:
                     StorageVolume storageVolume = intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
                     String state_txt = storageVolume.getState();
                     int state = state_txt.equals(ConstData.DeviceMountState.MOUNTED_TEXT) ? ConstData.DeviceMountState.MOUNTED : ConstData.DeviceMountState.UNMOUNTED;
+                    //Android 11以上
                     try {
                         Class clazz = storageVolume.getClass();
                         Method meth = clazz.getDeclaredMethod("getPath");
                         meth.setAccessible(true);
-                        String filepath = (String) meth.invoke(storageVolume);
-                        executeOnMountThread(storageVolume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, filepath, false, "", state);
+                        String path = (String) meth.invoke(storageVolume);
+                        executeOnMountThread(storageVolume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
@@ -161,8 +185,32 @@ public class DeviceMonitorService extends Service {
                         e.printStackTrace();
                     }
                     break;
-
             }
+        }
+    };
+
+    StorageManager.StorageVolumeCallback mStorageVolumeCallback = new StorageManager.StorageVolumeCallback() {
+        @Override
+        public void onStateChanged(@NonNull StorageVolume volume) {
+            super.onStateChanged(volume);
+            String state_txt = volume.getState();
+            int state = state_txt.equals(ConstData.DeviceMountState.MOUNTED_TEXT) ? ConstData.DeviceMountState.MOUNTED : ConstData.DeviceMountState.UNMOUNTED;
+            if (state == ConstData.DeviceMountState.MOUNTED) {
+                executeOnMountThread(volume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, volume.getDirectory().getPath(), false, "", state);
+            }else {
+                //拔出U盘的时候volume.getDirectory()返回的是null，所以被迫使用反射获取mPath的值
+                try {
+                    Class clazz = volume.getClass();
+                    Field field_mPath = clazz.getDeclaredField("mPath");
+                    field_mPath.setAccessible(true);
+                    File fpath = (File) field_mPath.get(volume);
+                    String path=fpath.toString();
+                    executeOnMountThread(volume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            LogUtil.v("onStateChanged name " + volume.getMediaStoreVolumeName() + " " + volume.getState());
         }
     };
 
@@ -204,11 +252,9 @@ public class DeviceMonitorService extends Service {
             broadIntent.putExtra(ConstData.DeviceMountMsg.MOUNT_DEVICE_STATE, mMountState);
             broadIntent.putExtra(ConstData.DeviceMountMsg.IS_FROM_NETWORK, false);//TODO hard code
             //设备状态为mounted则将设备信息入库，并扫描设备文件。
-            List<Device> deviceList = mDeviceDao.querybyMountPath(mMountPath);
-            if (deviceList != null && deviceList.size() > 0) {
-                for (Device device : deviceList) {
-                    mDeviceDao.deleteDevices(device);//删除设备
-                }
+            Device device_db = mDeviceDao.querybyMountPath(mMountPath);
+            if (device_db != null) {
+                mDeviceDao.deleteDevices(device_db);//删除设备
             }
             if (mMountState == ConstData.DeviceMountState.MOUNTED) {
                 Device device = buildDeviceFromPath(mMountPath, mNetworkPath, mDeviceType, mDeviceName);//生成一个基础设备
@@ -222,12 +268,22 @@ public class DeviceMonitorService extends Service {
                 broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_UP);
                 broadIntent.putExtra(ConstData.DeviceMountMsg.DEVICE_ID, device.id);
                 //启动文件扫描线程。
-                mFileScanExecutor.execute(new FileScanThread(DeviceMonitorService.this, device));
+                Future<Boolean> scan = mFileScanExecutor.submit(new FileScanThread(DeviceMonitorService.this, device));
+                try {
+                    if (scan.get()) {
+                        LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(broadIntent);
+                    }
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             } else {
                 ConstData.devicePathIDs.remove(mMountPath);
                 broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_DOWN);
+                LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(broadIntent);
             }
-            LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(broadIntent);
+
         }
 
 

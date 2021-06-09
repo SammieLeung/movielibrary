@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 
 /**
@@ -26,7 +27,7 @@ import java.util.List;
  * @date 18-12-17
  * 扫描文件设备线程
  */
-public class FileScanThread extends Thread {
+public class FileScanThread implements Callable<Boolean> {
     public static final String TAG = FileScanThread.class.getSimpleName();
     private DeviceMonitorService mService;
     private String mPath;
@@ -61,8 +62,7 @@ public class FileScanThread extends Thread {
     }
 
     @Override
-    public void run() {
-        super.run();
+    public Boolean call() throws Exception {
         int videoCount = 0;
         while (!mScanDirectories.isEmpty()) {
             boolean nomediaFlag = false;
@@ -120,6 +120,7 @@ public class FileScanThread extends Thread {
         }
         //队列结束保存文件信息入库
         saveVideoFileInfotoDB();
+        return true;
     }
 
 
@@ -145,7 +146,6 @@ public class FileScanThread extends Thread {
         if (startIndex >= path.length())
             return null;
         String tailEx = path.substring(startIndex).toLowerCase();
-        LogUtil.v(tailEx + " = " + Arrays.binarySearch(ConstData.VIDEO_SUFFIX, tailEx));
         if (Arrays.binarySearch(ConstData.VIDEO_SUFFIX, tailEx) >= 0) {
             String fileName = file.getName();
             VideoFile videoFile = new VideoFile();
@@ -162,7 +162,6 @@ public class FileScanThread extends Thread {
      * 从数据库将数据读入扫描目录队列
      */
     private void loadScanDirectoriesFromDB() {
-        Log.v(TAG, "loadScanDirectoriesFromDB===>");
         List<ScanDirectory> dbScanDirectories = mScanDirectoryDao.queryScanDirectories(mDevice.id, MAX_DIRS - mScanDirectories.size());
         if (dbScanDirectories != null && dbScanDirectories.size() > 0) {
             for (ScanDirectory itemDirectory : dbScanDirectories) {
@@ -197,6 +196,5 @@ public class FileScanThread extends Thread {
         }
 
     }
-
 
 }

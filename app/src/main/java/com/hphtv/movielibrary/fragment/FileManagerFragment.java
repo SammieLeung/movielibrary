@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.firelfy.util.Base64Helper;
 import com.firelfy.util.Md5Utils;
 import com.firelfy.util.SharePreferencesTools;
+import com.hphtv.movielibrary.service.MovieScanService2;
 import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.activity.FolderManagerActivity;
 import com.hphtv.movielibrary.activity.HomePageActivity;
@@ -49,7 +50,7 @@ public class FileManagerFragment extends Fragment {
     private RelativeLayout rv_encrypted_setting;
     private HomePageActivity context;
     private MovieApplication mApp;
-    MovieScanService scanService;
+    MovieScanService2 scanService;
     private SharePreferencesTools preferences;
     private String md5Password;
 

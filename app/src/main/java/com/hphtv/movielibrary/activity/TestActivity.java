@@ -98,7 +98,8 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     ServiceConnection mServiceConnection=new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-
+            DeviceMonitorService deviceMonitorService=((DeviceMonitorService.MonitorBinder)service).getService();
+            deviceMonitorService.scanDevices();
         }
 
         @Override
@@ -117,7 +118,8 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 public void run() {
                     VideoFileDao videoFileDao= MovieLibraryRoomDatabase.getDatabase(movieScanService2).getVideoFileDao();
                    List<VideoFile> videoFiles= videoFileDao.queryAll();
-                   movieScanService2.start(videoFiles);
+                  boolean res= movieScanService2.start(videoFiles);
+                  LogUtil.v("scanresult "+res);
 
                 }
             }).start();
@@ -128,4 +130,8 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     };
+
+    private void TestMediaStore(){
+
+    }
 }

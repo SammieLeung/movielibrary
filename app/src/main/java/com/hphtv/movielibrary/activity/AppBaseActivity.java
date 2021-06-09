@@ -31,7 +31,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     public static final String TAG = AppBaseActivity.class.getSimpleName();
     protected VDB mBinding;
     protected VM mViewModel;
-    protected DeviceMonitorService mDeviceMonitorService;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -93,30 +92,10 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
 
 
 
-    private void attachServices() {
-        Intent intent = new Intent(this, DeviceMonitorService.class);
-        bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
-    }
-
-    private void unBindServices() {
-        unbindService(mServiceConnection);
-    }
 
     public MovieApplication getApp() {
         return MovieApplication.getInstance();
     }
 
-    ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            DeviceMonitorService.MonitorBinder binder = (DeviceMonitorService.MonitorBinder) service;
-            mDeviceMonitorService = binder.getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mDeviceMonitorService = null;
-        }
-    };
 
 }

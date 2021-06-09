@@ -132,7 +132,7 @@ public class CategoryView extends LinearLayout implements
         mUIHandler.post(() -> {
             addConditionAt(mDevices, mCurDevPos, 1, obj -> ((Device) obj).name);
             addConditionAt(mYears, mCurYearPos, 2, null);
-            addConditionAt(mGenres, mCurGenrePos, 3, obj -> ((Genre) obj).name);
+            addConditionAt(mGenres, mCurGenrePos, 3,null);
             addSort();
             addOrder();
         });
@@ -194,6 +194,7 @@ public class CategoryView extends LinearLayout implements
         View line = view.findViewById(R.id.line);
         line.setVisibility(View.GONE);
         mSortRadioGroup = (RadioGroup) view.findViewById(R.id.container);
+        mSortRadioGroup.removeAllViews();
         RadioButton bt;
 
         if (mSortFilters != null && mSortFilters.size() > 0) {

@@ -191,13 +191,6 @@ public class ConstData {
 
     }
 
-    /**
-     * 广播
-     */
-    public interface BoardCastMsg {
-        String ACTION_DEVICE_LIST_REFRESH = "action_device_list_refresh";
-    }
-
     //8.-----------for adapter-------------------
     public interface CardViewType {
         int VIEWTYPE_SIMPLE = 0;
@@ -267,6 +260,10 @@ public class ConstData {
          * 重新扫描设备
          */
         String RESCAN_DEVICE="com.rockchips.mediacenter.rescan_device";
+
+        String MOVIE_SCRAP_FINISH="action.movie.scrap.finish";
+        String MOVIE_GET_CATEGORY_FINISH="action.get.category.finish";
+
     }
 
 

@@ -23,6 +23,7 @@ import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.MovieActorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieVideoFileCrossRef;
@@ -38,7 +39,7 @@ import org.fourthline.cling.support.model.container.MovieGenre;
 
 @Database(entities = {Actor.class, Device.class, Director.class, Genre.class, Movie.class, MovieActorCrossRef.class,
         MovieDirectorCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
-        ScanDirectory.class, VideoFile.class}, version = 1)
+        ScanDirectory.class, VideoFile.class},views = {MovieDataView.class},version = 1)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
 

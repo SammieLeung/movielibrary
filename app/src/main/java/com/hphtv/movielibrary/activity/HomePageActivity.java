@@ -51,18 +51,13 @@ import com.hphtv.movielibrary.fragment.FavoriteFragment;
 import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
-import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
-import com.hphtv.movielibrary.roomdb.dao.GenreDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.service.MovieScanService2;
-import com.hphtv.movielibrary.util.LanguageUtil;
+import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.view.CategoryView;
 import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
-import com.hphtv.movielibrary.view.VerticalViewPager;
 import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
 
 import java.util.ArrayList;
@@ -70,13 +65,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class HomePageActivity extends AppBaseActivity<HomepageViewModel, ActivityHomepageBinding> {
     public static final String TAG = HomePageActivity.class.getSimpleName();
@@ -100,11 +94,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     public static final int FILE_MANAGER_FRAGMENT = 3;
     public static final int ABOUTS_FRAGMENT = 4;
 
-    //筛选条件数据
-    private List<String> mConditionGenres;// 电影类型数据
-    private List<String> mConditionYears;
-    private List<Device> mConditionDevices;//
-    private List<String> mSortTypes;
     // 筛选条件
     private String mFilterDeviceName;
     private String mFilterDeviceId;
@@ -135,19 +124,15 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     private Device mCurrDevice;
     private QuickFragmentPageAdapter<Fragment> mPageAdapter;
-    private VerticalViewPager mVViewPager;
     //    private FrameLayout mContentPanel;
     private LeftMenuListAdapter mLeftMenuAdapter;
-    private ExecutorService mSingleThreadPool;
 
     //    private ImageView mBackgroundImage;
     private PopupWindow mPopupWindow;
     private CategoryView mCategoryView;
-    private MovieScanService mScanService;
+    private MovieScanService2 mScanService;
+    private DeviceMonitorService mDeviceMonitorService;
 
-    private DeviceDao mDeviceDao;
-    private MovieDao mMovieDao;
-    private GenreDao mGenreDao;
 
     private boolean isDevChange = false;
 
@@ -163,11 +148,10 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     @Override
     protected void processLogic() {
         LogUtil.v(TAG, "processLogic==>OnCreate");
-        if (LanguageUtil.isLanguageChanged(HomePageActivity.this, HomePageActivity.class))
-            LanguageUtil.restartApp(HomePageActivity.this, HomePageActivity.class);
+//        if (LanguageUtil.isLanguageChanged(HomePageActivity.this, HomePageActivity.class))
+//            LanguageUtil.restartApp(HomePageActivity.this, HomePageActivity.class);
         mTagAll = getResources().getString(R.string.tx_all);
         mTitleArr = new String[]{getResources().getString(R.string.lb_title), getResources().getString(R.string.lb_sort_directory), getResources().getString(R.string.lb_setting)};
-        mSingleThreadPool = Executors.newSingleThreadExecutor();
         requestPermission();
     }
 
@@ -176,162 +160,66 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     protected void onResume() {
         super.onResume();
         LogUtil.v(TAG, "onResume()");
-//
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
-        bindService();
+        registerReceiver();//注册广播
+        bindService();//绑定服务
     }
 
     @Override
     protected void onPause() {
+        LogUtil.v(TAG, "onPause()");
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         unbindService(mServiceConnection);
-        LogUtil.v(TAG, "onPause()");
+    }
+
+    /**
+     * 动态申请权限
+     */
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
+                //第一次请求权限的时候返回false,第二次shouldShowRequestPermissionRationale返回true
+                //如果用户选择了“不再提醒”永远返回false。
+                if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    //请求权限
+                    LogUtil.v(TAG, "showRequest true");
+                } else {
+                    LogUtil.v(TAG, "showRequest false");
+                }
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+
+            } else {
+                permissionGrant();
+            }
+        }
+    }
+
+
+    /**
+     * 权限获取后调用
+     */
+    private void permissionGrant() {
+        initView();
+
     }
 
 
     private void bindService() {
         Intent intent = new Intent(this, MovieScanService2.class);
         bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
-
         Intent intent2 = new Intent();
         intent2.setClass(this, DeviceMonitorService.class);
         bindService(intent2, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
-//    /**
-//     * 刷新设备列表成功后调用
-//     *
-//     * @param deviceList
-//     */
-//    @Override
-//    public void OnDeviceChange(final List<Device> deviceList) {
-//        LogUtil.v(TAG, "onDeviceChange");
-//        mDeviceList = deviceList;
-//        runOnUiThread(() -> {
-//            refreshDeviceAndDirectoryPopUpWindow();
-//            getSortCondition();
-//        });
-////        mDevcieRefreshService.execute(new Runnable() {
-////            @Override
-////            public void run() {
-////                Log.v(TAG, "Thread Begin");
-////                synchronized (mDeviceList) {
-////                    mDeviceList = deviceList;
-////                    runOnUiThread(new Runnable() {
-////                        @Override
-////                        public void run() {
-////                            Log.v(TAG, "refreshDeviceAndDirectoryPopUpWindow ");
-////                            refreshDeviceAndDirectoryPopUpWindow();
-////                            getSortCondition();
-////                        }
-////                    });
-////
-////                }
-////            }
-////        });
-//
-//    }
-//
-//    /**
-//     * 服务连接成功后检查连接设备。
-//     *
-//     * @param service
-//     */
-//    @Override
-//    public void OnDeviceMonitorServiceConnect(DeviceMonitorService service) {
-//        LogUtil.v(TAG, "OnDeviceMonitorServiceConnect");
-//        mDeviceMonitorService = service;
-//        try {
-//            checkConnectedDevices();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
-    /**
-     * 退出
-     */
-    @SuppressLint("WrongConstant")
-    @Override
-    public void onBackPressed() {
-        if (mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
-            mBinding.drawlayout.closeDrawer(GravityCompat.START);
-        } else if (getCurrentFragment() != HOME_PAGE_FRAGMENT) {
-            setCurrentFragment(HOME_PAGE_FRAGMENT);
-        } else if (mScanService != null && mScanService.isRunning()) {
-            getApp().moveToBack(HomePageActivity.this);
-        } else {
-            exitBy2Click();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        LogUtil.v(TAG, "onRequestPermissionsResult()");
-        if (requestCode == 1) {
-            if (permissions.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                permissionGrant();
-            } else {//没有获得到权限
-                finish();
-                LogUtil.v(TAG, "granted failed");
-            }
-        }
-    }
-
-
-    @SuppressLint("WrongConstant")
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                View view = getCurrentFocus();
-                LogUtil.v(TAG, "dispatchKeyEvent");
-                if (view instanceof ListView) {
-                    mBinding.drawlayout.closeDrawer(GravityCompat.START);
-                    mBinding.viewpager.requestFocus();
-                    if (getCurrentFragment() == HOME_PAGE_FRAGMENT) {
-//                        mHomePageFragment.movieRequestFocus();
-                    }
-                    return true;
-                }
-            }
-        }
-        LogUtil.v(TAG, getCurrentFocus() != null ? getCurrentFocus().toString() : "null");
-        return super.dispatchKeyEvent(event);
-    }
-
-    private void permissionGrant() {
-        initDao();
-        initView();
-//        if (mDeviceList == null)
-//            mDeviceList = new ArrayList<>();
-        Observable.just("")
-                .observeOn(Schedulers.from(mSingleThreadPool))
-                .doOnNext(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Throwable {
-                        prepareSortConditions();
-
-                    }
-                })
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
-                    @Override
-                    public void accept(String s) throws Throwable {
-                        initDevicePopUpWindow();
-                    }
-                });
-    }
-
-    private void initDao() {
-        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(this);
-        mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
-        mMovieDao = movieLibraryRoomDatabase.getMovieDao();
-        mGenreDao = movieLibraryRoomDatabase.getGenreDao();
+    private void registerReceiver() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
+        intentFilter.addAction(ConstData.BroadCastMsg.DEVICE_UP);
+        intentFilter.addAction(ConstData.BroadCastMsg.DEVICE_DOWN);
+        intentFilter.addAction(ConstData.BroadCastMsg.RESCAN_DEVICE);
+        intentFilter.addAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
     public void initMovie() {
@@ -340,7 +228,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         mFavoriteFragment.getFavoritMovie();
     }
 
-    public MovieScanService getMovieSearchService() {
+    public MovieScanService2 getMovieSearchService() {
         return mScanService;
     }
 
@@ -349,9 +237,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     public List<Device> getDeviceList() {
-        return mConditionDevices;
+        return null;
     }
-
 
     public int getCurrentFragment() {
         return mBinding.viewpager.getCurrentItem();
@@ -365,7 +252,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         return mFilterDeviceId;
     }
 
-
     public String getFilterYear() {
         return mFilterYear;
     }
@@ -376,35 +262,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     public String getSortType() {
         return mSortType;
-    }
-
-    public int getPosSortType() {
-        return mSortTypes.indexOf(mSortType);
-    }
-
-    public String getOrderBySqlStr() {
-        int pos_order = mSortTypes.indexOf(mSortType);
-        StringBuffer orderByBuffer = new StringBuffer();
-        String asc = isSortByAsc ? "asc" : "desc";
-        switch (pos_order) {
-            case 0:
-                orderByBuffer.append("title_pinyin " + asc + ",title " + asc + ",otitle " + asc);
-                break;
-            case 1:
-                orderByBuffer.append("rating " + asc);
-                break;
-            case 2:
-                orderByBuffer.append("genres " + asc);
-                break;
-            case 3:
-                orderByBuffer.append("year " + asc);
-                break;
-            default:
-                orderByBuffer.append("title_pinyin " + asc + ",title " + asc + ",otitle " + asc);
-
-                break;
-        }
-        return orderByBuffer.toString();
     }
 
     public boolean isSortByAsc() {
@@ -446,16 +303,45 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     private void initView() {
         LogUtil.v(TAG, "initView");
         mBinding.viewSortbox.setOnClickListener(v -> PopUpDeviceWindow(v));
+
+        prepareFragmentsAndViewpagers();
+        prepareLeftMenu();
+        //搜索按钮事件
+        mBinding.btnSearch.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MovieSearchActivity.class);
+            startActivity(intent);
+        });
+        mBinding.btnSearch.setOnHoverListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
+                ViewCompat.animate(v).scaleY(1.1f).scaleX(1.1f).start();
+            } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
+                ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
+            }
+            return false;
+        });
+        mBinding.btnSearch.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                ViewCompat.animate(v).scaleY(1.1f).scaleX(1.1f).start();
+            } else {
+                ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
+            }
+        });
+        initDevicePopUpWindow();
+
+    }
+
+    /**
+     * 初始化菜单
+     */
+    private void prepareLeftMenu() {
+        //注册开始菜单事件
         mBinding.openMenuBtn.setOnClickListener(v -> {
             if (mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
                 mBinding.drawlayout.closeDrawer(GravityCompat.START);
             } else {
-                LogUtil.v(TAG, "mBtnMenu onClick");
                 mBinding.drawlayout.openDrawer(GravityCompat.START);
             }
-
         });
-
         mBinding.openMenuBtn.setOnFocusChangeListener((v, hasFocus) -> {
             if (!mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
                 if (hasFocus) {
@@ -464,8 +350,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                 }
             }
         });
+        //设置左侧菜单运动时，按钮的运动
         mBinding.drawlayout.setScrimColor(Color.TRANSPARENT);
-        //设置内容页面滑动监听
         mBinding.drawlayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -495,75 +381,14 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
             }
         });
-
-
-        initFragment();
-        mFramentList = new ArrayList<>();
-        mFramentList.add(mHomePageFragment);
-//        mFramentList.add(mHistoryFragment);
-//        mFramentList.add(mFavoriteFragment);
-//        mFramentList.add(mFileManagerFragment);
-//        mFramentList.add(mAboutsFragment);
-
-        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(), mFramentList, mTitleArr);
-        mBinding.viewpager.setAdapter(mPageAdapter);
-        mBinding.viewpager.setOffscreenPageLimit(4);
-        mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                mBinding.leftmenuListview.setSelection(position);
-                if (position != HOME_PAGE_FRAGMENT && position != HISTORY_FRAGMENT && position != FAVORITE_FRAGMENT) {
-                    mBinding.viewSortbox.setVisibility(View.GONE);
-                } else {
-                    mBinding.viewSortbox.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-
-        initLeftMenu();
-        mBinding.btnSearch.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MovieSearchActivity.class);
-            startActivity(intent);
-        });
-
-        mBinding.btnSearch.setOnHoverListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-                ViewCompat.animate(v).scaleY(1.1f).scaleX(1.1f).start();
-            } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-                ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
-            }
-            return false;
-        });
-
-        mBinding.btnSearch.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                ViewCompat.animate(v).scaleY(1.1f).scaleX(1.1f).start();
-            } else {
-                ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
-            }
-        });
-
-    }
-
-    /**
-     * 初始化菜单
-     */
-    private void initLeftMenu() {
-        mLeftMenuAdapter = new LeftMenuListAdapter(HomePageActivity.this, prepareMenuData());
+        //填充左侧菜单
+        mLeftMenuAdapter = new LeftMenuListAdapter(HomePageActivity.this, prepareMenuDataSet());
         mBinding.leftmenuListview.setAdapter(mLeftMenuAdapter);
+        //遥控焦点事件
         mBinding.leftmenuListview.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position < mFramentList.size()) {
-                    LogUtil.v(TAG, "[onItemSelected] position=" + position);
                     mBinding.viewpager.setCurrentItem(position);
                     mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
                 }
@@ -574,9 +399,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
             }
         });
-
+        //鼠标/触屏事件
         mBinding.leftmenuListview.setOnItemClickListener((parent, view, position, id) -> {
-            LogUtil.v(TAG, "[onItemClick] position=" + position);
             if (position < mFramentList.size()) {
                 mBinding.viewpager.setCurrentItem(position);
                 mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[position].toString());
@@ -595,7 +419,12 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     }
 
-    private List<HashMap<String, Object>> prepareMenuData() {
+    /**
+     * 左侧菜单数据
+     *
+     * @return
+     */
+    private List<HashMap<String, Object>> prepareMenuDataSet() {
         ArrayList<HashMap<String, Object>> menuList = new ArrayList<>();
         String[] itemGroup1 = getResources().getStringArray(R.array.menu_item_group_1);
         TypedArray ta_1 = getResources().obtainTypedArray(R.array.menu_item_icon_group_1);
@@ -626,15 +455,18 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             mPopupWindow.setFocusable(true);
         }
         mCategoryView = (CategoryView) (mPopupWindow.getContentView().findViewById(R.id.categoryview));
-        mCategoryView.setDevices(mConditionDevices).setYears(mConditionYears).setGenres(mConditionGenres).create();
         mCategoryView.setOnClickCategoryListener(mOnClickCategoryListener);
 
     }
 
+    private void updateCateGoryView() {
+        mCategoryView.setDevices(mViewModel.getConditionDevices()).setYears(mViewModel.getConditionYears()).setGenres(mViewModel.getConditionGenres()).create();
+    }
+
     /**
-     * 初始化Fragment
+     * 初始化Fragment 和 Viewpager
      */
-    private void initFragment() {
+    private void prepareFragmentsAndViewpagers() {
         if (mFileManagerFragment == null) {
             mFileManagerFragment = new FileManagerFragment();
         }
@@ -651,25 +483,40 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         if (mHistoryFragment == null) {
             mHistoryFragment = new HistoryFragment();
         }
+        mFramentList = new ArrayList<>();
+        mFramentList.add(mHomePageFragment);
+//        mFramentList.add(mHistoryFragment);
+//        mFramentList.add(mFavoriteFragment);
+//        mFramentList.add(mFileManagerFragment);
+//        mFramentList.add(mAboutsFragment);
+        //设置ViewPager
+        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(), mFramentList, mTitleArr);
+        mBinding.viewpager.setAdapter(mPageAdapter);
+        mBinding.viewpager.setOffscreenPageLimit(4);
+        mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mBinding.leftmenuListview.setSelection(position);
+                if (position != HOME_PAGE_FRAGMENT && position != HISTORY_FRAGMENT && position != FAVORITE_FRAGMENT) {
+                    mBinding.viewSortbox.setVisibility(View.GONE);
+                } else {
+                    mBinding.viewSortbox.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
     }
 
 
     private void PopUpDeviceWindow(View v) {
         mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0);
-    }
-
-    /**
-     * 获取缓存分类条件和获取分类信息列表
-     */
-    private void prepareSortConditions() {
-            mConditionDevices = mDeviceDao.qureyAll();
-            mConditionGenres = mGenreDao.queryAllGenres();
-            mConditionYears = mMovieDao.qureyYearsGroup();
-            mSortTypes = new ArrayList<>();
-            mSortTypes.add(getResources().getString(R.string.order_name));
-            mSortTypes.add(getResources().getString(R.string.order_score));
-            mSortTypes.add(getResources().getString(R.string.order_type));
-            mSortTypes.add(getResources().getString(R.string.order_time));
     }
 
 
@@ -708,10 +555,10 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         RelativeLayout order_ll = (RelativeLayout) mCategoryView.getChildAt(SORT_ORDER);
         RadioGroup order_group = (RadioGroup) order_ll
                 .findViewById(R.id.container);
-        for (int j = 0; j < order_group.getChildCount(); j++) {
-            ((RadioButton) order_group.getChildAt(j))
-                    .setText(mSortTypes.get(j));
-        }//重置排序条件的文字（清除排序方式的箭头）
+//        for (int j = 0; j < order_group.getChildCount(); j++) {
+//            ((RadioButton) order_group.getChildAt(j))
+//                    .setText(mSortTypes.get(j));
+//        }//重置排序条件的文字（清除排序方式的箭头）
         RadioButton order_check_button = (RadioButton) order_group
                 .getChildAt(i);
         order_check_button.setText(mSortType + (isSortByAsc ? ASC : DESC));
@@ -730,12 +577,12 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             mCurrDevice = null;
             return pos;
         }
-        for (int i = 0; i < mConditionDevices.size(); i++) {
-            if (mConditionDevices.get(i).id.equals(mFilterDeviceId)) {
-                pos = i;
-                break;
-            }
-        }
+//        for (int i = 0; i < mConditionDevices.size(); i++) {
+//            if (mConditionDevices.get(i).id.equals(mFilterDeviceId)) {
+//                pos = i;
+//                break;
+//            }
+//        }
         return pos;
     }
 
@@ -748,25 +595,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     private void setCurrentFragment(int pos) {
         mBinding.viewpager.setCurrentItem(pos, true);
         mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[pos].toString());
-    }
-
-    private void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-                //第一次请求权限的时候返回false,第二次shouldShowRequestPermissionRationale返回true
-                //如果用户选择了“不再提醒”永远返回false。
-                if (shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    //请求权限
-                    LogUtil.v(TAG, "showRequest true");
-                } else {
-                    LogUtil.v(TAG, "showRequest false");
-                }
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
-            } else {
-                permissionGrant();
-            }
-        }
     }
 
 
@@ -807,6 +635,61 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     }
 
+    /**
+     * 退出
+     */
+    @SuppressLint("WrongConstant")
+    @Override
+    public void onBackPressed() {
+        if (mBinding.drawlayout.isDrawerOpen(GravityCompat.START)) {
+            mBinding.drawlayout.closeDrawer(GravityCompat.START);
+        } else if (getCurrentFragment() != HOME_PAGE_FRAGMENT) {
+            setCurrentFragment(HOME_PAGE_FRAGMENT);
+        }
+//        else if (mScanService != null && mScanService.isRunning()) {
+//            getApp().moveToBack(HomePageActivity.this);
+//        }
+        else {
+            exitBy2Click();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        LogUtil.v(TAG, "onRequestPermissionsResult()");
+        if (requestCode == 1) {
+            if (permissions.length > 0 && permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                permissionGrant();
+            } else {//没有获得到权限
+                finish();
+                LogUtil.v(TAG, "granted failed");
+            }
+        }
+    }
+
+
+    @SuppressLint("WrongConstant")
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                View view = getCurrentFocus();
+                LogUtil.v(TAG, "dispatchKeyEvent");
+                if (view instanceof ListView) {
+                    mBinding.drawlayout.closeDrawer(GravityCompat.START);
+                    mBinding.viewpager.requestFocus();
+                    if (getCurrentFragment() == HOME_PAGE_FRAGMENT) {
+//                        mHomePageFragment.movieRequestFocus();
+                    }
+                    return true;
+                }
+            }
+        }
+        LogUtil.v(TAG, getCurrentFocus() != null ? getCurrentFocus().toString() : "null");
+        return super.dispatchKeyEvent(event);
+    }
+
     CategoryView.OnClickCategoryListener mOnClickCategoryListener = new CategoryView.OnClickCategoryListener() {
         @Override
         public void onSortChange(String sortType, boolean isDesc) {
@@ -823,10 +706,13 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            name.getClassName().equalsIgnoreCase(MovieScanService2.class.getCanonicalName());
-            LogUtil.v(TAG, "on servcie" + name.getClassName() + " connected!!");
+            if (name.getClassName().equalsIgnoreCase(MovieScanService2.class.getCanonicalName())) {
+                mScanService = ((MovieScanService2.ScanBinder) service).getService();
 
-//            mScanService = ((MovieScanService.ScanBinder) service).getService();
+            } else if (name.getClassName().equalsIgnoreCase(DeviceMonitorService.class.getCanonicalName())) {
+                mDeviceMonitorService = ((DeviceMonitorService.MonitorBinder) service).getService();
+                mDeviceMonitorService.scanDevices();
+            }
         }
 
         @Override
@@ -837,8 +723,25 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ConstData.ACTION_FAVORITE_MOVIE_CHANGE)) {
-                mFavoriteFragment.getFavoritMovie();
+            String action = intent.getAction();
+            LogUtil.v(HomePageActivity.class.getSimpleName(), "mBroadcastReceiver action:" + action);
+            switch (action) {
+                case ConstData.ACTION_FAVORITE_MOVIE_CHANGE:
+                    break;
+                case ConstData.BroadCastMsg.DEVICE_UP:
+                    String mountPath = intent.getStringExtra(ConstData.DeviceMountMsg.DEVICE_MOUNT_PATH);
+                    mViewModel.prepareSortDeviceConditions(mScanService, mountPath, () -> updateCateGoryView());
+                    break;
+                case ConstData.BroadCastMsg.DEVICE_DOWN:
+                    mViewModel.prepareSortDeviceConditions(mScanService,() -> updateCateGoryView());
+                    break;
+                case ConstData.BroadCastMsg.RESCAN_DEVICE:
+                    break;
+                case ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH:
+                    mViewModel.prepareOtherConditions(() -> updateCateGoryView());
+                    break;
+                case ConstData.BroadCastMsg.MOVIE_GET_CATEGORY_FINISH:
+                    break;
             }
         }
     };
