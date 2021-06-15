@@ -21,6 +21,7 @@ import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService2;
+import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
 import com.hphtv.movielibrary.util.retrofit.MtimeAPIRequest;
 import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
@@ -53,9 +54,11 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_testservice:
-                Intent intent=new Intent();
-                intent.setClass(this,DeviceMonitorService.class);
-                bindService(intent,mServiceConnection, Context.BIND_AUTO_CREATE);
+//                Intent intent=new Intent();
+//                intent.setClass(this,DeviceMonitorService.class);
+//                bindService(intent,mServiceConnection, Context.BIND_AUTO_CREATE);
+              String res=  MyPinyinParseAndMatchUtil.parsePinyin("测试一下他的拼音准不准");
+              LogUtil.v("res "+res);
                 break;
             case R.id.btn_unbind:
                 unbindService(mServiceConnection);
@@ -99,7 +102,6 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             DeviceMonitorService deviceMonitorService=((DeviceMonitorService.MonitorBinder)service).getService();
-            deviceMonitorService.scanDevices();
         }
 
         @Override

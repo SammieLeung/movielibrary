@@ -1,25 +1,19 @@
 package com.hphtv.movielibrary.viewmodel;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
-import android.os.storage.StorageManager;
-import android.os.storage.StorageVolume;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.firelfy.util.LogUtil;
-import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.activity.HomePageActivity;
-import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.MovieScanService2;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -30,17 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -53,17 +40,23 @@ public class HomepageViewModel extends AndroidViewModel {
     private GenreDao mGenreDao;
     private VideoFileDao mVideoFileDao;
     private ExecutorService mSingleThreadPool;
-    private CompositeDisposable mCompositeDisposable=new CompositeDisposable();
+    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     //筛选条件数据
     private List<String> mConditionGenres = new ArrayList<>();// 电影类型数据
     private List<String> mConditionYears = new ArrayList<>();
-    ;
+
     private List<Device> mConditionDevices = new ArrayList<>();
-    ;//
+
 
     public List<VideoFile> mAllNotScannedVideoFiles;
 
+    public List<MovieWrapper> mMovieWrappers;
+
+    private Device mDevice;
+    private String mYear;
+    private String mGenre;
+    private int mSortType;
     private boolean isDesc = false;
 
     public HomepageViewModel(@NonNull @NotNull Application application) {
@@ -103,14 +96,13 @@ public class HomepageViewModel extends AndroidViewModel {
      *
      * @return
      */
-    public void prepareSortDeviceConditions(MovieScanService2 scanService, Callback callback) {
-        Observable.just(GET_BASE_CONDITIONS)
+    public void prepareSortDeviceConditions(Callback callback) {
+        Observable.just(GET_NOT_SCAN_VIDEOFILES)
                 .observeOn(Schedulers.from(mSingleThreadPool))
                 .doOnNext(s -> {
                     switch (s) {
-                        case GET_BASE_CONDITIONS:
+                        case GET_NOT_SCAN_VIDEOFILES:
                             mConditionDevices = mDeviceDao.qureyAll();
-                            mAllNotScannedVideoFiles = getNotScannedFiles();
                             break;
                     }
                 })
@@ -118,51 +110,11 @@ public class HomepageViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
-                        if (mAllNotScannedVideoFiles != null && mAllNotScannedVideoFiles.size() > 0)
-                            HomepageViewModel.this.startScrap(scanService, mAllNotScannedVideoFiles);
-                        else
-                            HomepageViewModel.this.prepareOtherConditions(callback);
+                      callback.runOnUIThread();
                     }
                 });
     }
 
-    public void prepareSortDeviceConditions(MovieScanService2 scanService, String mountPath, Callback callback) {
-        Observable.just(mountPath)
-                .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .observeOn(Schedulers.from(mSingleThreadPool))
-                .map(s -> {
-                    Device device = mDeviceDao.querybyMountPath(mountPath);
-                    boolean isContain = false;
-                    if (device != null) {
-                        for (int i = 0; i < mConditionDevices.size(); i++) {
-                            Device dev = mConditionDevices.get(i);
-                            if (dev.localPath.equalsIgnoreCase(device.localPath)) {
-                                mConditionDevices.add(i, device);
-                                mConditionDevices.remove(dev);
-                                isContain = true;
-                                break;
-                            }
-                        }
-                        if (!isContain)
-                            mConditionDevices.add(device);
-                    }
-                    return device;
-                })
-                .map(device -> {
-                    List<VideoFile> videoFiles = getNotScannedFiles(device);
-                    return videoFiles;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<VideoFile>>() {
-                    @Override
-                    public void onAction(List<VideoFile> videoFiles) {
-                        if (videoFiles != null && videoFiles.size() > 0)
-                            HomepageViewModel.this.startScrap(scanService, videoFiles);
-                        else
-                            HomepageViewModel.this.prepareOtherConditions(callback);
-                    }
-                });
-    }
 
     /**
      * 3.读取其他条件
@@ -170,10 +122,11 @@ public class HomepageViewModel extends AndroidViewModel {
      *
      * @return
      */
-    public void prepareOtherConditions(Callback callback) {
-        Observable.just(GET_MOVIE_CONDITION)
+    public void prepareConditions(Callback callback) {
+        Observable.just(PREPARE_CONDITIONS)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .doOnNext(s -> {
+                    mConditionDevices = mDeviceDao.qureyAll();
                     mConditionGenres = mGenreDao.queryAllGenres();
                     mConditionYears = mMovieDao.qureyYearsGroup();
                 })
@@ -182,10 +135,61 @@ public class HomepageViewModel extends AndroidViewModel {
                     @Override
                     public void onAction(String s) {
                         switch (s) {
-                            case HomepageViewModel.GET_MOVIE_CONDITION:
+                            case HomepageViewModel.PREPARE_CONDITIONS:
                                 callback.runOnUIThread();
                                 break;
                         }
+                    }
+                });
+    }
+
+
+    public void prepareMovies(Device device, String year, String genre, int sortType, boolean isDesc, Callback callback) {
+        mDevice = device;
+        mYear = year;
+        mGenre = genre;
+        mSortType = sortType;
+        this.isDesc = isDesc;
+        prepareMovies(callback);
+    }
+
+    public void prepareMovies(Device device, String year, String genre, Callback callback) {
+        mDevice = device;
+        mYear = year;
+        mGenre = genre;
+        prepareMovies(callback);
+    }
+
+    public void prepareMovies(int sortType, boolean isDesc, Callback callback) {
+        mSortType = sortType;
+        this.isDesc = isDesc;
+        prepareMovies(callback);
+    }
+
+    public void prepareMovies(Callback callback) {
+        Observable.just(GET_HOMEPAGE_MOVIE)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .map(s -> {
+                    StringBuffer condition = new StringBuffer();
+                    String device_id = null;
+                    String year = null;
+                    String genre = null;
+                    if (mDevice != null)
+                        device_id = mDevice.id;
+                    if (!TextUtils.isEmpty(mYear))
+                        year = mYear;
+                    if (!TextUtils.isEmpty(mGenre))
+                        genre = mGenre;
+
+                    int sortType = mSortType;
+                    List<MovieDataView> list = mMovieDao.queryMoiveDataView(device_id, year, genre, sortType, isDesc);
+                    return list;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<MovieDataView>>() {
+                    @Override
+                    public void onAction(List<MovieDataView> movieDataViews) {
+                        callback.runOnUIThread(movieDataViews);
                     }
                 });
     }
@@ -207,10 +211,11 @@ public class HomepageViewModel extends AndroidViewModel {
             mAllNotScannedVideoFiles.clear();
     }
 
-    public static final String GET_BASE_CONDITIONS = "event1";
+    public static final String GET_NOT_SCAN_VIDEOFILES = "get_not_scan_videofiles";
+    public static final String PREPARE_CONDITIONS = "prepare_conditions";
+
     public static final String GET_NOT_SCANNED_VIDEOFILE = "event2";
-    public static final String GET_MOVIE_CONDITION = "event3";
-    public static final String EVENT4 = "event4";
+    public static final String GET_HOMEPAGE_MOVIE = "event4";
 
 
     /**
@@ -252,6 +257,6 @@ public class HomepageViewModel extends AndroidViewModel {
     }
 
     public interface Callback {
-        void runOnUIThread();
+        void runOnUIThread(Object... args);
     }
 }

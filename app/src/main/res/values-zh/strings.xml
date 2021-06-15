@@ -30,6 +30,7 @@
     <string name="lb_sort_year">年份</string>
     <string name="lb_sort_type">类型</string>
     <string name="lb_sort_order">排序</string>
+
     <string name="mediacontroller_play_pause">播放/暂停</string>
     <string name="test">测试长度字符串测试长度字符串</string>
     <string name="pages">%1$d&#047;%2$d</string>
@@ -73,8 +74,10 @@
     <string name="message_faild">->获取失败！</string>
     <string name="order_name">名称</string>
     <string name="order_type">类型</string>
-    <string name="order_time">年份</string>
+    <string name="order_year">年份</string>
     <string name="order_score">评分</string>
+    <string name="order_addtime">添加时间</string>
+
     <string name="exit_toast">再按一次返回键退出程序</string>
     <string name="dm_tx_status">状态</string>
     <string name="dm_tx_folder">文件夹</string>

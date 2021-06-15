@@ -45,7 +45,7 @@ import com.hphtv.movielibrary.view.RefreshLayout.OnLoadListener;
 
 import org.jsoup.select.Elements;
 
-public class MovieSearchResultActivity extends Activity {
+public class MovieSearchResultActivity extends BaseActivity {
     public static final String TAG = "MovieSearchResult";
     public static final int LIMIT = 10;
     private ImageButton mBtnBack;

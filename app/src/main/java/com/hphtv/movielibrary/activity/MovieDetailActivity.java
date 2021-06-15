@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.activity;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -13,9 +12,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
@@ -36,7 +35,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firelfy.util.LogUtil;
-import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.History;
 import com.hphtv.movielibrary.sqlite.bean.MovieWrapper;
@@ -45,7 +43,6 @@ import com.hphtv.movielibrary.sqlite.bean.ScraperInfo;
 import com.hphtv.movielibrary.sqlite.bean.VideoFile;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.MovieTrailerAdapter;
@@ -71,7 +68,6 @@ import com.hphtv.movielibrary.util.StrUtils;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
-import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
 import com.hphtv.movielibrary.view.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.view.DrawTopButton;
 import com.hphtv.movielibrary.view.MovieEditFragment;
@@ -84,7 +80,7 @@ import me.khrystal.library.widget.CircleRecyclerView;
 import me.khrystal.library.widget.ItemViewMode;
 import me.khrystal.library.widget.ScaleXCenterViewMode;
 
-public class MovieDetailActivity extends Activity {
+public class MovieDetailActivity extends BaseActivity {
     public static final String TAG = "MovieDetailActivity";
     private MovieApplication mApplication;
     private Context mContext;
@@ -133,7 +129,6 @@ public class MovieDetailActivity extends Activity {
     boolean isChangeMovie;
     private int random;
     private List<MovieTrailer> mMovieTrailerList = new ArrayList<MovieTrailer>();
-    private CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
     private CustomRadioDialogFragment checkGroupDialogFragment;
     private MovieScanService mScanService;
 
@@ -935,22 +930,6 @@ public class MovieDetailActivity extends Activity {
         ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
         dialogFragment.setMessage(tips);
         dialogFragment.show(getFragmentManager(), "MovieDetail");
-    }
-
-    private void startLoading() {
-        LogUtil.v(TAG, "startLoading");
-        if (mLoadingCircleViewDialogFragment == null) {
-            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
-            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
-        }
-    }
-
-    private void stopLoading() {
-        LogUtil.v(TAG, "stopLoading");
-        if (mLoadingCircleViewDialogFragment != null) {
-            mLoadingCircleViewDialogFragment.dismiss();
-            mLoadingCircleViewDialogFragment = null;
-        }
     }
 
     @Override

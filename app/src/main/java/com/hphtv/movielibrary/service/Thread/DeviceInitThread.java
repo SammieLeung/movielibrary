@@ -7,6 +7,7 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
+import com.hphtv.movielibrary.viewmodel.DeviceMonitorViewModel;
 
 
 import java.util.List;
@@ -18,14 +19,14 @@ import java.util.List;
  */
 public class DeviceInitThread extends Thread {
     public static final String TAG = DeviceInitThread.class.getSimpleName();
-    private DeviceMonitorService mDeviceMonitorService;
+    private DeviceMonitorViewModel mDeviceMonitorViewModel;
     private DeviceDao mDeviceDao;
     private VideoFileDao mVideoFileDao;
     private MovieLibraryRoomDatabase mMovieLibraryRoomDatabase;
 
-    public DeviceInitThread(DeviceMonitorService service) {
-        mDeviceMonitorService =service;
-        mMovieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(mDeviceMonitorService);
+    public DeviceInitThread(DeviceMonitorViewModel viewModel) {
+        mDeviceMonitorViewModel =viewModel;
+        mMovieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(viewModel.getApplication());
         mDeviceDao = mMovieLibraryRoomDatabase.getDeviceDao();
         mVideoFileDao = mMovieLibraryRoomDatabase.getVideoFileDao();
     }
@@ -57,7 +58,7 @@ public class DeviceInitThread extends Thread {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
                 int type = ConstData.DeviceType.DEVICE_TYPE_SDCARDS;
                 int state = ConstData.DeviceMountState.MOUNTED;
-                mDeviceMonitorService.executeOnMountThread(deviceName, type, path, false, "", state);
+                mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
         //扫描USB设备
@@ -66,13 +67,13 @@ public class DeviceInitThread extends Thread {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
                 int type = ConstData.DeviceType.DEVICE_TYPE_USB;
                 int state = ConstData.DeviceMountState.MOUNTED;
-                mDeviceMonitorService.executeOnMountThread(deviceName, type, path, false, "", state);
+                mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
         //扫描内置存储
         String deviceName = internelStorage.substring(internelStorage.lastIndexOf("/") + 1);//TODO 验证Android 11上的可行性
         int type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
         int state = ConstData.DeviceMountState.MOUNTED;
-        mDeviceMonitorService.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
+        mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
     }
 }

@@ -72,9 +72,10 @@
     <string name="message_success">->Success!</string>
     <string name="message_faild">->Faild!</string>
     <string name="order_name">Title</string>
-    <string name="order_type">Genres</string>
-    <string name="order_time">Time</string>
+    <string name="order_type">Genre</string>
+    <string name="order_year">Year</string>
     <string name="order_score">Score</string>
+    <string name="order_addtime">Add time</string>
     <string name="exit_toast">press the BACK key again  to exit</string>
     <string name="dm_tx_status">Status</string>
     <string name="dm_tx_folder">Folder</string>

@@ -106,4 +106,6 @@ dependencies {
     implementation project(':service')
     implementation project(path: ':dlna')
     implementation project(':VideoNameParser')
+    //Android-spinkit loading动画
+    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
 }

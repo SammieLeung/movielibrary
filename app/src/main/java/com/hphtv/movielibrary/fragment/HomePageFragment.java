@@ -10,16 +10,14 @@ import android.view.ViewGroup;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.FLayoutFavoriteBinding;
-import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieDao;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +32,9 @@ public class HomePageFragment extends Fragment {
 
     public static final String TAG = HomePageFragment.class.getSimpleName();
 
-    private MovieLibraryAdapter mLibraryAdapter;// 电影列表适配器
-    private List<MovieWrapper> mWrapperList = new ArrayList<>();// 电影数据
+    private MovieLibraryAdapter mMovieLibraryAdapter;// 电影列表适配器
+    private List<MovieDataView> mMovieDataViewList = new ArrayList<>();// 电影数据
 
-    private MovieDao mMovieDao;
-    private DeviceDao mDeviceDao;
     private static AtomicBoolean atomicBoolean = new AtomicBoolean();
 
     private FLayoutFavoriteBinding mFLayoutFavoriteBinding;
@@ -54,7 +50,6 @@ public class HomePageFragment extends Fragment {
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initDao();
     }
 
     @Nullable
@@ -73,19 +68,6 @@ public class HomePageFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        initMovie();
-    }
-
-    /**
-     * 初始化数据库
-     */
-    private void initDao() {
-        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getContext());
-        mMovieDao = movieLibraryRoomDatabase.getMovieDao();
-        mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
-    }
-
-    public void initMovie() {
     }
 
     /**
@@ -95,33 +77,36 @@ public class HomePageFragment extends Fragment {
 
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), COLUMS, GridLayoutManager.VERTICAL, false);
         mFLayoutFavoriteBinding.rvMovies.setLayoutManager(mGridLayoutManager);
-        mLibraryAdapter = new MovieLibraryAdapter(getContext(), mWrapperList);
-        mFLayoutFavoriteBinding.rvMovies.setAdapter(mLibraryAdapter);
-        mLibraryAdapter
-                .setOnItemClickListener((view, wrapper) -> {
+        mMovieLibraryAdapter = new MovieLibraryAdapter(getContext(), mMovieDataViewList);
+        mFLayoutFavoriteBinding.rvMovies.setAdapter(mMovieLibraryAdapter);
+        mMovieLibraryAdapter
+                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, MovieDataView dataView) {
 
-                    Intent intent = new Intent(getContext(),
-                            MovieDetailActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putLong("movie_id", wrapper.movie.id);
-                    bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-                    intent.putExtras(bundle);
-                    ActivityResultContracts.StartActivityForResult startActivityForResult=new ActivityResultContracts.StartActivityForResult();
-                    registerForActivityResult(startActivityForResult, result -> {
-                        Log.v(TAG, "onActivityResult resultCode=" + result.getResultCode());
-                    }).launch(intent);
+                        Intent intent = new Intent(HomePageFragment.this.getContext(),
+                                MovieDetailActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("movie_id", dataView.id);
+                        bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+                        intent.putExtras(bundle);
+                        ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
+                        HomePageFragment.this.registerForActivityResult(startActivityForResult, result -> {
+                            Log.v(TAG, "onActivityResult resultCode=" + result.getResultCode());
+                        }).launch(intent);
+                    }
                 });
 
     }
 
 
-    private void refreshMovie() {
-        if (mWrapperList.size() > 0) {
+
+    public void updateMovie(List<MovieDataView> movieDataViews) {
+        if (movieDataViews.size() > 0) {
             mFLayoutFavoriteBinding.tipsEmpty.setVisibility(View.GONE);
         } else {
             mFLayoutFavoriteBinding.tipsEmpty.setVisibility(View.VISIBLE);
         }
-        mLibraryAdapter.notifyDataSetChanged();
+        mMovieLibraryAdapter.addAll(movieDataViews);
     }
-
 }

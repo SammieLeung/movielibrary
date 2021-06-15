@@ -1,12 +1,6 @@
 package com.hphtv.movielibrary.activity;
 
-import android.app.Activity;
-import android.app.Service;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,20 +9,18 @@ import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.MovieApplication;
-import com.hphtv.movielibrary.roomdb.entity.Device;
-import com.hphtv.movielibrary.service.DeviceMonitorService;
+import com.hphtv.movielibrary.fragment.dialog.LoadingDialogFragment;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.List;
 
 /**
  * @author lxp
  * @date 19-3-26
  */
-public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends AppCompatActivity {
-    public static final String TAG = AppBaseActivity.class.getSimpleName();
+public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseActivity {
     protected VDB mBinding;
     protected VM mViewModel;
 
@@ -37,7 +29,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, getContentViewId());
         mBinding.setLifecycleOwner(this);
-        createViewModel();
+        createAndroidViewModel();
         processLogic();
         init();
     }
@@ -57,7 +49,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     /**
      * 创建ViewModel
      */
-    private void createViewModel() {
+    private void createAndroidViewModel() {
         if (mViewModel == null) {
             Class modelClass;
             Type type = getClass().getGenericSuperclass();
@@ -67,7 +59,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
                 //如果没有指定泛型参数，则默认使用BaseViewModel
                 modelClass = AndroidViewModel.class;
             }
-            mViewModel = (VM) new ViewModelProvider(this).get(modelClass);
+            mViewModel = (VM)   new ViewModelProvider.AndroidViewModelFactory(getApplication()).create(modelClass);
+
         }
     }
 
@@ -81,17 +74,12 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     @Override
     protected void onPause() {
         super.onPause();
-//        unBindServices();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-//        attachServices();
     }
-
-
-
 
     public MovieApplication getApp() {
         return MovieApplication.getInstance();

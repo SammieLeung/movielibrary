@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.service.Thread;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.firelfy.util.LogUtil;
@@ -29,7 +30,6 @@ import java.util.concurrent.Callable;
  */
 public class FileScanThread implements Callable<Boolean> {
     public static final String TAG = FileScanThread.class.getSimpleName();
-    private DeviceMonitorService mService;
     private String mPath;
     private Device mDevice;
     /**
@@ -51,14 +51,13 @@ public class FileScanThread implements Callable<Boolean> {
     private ArrayList<MovieWrapper> mVideoFile__movies = new ArrayList<>();
     private boolean mIsOverMaxDirs = false;
 
-    public FileScanThread(DeviceMonitorService service, Device device) {
-        this.mService = service;
+    public FileScanThread(Context context, Device device) {
         this.mDevice = device;
         this.mPath = mDevice.localPath;
         this.mScanDirectories.add(new ScanDirectory(mPath, mDevice.id));
-        this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(service).getDeviceDao();
-        this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(service).getScanDirectoryDao();
-        this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(service).getVideoFileDao();
+        this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
+        this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
+        this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
     }
 
     @Override

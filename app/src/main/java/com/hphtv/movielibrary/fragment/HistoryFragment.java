@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
 import com.hphtv.movielibrary.sqlite.bean.History;
@@ -90,13 +91,13 @@ public class HistoryFragment extends Fragment {
         mRVMovies = (RecyclerViewWithMouseScroll) view.findViewById(R.id.rv_movies);
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(mContext, COLUMS, GridLayoutManager.VERTICAL, false);
         mRVMovies.setLayoutManager(mGridLayoutManager);
-        mAdapter = new MovieLibraryAdapter(mContext, mWrapperList);
-        mRVMovies.setAdapter(mAdapter);
+//        mAdapter = new MovieLibraryAdapter(mContext, mWrapperList);
+//        mRVMovies.setAdapter(mAdapter);
 
         mAdapter
                 .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
                     @Override
-                    public void onItemClick(View view, MovieWrapper wrapper) {
+                    public void onItemClick(View view, MovieDataView dataView) {
                         Intent intent = new Intent(mContext,
                                 MovieDetailActivity.class);
                         Bundle bundle = new Bundle();
@@ -105,6 +106,7 @@ public class HistoryFragment extends Fragment {
                         intent.putExtras(bundle);
                         startActivityForResult(intent, 0);
                     }
+
                 });
 
     }

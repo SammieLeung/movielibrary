@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.DlnaControlService;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.service.MovieScanService2;
@@ -16,9 +17,9 @@ import com.hphtv.movielibrary.service.MovieScanService2;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent service=new Intent(context, MovieScanService2.class);
+        Intent service=new Intent(context, DeviceMonitorService.class);
         context.startService(service);
-        Intent dlnaService=new Intent(context, DlnaControlService.class);
-        context.startService(dlnaService);
+//        Intent dlnaService=new Intent(context, DlnaControlService.class);
+//        context.startService(dlnaService);
     }
 }

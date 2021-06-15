@@ -1,9 +1,7 @@
 package com.hphtv.movielibrary.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -20,18 +18,15 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.LocalSearchAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.decoration.GridSpacingItemDecorationVertical;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
-import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
-import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
 import com.hphtv.movielibrary.view.FloatKeyboard;
 import com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll;
 
@@ -42,7 +37,7 @@ import java.util.List;
  * Created by tchip on 17-12-14.
  */
 
-public class MovieSearchActivity extends Activity {
+public class MovieSearchActivity extends BaseActivity {
     public static final String TAG = "MovieSearchActivity";
 
     private Context mContext;
@@ -51,10 +46,9 @@ public class MovieSearchActivity extends Activity {
     private TextView mTextViewTips;
     private ImageButton mImageButtonExit;
     private RecyclerViewWithMouseScroll mRVMovies;
-    private List<MovieWrapper> mWrapperList = new ArrayList<>();
+    private List<MovieDataView> mWrapperList = new ArrayList<>();
     private FloatKeyboard mRVFloatFastBoard;
     private MovieLibraryAdapter movieLibraryAdapter;
-    private CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
     private MovieApplication mApp;
 
     private MovieWrapperDao mMovieWrapperDao;
@@ -94,10 +88,10 @@ public class MovieSearchActivity extends Activity {
                 String keyword = mEditTextSearch.getText().toString();
                 Log.v(TAG, "matchMovieBegin-------");
 
-                List<MovieWrapper> wrapperList = matchMovie(keyword);
+                List<MovieDataView> dataViews = matchMovie(keyword);
                 Log.v(TAG, "matchMovie finish-------");
 
-                refreshMovie(wrapperList);
+                refreshMovie(dataViews);
             }
 
             @Override
@@ -145,7 +139,7 @@ public class MovieSearchActivity extends Activity {
         movieLibraryAdapter = new MovieLibraryAdapter(MovieSearchActivity.this, mWrapperList);
         movieLibraryAdapter.setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
             @Override
-            public void onItemClick(View view, MovieWrapper wrapper) {
+            public void onItemClick(View view, MovieDataView dataView) {
                 Intent intent = new Intent(mContext,
                         MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
@@ -154,6 +148,7 @@ public class MovieSearchActivity extends Activity {
                 intent.putExtras(bundle);
                 startActivityForResult(intent, 0);
             }
+
 
         });
         mRVKeyBoard.setAdapter(localSearchAdapter);
@@ -283,7 +278,7 @@ public class MovieSearchActivity extends Activity {
 
     }
 
-    private List<MovieWrapper> matchMovie(String keyword) {
+    private List<MovieDataView> matchMovie(String keyword) {
         if (keyword == null || keyword.equals("")) {
             return null;
         }
@@ -298,7 +293,7 @@ public class MovieSearchActivity extends Activity {
         return null;
     }
 
-    private void refreshMovie(List<MovieWrapper> wrappers) {
+    private void refreshMovie(List<MovieDataView> wrappers) {
         movieLibraryAdapter.removeAll();
         if (wrappers == null || wrappers.size() == 0) {
             showEmptyTips();
@@ -329,20 +324,4 @@ public class MovieSearchActivity extends Activity {
         }
     }
 
-    private void startLoading() {
-        LogUtil.v(TAG, "startLoading");
-        if (mLoadingCircleViewDialogFragment == null) {
-            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
-            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
-        }
-
-    }
-
-    private void stopLoading() {
-        LogUtil.v(TAG, "stopLoading");
-        if (mLoadingCircleViewDialogFragment != null) {
-            mLoadingCircleViewDialogFragment.dismiss();
-            mLoadingCircleViewDialogFragment = null;
-        }
-    }
 }

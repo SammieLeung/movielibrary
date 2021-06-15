@@ -152,7 +152,7 @@ public class FileManagerFragment extends Fragment {
                                             mApp.setShowEncrypted(false);
                                             updateShowPrivateText((TextView) v, false);
 //                                            context.checkConnectedDevices();
-                                            context.initMovie();
+//                                            context.initMovie();
                                             Toast.makeText(context, context.getResources().getString(R.string.tips_for_hide_private_videos), Toast.LENGTH_SHORT).show();
                                             return;
                                         }
@@ -174,7 +174,7 @@ public class FileManagerFragment extends Fragment {
                                                         mApp.setShowEncrypted(true);
                                                         updateShowPrivateText((TextView) v, true);
 //                                                        context.checkConnectedDevices();
-                                                        context.initMovie();
+//                                                        context.initMovie();
                                                         Toast.makeText(context, context.getResources().getString(R.string.tips_for_show_private_videos), Toast.LENGTH_SHORT).show();
                                                         fragment.dismiss();
                                                     }

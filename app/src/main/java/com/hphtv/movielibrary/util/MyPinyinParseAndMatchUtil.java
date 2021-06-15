@@ -42,13 +42,13 @@ public class MyPinyinParseAndMatchUtil {
         List<MovieWrapper> matchList = new ArrayList<>();
         if (mWrappers != null && mWrappers.size() > 0) {
             for (MovieWrapper wrapper : mWrappers) {
-                String title=wrapper.getTitle();
-                    PinyinSearchUnit pinyinSearchUnit = new PinyinSearchUnit(title);
-                    PinyinUtil.parse(pinyinSearchUnit);
-                    if (QwertyUtil.match(pinyinSearchUnit, rawKeyword)) {
-                        matchList.add(wrapper);
-                    }
+                String title = wrapper.getTitle();
+                PinyinSearchUnit pinyinSearchUnit = new PinyinSearchUnit(title);
+                PinyinUtil.parse(pinyinSearchUnit);
+                if (QwertyUtil.match(pinyinSearchUnit, rawKeyword)) {
+                    matchList.add(wrapper);
                 }
+            }
 
         }
         return matchList;
@@ -59,34 +59,28 @@ public class MyPinyinParseAndMatchUtil {
         PinyinUtil.parse(pinyinSearchUnit);
         List<PinyinUnit> pinyinUtils = pinyinSearchUnit.getPinyinUnits();
         StringBuffer wordBuffer = new StringBuffer();
-        int i=0;
+        int i = 0;
         for (PinyinUnit pyUnit : pinyinUtils) {
-            StringBuffer chineseBuffer = new StringBuffer();
-//            Log.v(TAG,"第"+i+"轮");
+            wordBuffer.append("(");
             for (PinyinBaseUnit pybaseUtil : pyUnit.getPinyinBaseUnitIndex()) {
-                chineseBuffer.append(pybaseUtil.getPinyin().charAt(0)+",");
-//                Log.v(TAG,pybaseUtil.getOriginalString()+" ="+pybaseUtil.getPinyin());
+                wordBuffer.append(pybaseUtil.getPinyin().charAt(0) + ",");
             }
-            chineseBuffer.deleteCharAt(chineseBuffer.length()-1);
+            wordBuffer.replace(wordBuffer.lastIndexOf(","), wordBuffer.length(), ")");
             i++;
-            wordBuffer.append(chineseBuffer.toString()+"|");
-        }
-        if(wordBuffer.length()>0){
-            wordBuffer.deleteCharAt(wordBuffer.length()-1);
         }
         return wordBuffer.toString();
     }
 
     public static List<Movie> match(String rawKeyword, Context context) {
         List<Movie> matchList = new ArrayList<Movie>();
-        rawKeyword=rawKeyword.toLowerCase();
+        rawKeyword = rawKeyword.toLowerCase();
         MovieDao dao = new MovieDao(context);
         String whereClause = "title_pinyin like ?";
         StringBuffer sqlKeyword = new StringBuffer();
         for (int i = 0; i < rawKeyword.length(); i++) {
-            sqlKeyword.append("%" + rawKeyword.charAt(i)+"%|");
+            sqlKeyword.append("%" + rawKeyword.charAt(i) + "%|");
         }
-        sqlKeyword.deleteCharAt(sqlKeyword.length()-1);
+        sqlKeyword.deleteCharAt(sqlKeyword.length() - 1);
         String[] whereArgs = new String[]{sqlKeyword.toString()};
         Cursor cursor = dao.select(null, whereClause, whereArgs, "title", null, null, null);
         Log.v(TAG, "ddd " + cursor);
@@ -97,10 +91,6 @@ public class MyPinyinParseAndMatchUtil {
             }
         return matchList;
     }
-
-
-
-
 
 
 }

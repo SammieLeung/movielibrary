@@ -262,8 +262,6 @@ public class ConstData {
         String RESCAN_DEVICE="com.rockchips.mediacenter.rescan_device";
 
         String MOVIE_SCRAP_FINISH="action.movie.scrap.finish";
-        String MOVIE_GET_CATEGORY_FINISH="action.get.category.finish";
-
     }
 
 

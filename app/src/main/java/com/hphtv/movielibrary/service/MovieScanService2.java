@@ -35,6 +35,7 @@ import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
 import com.hphtv.movielibrary.util.FileScanUtil;
+import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
 import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 
@@ -48,7 +49,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.functions.Supplier;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -74,7 +74,7 @@ public class MovieScanService2 extends Service {
     private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
     private VideoFileDao mVideoFileDao;
     private boolean isScanning;
-    private int count;
+    private int total;
     private int offset;
 
     @Override
@@ -129,14 +129,14 @@ public class MovieScanService2 extends Service {
     }
 
     public boolean start(VideoFile... videoFiles) {
-        if (isScanning)
-            return false;
         synchronized (this) {
-            if (isScanning)
-                return false;
+            if (!isScanning) {
+                total = videoFiles.length;
+                offset = 0;
+            } else {
+                total += videoFiles.length;
+            }
             isScanning = true;
-            count=videoFiles.length;
-            offset=0;
             for (VideoFile videoFile : videoFiles) {
                 startSearch(videoFile);
             }
@@ -145,14 +145,14 @@ public class MovieScanService2 extends Service {
     }
 
     public boolean start(List<VideoFile> videoFileList) {
-        if (isScanning)
-            return false;
         synchronized (this) {
-            if (isScanning)
-                return false;
+            if (!isScanning) {
+                total = videoFileList.size();
+                offset = 0;
+            } else {
+                total += videoFileList.size();
+            }
             isScanning = true;
-            count=videoFileList.size();
-            offset=0;
             for (VideoFile videoFile : videoFileList) {
                 startSearch(videoFile);
             }
@@ -168,17 +168,6 @@ public class MovieScanService2 extends Service {
      */
     private MovieNameInfo createMovieNameInfo(VideoFile videoFile) {
         String path = videoFile.path;
-//        String mediaTitle = null;
-//        if (!TextUtils.isEmpty(path)) {
-//            try {
-//                MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-//                mediaMetadataRetriever.setDataSource(path);
-//                mediaTitle = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        String raw = TextUtils.isEmpty(mediaTitle) ? path : mediaTitle;
         String raw = path;
         return FileScanUtil.simpleParse(raw);
     }
@@ -229,7 +218,7 @@ public class MovieScanService2 extends Service {
                 .subscribeWith(new DisposableObserver<MovieWrapper>() {
                     @Override
                     public void onNext(@NonNull MovieWrapper movieWrapper) {
-                        LogUtil.v("onNext " + Thread.currentThread().getName());
+                        LogUtil.v("startSearch+++++++++");
                         LogUtil.v("Result:origin" + videoFile.filename);
                         LogUtil.v("Result:==>" + movieWrapper.movie.title);
                         offset++;
@@ -243,11 +232,14 @@ public class MovieScanService2 extends Service {
 
                     @Override
                     public void onComplete() {
-                        if(offset==count){
-                            //扫描结束
-                            Intent intent=new Intent();
-                            intent.setAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
-                            LocalBroadcastManager.getInstance(MovieScanService2.this).sendBroadcast(intent);
+                        synchronized (MovieScanService2.this) {
+                            if (offset == total) {
+                                //扫描结束
+                                isScanning=false;
+                                Intent intent = new Intent();
+                                intent.setAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
+                                LocalBroadcastManager.getInstance(MovieScanService2.this).sendBroadcast(intent);
+                            }
                         }
                     }
                 })
@@ -266,6 +258,8 @@ public class MovieScanService2 extends Service {
         Director director = movieWrapper.director;
         List<Actor> actorList = movieWrapper.actors;
         //插入电影到数据库
+        movie.pinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.title);
+        movie.addTime = System.currentTimeMillis();
         mMovieDao.insertOrIgnoreMovie(movie);
         //查询影片ID
         long movie_id = mMovieDao.queryByMovieId(movie.movieId).id;
@@ -306,7 +300,7 @@ public class MovieScanService2 extends Service {
         mMovieVideofileCrossRefDao.insertMovieVideofileCrossRef(movieVideoFileCrossRef);
 
         videoFile.isScanned = 1;
-        LogUtil.v("videofile " + videoFile.filename + " isScanned ");
+        LogUtil.v("saveMovieWrapper==>: " + videoFile.filename + " isScanned ");
         mVideoFileDao.update(videoFile);
 
     }
@@ -317,7 +311,6 @@ public class MovieScanService2 extends Service {
 
         public MovieSupplier(VideoFile videoFile) {
             mVideoFile = videoFile;
-            LogUtil.v("VideoFile path=" + mVideoFile.path);
         }
 
         @Override

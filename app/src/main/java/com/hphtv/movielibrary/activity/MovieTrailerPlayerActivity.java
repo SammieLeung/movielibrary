@@ -1,11 +1,8 @@
 package com.hphtv.movielibrary.activity;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.view.CustomLoadingCircleView;
-import com.hphtv.movielibrary.view.CustomLoadingCircleViewFragment;
 import com.hphtv.movielibrary.view.CustomMediaController;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -20,10 +17,9 @@ import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
-public class MovieTrailerPlayerActivity extends Activity {
+public class MovieTrailerPlayerActivity extends BaseActivity {
     public static final String TAG = "MovieTrailerPlayer";
     VideoView videoView;
-    CustomLoadingCircleViewFragment mLoadingCircleViewDialogFragment;
     MediaController mc;
 
     @Override
@@ -128,17 +124,4 @@ public class MovieTrailerPlayerActivity extends Activity {
         }
     };
 
-    private void startLoading() {
-        if (mLoadingCircleViewDialogFragment == null) {
-            mLoadingCircleViewDialogFragment = new CustomLoadingCircleViewFragment();
-            mLoadingCircleViewDialogFragment.show(getFragmentManager(), TAG);
-        }
-    }
-
-    private void stopLoading() {
-        if (mLoadingCircleViewDialogFragment != null) {
-            mLoadingCircleViewDialogFragment.dismiss();
-            mLoadingCircleViewDialogFragment = null;
-        }
-    }
 }
