@@ -86,7 +86,7 @@ public class MtimeApi {
 
     private static JSONObject SearchMovies(String keyword, int offset) {
         try {
-            Response response = OkHttpUtil.getResponse(String.format(MtimeURL.SEARCH_NEW_URL2, keyword, offset));
+            Response response = OkHttpUtil.getResponse(String.format(MtimeURL.SEARCH_NEW_URL, keyword, offset));
             String content = response.body().string();
             JSONObject contentObj = JSON.parseObject(content);
             JSONObject data = contentObj.getJSONObject("data");

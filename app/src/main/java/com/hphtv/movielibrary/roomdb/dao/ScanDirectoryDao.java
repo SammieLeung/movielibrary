@@ -20,11 +20,6 @@ import java.util.List;
 public interface ScanDirectoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long[] insertScanDirectories(ScanDirectory... scanDirectories);
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertScanDirectories(List<ScanDirectory> scanDirectories);
-
-    @Delete
-    public void deleteScanDirectories(ScanDirectory... scanDirectories);
 
 
     @Delete

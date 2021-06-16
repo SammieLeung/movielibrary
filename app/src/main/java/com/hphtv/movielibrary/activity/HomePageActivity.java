@@ -123,8 +123,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     @Override
     protected void processLogic() {
         LogUtil.v(TAG, "processLogic==>OnCreate");
-//        if (LanguageUtil.isLanguageChanged(HomePageActivity.this, HomePageActivity.class))
-//            LanguageUtil.restartApp(HomePageActivity.this, HomePageActivity.class);
         mTagAll = getResources().getString(R.string.tx_all);
         mTitleArr = new String[]{getResources().getString(R.string.lb_title), getResources().getString(R.string.lb_sort_directory), getResources().getString(R.string.lb_setting)};
         requestPermission();
@@ -162,8 +160,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     private void bindService() {
-//        Intent intent = new Intent(this, MovieScanService2.class);
-//        bindService(intent, mServiceConnection, Service.BIND_AUTO_CREATE);
         Intent intent2 = new Intent();
         intent2.setClass(this, DeviceMonitorService.class);
         bindService(intent2, mServiceConnection, Context.BIND_AUTO_CREATE);
@@ -433,7 +429,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      * 1000毫秒后更新筛选分类和电影
      */
     private void postDelayMovieRefresh() {
-        this.postDelayMovieRefresh(1000);
+        this.postDelayMovieRefresh(800);
     }
 
     /**

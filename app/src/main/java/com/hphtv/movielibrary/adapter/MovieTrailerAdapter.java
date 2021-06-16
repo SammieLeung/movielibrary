@@ -1,34 +1,32 @@
 package com.hphtv.movielibrary.adapter;
 
-import java.util.List;
-
 import android.content.Context;
-import android.os.Handler;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.sqlite.bean.scraperBean.MovieTrailer;
+import com.hphtv.movielibrary.databinding.MovieTrailerItemBinding;
+import com.hphtv.movielibrary.roomdb.entity.Trailer;
+
+import java.util.List;
 
 public class MovieTrailerAdapter extends
         RecyclerView.Adapter<MovieTrailerAdapter.ViewHolder> implements OnClickListener {
     private static final String TAG = "MovieTrailerAdapter";
-    private List<MovieTrailer> list = null;
+    private List<Trailer> list = null;
 
     private Context context;
-    Handler handler = new Handler();
     Boolean mIsNotLoop = false;
 
-    public MovieTrailerAdapter(Context context, List<MovieTrailer> datas) {
-        this.list = datas;
+    public MovieTrailerAdapter(Context context, List<Trailer> trailerList) {
+        this.list = trailerList;
         this.context = context;
     }
 
@@ -53,16 +51,10 @@ public class MovieTrailerAdapter extends
         } else {
             return;
         }
-        MovieTrailer movieTrailer = list.get(position);
-        viewHolder.mTitle.setText(movieTrailer.getTitle());
-        viewHolder.mDuration.setText(movieTrailer.getDuration());
-        ImageView imageView = viewHolder.mPoster;
-//        if (movieTrailer.getBitmap() != null) {
-//            imageView.setImageBitmap(movieTrailer.getBitmap());
-//        } else {
-            Glide.with(context).load(movieTrailer.getPhoto())
-                    .apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(imageView);
-//        }
+        Trailer trailer = list.get(position);
+        viewHolder.mTrailerItemBinding.tvTitle.setText(trailer.title);
+            Glide.with(context).load(trailer.img)
+                    .apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(viewHolder.mTrailerItemBinding.ivPoster);
 
         //将数据保存在itemView的Tag中，以便点击时进行获取
         viewHolder.itemView.setTag(list.get(position));
@@ -77,37 +69,22 @@ public class MovieTrailerAdapter extends
 
     // 自定义的ViewHolder，持有每个Item的的所有界面元素
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView mTitle;
-        TextView mDuration;
-        ImageView mPoster;
+        MovieTrailerItemBinding mTrailerItemBinding;
 
         public ViewHolder(View view) {
             super(view);//绑定RecyclerView.ViewHolder的itemView
-            mTitle = (TextView) view.findViewById(R.id.tv_title);
-            mDuration = (TextView) view.findViewById(R.id.tv_duration);
-            mPoster = (ImageView) view.findViewById(R.id.iv_poster);
+            mTrailerItemBinding= DataBindingUtil.bind(view);
         }
     }
 
-    /**
-     * 添加数据
-     *
-     * @param content
-     * @param position
-     */
-    public void addItem(MovieTrailer content, int position) {
-        list.add(position, content);
-        notifyItemInserted(position); // Attention!
+
+    public void addItems(List<Trailer> list) {
+        if(list!=null) {
+            this.list.addAll(list);
+            notifyDataSetChanged();
+        }
     }
 
-    public void addItems(List<MovieTrailer> list) {
-        this.list = list;
-        notifyDataSetChanged();
-    }
-
-    public void modifyItems(int started, int end) {
-        notifyItemRangeChanged(started, end);
-    }
 
     @Override
     public long getItemId(int position) {
@@ -122,7 +99,7 @@ public class MovieTrailerAdapter extends
     }
 
     public interface OnRecyclerViewItemClickListener {
-        void onItemClick(View view, MovieTrailer data);
+        void onItemClick(View view, Trailer data);
     }
 
     private OnRecyclerViewItemClickListener mOnItemClickListener = null;
@@ -133,9 +110,8 @@ public class MovieTrailerAdapter extends
 
     @Override
     public void onClick(View v) {
-        Log.v(TAG, "onClick() mOnItemClickListener= " + mOnItemClickListener);
         if (mOnItemClickListener != null) {
-            mOnItemClickListener.onItemClick(v, (MovieTrailer) v.getTag());
+            mOnItemClickListener.onItemClick(v, (Trailer) v.getTag());
         }
 
     }

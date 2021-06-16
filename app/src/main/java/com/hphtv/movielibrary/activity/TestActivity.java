@@ -22,8 +22,8 @@ import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService2;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
-import com.hphtv.movielibrary.util.retrofit.MtimeAPIRequest;
-import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
+import com.hphtv.movielibrary.scraper.mtime.MtimeAPIRequest;
+import com.hphtv.movielibrary.scraper.mtime.MtimeSearchRespone;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
 
 import java.util.List;

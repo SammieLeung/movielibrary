@@ -14,11 +14,6 @@ import java.util.List;
  */
 @Dao
 public interface ActorDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long insertActor(Actor actor);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long[] insertActors(Actor... actors);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertActors(List<Actor> actors);

@@ -10,6 +10,8 @@ public interface TABLE {
     String DIRECTOR = "director";
     String GENRE = "genre";
     String MOVIE = "movie";
+    String TRAILER="trailer";
+
     String MOVIE_ACTOR_CROSS_REF = "movie_actor_cross_ref";
     String MOVIE_DIRECTOR_CROSS_REF = "movie_director_cross_ref";
     String MOVIE_GENRE_CROSS_REF = "movie_genre_cross_ref";

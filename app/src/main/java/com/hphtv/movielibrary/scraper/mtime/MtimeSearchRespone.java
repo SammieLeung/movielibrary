@@ -1,8 +1,9 @@
-package com.hphtv.movielibrary.util.retrofit;
+package com.hphtv.movielibrary.scraper.mtime;
 
 
 
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
 import java.util.ArrayList;
 import java.util.List;

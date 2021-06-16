@@ -12,11 +12,16 @@ import com.hphtv.movielibrary.roomdb.TABLE;
  */
 @Entity(tableName = TABLE.DIRECTOR)
 public class Director {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "director_id")
     public long directorId;
     public String name;
     @ColumnInfo(name = "name_en")
     public String nameEn;
     public String img;
+
+    @Override
+    public String toString() {
+        return name+"("+nameEn+")";
+    }
 }

@@ -38,4 +38,32 @@ public class MovieWrapper {
             entityColumn = "genre_id",
             associateBy = @Junction(MovieGenreCrossRef.class))
     public List<Genre> genres;//电影分类列表，多对多关系
+
+    @Relation(
+            parentColumn = "id",
+            entityColumn = "tra_id"
+    )
+    public List<Trailer> trailers;//预告片列表
+
+    public String toGenreString(){
+        StringBuffer sb=new StringBuffer();
+        for(Genre genre:genres){
+            sb.append(genre.toString()+" ");
+        }
+        sb.replace(sb.lastIndexOf(" "),sb.length(),"");
+        return sb.toString();
+    }
+
+    public String toActorString(){
+        StringBuffer sb=new StringBuffer();
+        int i=0;
+        for(Actor actor:actors){
+            if(i>=2)
+                break;
+            sb.append(actor.toString()+",");
+            i++;
+        }
+        sb.replace(sb.lastIndexOf(","),sb.length(),"");
+        return sb.toString();
+    }
 }

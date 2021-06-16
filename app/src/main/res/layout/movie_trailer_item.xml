@@ -1,74 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="374dp"
-    android:layout_height="208dp"
-    android:layout_marginLeft="6.7dip"
-    android:layout_marginRight="6.7dip"
-    android:layout_marginTop="31dp"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <RelativeLayout
-        android:id="@+id/ln_poster"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/cdfdfdf"
-        android:duplicateParentState="true">
+    <data>
 
-        <ImageView
-            android:id="@+id/iv_poster"
+    </data>
+
+    <FrameLayout
+        android:layout_width="374dp"
+        android:layout_height="208dp"
+        android:layout_marginLeft="6.7dip"
+        android:layout_marginRight="6.7dip"
+        android:layout_marginTop="31dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <RelativeLayout
+            android:id="@+id/ln_poster"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:padding="3dp"
-            android:scaleType="fitXY" />
+            android:background="@color/cdfdfdf"
+            android:duplicateParentState="true">
 
-        <ImageView
-            android:id="@+id/iv_poster2"
+            <ImageView
+                android:id="@+id/iv_poster"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:padding="3dp"
+                android:scaleType="fitXY" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:duplicateParentState="true"
+                android:scaleType="center"
+                android:src="@drawable/trailer_bg" />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:duplicateParentState="true"
+                android:scaleType="center"
+                android:src="@drawable/trailer_src" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/text_group_trailer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:duplicateParentState="true"
-            android:scaleType="center"
-            android:src="@drawable/trailer_bg" />
-
-        <ImageView
-            android:id="@+id/iv_poster3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:duplicateParentState="true"
-            android:scaleType="center"
-            android:src="@drawable/trailer_src" />
+            android:layout_margin="12dp"
+            android:visibility="gone">
 
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/text_group_trailer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="12dp"
-        android:visibility="gone">
-
-
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:ellipsize="end"
-            android:lines="1"
-            android:textColor="@color/tx_fff"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="20dp"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textColor="@color/tx_fff"
+                android:textSize="14sp" />
 
 
-        <TextView
-            android:id="@+id/tv_duration"
-            android:layout_width="wrap_content"
-            android:layout_height="20dip"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentBottom="true"
-            android:textColor="@color/tx_fff"
-            android:textSize="14sp" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/tv_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="20dip"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:textColor="@color/tx_fff"
+                android:textSize="14sp" />
+        </RelativeLayout>
 
 
-</FrameLayout>
+    </FrameLayout>
+</layout>

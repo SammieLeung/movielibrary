@@ -1,8 +1,5 @@
 package com.hphtv.movielibrary.scraper.mtime;
 
-import com.hphtv.movielibrary.util.retrofit.MtimeAPIRequest;
-import com.hphtv.movielibrary.util.retrofit.MtimeDetailRespone;
-import com.hphtv.movielibrary.util.retrofit.MtimeSearchRespone;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
 
 import io.reactivex.rxjava3.core.Observable;

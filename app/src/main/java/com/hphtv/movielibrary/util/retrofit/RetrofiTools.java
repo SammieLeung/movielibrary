@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.util.retrofit;
 
+import com.hphtv.movielibrary.scraper.mtime.MtimeAPIRequest;
 import com.hphtv.movielibrary.scraper.mtime.MtimeURL;
 
 import okhttp3.OkHttpClient;

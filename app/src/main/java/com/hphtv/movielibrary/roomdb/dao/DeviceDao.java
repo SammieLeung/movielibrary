@@ -22,8 +22,6 @@ public interface DeviceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long[] insertDevices(Device... devices);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertDevices(List<Device> deviceList);
 
     @Update
     public void updateDevice(Device... devices);

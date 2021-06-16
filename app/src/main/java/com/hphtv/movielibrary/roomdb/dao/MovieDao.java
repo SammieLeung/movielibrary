@@ -23,17 +23,10 @@ import java.util.List;
  */
 @Dao
 public interface MovieDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long insertOrReplaceMovie(Movie movie);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertOrIgnoreMovie(Movie movie);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertMovies(Movie... movies);
-
-    @Update
-    public void updateMovie(Movie movie);
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
     public Movie queryByMovieId(String movie_id);
@@ -45,8 +38,14 @@ public interface MovieDao {
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
             "(SELECT VF.path from " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
-            "ON MOVIE__VF.path=VF__DEV.path) ORDER BY :orderBy")
-    public List<MovieWrapper> queryAll(String orderBy);
+            "ON MOVIE__VF.path=VF__DEV.path)")
+    public List<MovieWrapper> queryAll();
+
+    @Transaction
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
+            "(SELECT VF.path from " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
+            "ON MOVIE__VF.path=VF__DEV.path) and id=:id")
+    public MovieWrapper queryMovieWrapperById(long id);
 
     /**
      *

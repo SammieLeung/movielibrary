@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -38,6 +39,7 @@ public class HomePageFragment extends Fragment {
     private static AtomicBoolean atomicBoolean = new AtomicBoolean();
 
     private FLayoutFavoriteBinding mFLayoutFavoriteBinding;
+    private ActivityResultLauncher mActivityResultLauncher;
 
     public static HomePageFragment newInstance() {
 
@@ -47,15 +49,20 @@ public class HomePageFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
+        mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
+            Log.v(TAG, "onActivityResult resultCode=" + result.getResultCode());
+        });
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        mFLayoutFavoriteBinding=FLayoutFavoriteBinding.inflate(inflater);
+        mFLayoutFavoriteBinding = FLayoutFavoriteBinding.inflate(inflater);
         return mFLayoutFavoriteBinding.getRoot();
     }
 
@@ -80,25 +87,18 @@ public class HomePageFragment extends Fragment {
         mMovieLibraryAdapter = new MovieLibraryAdapter(getContext(), mMovieDataViewList);
         mFLayoutFavoriteBinding.rvMovies.setAdapter(mMovieLibraryAdapter);
         mMovieLibraryAdapter
-                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, MovieDataView dataView) {
+                .setOnItemClickListener((view, dataView) -> {
 
-                        Intent intent = new Intent(HomePageFragment.this.getContext(),
-                                MovieDetailActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putLong("movie_id", dataView.id);
-                        bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-                        intent.putExtras(bundle);
-                        ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
-                        HomePageFragment.this.registerForActivityResult(startActivityForResult, result -> {
-                            Log.v(TAG, "onActivityResult resultCode=" + result.getResultCode());
-                        }).launch(intent);
-                    }
+                    Intent intent = new Intent(HomePageFragment.this.getContext(),
+                            MovieDetailActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putLong(ConstData.IntentKey.KEY_MOVIE_ID, dataView.id);
+                    bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+                    intent.putExtras(bundle);
+                    mActivityResultLauncher.launch(intent);
                 });
 
     }
-
 
 
     public void updateMovie(List<MovieDataView> movieDataViews) {

@@ -182,23 +182,18 @@ public class ConstData {
         String KEY_MNI = "key_mni";
         String KEY_FILE = "key_video_file";
         String KEY_PHRASENAME = "key_phrase_name";
+
     }
 
 
     //7.---------------for MovieSearcherHelper -----------
     public interface IntentKey {
         String IS_GET_MOVIE_LISTS = "MODE_LIST";
+        String KEY_MOVIE_ID="movie_id";
+
 
     }
 
-    //8.-----------for adapter-------------------
-    public interface CardViewType {
-        int VIEWTYPE_SIMPLE = 0;
-        int VIEWTYPE_EXPEND = 1;
-        int VIEWTYPE_SMALL = 2;
-        int VIEWTYPE_HISTORY = 3;
-        int VIEWTYPE_FAVORITE = 4;
-    }
 
     public interface DeviceModel {
         String TRV9 = "trv9";
@@ -274,6 +269,6 @@ public class ConstData {
 
         String PASSWORD="password";
         String MOVIE_DB_UPDATE="movie_db_update";
-
     }
+
 }

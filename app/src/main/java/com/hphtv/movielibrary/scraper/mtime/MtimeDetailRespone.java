@@ -1,12 +1,12 @@
-package com.hphtv.movielibrary.util.retrofit;
+package com.hphtv.movielibrary.scraper.mtime;
 
 
 import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.roomdb.entity.Actor;
-import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +41,7 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
             private String story;
             private String year;
             private Country[] countries;
+            private Video[] videos;
 
             @Override
             public MovieWrapper toEntity() {
@@ -94,11 +95,25 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
                         actorList.add(t_actor);
                     }
 
+                List<Trailer> trailerList = new ArrayList<>();
+                if (videos != null && videos.length > 0) {
+                    for (int i = 0; i < 10 && i < videos.length; i++) {
+                        Trailer trailer = new Trailer();
+                        trailer.img = videos[i].img;
+                        trailer.url = videos[i].hightUrl;
+                        trailer.title = videos[i].title;
+                        trailer.tra_id=videos[i].videoId;
+                        trailerList.add(trailer);
+                    }
+                }
+
+
                 MovieWrapper movieWrapper = new MovieWrapper();
                 movieWrapper.movie = movie;
                 movieWrapper.actors = actorList;
                 movieWrapper.director = t_director;
                 movieWrapper.genres = genreList;
+                movieWrapper.trailers = trailerList;
 
                 return movieWrapper;
             }
@@ -121,6 +136,13 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
             private class Country {
                 private String name;
                 private String nameEn;
+            }
+
+            private class Video {
+                private long videoId;
+                private String hightUrl;
+                private String title;
+                private String img;
             }
         }
 

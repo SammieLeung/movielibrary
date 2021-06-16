@@ -17,9 +17,4 @@ import java.util.List;
 public interface MovieActorCrossRefDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long insertMovieActorCrossRef(MovieActorCrossRef movieActorCrossRef);
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertMovieActorCrossRefs(MovieActorCrossRef... movieActorCrossRefs);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertMovieActorCrossRefs(List<MovieActorCrossRef> movieActorCrossRefs);
 }

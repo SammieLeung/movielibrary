@@ -17,4 +17,9 @@ public class Genre {
     @ColumnInfo(name = "genre_id")
     public long genreId;
     public String name;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -21,29 +21,17 @@ public interface VideoFileDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertOrIgnore(VideoFile videoFile);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long[] insertOrIgnore(VideoFile... fileInfos);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long[] insertOrIgnore(List<VideoFile> fileInfos);
-
     @Update
     public int update(VideoFile videoFile);
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_id in (:device_ids)")
-    public List<VideoFile> queryAllByIds(String[] device_ids);
-
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_id in (:device_ids) AND is_scanned=0")
     public List<VideoFile> queryAllNotScanedByIds(String... device_ids);
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);
-
-    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId")
-    public void deleteByDeviceId(String deviceId);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId and path not in (:paths) ")
     public void deleteByDeviceId(String deviceId, String[] paths);

@@ -17,12 +17,13 @@ import java.util.List;
  */
 @Dao
 public interface GenreDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long[] insertGenres(Genre... genres);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertGenres(List<Genre> genres);
 
-    @Query("SELECT name From "+ TABLE.GENRE)
+    @Query("SELECT name FROM "+ TABLE.GENRE)
     public List<String> queryAllGenres();
+
+    @Query("SELECT genre_id FROM "+TABLE.GENRE +" WHERE name in (:names)")
+    public long[] queryByName(List<String> names);
 }

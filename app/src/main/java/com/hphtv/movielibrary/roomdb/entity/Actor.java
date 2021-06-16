@@ -12,11 +12,16 @@ import com.hphtv.movielibrary.roomdb.TABLE;
  */
 @Entity(tableName = TABLE.ACTOR)
 public class Actor {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "actor_id")
     public long actorId;
     public String name;
     @ColumnInfo(name = "name_en")
     public String nameEn;
     public String img;
+
+    @Override
+    public String toString() {
+        return name+"("+nameEn+")";
+    }
 }

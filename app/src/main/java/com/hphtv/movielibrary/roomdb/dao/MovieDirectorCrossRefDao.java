@@ -18,9 +18,4 @@ public interface MovieDirectorCrossRefDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long insertMovieDirectorCrossRef(MovieDirectorCrossRef movieDirectorCrossRef);
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertMovieDirectorCrossRefs(MovieDirectorCrossRef... movieDirectorCrossRefs);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public long[] insertMovieDirectorCrossRefs(List<MovieDirectorCrossRef> movieDirectorCrossRefs);
 }

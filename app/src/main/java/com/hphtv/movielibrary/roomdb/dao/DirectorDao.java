@@ -17,9 +17,4 @@ import java.util.List;
 public interface DirectorDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertDirector(Director director);
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long[] insertDirectors(Director... directors);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long[] insertDirectors(List<Director> directors);
 }

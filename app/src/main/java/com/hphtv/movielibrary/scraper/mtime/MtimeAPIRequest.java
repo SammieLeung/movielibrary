@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.util.retrofit;
+package com.hphtv.movielibrary.scraper.mtime;
 
 import io.reactivex.rxjava3.core.Observable;
 import retrofit2.Call;
@@ -20,4 +20,5 @@ public interface MtimeAPIRequest {
 
     @GET("library/movie/detail.api")
     Observable<MtimeDetailRespone> getMovieDetailByMtimeRx(@Query("movieId") String movieId);
+
 }

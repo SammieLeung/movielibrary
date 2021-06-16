@@ -194,17 +194,6 @@ public class HomepageViewModel extends AndroidViewModel {
                 });
     }
 
-    /**
-     * 开始对未匹配文件进行海报匹配
-     *
-     * @param service
-     * @param videoFileList
-     */
-    public void startScrap(MovieScanService2 service, List<VideoFile> videoFileList) {
-        if (videoFileList.size() > 0) {
-            service.start(videoFileList);
-        }
-    }
 
     public void clearNotScannedVideoFiles() {
         if (mAllNotScannedVideoFiles != null)
@@ -236,12 +225,6 @@ public class HomepageViewModel extends AndroidViewModel {
     private List<VideoFile> getNotScannedFiles(Device device) {
         List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedByIds(device.id);
         return mountedDeviceFiles;
-    }
-
-    public void startScrap(MovieScanService2 service) {
-        if (mAllNotScannedVideoFiles != null && mAllNotScannedVideoFiles.size() > 0) {
-            service.start(mAllNotScannedVideoFiles);
-        }
     }
 
     public List<String> getConditionGenres() {
