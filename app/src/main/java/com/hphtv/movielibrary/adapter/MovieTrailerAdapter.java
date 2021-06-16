@@ -54,7 +54,7 @@ public class MovieTrailerAdapter extends
         Trailer trailer = list.get(position);
         viewHolder.mTrailerItemBinding.tvTitle.setText(trailer.title);
             Glide.with(context).load(trailer.img)
-                    .apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(viewHolder.mTrailerItemBinding.ivPoster);
+                    .apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(viewHolder.mTrailerItemBinding.ivPhoto);
 
         //将数据保存在itemView的Tag中，以便点击时进行获取
         viewHolder.itemView.setTag(list.get(position));

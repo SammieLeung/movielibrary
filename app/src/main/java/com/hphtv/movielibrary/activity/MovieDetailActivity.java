@@ -1,20 +1,14 @@
 package com.hphtv.movielibrary.activity;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,17 +22,14 @@ import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
-import com.hphtv.movielibrary.scraper.douban.DoubanApi;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApi;
 import com.hphtv.movielibrary.service.MovieScanService;
-import com.hphtv.movielibrary.util.BroadcastHelper;
-import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
 import com.hphtv.movielibrary.view.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import me.khrystal.library.widget.ItemViewMode;
 import me.khrystal.library.widget.ScaleXCenterViewMode;
@@ -122,7 +113,14 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                if(args[0]!=null){
                    MovieWrapper wrapper= (MovieWrapper) args[0];
                    mBinding.setWrapper(wrapper);
+                   String stagePhoto="";
+                   if(wrapper.stagePhotos!=null&&wrapper.stagePhotos.size()>0){
+                       Random random=new Random();
+                       int index=random.nextInt(wrapper.stagePhotos.size());
+                       stagePhoto=wrapper.stagePhotos.get(index).imgUrl;
+                   }
                    Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
+                   Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
                }
 
            });

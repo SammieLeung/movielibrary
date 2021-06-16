@@ -16,6 +16,7 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
+import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao;
 import com.hphtv.movielibrary.roomdb.dao.TrailerDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
@@ -29,6 +30,7 @@ import com.hphtv.movielibrary.roomdb.entity.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
+import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
@@ -41,7 +43,7 @@ import org.fourthline.cling.support.model.container.MovieGenre;
 
 @Database(entities = {Actor.class, Device.class, Director.class, Genre.class, Movie.class, MovieActorCrossRef.class,
         MovieDirectorCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
-        ScanDirectory.class, VideoFile.class, Trailer.class}, views = {MovieDataView.class}, version = 2)
+        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class}, views = {MovieDataView.class}, version = 2)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO
@@ -68,6 +70,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     public abstract ScanDirectoryDao getScanDirectoryDao();
 
     public abstract TrailerDao getTrailerDao();
+
+    public abstract StagePhotoDao getStagePhotoDao();
 
     public static MovieLibraryRoomDatabase getDatabase(final Context context) {
         if (sInstance == null) {

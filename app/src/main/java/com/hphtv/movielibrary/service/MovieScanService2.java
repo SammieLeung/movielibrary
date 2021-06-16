@@ -22,6 +22,7 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
+import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao;
 import com.hphtv.movielibrary.roomdb.dao.TrailerDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
@@ -33,6 +34,7 @@ import com.hphtv.movielibrary.roomdb.entity.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
@@ -77,6 +79,7 @@ public class MovieScanService2 extends Service {
     private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
     private VideoFileDao mVideoFileDao;
     private TrailerDao mTrailerDao;
+    private StagePhotoDao mStagePhotoDao;
     private boolean isScanning;
     private int total;
     private int offset;
@@ -112,6 +115,7 @@ public class MovieScanService2 extends Service {
         mMovieVideofileCrossRefDao = movieLibraryRoomDatabase.getMovieVideofileCrossRefDao();
         mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
         mTrailerDao=movieLibraryRoomDatabase.getTrailerDao();
+        mStagePhotoDao=movieLibraryRoomDatabase.getStagePhotoDao();
     }
 
     private void initThreadPools() {
@@ -263,6 +267,7 @@ public class MovieScanService2 extends Service {
         Director director = movieWrapper.director;
         List<Actor> actorList = movieWrapper.actors;
         List<Trailer> trailerList = movieWrapper.trailers;
+        List<StagePhoto> stagePhotoList=movieWrapper.stagePhotos;
         //插入电影到数据库
         movie.pinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
@@ -311,8 +316,15 @@ public class MovieScanService2 extends Service {
 
         for(Trailer trailer:trailerList){
             if(trailer!=null){
-                trailer.m_id=movie_id;
-                mTrailerDao.insertOrReplace(trailer);
+                trailer.movieId=movie_id;
+                mTrailerDao.insertOrIgnore(trailer);
+            }
+        }
+
+        for(StagePhoto stagePhoto:stagePhotoList){
+            if(stagePhoto!=null){
+                stagePhoto.movieId=movie_id;
+                mStagePhotoDao.insertOrIgnore(stagePhoto);
             }
         }
 

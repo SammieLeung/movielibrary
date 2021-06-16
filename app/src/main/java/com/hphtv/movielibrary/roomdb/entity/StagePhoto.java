@@ -8,16 +8,15 @@ import com.hphtv.movielibrary.roomdb.TABLE;
 
 /**
  * author: Sam Leung
- * date:  2021/6/15
+ * date:  2021/6/16
  */
-@Entity(tableName = TABLE.TRAILER)
-public class Trailer {
+@Entity (tableName = TABLE.STAGEPHOTO)
+public class StagePhoto {
     @PrimaryKey
-    @ColumnInfo(name = "trailer_id")
-    public long trailerId;
-    public String url;
-    public String title;
-    public String img;
+    @ColumnInfo(name = "stage_id")
+    public long stageId;
     @ColumnInfo(name = "movie_id")
     public long movieId;
+    public String imgUrl;
+
 }

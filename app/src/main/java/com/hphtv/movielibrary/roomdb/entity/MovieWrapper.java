@@ -41,29 +41,35 @@ public class MovieWrapper {
 
     @Relation(
             parentColumn = "id",
-            entityColumn = "tra_id"
+            entityColumn = "movie_id"
     )
     public List<Trailer> trailers;//预告片列表
 
-    public String toGenreString(){
-        StringBuffer sb=new StringBuffer();
-        for(Genre genre:genres){
-            sb.append(genre.toString()+" ");
+    @Relation(parentColumn = "id",
+            entityColumn = "movie_id")
+    public List<StagePhoto> stagePhotos;
+
+    public String toGenreString() {
+        StringBuffer sb = new StringBuffer();
+        for (Genre genre : genres) {
+            sb.append(genre.toString() + " ");
         }
-        sb.replace(sb.lastIndexOf(" "),sb.length(),"");
+        if (sb.length() > 0)
+            sb.replace(sb.lastIndexOf(" "), sb.length(), "");
         return sb.toString();
     }
 
-    public String toActorString(){
-        StringBuffer sb=new StringBuffer();
-        int i=0;
-        for(Actor actor:actors){
-            if(i>=2)
+    public String toActorString() {
+        StringBuffer sb = new StringBuffer();
+        int i = 0;
+        for (Actor actor : actors) {
+            if (i >= 3)
                 break;
-            sb.append(actor.toString()+",");
+            sb.append(actor.toString() + ",");
             i++;
         }
-        sb.replace(sb.lastIndexOf(","),sb.length(),"");
+        if (sb.length() > 0)
+            sb.replace(sb.lastIndexOf(","), sb.length(), "");
         return sb.toString();
     }
 }

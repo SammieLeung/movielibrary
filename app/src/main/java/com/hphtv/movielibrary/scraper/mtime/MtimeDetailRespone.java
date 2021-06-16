@@ -5,6 +5,7 @@ import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
@@ -42,6 +43,7 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
             private String year;
             private Country[] countries;
             private Video[] videos;
+            private StageImg stageImg;
 
             @Override
             public MovieWrapper toEntity() {
@@ -102,8 +104,20 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
                         trailer.img = videos[i].img;
                         trailer.url = videos[i].hightUrl;
                         trailer.title = videos[i].title;
-                        trailer.tra_id=videos[i].videoId;
+                        trailer.trailerId = videos[i].videoId;
                         trailerList.add(trailer);
+                    }
+                }
+
+                List<StagePhoto> stagePhotoList = new ArrayList<>();
+                if (stageImg != null) {
+                    if (stageImg.list != null && stageImg.list.length > 0) {
+                        for (int i = 0; i < 10 && i < stageImg.list.length; i++) {
+                            StagePhoto stagePhoto = new StagePhoto();
+                            stagePhoto.imgUrl = stageImg.list[i].imgUrl;
+                            stagePhoto.stageId = stageImg.list[i].imgId;
+                            stagePhotoList.add(stagePhoto);
+                        }
                     }
                 }
 
@@ -114,6 +128,7 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
                 movieWrapper.director = t_director;
                 movieWrapper.genres = genreList;
                 movieWrapper.trailers = trailerList;
+                movieWrapper.stagePhotos = stagePhotoList;
 
                 return movieWrapper;
             }
@@ -143,6 +158,16 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
                 private String hightUrl;
                 private String title;
                 private String img;
+            }
+
+            private class StageImg {
+                private int count;
+                private Img[] list;
+            }
+
+            private class Img {
+                private long imgId;
+                private String imgUrl;
             }
         }
 

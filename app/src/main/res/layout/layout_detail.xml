@@ -6,6 +6,7 @@
     <data>
         <import type="com.hphtv.movielibrary.roomdb.entity.MovieWrapper"></import>
         <import type="android.text.TextUtils"/>
+        <import type="android.view.View"/>
         <variable
             name="wrapper"
             type="MovieWrapper" />
@@ -19,10 +20,9 @@
 
 
         <ImageView
-            android:id="@+id/iv_poster"
+            android:id="@+id/iv_stage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="-200dp"
             android:scaleType="centerCrop"
             android:src="#22000000" />
 
@@ -35,9 +35,10 @@
             <ImageView
                 android:id="@+id/detail_bg"
                 android:layout_width="match_parent"
-                android:layout_height="394dp"
+                android:layout_height="494dp"
                 android:layout_alignParentBottom="true"
-                android:background="@mipmap/detail_bg" />
+                android:background="#CC000000"/>
+<!--                android:background="@mipmap/detail_bg" />-->
         </RelativeLayout>
 
         <RelativeLayout
@@ -49,7 +50,7 @@
                 android:id="@+id/ln_part1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingBottom="68dp">
+                android:paddingBottom="118dp">
 
                 <ImageView
                     android:id="@+id/iv_cover"
@@ -83,7 +84,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_alignParentBottom="true"
                     android:layout_marginLeft="10.0dip"
-                    android:layout_marginBottom="271dp"
+                    android:layout_marginBottom="371dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -129,7 +130,7 @@
                     android:layout_height="match_parent"
                     android:layout_alignTop="@id/ln_part_of_btn"
                     android:layout_alignParentRight="true"
-                    android:layout_marginTop="126dp">
+                    android:layout_marginTop="176dp">
 
                     <RelativeLayout
                         android:id="@+id/title_group"
@@ -186,12 +187,19 @@
 
 
                     </RelativeLayout>
+                    <TextView
+                        android:id="@+id/tv_title_en"
+                        android:text="@{wrapper.movie.otherTitle}"
+                        android:layout_height="wrap_content"
+                        android:textSize="26sp"
+                        android:layout_below="@id/title_group"
+                        android:layout_width="match_parent"/>
 
                     <LinearLayout
                         android:id="@+id/tag_group"
                         android:layout_width="match_parent"
                         android:layout_height="28dp"
-                        android:layout_below="@id/title_group"
+                        android:layout_below="@id/tv_title_en"
                         android:layout_marginTop="16dp"
                         android:orientation="horizontal">
 
@@ -207,6 +215,7 @@
                             android:paddingRight="5dp"
                             android:textColor="@color/tx_fff"
                             android:textSize="15sp"
+                            android:visibility="@{TextUtils.isEmpty(wrapper.movie.year)?View.GONE:View.VISIBLE}"
                             android:textStyle="bold" />
 
 
@@ -218,6 +227,7 @@
                             android:background="@color/c70000000"
                             android:gravity="center"
                             android:text="@{wrapper.movie.country}"
+                            android:visibility="@{TextUtils.isEmpty(wrapper.movie.country)?View.GONE:View.VISIBLE}"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp"
                             android:textColor="@color/tx_fff"
@@ -234,6 +244,7 @@
                             android:gravity="center"
                             android:paddingLeft="5dp"
                             android:text="@{wrapper.movie.duration}"
+                            android:visibility="@{TextUtils.isEmpty(wrapper.movie.duration)?View.GONE:View.VISIBLE}"
                             android:paddingRight="5dp"
                             android:textColor="@color/tx_fff"
                             android:textSize="15sp"
@@ -251,6 +262,7 @@
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp"
                             android:singleLine="true"
+                            android:visibility="gone"
                             android:textColor="@color/tx_fff"
                             android:textSize="15sp"
                             android:textStyle="bold" />
@@ -265,6 +277,7 @@
                             android:ellipsize="end"
                             android:gravity="center"
                             android:text="@{wrapper.toGenreString()}"
+                            android:visibility="@{TextUtils.isEmpty(wrapper.toGenreString())?View.GONE:View.VISIBLE}"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp"
                             android:singleLine="true"
