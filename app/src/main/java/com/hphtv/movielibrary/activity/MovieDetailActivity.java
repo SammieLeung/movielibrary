@@ -4,12 +4,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
 
+import androidx.databinding.BindingAdapter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +26,8 @@ import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.service.MovieScanService;
+import com.hphtv.movielibrary.util.VideoPlayTools;
+import com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll;
 import com.hphtv.movielibrary.view.ConfirmDialogFragment;
 import com.hphtv.movielibrary.view.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
@@ -30,7 +35,12 @@ import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.khrystal.library.widget.ItemViewMode;
 import me.khrystal.library.widget.ScaleXCenterViewMode;
 
@@ -121,6 +131,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                    }
                    Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
                    Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
+                   mMovieTrailerAdapter.addItems(wrapper.trailers);
                }
 
            });
@@ -198,8 +209,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.rvTrailer.setAdapter(mMovieTrailerAdapter);
         mMovieTrailerAdapter
                 .setOnItemClickListener(mCenterItemClickListener);
-        mBinding.rvTrailer.setOnClickListener(v -> hideMovieTrailer());
+        mBinding.viewTrailer.setOnClickListener(v -> hideMovieTrailer());
     }
+
 
 //    private void refreshMovieInfo(Intent intent) {
 //        Log.v(TAG, "refreshMovieInfo()");
@@ -771,16 +783,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 显示电影预告片
      */
     private void showMovieTrailer() {
-        stopLoading();
-        mBinding.viewTrailer.setVisibility(RelativeLayout.VISIBLE);
+        mBinding.viewTrailer.setVisibility(View.VISIBLE);
+        if( mBinding.rvTrailer.getChildAt(0)!=null)
+            mBinding.rvTrailer.getChildAt(0).requestFocus();
     }
 
     /**
      * 隐藏电影预告片
      */
     private void hideMovieTrailer() {
-        mMovieTrailerAdapter.removeAll();
-        mBinding.viewTrailer.setVisibility(RelativeLayout.GONE);
+        mBinding.viewTrailer.setVisibility(View.GONE);
     }
 
     /**
@@ -794,38 +806,38 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
-//                if (isMovieTrailerShowing())
-//                    if (mCircleRVforTrailer.findFocus() == null) {
-//                        mCircleRVforTrailer.getChildAt(0).requestFocus();
-//                        return true;
-//                    } else {
-//                        if (mCircleRVforTrailer.getChildAt(0).isFocused()) {
-//                            return false;
-//                        }
-//                    }
-//
-//            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-//                if (isMovieTrailerShowing()) {
-//                    int postion = mCircleRVforTrailer.getChildCount() - 1;
-//                    if (mCircleRVforTrailer.findFocus() == null) {
-//                        mCircleRVforTrailer.getChildAt(postion).requestFocus();
-//                        return true;
-//                    } else {
-//
-//                        if (mCircleRVforTrailer.getChildAt(postion).isFocused()) {
-//                            return false;
-//                        }
-//                    }
-//                }
-//            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-//                if (isMovieTrailerShowing()) {
-//                    return true;
-//                }
-//
-//            }
-//        }
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
+                if (isMovieTrailerShowing())
+                    if (mBinding.rvTrailer.findFocus() == null) {
+                        mBinding.rvTrailer.getChildAt(0).requestFocus();
+                        return true;
+                    } else {
+                        if (mBinding.rvTrailer.getChildAt(0).isFocused()) {
+                            return false;
+                        }
+                    }
+
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
+                if (isMovieTrailerShowing()) {
+                    int postion = mBinding.rvTrailer.getChildCount() - 1;
+                    if (mBinding.rvTrailer.findFocus() == null) {
+                        mBinding.rvTrailer.getChildAt(postion).requestFocus();
+                        return true;
+                    } else {
+
+                        if (mBinding.rvTrailer.getChildAt(postion).isFocused()) {
+                            return false;
+                        }
+                    }
+                }
+            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
+                if (isMovieTrailerShowing()) {
+                    return true;
+                }
+
+            }
+        }
 
 
         return super.dispatchKeyEvent(event);
@@ -893,16 +905,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     };
 
 
-    public OnClickListener mClickListener = new OnClickListener() {
+    public OnClickListener mClickListener = view -> {
 
-        @Override
-        public void onClick(final View view) {
-
-//            switch (view.getId()) {
+        switch (view.getId()) {
 //                case R.id.btb_edit:
 //                    editVideoInfo();
 //                    break;
-//                case R.id.btn_trailer:
+            case R.id.btn_trailer:
+                showMovieTrailer();
+                break;
 //                    if (isParseOver) {
 //                        startLoading();
 //                        new Thread(new Runnable() {
@@ -1022,16 +1033,17 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //                    finish();
 //                    break;
 //
-//            }
         }
-
     };
 
-    OnRecyclerViewItemClickListener mCenterItemClickListener = new OnRecyclerViewItemClickListener() {
-        @Override
-        public void onItemClick(View view, Trailer trailer) {
-//            final String pageUrl = data.getAlt();
-//            startLoading();
+    OnRecyclerViewItemClickListener mCenterItemClickListener = (view, trailer) -> {
+        if(trailer!=null) {
+            startLoading();
+            VideoPlayTools.play(getApplicationContext(), Uri.parse(trailer.url));
+            Observable.timer(2, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(aLong -> stopLoading());
+        }
 //            new Thread(new Runnable() {
 //                @Override
 //                public void run() {
@@ -1077,6 +1089,5 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //                }
 //            }).start();
 
-        }
     };
 }

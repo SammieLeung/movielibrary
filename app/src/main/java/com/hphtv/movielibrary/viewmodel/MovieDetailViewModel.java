@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.viewmodel;
 
 import android.app.Application;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -9,6 +10,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +58,10 @@ public class MovieDetailViewModel extends AndroidViewModel {
                         callback.runOnUIThread(movieWrapper);
                     }
                 });
+    }
+
+    public void playTralier(Trailer trailer){
+            VideoPlayTools.play(getApplication(), Uri.parse(trailer.url));
     }
 
     public interface Callback {
