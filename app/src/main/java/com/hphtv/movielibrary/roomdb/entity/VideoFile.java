@@ -11,13 +11,15 @@ import androidx.room.PrimaryKey;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import java.io.Serializable;
+
 /**
  * author: Sam Leung
  * date:  2021/5/24
  */
 @Entity(tableName = TABLE.VIDEOFILE,
         indices = {@Index(value = {"path"}, unique = true)})
-public class VideoFile {
+public class VideoFile implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public long vid;
     @NonNull

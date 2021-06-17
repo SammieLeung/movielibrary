@@ -11,6 +11,7 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -62,6 +63,10 @@ public class MovieDetailViewModel extends AndroidViewModel {
 
     public void playTralier(Trailer trailer){
             VideoPlayTools.play(getApplication(), Uri.parse(trailer.url));
+    }
+
+    public void playingVideo(VideoFile file) {
+        VideoPlayTools.play(getApplication(), file);
     }
 
     public interface Callback {

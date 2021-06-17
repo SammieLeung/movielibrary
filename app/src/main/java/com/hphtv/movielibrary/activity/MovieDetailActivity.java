@@ -25,6 +25,7 @@ import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll;
@@ -116,26 +117,26 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-       if(intent!=null){
-           mMovieId=intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID,-1);
-           //TODO 根据MovieDataView的id获取MovieWrapper
-           mViewModel.getMovieWrapper(mMovieId, args -> {
-               if(args[0]!=null){
-                   MovieWrapper wrapper= (MovieWrapper) args[0];
-                   mBinding.setWrapper(wrapper);
-                   String stagePhoto="";
-                   if(wrapper.stagePhotos!=null&&wrapper.stagePhotos.size()>0){
-                       Random random=new Random();
-                       int index=random.nextInt(wrapper.stagePhotos.size());
-                       stagePhoto=wrapper.stagePhotos.get(index).imgUrl;
-                   }
-                   Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
-                   Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
-                   mMovieTrailerAdapter.addItems(wrapper.trailers);
-               }
+        if (intent != null) {
+            mMovieId = intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID, -1);
+            //TODO 根据MovieDataView的id获取MovieWrapper
+            mViewModel.getMovieWrapper(mMovieId, args -> {
+                if (args[0] != null) {
+                    MovieWrapper wrapper = (MovieWrapper) args[0];
+                    mBinding.setWrapper(wrapper);
+                    String stagePhoto = "";
+                    if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
+                        Random random = new Random();
+                        int index = random.nextInt(wrapper.stagePhotos.size());
+                        stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
+                    }
+                    Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
+                    Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
+                    mMovieTrailerAdapter.addItems(wrapper.trailers);
+                }
 
-           });
-       }
+            });
+        }
     }
 
     @Override
@@ -784,7 +785,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void showMovieTrailer() {
         mBinding.viewTrailer.setVisibility(View.VISIBLE);
-        if( mBinding.rvTrailer.getChildAt(0)!=null)
+        if (mBinding.rvTrailer.getChildAt(0) != null)
             mBinding.rvTrailer.getChildAt(0).requestFocus();
     }
 
@@ -843,9 +844,25 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         return super.dispatchKeyEvent(event);
     }
 
-    public void showRadioDialog(CustomRadioDialogFragment.DialogSetting dialogSetting) {
-        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(dialogSetting);
-        dialogFragment.show(getFragmentManager(), "detail");
+    public void showRadioDialog() {
+        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(mBinding.getWrapper().videoFiles);
+        dialogFragment.setOnClickListener(new CustomRadioDialogFragment.OnClickListener() {
+            @Override
+            public void doPositiveClick(Object obj) {
+                startLoading();
+                VideoFile file = (VideoFile) obj;
+                mViewModel.playingVideo(file);
+                Observable.timer(2, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(aLong -> stopLoading());
+            }
+
+            @Override
+            public void doItemSelect(Object obj) {
+                doPositiveClick(obj);
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), "detail");
     }
 
     public void showIsScanningDialog() {
@@ -914,108 +931,19 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             case R.id.btn_trailer:
                 showMovieTrailer();
                 break;
-//                    if (isParseOver) {
-//                        startLoading();
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Movie movie = mCurrentMovie;
-//                                long id = movie.getId();
-//                                if (id > 0) {
-//                                    Cursor cursor = mMovietrailerDao.select(null, "movie_id=?",
-//                                            new String[]{String.valueOf(id)});
-//                                    if (cursor.getCount() > 0) {
-//                                        mMovieTrailerAdapter.removeAll();
-//                                        mMovieTrailerList = mMovietrailerDao.parseList(cursor);
-//                                        runOnUiThread(new Runnable() {
-//                                            @Override
-//                                            public void run() {
-//                                                showMovieTrailer();
-//                                                mMovieTrailerAdapter.addItems(mMovieTrailerList);
-//                                            }
-//                                        });
-//                                        return;//返回
-//                                    }
-//                                    int api = mCurrentMovie.getApi();
-//                                    switch (api) {
-//                                        case ConstData.Scraper.DOUBAN:
-//                                            DoubanApi.parseMovieTrailerInfo(
-//                                                    mCurrentMovie, mMovieTrailerList);
-//                                            break;
-//                                        case ConstData.Scraper.MTIME:
-//                                            MtimeApi.parseMovieTrailerInfo(mCurrentMovie.getId(), mCurrentMovie.getMovieId(), mMovieTrailerList);
-//                                            break;
-//                                    }
-//
-//                                    Log.v(TAG, "trailers_list.size()="
-//                                            + mMovieTrailerList.size());
-//                                    if (mMovieTrailerList.size() > 0) {
-//                                        try {
-//                                            Log.v(TAG, "time ===>save data begin ");
-//                                            for (MovieTrailer movieTrailer : mMovieTrailerList) {
-//                                                ContentValues contentValues = mMovietrailerDao
-//                                                        .parseContentValues(movieTrailer);
-//                                                mMovietrailerDao.insert(contentValues);
-//                                            }
-//                                            Log.v(TAG, "time ===>save data end ");
-//                                        } catch (Exception e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                        runOnUiThread(new Runnable() {
-//                                            @Override
-//                                            public void run() {
-//                                                mMovieTrailerAdapter.notifyDataSetChanged();
-//                                                showMovieTrailer();
-//                                            }
-//                                        });
-//
-//                                    } else {
-//                                        runOnUiThread(new Runnable() {
-//                                            @Override
-//                                            public void run() {
-//                                                Toast.makeText(MovieDetailActivity.this, "找不到预告片", Toast.LENGTH_SHORT).show();
-//                                                stopLoading();
-//                                            }
-//                                        });
-//                                    }
-//                                }
-//
-//                            }
-//
-//                        }).start();
-//                    }
-//                    break;
-//                case R.id.btn_play:
-//                    if (mCurrentWrapper != null) {
-//                        if (mVideoFileList.size() == 1) {
-//                            startLoading();
-//                            playingVideo(mVideoFileList.get(0));
-//                        } else if (mVideoFileList.size() > 1) {
-//                            showRadioDialog(new CustomRadioDialogFragment.DialogSetting() {
-//                                @Override
-//                                public void doPositiveClick(Object obj) {
-//                                    startLoading();
-//                                    VideoFile file = (VideoFile) obj;
-//                                    playingVideo(file);
-//                                }
-//
-//                                @Override
-//                                public void doItemSelect(Object obj) {
-//                                    this.doPositiveClick(obj);
-//                                }
-//
-//                                @Override
-//                                public VideoFile[] getVideoFiles() {
-//                                    List<VideoFile> tmplist = new ArrayList<>();
-//                                    for (int i = 0; i < mVideoFileList.size(); i++) {
-//                                        tmplist.add(mVideoFileList.get(i));
-//                                    }
-//                                    return tmplist.toArray(new VideoFile[0]);
-//                                }
-//                            });
-//                        }
-//                    }
-//                    break;
+            case R.id.btn_play:
+                if (mBinding.getWrapper() != null) {
+                    if (mBinding.getWrapper().videoFiles.size() == 1) {
+                        startLoading();
+                        mViewModel.playingVideo(mBinding.getWrapper().videoFiles.get(0));
+                        Observable.timer(2, TimeUnit.SECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(aLong -> stopLoading());
+                    } else if (mBinding.getWrapper().videoFiles.size() > 1) {
+                      showRadioDialog();
+                    }
+                }
+                break;
 //                case R.id.btn_remove:
 //                    ConfirmDialogFragment confirmDialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
 //                    confirmDialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
@@ -1037,7 +965,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     };
 
     OnRecyclerViewItemClickListener mCenterItemClickListener = (view, trailer) -> {
-        if(trailer!=null) {
+        if (trailer != null) {
             startLoading();
             VideoPlayTools.play(getApplicationContext(), Uri.parse(trailer.url));
             Observable.timer(2, TimeUnit.SECONDS)
