@@ -269,6 +269,8 @@ public class ConstData {
 
         String PASSWORD="password";
         String MOVIE_DB_UPDATE="movie_db_update";
+
+        String LAST_POTSER="last_poster";
     }
 
 }

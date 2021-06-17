@@ -8,12 +8,14 @@ import androidx.room.PrimaryKey;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import java.io.Serializable;
+
 /**
  * author: Sam Leung
  * date:  21-5-14
  */
 @Entity(tableName = TABLE.MOVIE,indices = {@Index(value = {"movie_id","source"},unique = true)})
-public class Movie {
+public class Movie  implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public long id;
     @ColumnInfo(name = "movie_id")
@@ -42,6 +44,10 @@ public class Movie {
     public long addTime;//添加时间
     @ColumnInfo(name = "update_time")
     public long updateTime;//更新时间
+    @ColumnInfo(name = "is_favorite")
+    public boolean isFavorite;//收藏
+    @ColumnInfo(name = "last_playtime")
+    public long lastPlayTime;//上次播放时间
 
 
     @Override

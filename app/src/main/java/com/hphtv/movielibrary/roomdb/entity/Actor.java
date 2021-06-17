@@ -6,12 +6,14 @@ import androidx.room.PrimaryKey;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import java.io.Serializable;
+
 /**
  * author: Sam Leung
  * date:  2021/5/27
  */
 @Entity(tableName = TABLE.ACTOR)
-public class Actor {
+public class Actor  implements Serializable {
     @PrimaryKey
     @ColumnInfo(name = "actor_id")
     public long actorId;

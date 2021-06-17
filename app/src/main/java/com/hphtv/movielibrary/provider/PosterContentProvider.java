@@ -4,10 +4,15 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.firelfy.util.LogUtil;
+import com.firelfy.util.SharePreferencesTools;
+import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
 
@@ -16,8 +21,7 @@ import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
  */
 
 public class PosterContentProvider extends ContentProvider {
-    MovieWrapperDao mMovieWrapperDao;
-    PosterProviderDao posterProviderDao;
+    String[] COLUMN_NAME = new String[]{"poster"};
     UriMatcher matcher;
 
     public static final int ONE_PHOTO = 1;
@@ -25,12 +29,16 @@ public class PosterContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        mMovieWrapperDao = new MovieWrapperDao(getContext());
-        posterProviderDao = new PosterProviderDao(getContext());
         matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI("com.hphtv.movielibrary", "poster", ONE_PHOTO);
-//        matcher.addURI("com.hphtv.movielibrary", "poster_cache/#", LOCAL_CACHE);
         return false;
+    }
+
+    private Cursor createPhotoCursor() {
+        String poster = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.LAST_POTSER, "");
+        MatrixCursor matrixCursor = new MatrixCursor(COLUMN_NAME);
+        matrixCursor.addRow(new String[]{poster});
+        return matrixCursor;
     }
 
     @Nullable
@@ -38,37 +46,8 @@ public class PosterContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         int code = matcher.match(uri);
         if (code == ONE_PHOTO) {
-            Cursor posterCursor = posterProviderDao.selectAll();
-            return posterCursor;
+            return createPhotoCursor();
         }
-//        else if (code == LOCAL_CACHE)
-//        {
-//            long id = ContentUris.parseId(uri);
-//            Cursor cursor = posterProviderDao.selectAll();
-//            if (cursor.getCount() < 0) {
-//                Cursor movieWrapperCursor = mMovieWrapperDao.selectAll();
-//                List<MovieWrapper> movieList = mMovieWrapperDao.parseList(movieWrapperCursor);
-//                for (MovieWrapper movie : movieList) {
-//                    String poster = null;
-//                    movie
-//                    if (movie.getImages().large != null) {
-//                        poster = movie.getImages().large;
-//                    } else if (movie.getImages().medium != null) {
-//                        poster = movie.getImages().medium;
-//                    } else if (movie.getImages().small != null) {
-//                        poster = movie.getImages().small;
-//                    }
-//                    if (poster != null) {
-//                        PosterProviderBean posterProviderBean = new PosterProviderBean();
-//                        posterProviderBean.setPoster(poster);
-//                        ContentValues values = posterProviderDao.parseContentValues(posterProviderBean);
-//                        posterProviderDao.insert(values);
-//                    }
-//                }
-//                cursor = posterProviderDao.selectAll();
-//            }
-//
-//        }
         return null;
     }
 

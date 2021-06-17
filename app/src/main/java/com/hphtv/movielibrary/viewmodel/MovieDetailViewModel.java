@@ -7,8 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.firelfy.util.LogUtil;
+import com.firelfy.util.SharePreferencesTools;
+import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
@@ -19,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -33,6 +38,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MovieDetailViewModel extends AndroidViewModel {
     public MutableLiveData<MovieWrapper> mWrapperMutableLiveData;
     private MovieDao mMovieDao;
+    private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
     private ExecutorService mSingleThreadPool;
 
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
@@ -43,9 +49,10 @@ public class MovieDetailViewModel extends AndroidViewModel {
 
     private void initData() {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+        mMovieVideofileCrossRefDao=MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieVideofileCrossRefDao();
     }
 
-    public void getMovieWrapper(long id, Callback callback) {
+    public void getMovieWrapper(long id, MovieWrapperCallback callback) {
         Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
@@ -65,11 +72,38 @@ public class MovieDetailViewModel extends AndroidViewModel {
             VideoPlayTools.play(getApplication(), Uri.parse(trailer.url));
     }
 
-    public void playingVideo(VideoFile file) {
-        VideoPlayTools.play(getApplication(), file);
+    public void playingVideo(MovieWrapper wrapper,VideoFile file,Callback callback) {
+        Observable.just(file)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                //记录播放时间，作为播放记录
+                .doOnNext(videoFile -> {
+                    String path=videoFile.path;
+                    mMovieDao.updateLastPlaytime(path,System.currentTimeMillis());
+                    SharePreferencesTools.getInstance(getApplication()).saveProperty(ConstData.SharePreferenceKeys.LAST_POTSER,wrapper.movie.poster);
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<VideoFile>() {
+                    @Override
+                    public void onAction(VideoFile videoFile) {
+                        VideoPlayTools.play(getApplication(), videoFile);
+                        Observable.timer(2, TimeUnit.SECONDS)
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new SimpleObserver<Long>() {
+                                    @Override
+                                    public void onAction(Long aLong) {
+                                        callback.runOnUIThreadDelay();
+                                    }
+                                });
+                    }
+                });
     }
 
     public interface Callback {
-        void runOnUIThread(Object... args);
+        void runOnUIThreadDelay();
+
+    }
+
+    public interface MovieWrapperCallback{
+        void runOnUIThread(MovieWrapper movieWrapper);
     }
 }

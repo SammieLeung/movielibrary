@@ -120,9 +120,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         if (intent != null) {
             mMovieId = intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID, -1);
             //TODO 根据MovieDataView的id获取MovieWrapper
-            mViewModel.getMovieWrapper(mMovieId, args -> {
-                if (args[0] != null) {
-                    MovieWrapper wrapper = (MovieWrapper) args[0];
+            mViewModel.getMovieWrapper(mMovieId, wrapper -> {
+                if (wrapper != null) {
                     mBinding.setWrapper(wrapper);
                     String stagePhoto = "";
                     if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
@@ -845,37 +844,34 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     public void showRadioDialog() {
-        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(mBinding.getWrapper().videoFiles);
+        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(mBinding.getWrapper());
         dialogFragment.setOnClickListener(new CustomRadioDialogFragment.OnClickListener() {
             @Override
-            public void doPositiveClick(Object obj) {
+            public void doPositiveClick(MovieWrapper movieWrapper, VideoFile videoFile) {
                 startLoading();
-                VideoFile file = (VideoFile) obj;
-                mViewModel.playingVideo(file);
-                Observable.timer(2, TimeUnit.SECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(aLong -> stopLoading());
+                mViewModel.playingVideo(movieWrapper, videoFile, () -> stopLoading());
             }
 
             @Override
-            public void doItemSelect(Object obj) {
-                doPositiveClick(obj);
+            public void doItemSelect(MovieWrapper movieWrapper, VideoFile videoFile) {
+                doPositiveClick(movieWrapper, videoFile);
             }
+
         });
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
 
-    public void showIsScanningDialog() {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
-        dialogFragment.setMessage(getResources().getString(R.string.dialog_is_scanning));
-        dialogFragment.show(getFragmentManager(), "MovieDetail");
-    }
-
-    public void showTipsDialog(String tips) {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
-        dialogFragment.setMessage(tips);
-        dialogFragment.show(getFragmentManager(), "MovieDetail");
-    }
+//    public void showIsScanningDialog() {
+//        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
+//        dialogFragment.setMessage(getResources().getString(R.string.dialog_is_scanning));
+//        dialogFragment.show(getFragmentManager(), "MovieDetail");
+//    }
+//
+//    public void showTipsDialog(String tips) {
+//        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
+//        dialogFragment.setMessage(tips);
+//        dialogFragment.show(getFragmentManager(), "MovieDetail");
+//    }
 
     @Override
     public void onBackPressed() {
@@ -935,12 +931,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 if (mBinding.getWrapper() != null) {
                     if (mBinding.getWrapper().videoFiles.size() == 1) {
                         startLoading();
-                        mViewModel.playingVideo(mBinding.getWrapper().videoFiles.get(0));
-                        Observable.timer(2, TimeUnit.SECONDS)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(aLong -> stopLoading());
+                        mViewModel.playingVideo(mBinding.getWrapper(), mBinding.getWrapper().videoFiles.get(0), () -> stopLoading());
                     } else if (mBinding.getWrapper().videoFiles.size() > 1) {
-                      showRadioDialog();
+                        showRadioDialog();
                     }
                 }
                 break;

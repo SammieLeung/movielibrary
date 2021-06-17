@@ -32,7 +32,21 @@ public interface MovieDao {
     public Movie queryByMovieId(String movie_id);
 
     /**
+     * 根据文件路径设置last_playtime
+     *
+     * @param path
+     * @return
+     */
+    @Query("UPDATE " + TABLE.MOVIE + " " +
+            "SET last_playtime=:time " +
+            "WHERE id = " +
+            "(SELECT id from " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " " +
+            "WHERE path=:path)")
+    public int updateLastPlaytime(String path, long time);
+
+    /**
      * 只查询当前以挂载的设备
+     *
      * @return
      */
     @Transaction
@@ -41,6 +55,12 @@ public interface MovieDao {
             "ON MOVIE__VF.path=VF__DEV.path)")
     public List<MovieWrapper> queryAll();
 
+    /**
+     * 按电影id查询电影wrapper
+     *
+     * @param id
+     * @return
+     */
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
             "(SELECT VF.path from " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
@@ -48,16 +68,15 @@ public interface MovieDao {
     public MovieWrapper queryMovieWrapperById(long id);
 
     /**
-     *
-     * @param device_id 设备id
-     * @param year 年份
+     * @param device_id  设备id
+     * @param year       年份
      * @param genre_name 类型
-     * @param order 排序方式
-     * @param isDesc 是否倒序
+     * @param order      排序方式
+     * @param isDesc     是否倒序
      * @return
      */
-    @Query("SELECT * FROM "+ VIEW.MOVIE_DATAVIEW
-            +" WHERE (:device_id IS NULL OR device_id=:device_id)" +
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE (:device_id IS NULL OR device_id=:device_id)" +
             " AND (:year IS NULL OR year=:year)" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name)" +
             " GROUP BY id " +
@@ -71,10 +90,17 @@ public interface MovieDao {
             "CASE WHEN :order =1 AND :isDesc=1 THEN ratings END DESC," +
             "CASE WHEN :order =2 AND :isDesc=1 THEN genre_name END DESC," +
             "CASE WHEN :order =3 AND :isDesc=1 THEN year END DESC," +
-            "CASE WHEN :order =4 AND :isDesc=1 THEN add_time END DESC"
-           )
-    public List<MovieDataView> queryMoiveDataView(@Nullable String device_id,@Nullable String year,@Nullable String genre_name,  int order,@Nullable boolean isDesc);
+            "CASE WHEN :order =4 AND :isDesc=1 THEN add_time END DESC," +
+            "CASE WHEN :order =5 THEN last_playtime END ASC," +
+            "CASE WHEN :order =6 THEN is_favorite END ASC"
+    )
+    public List<MovieDataView> queryMoiveDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, @Nullable boolean isDesc);
 
+    /**
+     * 查询年份
+     *
+     * @return
+     */
     @Query("SELECT year FROM " + TABLE.MOVIE + " GROUP BY year ORDER BY year DESC")
     public List<String> qureyYearsGroup();
 }

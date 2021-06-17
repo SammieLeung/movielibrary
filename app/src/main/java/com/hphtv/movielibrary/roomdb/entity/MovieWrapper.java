@@ -9,13 +9,14 @@ import androidx.room.Relation;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * author: Sam Leung
  * date:  2021/5/25
  */
-public class MovieWrapper {
+public class MovieWrapper implements Serializable {
     @Embedded
     public Movie movie;//实体父类
 

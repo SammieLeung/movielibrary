@@ -3,7 +3,6 @@ package com.hphtv.movielibrary.view;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,12 +20,13 @@ import androidx.fragment.app.DialogFragment;
 import com.firelfy.util.DensityUtil;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ComponentMyRadioDialogFragmentBinding;
+import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ import java.util.List;
 
 public class CustomRadioDialogFragment extends DialogFragment {
     public static final String TAG = CustomRadioDialogFragment.class.getSimpleName();
-    public static final String VIDEO_LIST = "videolist";
+    public static final String WRAPPER = "wrapper";
     public static final String TITLE = "title";
     public static final String CONIFRM_TEXT = "confirm_text";
     public int focusId;
@@ -43,27 +43,17 @@ public class CustomRadioDialogFragment extends DialogFragment {
     private String mConfirmText;
 
     private ComponentMyRadioDialogFragmentBinding mBinding;
-
+    public MovieWrapper mMovieWrapper;
     public List<VideoFile> mVideoFileList;
 
     public CustomRadioDialogFragment() {
 
     }
 
-    public static CustomRadioDialogFragment newInstance(String title, String confirmText, List<VideoFile> videoFiles) {
+    public static CustomRadioDialogFragment newInstance(MovieWrapper movieWrapper) {
         CustomRadioDialogFragment fragment = new CustomRadioDialogFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(VIDEO_LIST, (Serializable) videoFiles);
-        bundle.putSerializable(TITLE, title);
-        bundle.putSerializable(CONIFRM_TEXT, confirmText);
-        fragment.setArguments(bundle);
-        return fragment;
-    }
-
-    public static CustomRadioDialogFragment newInstance(List<VideoFile> videoFiles) {
-        CustomRadioDialogFragment fragment = new CustomRadioDialogFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(VIDEO_LIST, (Serializable) videoFiles);
+        bundle.putSerializable(WRAPPER, (Serializable) movieWrapper);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -75,7 +65,9 @@ public class CustomRadioDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.component_my_radio_dialog_fragment, container, false);
-        mVideoFileList = (List<VideoFile>) getArguments().getSerializable(VIDEO_LIST);
+        mMovieWrapper= (MovieWrapper) getArguments().getSerializable(WRAPPER);
+        mVideoFileList=new ArrayList<>();
+        mVideoFileList.addAll(mMovieWrapper.videoFiles);
         mVideoFileList.sort((o1, o2) -> o1.filename.compareTo(o2.filename));
         mTitle = getArguments().getString(TITLE);
         mConfirmText = getArguments().getString(CONIFRM_TEXT);
@@ -91,7 +83,7 @@ public class CustomRadioDialogFragment extends DialogFragment {
                 if (((RadioButton) v).isChecked()) {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         if (mOnClickListener != null)
-                            mOnClickListener.doItemSelect(v.getTag());
+                            mOnClickListener.doItemSelect(mMovieWrapper, (VideoFile) v.getTag());
                     }
                 }
                 return false;
@@ -101,7 +93,7 @@ public class CustomRadioDialogFragment extends DialogFragment {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
                             if (mOnClickListener != null)
-                                mOnClickListener.doItemSelect(v.getTag());
+                                mOnClickListener.doItemSelect(mMovieWrapper, (VideoFile) v.getTag());
                         }
                     }
                 }
@@ -115,7 +107,7 @@ public class CustomRadioDialogFragment extends DialogFragment {
             if (id != -1) {
                 VideoFile file = (VideoFile) mBinding.rbPathsGroup.findViewById(id).getTag();
                 if (mOnClickListener != null)
-                    mOnClickListener.doPositiveClick(file);
+                    mOnClickListener.doPositiveClick(mMovieWrapper,file);
             }
 
         });
@@ -166,17 +158,16 @@ public class CustomRadioDialogFragment extends DialogFragment {
     public interface OnClickListener {
         /**
          * 点击按钮时触发
-         *
-         * @param obj
+         * @param movieWrapper
+         * @param videoFile
          */
-        public void doPositiveClick(Object obj);
-
+        public void doPositiveClick(MovieWrapper movieWrapper,VideoFile videoFile);
         /**
          * 点击已选项目时触发
-         *
-         * @param obj
+         * @param movieWrapper
+         * @param videoFile
          */
-        public void doItemSelect(Object obj);
+        public void doItemSelect(MovieWrapper movieWrapper,VideoFile videoFile);
 
 
     }
