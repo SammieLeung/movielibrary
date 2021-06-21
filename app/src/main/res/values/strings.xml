@@ -49,7 +49,7 @@
     <string name="tx_parse">Parsed Success:%1$d</string>
     <string name="tx_parse_p">Failed :%1$d</string>
 
-    <string name="btn_yes">Yes</string>
+    <string name="btn_ok">OK</string>
     <string name="btn_no">Cancel</string>
     <string name="choose_play">Episodes</string>
     <string name="language">Lang:</string>

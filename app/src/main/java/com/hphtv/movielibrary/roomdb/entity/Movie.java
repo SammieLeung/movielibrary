@@ -57,4 +57,5 @@ public class Movie  implements Serializable {
                 ", title='" + title + '\'' +
                 '}';
     }
+
 }

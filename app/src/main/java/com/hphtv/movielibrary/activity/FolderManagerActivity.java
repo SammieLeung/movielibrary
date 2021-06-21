@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.activity;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -10,9 +9,11 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -45,8 +46,8 @@ import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.BroadcastHelper;
-import com.hphtv.movielibrary.view.ConfirmDialogFragment;
-import com.hphtv.movielibrary.view.PasswordDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.ConfirmDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
 import com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll;
 
 import java.text.SimpleDateFormat;
@@ -311,7 +312,7 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
             case R.id.privatedevice:
                 if (isChecked == true) {
                     if (!mApp.isShowEncrypted()) {
-                        mMd5EncodePwd = mPreferences.readProperty(ConstData.SharePreferenceKeys.PASSWORD,"");
+                        mMd5EncodePwd = mPreferences.readProperty(ConstData.SharePreferenceKeys.PASSWORD, "");
                         if (!TextUtils.isEmpty(mMd5EncodePwd)) {
                             final PasswordDialogFragment fragment = PasswordDialogFragment.newInstance(mContext);
                             fragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
@@ -361,7 +362,7 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
                                             editTextList.get(1).requestFocus();
                                         } else {
                                             mMd5EncodePwd = Md5Utils.digest(psd2);
-                                            mPreferences.saveProperty(ConstData.SharePreferenceKeys.PASSWORD,mMd5EncodePwd);
+                                            mPreferences.saveProperty(ConstData.SharePreferenceKeys.PASSWORD, mMd5EncodePwd);
                                             mCheckedSet.clear();
                                             initData();
                                             mApp.setShowEncrypted(true);
@@ -458,11 +459,11 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
                                         wrapper.setFileIds(file_ids);
                                         ContentValues contentValues = mMovieWrapperDao.parseContentValues(wrapper);
                                         mMovieWrapperDao.update(contentValues, "id=?", new String[]{String.valueOf(wrapper_id)});
-                                        BroadcastHelper.sendBroadcastMovieUpdateSync(FolderManagerActivity.this,wrapper_id);
+                                        BroadcastHelper.sendBroadcastMovieUpdateSync(FolderManagerActivity.this, wrapper_id);
                                     } else {
                                         mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
                                         mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
-                                        BroadcastHelper.sendBroadcastMovieRemoveSync(FolderManagerActivity.this,wrapper_id);
+                                        BroadcastHelper.sendBroadcastMovieRemoveSync(FolderManagerActivity.this, wrapper_id);
                                     }
                                 }
                             }
@@ -518,11 +519,11 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
                                         wrapper.setFileIds(file_ids);
                                         ContentValues contentValues = mMovieWrapperDao.parseContentValues(wrapper);
                                         mMovieWrapperDao.update(contentValues, "id=?", new String[]{String.valueOf(wrapper_id)});
-                                        BroadcastHelper.sendBroadcastMovieUpdateSync(FolderManagerActivity.this,wrapper_id);
+                                        BroadcastHelper.sendBroadcastMovieUpdateSync(FolderManagerActivity.this, wrapper_id);
                                     } else {
                                         mMovieDao.delete("wrapper_id=?", new String[]{String.valueOf(wrapper_id)});
                                         mMovieWrapperDao.delete("id=?", new String[]{String.valueOf(wrapper_id)});
-                                        BroadcastHelper.sendBroadcastMovieRemoveSync(FolderManagerActivity.this,wrapper_id);
+                                        BroadcastHelper.sendBroadcastMovieRemoveSync(FolderManagerActivity.this, wrapper_id);
                                     }
                                 }
                             }
@@ -611,55 +612,81 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
     }
 
     private void showDeleteDialog() {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(FolderManagerActivity.this);
-        dialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+        ConfirmDialogFragment dialogFragment = ConfirmDialogFragment.newInstance();
+        dialogFragment.setMessage(getResources().getString(R.string.setting_confirm_delete)).setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
             @Override
-            public void OnPositivePress(Button button) {
+            public void OK() {
                 deleteDeviceAndVideo();
             }
-        }).setMessage(getResources().getString(R.string.setting_confirm_delete)).show(getFragmentManager(), TAG);
+
+            @Override
+            public void Cancel() {
+
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), TAG);
     }
 
     private void showClearDialog() {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(FolderManagerActivity.this);
-        dialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+        ConfirmDialogFragment dialogFragment = ConfirmDialogFragment.newInstance();
+        dialogFragment.setMessage(getResources().getString(R.string.setting_confirm_clear)).setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
             @Override
-            public void OnPositivePress(Button button) {
+            public void OK() {
                 clearVideoInfo();
             }
-        }).setMessage(getResources().getString(R.string.setting_confirm_clear)).show(getFragmentManager(), TAG);
+
+            @Override
+            public void Cancel() {
+
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), TAG);
     }
 
     private void showHideEncryptedFolderDialog() {
-        ConfirmDialogFragment dialogFragment = new ConfirmDialogFragment(FolderManagerActivity.this);
-        dialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+        ConfirmDialogFragment dialogFragment = ConfirmDialogFragment.newInstance();
+        dialogFragment.setMessage(getResources().getString(R.string.setting_confirm_hide_encrypted_video)).setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
             @Override
-            public void OnPositivePress(Button button) {
+            public void OK() {
                 mCheckBoxPrivate.setChecked(false);
             }
-        }).setMessage(getResources().getString(R.string.setting_confirm_hide_encrypted_video)).show(getFragmentManager(), TAG);
+
+            @Override
+            public void Cancel() {
+
+            }
+        });
     }
 
     private void showDialog() {
-        ConfirmDialogFragment dialog = new ConfirmDialogFragment(FolderManagerActivity.this);
-        dialog.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+        ConfirmDialogFragment dialogFragment = ConfirmDialogFragment.newInstance();
+        dialogFragment.setMessage(getResources().getString(R.string.dialog_begin_scan)).setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
             @Override
-            public void OnPositivePress(Button button) {
+            public void OK() {
                 beginScan();
             }
-        }, true).setMessage(getResources().getString(R.string.dialog_begin_scan)).show(getFragmentManager(), TAG);
+
+            @Override
+            public void Cancel() {
+
+            }
+        });
     }
 
 
     private void showStopDialog() {
-        ConfirmDialogFragment dialog = new ConfirmDialogFragment(FolderManagerActivity.this);
-        dialog.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
+        ConfirmDialogFragment dialogFragment = ConfirmDialogFragment.newInstance();
+        dialogFragment.setMessage(getResources().getString(R.string.dialog_stop_scan)).setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
             @Override
-            public void OnPositivePress(Button button) {
+            public void OK() {
                 stopScanVideo();
             }
-        }, true).setMessage(getResources().getString(R.string.dialog_stop_scan)).show(getFragmentManager(), TAG);
 
+            @Override
+            public void Cancel() {
+
+            }
+        });
     }
 
     ScanProgressListener mScanProgressListener = new ScanProgressListener() {
@@ -732,9 +759,9 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
             Log.v(TAG, "on serviceIntent " + name + " connected");
             initView();
             initData();
-            Intent intent=getIntent();
+            Intent intent = getIntent();
             Bundle bundle = intent.getExtras();
-            if(bundle!=null) {
+            if (bundle != null) {
                 Device device = (Device) bundle.getSerializable("device");
                 Directory directory = (Directory) bundle.getSerializable("dir");
                 int isEncrypted = bundle.getInt("is_encrypted");

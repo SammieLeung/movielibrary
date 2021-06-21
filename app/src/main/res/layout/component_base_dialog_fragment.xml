@@ -1,70 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/background_corners">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:id="@+id/dialog_msg"
+    <data>
+
+    </data>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="39dp"
-        android:layout_marginLeft="26dp"
-        android:layout_marginRight="26dp"
-        android:layout_marginBottom="13dp"
-        android:gravity="center"
-        android:textColor="@android:color/white"
-        android:textSize="24sp" />
+        android:background="@drawable/background_corners">
 
-    <LinearLayout
-        android:layout_below="@id/dialog_msg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        >
-
-        <RelativeLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/dialog_msg"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginTop="39dp"
+            android:layout_marginLeft="26dp"
+            android:layout_marginRight="26dp"
+            android:layout_marginBottom="13dp"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="24sp" />
+
+        <LinearLayout
+            android:layout_below="@id/dialog_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center">
 
-            <Button
-                android:id="@+id/nagetive_btn"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="158dp"
-                android:layout_height="48dp"
-                android:layout_marginBottom="26dp"
-                android:layout_marginLeft="26dp"
-                android:layout_marginRight="13dp"
-                android:layout_marginTop="26dp"
-                android:background="@drawable/st_episode_btn_for_folder_manager"
-                android:text="@string/btn_yes"
-                android:textColor="@color/selector_category_text"
-                android:textSize="24sp" />
-        </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/btn_ok"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="158dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="26dp"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginRight="13dp"
+                    android:layout_marginTop="26dp"
+                    android:background="@drawable/st_episode_btn_for_folder_manager"
+                    android:text="@string/btn_ok"
+                    android:textColor="@color/selector_category_text"
+                    android:textSize="24sp" />
+            </RelativeLayout>
 
 
-        <RelativeLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center">
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center">
 
-            <Button
-                android:id="@+id/positive_btn"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="158dp"
-                android:layout_height="48dp"
-                android:layout_marginBottom="26dp"
-                android:layout_marginRight="26dp"
-                android:layout_marginLeft="13dp"
-                android:layout_marginTop="26dp"
-                android:background="@drawable/st_episode_btn_for_folder_manager"
-                android:text="@string/btn_no"
-                android:textSize="24sp"
-                android:textColor="@color/selector_category_text" />
-        </RelativeLayout>
-    </LinearLayout>
+                <Button
+                    android:id="@+id/btn_cancel"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="158dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="26dp"
+                    android:layout_marginRight="26dp"
+                    android:layout_marginLeft="13dp"
+                    android:layout_marginTop="26dp"
+                    android:background="@drawable/st_episode_btn_for_folder_manager"
+                    android:text="@string/btn_no"
+                    android:textSize="24sp"
+                    android:textColor="@color/selector_category_text" />
+            </RelativeLayout>
+        </LinearLayout>
 
-</RelativeLayout>
+    </RelativeLayout>
+</layout>

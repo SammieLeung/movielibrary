@@ -53,7 +53,7 @@
     <string name="tx_parse">获取信息成功:%1$d</string>
     <string name="tx_parse_p">失败:%1$d</string>
 
-    <string name="btn_yes">确定</string>
+    <string name="btn_ok">确定</string>
     <string name="btn_no">取消</string>
     <string name="choose_play">选集</string>
 

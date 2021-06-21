@@ -37,7 +37,7 @@ public class FPDialog extends Dialog {
 
         mContentPanel = (ViewGroup) findViewById(R.id.content_panel);
         mTitleView = (TextView) findViewById(R.id.dialog_title);
-        mPositiveButton = (Button) findViewById(R.id.positive_btn);
+        mPositiveButton = (Button) findViewById(R.id.btn_cancel);
         mNegativeButton = (Button) findViewById(R.id.negative_btn);
 
         mPositiveButton.setOnClickListener(new View.OnClickListener() {

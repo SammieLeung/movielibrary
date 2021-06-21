@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.view;
+package com.hphtv.movielibrary.fragment.dialog;
 
 import android.app.Dialog;
 import android.os.Bundle;

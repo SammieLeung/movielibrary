@@ -231,7 +231,7 @@
                 android:layout_width="158dp"
                 android:layout_height="48dp"
                 android:background="@drawable/st_episode_btn_for_folder_manager"
-                android:text="@string/btn_yes"
+                android:text="@string/btn_ok"
                 android:textColor="@color/selector_category_text"
                 android:textSize="24sp" />
         </RelativeLayout>

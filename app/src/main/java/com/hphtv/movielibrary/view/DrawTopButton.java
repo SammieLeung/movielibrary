@@ -5,6 +5,9 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.databinding.BindingAdapter;
+
 import com.hphtv.movielibrary.R;
 
 
@@ -12,7 +15,7 @@ import com.hphtv.movielibrary.R;
  * Created by tchip on 18-4-27.
  */
 
-public class DrawTopButton extends androidx.appcompat.widget.AppCompatButton {
+public class DrawTopButton extends AppCompatButton {
     private int drawableSize;
     private STATE_COLLECTION currentState=STATE_COLLECTION.FALSE;
 
@@ -38,7 +41,6 @@ public class DrawTopButton extends androidx.appcompat.widget.AppCompatButton {
 
     public DrawTopButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
     }
 
     @Override
@@ -91,4 +93,5 @@ public class DrawTopButton extends androidx.appcompat.widget.AppCompatButton {
             this.currentState=STATE_COLLECTION.FALSE;
         }
     }
+
 }

@@ -44,6 +44,11 @@ public interface MovieDao {
             "WHERE path=:path)")
     public int updateLastPlaytime(String path, long time);
 
+    @Query("UPDATE "+TABLE.MOVIE+" " +
+            "SET is_favorite=:isFavorite " +
+            "WHERE id=:id")
+    public int updateFavorite(boolean isFavorite,long id);
+
     /**
      * 只查询当前以挂载的设备
      *

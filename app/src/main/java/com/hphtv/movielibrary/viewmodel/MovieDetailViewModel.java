@@ -68,6 +68,14 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
+    public void setFavorite(MovieWrapper movieWrapper){
+        Observable.just(movieWrapper)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .subscribe(movieWrapper1 -> mMovieDao.updateFavorite(movieWrapper1.movie.isFavorite, movieWrapper1.movie.id));
+    }
+
+
+
     public void playTralier(Trailer trailer){
             VideoPlayTools.play(getApplication(), Uri.parse(trailer.url));
     }

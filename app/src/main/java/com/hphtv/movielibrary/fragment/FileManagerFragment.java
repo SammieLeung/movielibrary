@@ -27,13 +27,12 @@ import com.hphtv.movielibrary.activity.FolderManagerActivity;
 import com.hphtv.movielibrary.activity.HomePageActivity;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
-import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.dao.DeviceDao;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
-import com.hphtv.movielibrary.view.CustomSelectorDialogFragment;
-import com.hphtv.movielibrary.view.PasswordDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.CustomSelectorDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
 
 import java.util.List;
 

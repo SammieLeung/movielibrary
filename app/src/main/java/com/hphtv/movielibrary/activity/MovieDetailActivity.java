@@ -11,8 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-import androidx.databinding.BindingAdapter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,9 +28,8 @@ import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.util.VideoPlayTools;
-import com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll;
-import com.hphtv.movielibrary.view.ConfirmDialogFragment;
-import com.hphtv.movielibrary.view.CustomRadioDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.ConfirmDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
 
 import java.util.ArrayList;
@@ -40,8 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.khrystal.library.widget.ItemViewMode;
 import me.khrystal.library.widget.ScaleXCenterViewMode;
 
@@ -131,6 +128,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     }
                     Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
                     Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
+                    mBinding.btnFavorite.setFavoriteState(wrapper.movie.isFavorite);
                     mMovieTrailerAdapter.addItems(wrapper.trailers);
                 }
 
@@ -653,10 +651,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //        }
 //    }
 
-//    /**
-//     * 删除电影和电影文件信息
-//     */
-//    private void removeMovie() {
+    /**
+     * 删除电影和电影文件信息
+     */
+    private void removeMovie() {
 //        new Thread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -675,16 +673,18 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //                        runOnUiThread(new Runnable() {
 //                            @Override
 //                            public void run() {
-//                                Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
 //                            }
 //                        });
-//                        setResult(1);
-//                        finish();
+//
 //                    }
 //                }
 //            }
 //        }).start();
-//    }
+        setResult(1);
+        finish();
+        Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
+
+    }
 
 //    /**
 //     * 刷新详情页面收藏状态。
@@ -723,61 +723,14 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //
 //    }
 
-//    /**
-//     * 切换收藏状态
-//     */
-//    private void toggleFavroite() {
-//        startLoading();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                long id = mCurrentWrapper.getId();
-//
-//                Cursor cursor = null;
-//                if (id > 0) {
-//                    cursor = mFavoriteDao.select("wrapper_id=?", new String[]{String.valueOf(id)}, null);
-//                    if (cursor != null) {
-//                        List<Favorite> favoriteList = mFavoriteDao.parseList(cursor);
-//                        long count;
-//                        if (favoriteList.size() > 0) {
-//                            count = mFavoriteDao.delete("wrapper_id=?", new String[]{String.valueOf(id)});
-//                            if (count > 0) {
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        mBtnFavorite.setFavoriteState(false);
-//                                    }
-//                                });
-//                                BroadcastHelper.sendBroadcastMovieUpdateSync(MovieDetailActivity.this, id);
-//                            }
-//                        } else {
-//                            Favorite favorite = new Favorite();
-//                            favorite.setWrapper_id(id);
-//                            ContentValues values = mFavoriteDao.parseContentValues(favorite);
-//                            count = mFavoriteDao.insert(values);
-//                            if (count > 0) {
-//                                runOnUiThread(new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//                                        mBtnFavorite.setFavoriteState(true);
-//                                    }
-//                                });
-//                                BroadcastHelper.sendBroadcastMovieUpdateSync(MovieDetailActivity.this, id);
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        stopLoading();
-//                    }
-//                });
-//            }
-//        }).start();
-//
-//    }
+    /**
+     * 切换收藏状态
+     */
+    private void toggleFavroite() {
+        mBinding.getWrapper().movie.isFavorite = !mBinding.getWrapper().movie.isFavorite;
+        mBinding.btnFavorite.setFavoriteState(mBinding.getWrapper().movie.isFavorite);
+        mViewModel.setFavorite(mBinding.getWrapper());
+    }
 
     /**
      * 显示电影预告片
@@ -937,23 +890,29 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     }
                 }
                 break;
-//                case R.id.btn_remove:
-//                    ConfirmDialogFragment confirmDialogFragment = new ConfirmDialogFragment(MovieDetailActivity.this);
-//                    confirmDialogFragment.setPositiveButton(new ConfirmDialogFragment.OnPositiveListener() {
-//                        @Override
-//                        public void OnPositivePress(Button button) {
-//                            removeMovie();
-//                        }
-//                    }, true).setMessage(getResources().getString(R.string.remove_confirm)).show(getFragmentManager(), TAG);
-//
-//                    break;
-//                case R.id.btn_favorite:
-//                    toggleFavroite();
-//                    break;
-//                case R.id.btn_exit:
-//                    finish();
-//                    break;
-//
+            case R.id.btn_remove:
+                ConfirmDialogFragment confirmDialogFragment = ConfirmDialogFragment.newInstance();
+                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm))
+                        .setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
+                            @Override
+                            public void OK() {
+                                removeMovie();
+                            }
+
+                            @Override
+                            public void Cancel() {
+
+                            }
+                        });
+                confirmDialogFragment.show(getSupportFragmentManager(), TAG);
+
+                break;
+            case R.id.btn_favorite:
+                toggleFavroite();
+                break;
+            case R.id.btn_exit:
+                finish();
+                break;
         }
     };
 
