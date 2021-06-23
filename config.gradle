@@ -1,11 +1,11 @@
 ext {
     //android开发版本配置
     android = [
-            compileSdkVersion: 28,
-            buildToolsVersion: "28.0.3",
+            compileSdkVersion: 30,
+            buildToolsVersion: "30.0.3",
             applicationId    : "com.hphtv.movielibrary",
             minSdkVersion    : 24,
-            targetSdkVersion : 28,
+            targetSdkVersion : 30,
             versionCode      : 21,
             versionName      : "2.4.12",
     ]

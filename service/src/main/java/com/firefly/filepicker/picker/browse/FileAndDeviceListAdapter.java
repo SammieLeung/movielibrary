@@ -21,7 +21,6 @@ import org.fourthline.cling.support.model.item.Item;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -71,16 +70,27 @@ public class FileAndDeviceListAdapter
                 iconId = R.mipmap.net_focus;
                 break;
             case Node.EXTERNAL_DEVICE:
-                if (node.getId().equals(Environment.getExternalStorageDirectory().getAbsolutePath())) {
-                    iconId = R.mipmap.local_storage_icon_focus;
-                    title = mContext.getString(R.string.external_name);
-                } else {
-                    iconId = R.mipmap.flash_disk_icon;
-                    title = String.format("%s (%s)", mContext.getString(R.string.udisk_name), title);
-                }
+                iconId = R.mipmap.ic_internal;
+                title = mContext.getString(R.string.external_storage);
                 break;
             case Node.INTERNAL_DEVICE:
                 iconId = R.mipmap.local_storage_icon_focus;
+                break;
+            case Node.USB_DEVICE:
+                iconId = R.mipmap.ic_usb;
+                title = String.format(mContext.getString(R.string.udisk_name), title);
+                break;
+            case Node.SDCARD_DEVICE:
+                iconId = R.mipmap.ic_tf_card;
+                title = String.format(mContext.getString(R.string.sdcard_name), title);
+                break;
+            case Node.SATA_DEVICE:
+                iconId = R.mipmap.ic_sata;
+                title = String.format(mContext.getString(R.string.sata_name), title);
+                break;
+            case Node.PCIE_DEVICE:
+                iconId = R.mipmap.ic_ssd;
+                title = String.format(mContext.getString(R.string.pcie_name), title);
                 break;
             default:
                 if ("..".equals(node.getTitle())) {
@@ -153,7 +163,7 @@ public class FileAndDeviceListAdapter
                 && node.getItem() instanceof Item) {
             return true;
         } else if (node.getType() == Node.EXTERNAL
-                && ((File)node.getItem()).isFile()) {
+                && ((File) node.getItem()).isFile()) {
             return true;
         } else if (node.getType() == Node.SAMBA) {
             final SmbFile smbFile = (SmbFile) node.getItem();

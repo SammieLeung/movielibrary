@@ -137,7 +137,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     public void init() {
         Node node = new Node("root", "root", Node.ROOT, null);
         mLocalRoot = new Node("localRoot",
-                mContext.getString(R.string.local_storage),
+                mContext.getString(R.string.device),
                 Node.EXTERNAL_CATEGORY,
                 null);
         mDLNARoot = new Node("DNLARoot",
@@ -192,6 +192,10 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             case Node.EXTERNAL_CATEGORY:
             case Node.EXTERNAL_DEVICE:
             case Node.EXTERNAL:
+            case Node.PCIE_DEVICE:
+            case Node.SATA_DEVICE:
+            case Node.SDCARD_DEVICE:
+            case Node.USB_DEVICE:
                 if (node.getType() == Node.EXTERNAL_CATEGORY) {
                     localDevice(node);
                 } else if (mSelectType == SELECT_DIR) {
@@ -562,17 +566,44 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     }
 
     private void localDevice(Node parent) {
-        String[] paths = StorageHelper.getVolumePaths(mContext);
-
-        for (String path : paths) {
-            String dirName = path.substring(path.lastIndexOf('/') + 1);
-
-            Node node = new Node(path, dirName, currentNodeType(parent), null);
-
-            Log.d("BrowsePathPresenter", dirName);
+        String external = StorageHelper.getFlashStoragePath(mContext);
+        if (!TextUtils.isEmpty(external)) {
+            String dirName = external.substring(external.lastIndexOf('/') + 1);
+            Node node = new Node(external, dirName, currentNodeType(parent), null);
+            Log.d("BrowsePathPresenter udisk ", dirName);
             parent.addChild(node);
         }
 
+        List<String> UDisks = StorageHelper.getUSBPaths(mContext);
+        List<String> sdCards = StorageHelper.getSdCardPaths(mContext);
+        List<String> SSDs = StorageHelper.getPciePaths(mContext);
+        List<String> hardDisks = StorageHelper.getHardDiskPaths(mContext);
+
+        for (String path : UDisks) {
+            String dirName = path.substring(path.lastIndexOf('/') + 1);
+            Node node = new Node(path, dirName, Node.USB_DEVICE, null);
+            Log.d("BrowsePathPresenter udisk ", dirName);
+            parent.addChild(node);
+        }
+
+        for (String path : sdCards) {
+            String dirName = path.substring(path.lastIndexOf('/') + 1);
+            Node node = new Node(path, dirName, Node.SDCARD_DEVICE, null);
+            Log.d("BrowsePathPresenter sdcard ", dirName);
+            parent.addChild(node);
+        }
+        for (String path : SSDs) {
+            String dirName = path.substring(path.lastIndexOf('/') + 1);
+            Node node = new Node(path, dirName, Node.PCIE_DEVICE, null);
+            Log.d("BrowsePathPresenter SSD ", dirName);
+            parent.addChild(node);
+        }
+        for (String path : hardDisks) {
+            String dirName = path.substring(path.lastIndexOf('/') + 1);
+            Node node = new Node(path, dirName, Node.SATA_DEVICE, null);
+            Log.d("BrowsePathPresenter HardDisk ", dirName);
+            parent.addChild(node);
+        }
         updateTreeView(parent);
     }
 

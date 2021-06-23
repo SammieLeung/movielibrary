@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">文件选择器</string>
     <string name="action_settings">设置</string>
-    <string name="local_storage">本地存储</string>
+    <string name="device">存储设备</string>
     <string name="notice_for_request_permission">为使app正常运行，请赋予app权限</string>
     <string name="select_dir_notice">长按OK选择文件夹</string>
     <string name="add_directory">添加文件夹</string>
@@ -26,6 +26,9 @@
     <string name="can_not_access">无法连接url。</string>
     <string name="url_is_invalid">url无效。</string>
     <string name="must_end_with_divide">url必需以/结束。</string>
-    <string name="external_name">本地磁盘</string>
-    <string name="udisk_name">移动磁盘</string>
+    <string name="external_storage">内置存储</string>
+    <string name="udisk_name">U盘 (%1$s)</string>
+    <string name="sdcard_name">TF卡 (%1$s)</string>
+    <string name="pcie_name">M.2 SSD (%1$s)</string>
+    <string name="sata_name">硬盘 (%1$s)</string>
 </resources>

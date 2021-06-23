@@ -2,7 +2,7 @@
     <string name="app_name">File picker</string>
     <string name="title_activity_browse_path" translatable="false">BrowsePathActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="local_storage">Local Storage</string>
+    <string name="device">Storage</string>
     <string name="dlna_node" translatable="false">DLNA</string>
     <string name="samba_node" translatable="false">Samba</string>
     <string name="notice_for_request_permission">Please grant the permision or the app can\'t work.</string>
@@ -29,6 +29,9 @@
     <string name="can_not_access">Can\'t access this url.</string>
     <string name="url_is_invalid">Url is invalid.</string>
     <string name="must_end_with_divide">Url must ends with \"/\".</string>
-    <string name="external_name">Local Disk</string>
-    <string name="udisk_name">Usb Disk</string>
+    <string name="external_storage">Internal Storage</string>
+    <string name="udisk_name">U-Disk (%1$s)</string>
+    <string name="sdcard_name">TFCard (%1$s)</string>
+    <string name="pcie_name">M.2 SSD (%1$s)</string>
+    <string name="sata_name">HardDisk (%1$s)</string>
 </resources>

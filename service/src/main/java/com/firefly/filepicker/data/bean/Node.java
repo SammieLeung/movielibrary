@@ -38,6 +38,10 @@ public class Node implements Serializable {
             SAMBA_CATEGORY,
             INTERNAL_DEVICE,
             EXTERNAL_DEVICE,
+            SDCARD_DEVICE,
+            PCIE_DEVICE,
+            SATA_DEVICE,
+            USB_DEVICE,
             DLNA_DEVICE,
             SAMBA_DEVICE})
     public @interface Type {};
@@ -55,6 +59,10 @@ public class Node implements Serializable {
 
     public static final int INTERNAL_DEVICE = 8;
     public static final int EXTERNAL_DEVICE = 9;
+    public static final int SDCARD_DEVICE=91;
+    public static final int PCIE_DEVICE=92;
+    public static final int SATA_DEVICE=93;
+    public static final int USB_DEVICE=94;
     public static final int DLNA_DEVICE = 10;
     public static final int SAMBA_DEVICE = 11;
 
@@ -224,7 +232,12 @@ public class Node implements Serializable {
         return DLNA_DEVICE == type
                 || SAMBA_DEVICE == type
                 || EXTERNAL_DEVICE == type
-                || INTERNAL_DEVICE == type;
+                || INTERNAL_DEVICE == type
+                || PCIE_DEVICE == type
+                || SATA_DEVICE == type
+                || SDCARD_DEVICE == type
+                || USB_DEVICE == type
+                ;
     }
 
     public int getFlag() {
