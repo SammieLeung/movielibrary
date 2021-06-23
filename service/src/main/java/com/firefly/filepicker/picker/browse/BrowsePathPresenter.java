@@ -40,6 +40,8 @@ import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -288,6 +290,10 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             case Node.EXTERNAL_CATEGORY:
             case Node.EXTERNAL_DEVICE:
             case Node.EXTERNAL:
+            case Node.PCIE_DEVICE:
+            case Node.SATA_DEVICE:
+            case Node.USB_DEVICE:
+            case Node.SDCARD_DEVICE:
                 if (node.getItem() instanceof File) {
                     File file = (File) node.getItem();
                     if (file.isFile()) {
@@ -347,6 +353,10 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             case Node.EXTERNAL_CATEGORY:
             case Node.EXTERNAL_DEVICE:
             case Node.EXTERNAL:
+            case Node.USB_DEVICE:
+            case Node.SDCARD_DEVICE:
+            case Node.PCIE_DEVICE:
+            case Node.SATA_DEVICE:
                 MediaDirHelper.addAndSave(mContext, new SaveItem(SaveItem.TYPE_LOCAL, identity));
                 identity = Base64Helper.encode(identity);
                 deviceType = "local";

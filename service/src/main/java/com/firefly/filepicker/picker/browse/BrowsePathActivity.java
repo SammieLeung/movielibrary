@@ -6,7 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -23,7 +26,7 @@ public class BrowsePathActivity extends AppCompatActivity {
     public final static String ARG_SELECT_TYPE = "selectType";
     public final static String ARG_FRAGMENT_TITLE = "title";
     public final static String ARG_SUPPORT_NET = "supportNet";
-    public static final String ARG_ENABLE_CONFIRM_DIALOG ="enableConfrimDialog";
+    public static final String ARG_ENABLE_CONFIRM_DIALOG = "enableConfrimDialog";
 
     private static final int REQUEST_CODE_CHECK_PERMISSION = 1000;
     private BrowsePathPresenter mPresenter;
@@ -33,7 +36,7 @@ public class BrowsePathActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browse_path);
-
+        checkStorageManagerPermission();
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -82,7 +85,7 @@ public class BrowsePathActivity extends AppCompatActivity {
         int browseType = getIntent().getIntExtra(ARG_SELECT_TYPE, SELECT_DIR);
         String fragmentTitle = getIntent().getStringExtra(ARG_FRAGMENT_TITLE);
         boolean supportNet = getIntent().getBooleanExtra(ARG_SUPPORT_NET, true);
-        boolean enableConfirm=getIntent().getBooleanExtra(ARG_ENABLE_CONFIRM_DIALOG,true);
+        boolean enableConfirm = getIntent().getBooleanExtra(ARG_ENABLE_CONFIRM_DIALOG, true);
         mFragment = new BrowsePathFragment();
         mFragment.setTitle(fragmentTitle);
 
@@ -149,5 +152,14 @@ public class BrowsePathActivity extends AppCompatActivity {
         }
 
         return super.dispatchTouchEvent(ev);
+    }
+
+    public void checkStorageManagerPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                !Environment.isExternalStorageManager()) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
     }
 }
