@@ -133,7 +133,7 @@
                         android:textSize="16sp" />
                 </RelativeLayout>
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/status_bar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -147,16 +147,19 @@
                     android:paddingBottom="12dp">
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
+                        android:layout_toStartOf="@id/textView4"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:paddingEnd="50dp"
                         android:orientation="vertical">
 
                         <TextView
                             android:id="@+id/focused_dir"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:ellipsize="end"
+                            android:ellipsize="marquee"
+                            android:marqueeRepeatLimit="marquee_forever"
                             android:gravity="center_vertical"
                             android:maxWidth="200dp"
                             android:singleLine="true"
@@ -176,33 +179,17 @@
 
                     </LinearLayout>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/textView4"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical">
-
-                        <ImageView
-                            android:id="@+id/imageView3"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_centerVertical="true"
-                            android:layout_marginEnd="8dp"
-                            android:visibility="gone"
-                            android:layout_toStartOf="@+id/textView4"
-                            android:src="@mipmap/ok" />
-
-                        <TextView
-                            android:id="@+id/textView4"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_centerVertical="true"
-                            android:layout_gravity="center"
-                            android:text="@string/select_dir_notice"
-                            android:textColor="@color/textColor"
-                            android:textSize="16sp" />
-                    </RelativeLayout>
-                </LinearLayout>
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:text="@string/select_dir_notice"
+                        android:textColor="@color/textColor"
+                        android:textSize="16sp" />
+                </RelativeLayout>
 
             </RelativeLayout>
 

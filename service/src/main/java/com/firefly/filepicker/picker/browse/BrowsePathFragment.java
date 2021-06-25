@@ -28,6 +28,7 @@ import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.filepicker.data.bean.Node;
 import com.firefly.filepicker.utils.SmbFileHelper;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -438,8 +439,12 @@ public class BrowsePathFragment extends Fragment
             FileItem fileItem = (FileItem) node.getItem();
             lastModified = fileItem.getDate();
         }
-
-        mFocusedDirView.setText(getString(R.string.selected, focus ? node.getTitle() : "-"));
+        File file= (File) node.getItem();
+        String text=node.getTitle();
+        if(file!=null&&file.isDirectory())
+            text=file.getPath();
+        mFocusedDirView.setText(getString(R.string.selected, focus ? text : "-"));
+        mFocusedDirView.setSelected(true);
         mFocusedLastModifiedView.setText(
                 getString(R.string.last_modify_date, lastModified));
     }
