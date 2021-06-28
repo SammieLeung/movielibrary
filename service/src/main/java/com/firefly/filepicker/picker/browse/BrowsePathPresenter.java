@@ -25,7 +25,7 @@ import com.firefly.filepicker.utils.Base64Helper;
 import com.firefly.filepicker.utils.MediaDirHelper;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.firefly.filepicker.utils.SmbFileHelper;
-import com.firefly.filepicker.utils.StorageHelper;
+import com.firelfy.util.StorageHelper;
 
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
@@ -40,8 +40,6 @@ import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;

@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.scraper.mtime;
 
 
-
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
@@ -16,29 +15,30 @@ public class MtimeSearchRespone implements ResponeEntity<List<Movie>> {
     private Data data;
 
     @Override
-    public  List<Movie> toEntity() {
+    public List<Movie> toEntity() {
         List<Movie> movies = new ArrayList<>();
-        for (Data.MtimeMovie movie : data.movies) {
-            movies.add(movie.toEntity());
-        }
+        if (data.movies != null)
+            for (Data.MtimeMovie movie : data.movies) {
+                movies.add(movie.toEntity());
+            }
         return movies;
     }
 
-    private class Data{
+    private class Data {
         private List<MtimeMovie> movies;
 
 
-        private class MtimeMovie implements ResponeEntity<Movie>{
+        private class MtimeMovie implements ResponeEntity<Movie> {
             private int movieId;
             private String name;
             private String nameEn;
 
             @Override
             public Movie toEntity() {
-                Movie movie=new Movie();
-                movie.movieId=(String.valueOf(movieId));
-                movie.title=(name);
-                movie.otherTitle=nameEn;
+                Movie movie = new Movie();
+                movie.movieId = (String.valueOf(movieId));
+                movie.title = (name);
+                movie.otherTitle = nameEn;
                 return movie;
             }
         }

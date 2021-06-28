@@ -11,10 +11,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
+import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.FLayoutFavoriteBinding;
@@ -22,7 +23,6 @@ import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author lxp
@@ -36,8 +36,6 @@ public class HomePageFragment extends Fragment {
     private MovieLibraryAdapter mMovieLibraryAdapter;// 电影列表适配器
     private List<MovieDataView> mMovieDataViewList = new ArrayList<>();// 电影数据
 
-    private static AtomicBoolean atomicBoolean = new AtomicBoolean();
-
     private FLayoutFavoriteBinding mFLayoutFavoriteBinding;
     private ActivityResultLauncher mActivityResultLauncher;
 
@@ -49,6 +47,7 @@ public class HomePageFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -74,6 +73,7 @@ public class HomePageFragment extends Fragment {
 
     @Override
     public void onResume() {
+        LogUtil.v(TAG,"OnResume");
         super.onResume();
     }
 
@@ -81,25 +81,21 @@ public class HomePageFragment extends Fragment {
      * 初始化
      */
     private void initView() {
-
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), COLUMS, GridLayoutManager.VERTICAL, false);
         mFLayoutFavoriteBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mMovieLibraryAdapter = new MovieLibraryAdapter(getContext(), mMovieDataViewList);
         mFLayoutFavoriteBinding.rvMovies.setAdapter(mMovieLibraryAdapter);
         mMovieLibraryAdapter
-                .setOnItemClickListener((view, dataView) -> {
-
+                .setOnItemClickListener((BaseAdapter.OnRecyclerViewItemClickListener<MovieDataView>) (view, data) -> {
                     Intent intent = new Intent(HomePageFragment.this.getContext(),
                             MovieDetailActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putLong(ConstData.IntentKey.KEY_MOVIE_ID, dataView.id);
+                    bundle.putLong(ConstData.IntentKey.KEY_MOVIE_ID, data.id);
                     bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
                     intent.putExtras(bundle);
                     mActivityResultLauncher.launch(intent);
                 });
-
     }
-
 
     public void updateMovie(List<MovieDataView> movieDataViews) {
         if (movieDataViews.size() > 0) {

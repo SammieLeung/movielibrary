@@ -30,6 +30,7 @@ import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -49,6 +50,7 @@ import com.hphtv.movielibrary.fragment.FavoriteFragment;
 import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
+import com.hphtv.movielibrary.fragment.UnrecognizedFileFragement;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
@@ -78,6 +80,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     // 筛选条件
     private FileManagerFragment mFileManagerFragment;
     private HomePageFragment mHomePageFragment;
+    private UnrecognizedFileFragement mUnrecognizedFileFragement;
     private AboutsFragment mAboutsFragment;
     private FavoriteFragment mFavoriteFragment;
     private HistoryFragment mHistoryFragment;
@@ -376,8 +379,13 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         if (mHistoryFragment == null) {
             mHistoryFragment = new HistoryFragment();
         }
+
+        if (mUnrecognizedFileFragement == null) {
+            mUnrecognizedFileFragement = UnrecognizedFileFragement.newInstance();
+        }
         mFramentList = new ArrayList<>();
         mFramentList.add(mHomePageFragment);
+        mFramentList.add(mUnrecognizedFileFragement);
 //        mFramentList.add(mHistoryFragment);
 //        mFramentList.add(mFavoriteFragment);
 //        mFramentList.add(mFileManagerFragment);
@@ -394,7 +402,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             @Override
             public void onPageSelected(int position) {
                 mBinding.leftmenuListview.setSelection(position);
-                if (position != HOME_PAGE_FRAGMENT && position != HISTORY_FRAGMENT && position != FAVORITE_FRAGMENT) {
+                if (position != HOME_PAGE_FRAGMENT) {
                     mBinding.viewSortbox.setVisibility(View.GONE);
                 } else {
                     mBinding.viewSortbox.setVisibility(View.VISIBLE);
@@ -409,6 +417,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     /**
      * 弹出筛选
+     *
      * @param v
      */
     private void PopUpDeviceWindow(View v) {
@@ -416,7 +425,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     /**
-     *一定时间后更新筛选分类和电影
+     * 一定时间后更新筛选分类和电影
+     *
      * @param delay 毫秒
      */
     private void postDelayMovieRefresh(long delay) {
@@ -441,7 +451,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         mBinding.viewpager.setCurrentItem(pos, true);
         mBinding.lbTitle.setText(getResources().getTextArray(R.array.home_page_classified_title)[pos].toString());
     }
-
 
 
     private void exitBy2Click() {
@@ -605,7 +614,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
             } else if (name.getClassName().equalsIgnoreCase(DeviceMonitorService.class.getCanonicalName())) {
                 mDeviceMonitorService = ((DeviceMonitorService.MonitorBinder) service).getService();
-                postDelayMovieRefresh();
             }
         }
 
@@ -619,10 +627,14 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             LogUtil.v(HomePageActivity.class.getSimpleName(), "mBroadcastReceiver action:" + action);
-            switch (action)
-            {
+            switch (action) {
                 case ConstData.BroadCastMsg.DEVICE_DOWN:
                     mCategoryView.resetDevicePos();
+                    postDelayMovieRefresh();
+                    break;
+                case ConstData.BroadCastMsg.DEVICE_UP:
+                    startLoading();
+                    break;
                 case ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH:
                     postDelayMovieRefresh();
                     break;
@@ -630,5 +642,11 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         }
     };
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        LogUtil.v(TAG, "onActivityResult " + requestCode + ":" + resultCode);
+        switch (requestCode) {
+        }
+    }
 }

@@ -7,6 +7,8 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.roomdb.VIEW;
+import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
 import java.util.List;
@@ -38,5 +40,10 @@ public interface VideoFileDao {
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE)
     public void deleteAll();
+
+
+    @Query("SELECT * FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW +
+            " GROUP BY keyword")
+    public List<UnrecognizedFileDataView> queryUnrecognizedFiles();
 
 }

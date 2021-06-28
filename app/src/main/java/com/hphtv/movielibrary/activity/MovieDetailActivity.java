@@ -82,21 +82,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //    private static final int PARSE_SUCCESS = 3;
 //    private static final int PARSE_ERROR = -2;
 
-    boolean isSearchDialogShow = true;
-    boolean isParseOver = false;
-    boolean isExist;
-    boolean isExistButNeedUpdate;
-    boolean isChangeMovie;
-    private int random;
     private List<Trailer> mMovieTrailerList = new ArrayList<>();
-    private CustomRadioDialogFragment checkGroupDialogFragment;
-    private MovieScanService mScanService;
-
-    private int mCurrentMode;
-
-    // Button mBtnPlay;//播放
-
-    private long mMovieId;
 
     @Override
     protected int getContentViewId() {
@@ -115,25 +101,42 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent != null) {
-            mMovieId = intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID, -1);
-            //TODO 根据MovieDataView的id获取MovieWrapper
-            mViewModel.getMovieWrapper(mMovieId, wrapper -> {
-                if (wrapper != null) {
-                    mBinding.setWrapper(wrapper);
-                    String stagePhoto = "";
-                    if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
-                        Random random = new Random();
-                        int index = random.nextInt(wrapper.stagePhotos.size());
-                        stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
-                    }
-                    Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
-                    Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
-                    mBinding.btnFavorite.setFavoriteState(wrapper.movie.isFavorite);
-                    mMovieTrailerAdapter.addItems(wrapper.trailers);
-                }
+            int mode = intent.getIntExtra(ConstData.IntentKey.KEY_MODE, -1);
+            switch (mode) {
+                case ConstData.MovieDetailMode.MODE_WRAPPER:
+                    long movieId = intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID, -1);
+                    prepareMovieWrapper(movieId);
+                    break;
+                case ConstData.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
+                    String unrecognizedFileKeyword = intent.getStringExtra(ConstData.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD);
+                    prepareUnrecogizedFile(unrecognizedFileKeyword);
+                    break;
+            }
 
-            });
+
         }
+    }
+
+    private void prepareMovieWrapper(long movieId) {
+        mViewModel.getMovieWrapper(movieId, wrapper -> {
+            if (wrapper != null) {
+                mBinding.setWrapper(wrapper);
+                String stagePhoto = "";
+                if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
+                    Random random = new Random();
+                    int index = random.nextInt(wrapper.stagePhotos.size());
+                    stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
+                }
+                Glide.with(this).load(wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
+                Glide.with(this).load(stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
+                mBinding.btnFavorite.setFavoriteState(wrapper.movie.isFavorite);
+                mMovieTrailerAdapter.addItems(wrapper.trailers);
+            }
+        });
+    }
+
+    private void prepareUnrecogizedFile(String keyword) {
+
     }
 
     @Override
@@ -181,7 +184,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             }
         });
         initMovieTrailerList();
-
     }
 
     /**

@@ -21,7 +21,6 @@ import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
 import com.hphtv.movielibrary.sqlite.bean.History;
-//import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.activity.HomePageActivity;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
@@ -95,7 +94,7 @@ public class HistoryFragment extends Fragment {
 //        mRVMovies.setAdapter(mAdapter);
 
         mAdapter
-                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
+                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener<MovieDataView>() {
                     @Override
                     public void onItemClick(View view, MovieDataView dataView) {
                         Intent intent = new Intent(mContext,

@@ -1,12 +1,13 @@
 package com.hphtv.movielibrary.service.Thread;
 
+import android.text.TextUtils;
+
 import com.firelfy.util.LogUtil;
-import com.firelfy.util.StorageList;
+import com.firelfy.util.StorageHelper;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
-import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.viewmodel.DeviceMonitorViewModel;
 
 
@@ -25,7 +26,7 @@ public class DeviceInitThread extends Thread {
     private MovieLibraryRoomDatabase mMovieLibraryRoomDatabase;
 
     public DeviceInitThread(DeviceMonitorViewModel viewModel) {
-        mDeviceMonitorViewModel =viewModel;
+        mDeviceMonitorViewModel = viewModel;
         mMovieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(viewModel.getApplication());
         mDeviceDao = mMovieLibraryRoomDatabase.getDeviceDao();
         mVideoFileDao = mMovieLibraryRoomDatabase.getVideoFileDao();
@@ -39,18 +40,13 @@ public class DeviceInitThread extends Thread {
         super.run();
         //清除数据库设备
         mDeviceDao.deleteAll();
-//        String[] paths=StorageList.getInstance().getVolumnPaths();
-//        if(paths!=null){
-//            for(String path:paths){
-//                LogUtil.v("StorageList path="+path);
-//                LogUtil.v("mountState "+StorageList.getInstance().isVolumeMounted(path));
-//            }
-//        }
         LogUtil.v(TAG, "=============>挂载设备:");
-        String internelStorage = StorageList.getInstance().getFlashStoragePath();
-        LogUtil.v("internelStorage = "+internelStorage);
-        List<String> allCardPaths = StorageList.getInstance().getSdCardPaths();
-        List<String> allUsbPaths = StorageList.getInstance().getUSBPaths();
+
+        String internelStorage = StorageHelper.getFlashStoragePath(mDeviceMonitorViewModel.getApplication());
+        List<String> allCardPaths = StorageHelper.getSdCardPaths(mDeviceMonitorViewModel.getApplication());
+        List<String> allUsbPaths = StorageHelper.getUSBPaths(mDeviceMonitorViewModel.getApplication());
+        List<String> allPciePaths = StorageHelper.getPciePaths(mDeviceMonitorViewModel.getApplication());
+        List<String> allHardDiskPaths = StorageHelper.getHardDiskPaths(mDeviceMonitorViewModel.getApplication());
 
         //扫描sd卡
         if (allCardPaths != null && allCardPaths.size() > 0) {
@@ -70,10 +66,33 @@ public class DeviceInitThread extends Thread {
                 mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
-        //扫描内置存储
-        String deviceName = internelStorage.substring(internelStorage.lastIndexOf("/") + 1);//TODO 验证Android 11上的可行性
-        int type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
-        int state = ConstData.DeviceMountState.MOUNTED;
-        mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
+
+        //扫描PCIE设备
+        if (allPciePaths != null && allPciePaths.size() > 0) {
+            for (String path : allPciePaths) {
+                String deviceName = path.substring(path.lastIndexOf("/") + 1);
+                int type = ConstData.DeviceType.DEVICE_TYPE_PCIE;
+                int state = ConstData.DeviceMountState.MOUNTED;
+                mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
+            }
+        }
+
+        //扫描Hard Disk设备
+        if (allHardDiskPaths != null && allHardDiskPaths.size() > 0) {
+            for (String path : allHardDiskPaths) {
+                String deviceName = path.substring(path.lastIndexOf("/") + 1);
+                int type = ConstData.DeviceType.DEVICE_TYPE_HARD_DISK;
+                int state = ConstData.DeviceMountState.MOUNTED;
+                mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
+            }
+        }
+
+        if (!TextUtils.isEmpty(internelStorage)) {
+            //扫描内置存储
+            String deviceName = internelStorage.substring(internelStorage.lastIndexOf("/") + 1);//TODO 验证Android 11上的可行性
+            int type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
+            int state = ConstData.DeviceMountState.MOUNTED;
+            mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
+        }
     }
 }

@@ -2,28 +2,23 @@ package com.hphtv.movielibrary.fragment;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.GridLayoutManager;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.activity.HomePageActivity;
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
-import com.hphtv.movielibrary.adapter.MovieLibraryAdapter.OnRecyclerViewItemClickListener;
 import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
-import com.hphtv.movielibrary.sqlite.bean.Directory;
-import com.hphtv.movielibrary.sqlite.bean.Favorite;
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.FavoriteDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
@@ -87,18 +82,14 @@ public class FavoriteFragment extends Fragment {
 //        mAdapter = new MovieLibraryAdapter(mContext, mWrapperList);
 //        mRVMovies.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener(new OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, MovieDataView dataView) {
-                Intent intent = new Intent(mContext,
-                        MovieDetailActivity.class);
-                Bundle bundle = new Bundle();
+        mAdapter.setOnItemClickListener((view1, data) -> {
+            Intent intent = new Intent(mContext,
+                    MovieDetailActivity.class);
+            Bundle bundle = new Bundle();
 //                bundle.putSerializable("wrapper", wrapper);
-                bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 0);
-            }
-
+            bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 0);
         });
 
     }

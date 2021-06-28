@@ -30,7 +30,6 @@ public class VideoFile implements Serializable {
     @ColumnInfo(name = "is_scanned")
     public int isScanned;
 
-    @Ignore
     public String keyword;
 
 }

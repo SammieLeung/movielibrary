@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.roomdb.entity;
 import androidx.room.DatabaseView;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.roomdb.VIEW;
 
 /**
  * author: Sam Leung
@@ -23,7 +24,7 @@ import com.hphtv.movielibrary.roomdb.TABLE;
                 "JOIN " + TABLE.MOVIE_GENRE_CROSS_REF + " AS MGCF " +
                 "ON MGCF.genre_id = G.genre_id) AS MGCF__G " +
                 "ON MGCF__G.id = M.id ",
-        viewName = "movie_dataview"
+        viewName = VIEW.MOVIE_DATAVIEW
 )
 public class MovieDataView {
     public long id;

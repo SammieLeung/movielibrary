@@ -7,16 +7,14 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.firefly.filepicker.data.Constants;
 import com.firelfy.util.LogUtil;
-import com.firelfy.util.StorageList;
+import com.firelfy.util.StorageHelper;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService2;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.FileScanThread;
@@ -34,7 +32,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -56,6 +53,7 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
 
     private DeviceDao mDeviceDao;
     private VideoFileDao mVideoFileDao;
+    private int mScanFlag = 0;
 
     public DeviceMonitorViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -77,15 +75,21 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
         mDeviceMountExecutor = Executors.newSingleThreadExecutor();
         mFileScanExecutor = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         mDeviceInitExecutor = Executors.newSingleThreadExecutor();
-        mSingleThreadPool=Executors.newSingleThreadExecutor();
+        mSingleThreadPool = Executors.newSingleThreadExecutor();
     }
 
     /**
      * 扫描本地所有挂载设备并扫描文件
      */
     public void scanDevices() {
-        LogUtil.v("movielib scanDevices");
-        mDeviceInitExecutor.execute(new DeviceInitThread(this));
+        if (mScanFlag == 0) {
+            synchronized (DeviceMonitorViewModel.this) {
+                if (mScanFlag == 0) {
+                    mScanFlag = 1;
+                    mDeviceInitExecutor.execute(new DeviceInitThread(this));
+                }
+            }
+        }
     }
 
     /**
@@ -201,6 +205,14 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
 
         }
 
+        /**
+         *
+         * @param mountPath
+         * @param netWorkPath
+         * @param deviceType
+         * @param name
+         * @return
+         */
         private Device buildDeviceFromPath(String mountPath, String netWorkPath, int deviceType, String name) {
             Device device = new Device();
             File file = new File(mountPath);
@@ -210,16 +222,21 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
             device.name = name;
             device.networkPath = netWorkPath;
 
+            //获取设备具体类型
             if (deviceType == ConstData.DeviceType.DEVICE_TYPE_LOCAL) {
-                if (StorageList.getInstance().isMountUsb(mountPath)) {
+                if (StorageHelper.isMountUsb(getApplication(), mountPath)) {
                     device.type = ConstData.DeviceType.DEVICE_TYPE_USB;
-                } else if (StorageList.getInstance().isMountSdCard(mountPath)) {
-                    device.type = (ConstData.DeviceType.DEVICE_TYPE_SDCARDS);
+                } else if (StorageHelper.isMountSdCard(getApplication(), mountPath)) {
+                    device.type = ConstData.DeviceType.DEVICE_TYPE_SDCARDS;
+                } else if (StorageHelper.isMountHardDisk(getApplication(), mountPath)) {
+                    device.type = ConstData.DeviceType.DEVICE_TYPE_HARD_DISK;
+                } else if (StorageHelper.isMountPcie(getApplication(), mountPath)) {
+                    device.type = ConstData.DeviceType.DEVICE_TYPE_PCIE;
                 } else {
-                    device.type = (ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE);
+                    device.type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
                 }
             } else {
-                device.type = (deviceType);
+                device.type = deviceType;
             }
             return device;
         }

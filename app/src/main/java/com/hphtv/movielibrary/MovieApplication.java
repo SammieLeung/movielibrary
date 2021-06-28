@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.webkit.WebView;
 
-import com.firelfy.util.StorageList;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.umeng.analytics.MobclickAgent;
@@ -36,7 +35,6 @@ public class MovieApplication extends Application {
         helper.initWebView(true, cachePath);
         //友盟统计
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
-        StorageList.getInstance().init(this);
     }
 
     @Override
@@ -67,6 +65,7 @@ public class MovieApplication extends Application {
             }
         }
     }
+
 
 
     // 遍历所有Activity并finish

@@ -113,8 +113,17 @@ public class ConstData {
          * sd卡
          */
         int DEVICE_TYPE_SDCARDS = 3;
-        int DEVICE_TYPE_DLNA = 4;
-        int DEVICE_TYPE_SMB = 5;
+        /**
+         * pcie
+         */
+        int DEVICE_TYPE_PCIE=4;
+        /**
+         * hardDisk
+         */
+        int DEVICE_TYPE_HARD_DISK=5;
+
+        int DEVICE_TYPE_DLNA = 6;
+        int DEVICE_TYPE_SMB =7;
     }
 
     public interface EncryptState {
@@ -167,6 +176,7 @@ public class ConstData {
         int MODE_OUTSIDE = 2;
         /*通过MovieWrapper打开*/
         int MODE_WRAPPER=4;
+        int MODE_UNRECOGNIZEDFILE=5;
     }
 
     //6. --------------for movie and videofile-------------
@@ -189,7 +199,9 @@ public class ConstData {
     //7.---------------for MovieSearcherHelper -----------
     public interface IntentKey {
         String IS_GET_MOVIE_LISTS = "MODE_LIST";
+        String KEY_MODE="mode";
         String KEY_MOVIE_ID="movie_id";
+        String KEY_UNRECOGNIZE_FILE_KEYWORD="keyword";
 
 
     }

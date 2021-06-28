@@ -24,6 +24,7 @@ dependencies {
     implementation support["appcompat"]
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation support["design"]
+    implementation project(path: ':util')
     testImplementation 'junit:junit:4.12'
     implementation 'org.fourthline.cling:cling-core:2.1.1'
     implementation 'org.fourthline.cling:cling-support:2.1.1'

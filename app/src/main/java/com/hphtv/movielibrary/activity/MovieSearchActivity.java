@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hphtv.movielibrary.MovieApplication;
+import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.LocalSearchAdapter;
@@ -137,19 +138,14 @@ public class MovieSearchActivity extends BaseActivity {
 
         LocalSearchAdapter localSearchAdapter = new LocalSearchAdapter(MovieSearchActivity.this, datas);
         movieLibraryAdapter = new MovieLibraryAdapter(MovieSearchActivity.this, mWrapperList);
-        movieLibraryAdapter.setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, MovieDataView dataView) {
-                Intent intent = new Intent(mContext,
-                        MovieDetailActivity.class);
-                Bundle bundle = new Bundle();
+        movieLibraryAdapter.setOnItemClickListener((MovieLibraryAdapter.OnRecyclerViewItemClickListener<MovieDataView>) (view, dataView) -> {
+            Intent intent = new Intent(mContext,
+                    MovieDetailActivity.class);
+            Bundle bundle = new Bundle();
 //                bundle.putSerializable("wrapper", wrapper);
-                bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 0);
-            }
-
-
+            bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 0);
         });
         mRVKeyBoard.setAdapter(localSearchAdapter);
         mRVKeyBoard.post(new Runnable() {

@@ -114,8 +114,8 @@ public class MovieScanService2 extends Service {
         mMovieGenreCrossRefDao = movieLibraryRoomDatabase.getMovieGenreCrossRefDao();
         mMovieVideofileCrossRefDao = movieLibraryRoomDatabase.getMovieVideofileCrossRefDao();
         mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
-        mTrailerDao=movieLibraryRoomDatabase.getTrailerDao();
-        mStagePhotoDao=movieLibraryRoomDatabase.getStagePhotoDao();
+        mTrailerDao = movieLibraryRoomDatabase.getTrailerDao();
+        mStagePhotoDao = movieLibraryRoomDatabase.getStagePhotoDao();
     }
 
     private void initThreadPools() {
@@ -211,25 +211,29 @@ public class MovieScanService2 extends Service {
                                 maxSimilarity = tmpSimilarity;
                             }
                         }
-                        return mostSimilarMovie.movieId;
+                        if (mostSimilarMovie != null)
+                            return mostSimilarMovie.movieId;
                     }
-                    return null;
+                    return "";
                 })
                 .observeOn(Schedulers.from(mMovieDetailExecutor))
                 .map((Function<String, MovieWrapper>) movieId -> {
-
-                    MovieWrapper wrapper = MtimeApi2.getMovieDetail(movieId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
-                    saveMovieWrapper(wrapper, videoFile);
-
-                    return wrapper;
+                    if(!TextUtils.isEmpty(movieId)) {
+                        MovieWrapper wrapper = MtimeApi2.getMovieDetail(movieId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                        saveMovieWrapper(wrapper, videoFile);
+                        return wrapper;
+                    }
+                    return new MovieWrapper();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<MovieWrapper>() {
                     @Override
                     public void onNext(@NonNull MovieWrapper movieWrapper) {
-                        LogUtil.v("startSearch+++++++++");
-                        LogUtil.v("Result:origin" + videoFile.filename);
-                        LogUtil.v("Result:==>" + movieWrapper.movie.title);
+                        if(movieWrapper.movie!=null) {
+                            LogUtil.v(offset+":file[" +videoFile.filename+"] movie[" + movieWrapper.movie.title+"]");
+                        }else{
+                            LogUtil.v(offset+":file[" +videoFile.filename+"] movie[not found]");
+                        }
                         offset++;
                         //TODO 发送广播
                     }
@@ -267,7 +271,7 @@ public class MovieScanService2 extends Service {
         Director director = movieWrapper.director;
         List<Actor> actorList = movieWrapper.actors;
         List<Trailer> trailerList = movieWrapper.trailers;
-        List<StagePhoto> stagePhotoList=movieWrapper.stagePhotos;
+        List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
         //插入电影到数据库
         movie.pinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
@@ -276,8 +280,8 @@ public class MovieScanService2 extends Service {
         mActorDao.insertActors(actorList);
         mDirectorDao.insertDirector(director);
 
-        List<String> querySelectionGenreNames=new ArrayList<>();
-        for(Genre genre:genreList){
+        List<String> querySelectionGenreNames = new ArrayList<>();
+        for (Genre genre : genreList) {
             querySelectionGenreNames.add(genre.name);
         }
 
@@ -292,9 +296,9 @@ public class MovieScanService2 extends Service {
                 MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
                 movieGenreCrossRef.genreId = genre_id;
                 movieGenreCrossRef.id = movie_id;
-                LogUtil.v("save genre "+movieGenreCrossRef.id+" "+movieGenreCrossRef.genreId );
-                long res=mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
-                LogUtil.v("save genre result "+res);
+                LogUtil.v("save genre " + movieGenreCrossRef.id + " " + movieGenreCrossRef.genreId);
+                long res = mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
+                LogUtil.v("save genre result " + res);
             }
         }
 
@@ -307,23 +311,23 @@ public class MovieScanService2 extends Service {
             }
         }
 
-        if (director !=null) {
+        if (director != null) {
             MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
             movieDirectorCrossRef.directorId = director.directorId;
             movieDirectorCrossRef.id = movie_id;
             mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
         }
 
-        for(Trailer trailer:trailerList){
-            if(trailer!=null){
-                trailer.movieId=movie_id;
+        for (Trailer trailer : trailerList) {
+            if (trailer != null) {
+                trailer.movieId = movie_id;
                 mTrailerDao.insertOrIgnore(trailer);
             }
         }
 
-        for(StagePhoto stagePhoto:stagePhotoList){
-            if(stagePhoto!=null){
-                stagePhoto.movieId=movie_id;
+        for (StagePhoto stagePhoto : stagePhotoList) {
+            if (stagePhoto != null) {
+                stagePhoto.movieId = movie_id;
                 mStagePhotoDao.insertOrIgnore(stagePhoto);
             }
         }
@@ -352,6 +356,8 @@ public class MovieScanService2 extends Service {
         public Observable<MovieNameInfo> get() throws Throwable {
             MovieNameInfo movieNameInfo = createMovieNameInfo(mVideoFile);
             keyword = movieNameInfo.getName();
+            mVideoFile.keyword = keyword;
+            mVideoFileDao.update(mVideoFile);
             LogUtil.v("MovieSupplier " + keyword);
             return Observable.just(movieNameInfo);
         }

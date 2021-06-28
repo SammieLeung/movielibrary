@@ -170,7 +170,6 @@ public class HomepageViewModel extends AndroidViewModel {
         Observable.just(GET_HOMEPAGE_MOVIE)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(s -> {
-                    StringBuffer condition = new StringBuffer();
                     String device_id = null;
                     String year = null;
                     String genre = null;
