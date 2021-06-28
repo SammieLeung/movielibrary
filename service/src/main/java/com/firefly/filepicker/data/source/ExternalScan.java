@@ -89,7 +89,7 @@ public class ExternalScan extends AbstractScanFiles {
         File file = new File(mNode.getId());
 
         if (file.isDirectory()) {
-            Log.e("lxptest", "is file.canRead() " + file.canRead());
+            Log.e("lxp", "is file.canRead() " + file.canRead());
             scanRecursive(file);
             finish();
         }

@@ -312,7 +312,7 @@ public class FileManagerFragment extends Fragment {
 
                         if (decodeData.contains("/storage/emulated/0")) {
                             devicePath = "/storage/emulated/0";
-                            deviceName = getResources().getString(R.string.local_storage);
+                            deviceName = getResources().getString(R.string.device);
                             if (decodeData.equals("/storage/emulated/0"))
                                 dirName = deviceName;
                             else

@@ -35,6 +35,10 @@ public class FilesRepository implements IFileSource {
                 break;
             case Node.EXTERNAL:
             case Node.EXTERNAL_DEVICE:
+            case Node.PCIE_DEVICE:
+            case Node.SATA_DEVICE:
+            case Node.USB_DEVICE:
+            case Node.SDCARD_DEVICE:
                 svf = new ExternalScan(mContext);
                 break;
 //            case Node.DLNA_CATEGORY:
