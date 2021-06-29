@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="menu_item_group_1"  translatable="false">
-        <item>@string/left_menu_item_1_1</item>
-        <item>@string/left_menu_item_1_2</item>
-        <item>@string/left_menu_item_1_3</item>
-        <item>@string/left_menu_item_1_4</item>
-        <item>@string/left_menu_item_1_5</item>
-        <item>@string/left_menu_item_1_6</item>
+        <item>@string/left_menu_title_movie</item>
+        <item>@string/left_menu_title_unrecognizedfile</item>
+        <item>@string/left_menu_title_history</item>
+        <item>@string/left_menu_title_favorite</item>
+        <item>@string/left_menu_title_manager</item>
+        <item>@string/left_menu_title_about</item>
+        <item>@string/left_menu_title_exit</item>
     </string-array>
 
     <string-array name="menu_item_icon_group_1"  translatable="false">
+        <item>@drawable/ic_videos</item>
         <item>@drawable/ic_videos</item>
         <item>@drawable/ic_history</item>
         <item>@drawable/ic_favorite</item>
@@ -40,10 +42,11 @@
 
     <string-array name="home_page_classified_title" translatable="false">
         <item>@string/left_menu_title_homepage</item>
-        <item>@string/left_menu_item_1_2</item>
-        <item>@string/left_menu_item_1_3</item>
-        <item>@string/left_menu_item_1_4</item>
-        <item>@string/left_menu_item_1_5</item>
+        <item>@string/left_menu_title_homepage</item>
+        <item>@string/left_menu_title_history</item>
+        <item>@string/left_menu_title_favorite</item>
+        <item>@string/left_menu_title_manager</item>
+        <item>@string/left_menu_title_about</item>
     </string-array>
 
     <string-array name="api_group" translatable="false">

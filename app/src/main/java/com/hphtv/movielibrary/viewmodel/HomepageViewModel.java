@@ -38,9 +38,7 @@ public class HomepageViewModel extends AndroidViewModel {
     private DeviceDao mDeviceDao;
     private MovieDao mMovieDao;
     private GenreDao mGenreDao;
-    private VideoFileDao mVideoFileDao;
     private ExecutorService mSingleThreadPool;
-    private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
 
     //筛选条件数据
     private List<String> mConditionGenres = new ArrayList<>();// 电影类型数据
@@ -49,15 +47,13 @@ public class HomepageViewModel extends AndroidViewModel {
     private List<Device> mConditionDevices = new ArrayList<>();
 
 
-    public List<VideoFile> mAllNotScannedVideoFiles;
 
-    public List<MovieWrapper> mMovieWrappers;
-
-    private Device mDevice;
-    private String mYear;
-    private String mGenre;
-    private int mSortType;
-    private boolean isDesc = false;
+//
+//    private Device mDevice;
+//    private String mYear;
+//    private String mGenre;
+//    private int mSortType;
+//    private boolean isDesc = false;
 
     public HomepageViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -81,14 +77,8 @@ public class HomepageViewModel extends AndroidViewModel {
         mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
         mMovieDao = movieLibraryRoomDatabase.getMovieDao();
         mGenreDao = movieLibraryRoomDatabase.getGenreDao();
-        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        mCompositeDisposable.clear();
-    }
 
     /**
      * 1.加载筛选数据 设备、排序方式
@@ -144,60 +134,43 @@ public class HomepageViewModel extends AndroidViewModel {
     }
 
 
-    public void prepareMovies(Device device, String year, String genre, int sortType, boolean isDesc, Callback callback) {
-        mDevice = device;
-        mYear = year;
-        mGenre = genre;
-        mSortType = sortType;
-        this.isDesc = isDesc;
-        prepareMovies(callback);
-    }
-
-    public void prepareMovies(Device device, String year, String genre, Callback callback) {
-        mDevice = device;
-        mYear = year;
-        mGenre = genre;
-        prepareMovies(callback);
-    }
-
-    public void prepareMovies(int sortType, boolean isDesc, Callback callback) {
-        mSortType = sortType;
-        this.isDesc = isDesc;
-        prepareMovies(callback);
-    }
-
-    public void prepareMovies(Callback callback) {
-        Observable.just(GET_HOMEPAGE_MOVIE)
-                .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .map(s -> {
-                    String device_id = null;
-                    String year = null;
-                    String genre = null;
-                    if (mDevice != null)
-                        device_id = mDevice.id;
-                    if (!TextUtils.isEmpty(mYear))
-                        year = mYear;
-                    if (!TextUtils.isEmpty(mGenre))
-                        genre = mGenre;
-
-                    int sortType = mSortType;
-                    List<MovieDataView> list = mMovieDao.queryMoiveDataView(device_id, year, genre, sortType, isDesc);
-                    return list;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViews) {
-                        callback.runOnUIThread(movieDataViews);
-                    }
-                });
-    }
+//    public void prepareMovies(Device device, String year, String genre, int sortType, boolean isDesc, Callback callback) {
+//        mDevice = device;
+//        mYear = year;
+//        mGenre = genre;
+//        mSortType = sortType;
+//        this.isDesc = isDesc;
+//        prepareMovies(callback);
+//    }
+//
+//    public void prepareMovies(Callback callback) {
+//        Observable.just(GET_HOMEPAGE_MOVIE)
+//                .subscribeOn(Schedulers.from(mSingleThreadPool))
+//                .map(s -> {
+//                    String device_id = null;
+//                    String year = null;
+//                    String genre = null;
+//                    if (mDevice != null)
+//                        device_id = mDevice.id;
+//                    if (!TextUtils.isEmpty(mYear))
+//                        year = mYear;
+//                    if (!TextUtils.isEmpty(mGenre))
+//                        genre = mGenre;
+//
+//                    int sortType = mSortType;
+//                    List<MovieDataView> list = mMovieDao.queryMoiveDataView(device_id, year, genre, sortType, isDesc);
+//                    return list;
+//                })
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new SimpleObserver<List<MovieDataView>>() {
+//                    @Override
+//                    public void onAction(List<MovieDataView> movieDataViews) {
+//                        callback.runOnUIThread(movieDataViews);
+//                    }
+//                });
+//    }
 
 
-    public void clearNotScannedVideoFiles() {
-        if (mAllNotScannedVideoFiles != null)
-            mAllNotScannedVideoFiles.clear();
-    }
 
     public static final String GET_NOT_SCAN_VIDEOFILES = "get_not_scan_videofiles";
     public static final String PREPARE_CONDITIONS = "prepare_conditions";
@@ -206,25 +179,6 @@ public class HomepageViewModel extends AndroidViewModel {
     public static final String GET_HOMEPAGE_MOVIE = "event4";
 
 
-    /**
-     * 获取所以未扫描的文件
-     */
-    private List<VideoFile> getNotScannedFiles() {
-        String[] deviceIds = new String[mConditionDevices.size()];
-        for (int i = 0; i < mConditionDevices.size(); i++) {
-            deviceIds[i] = mConditionDevices.get(i).id;
-        }
-        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedByIds(deviceIds);
-        return mountedDeviceFiles;
-    }
-
-    /**
-     * 获取所以未扫描的文件
-     */
-    private List<VideoFile> getNotScannedFiles(Device device) {
-        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedByIds(device.id);
-        return mountedDeviceFiles;
-    }
 
     public List<String> getConditionGenres() {
         return mConditionGenres;

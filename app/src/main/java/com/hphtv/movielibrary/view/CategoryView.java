@@ -29,6 +29,7 @@ import com.firelfy.util.SharePreferencesTools;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.util.FormatterTools;
 
 public class CategoryView extends LinearLayout implements
         OnCheckedChangeListener, OnTouchListener {
@@ -145,7 +146,10 @@ public class CategoryView extends LinearLayout implements
     public void create() {
 //        prepareCheckPosition();
         mUIHandler.post(() -> {
-            addConditionAt(mDevices, mCurDevPos, 1, obj -> ((Device) obj).name);
+            addConditionAt(mDevices, mCurDevPos, 1, obj -> {
+                Device device = (Device) obj;
+                return FormatterTools.getDeviceName(getContext(),device);
+            });
             addConditionAt(mYears, mCurYearPos, 2, null);
             addConditionAt(mGenres, mCurGenrePos, 3, null);
             addSort();
@@ -222,7 +226,7 @@ public class CategoryView extends LinearLayout implements
                 bt.setOnTouchListener(this);// 为每个radiobutton设置监听器
                 mSortRadioGroup.addView(bt);
                 if (i == mCurSortPos)
-                  bt.setChecked(true);
+                    bt.setChecked(true);
             }
         }
     }
@@ -289,6 +293,8 @@ public class CategoryView extends LinearLayout implements
     }
 
 
+
+
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         if (mListener != null) {
@@ -307,7 +313,7 @@ public class CategoryView extends LinearLayout implements
                     mCurGenrePos = checkPos;
                     break;
             }
-            mListener.onConditionChange(getDevice(), getYear(), getGenre());
+            mListener.onConditionChange(getDevice(), getYear(), getGenre(),getSortTypePos(),isDesc());
         }
     }
 
@@ -321,22 +327,15 @@ public class CategoryView extends LinearLayout implements
     private OnClickCategoryListener mListener;
 
     public void resetDevicePos() {
-        mCurDevPos=-1;
+        mCurDevPos = -1;
     }
 
     /**
      * 回调接口
      */
     public interface OnClickCategoryListener {
-        /**
-         * 排序条件改变
-         *
-         * @param sortType
-         * @param isDesc
-         */
-        public void onSortChange(int sortType, boolean isDesc);
 
-        public void onConditionChange(Device device, String year, String genre);
+        public void onConditionChange(Device device, String year, String genre,int sortType, boolean isDesc);
     }
 
     @Override
@@ -348,7 +347,7 @@ public class CategoryView extends LinearLayout implements
                     isDesc = !isDesc;
                 else
                     mCurSortPos = pos;
-                mListener.onSortChange(mCurSortPos, isDesc);
+                mListener.onConditionChange(getDevice(),getYear(),getGenre(),getSortTypePos(),isDesc());
                 updateOrder();
             }
         }
@@ -368,7 +367,7 @@ public class CategoryView extends LinearLayout implements
                                 isDesc = !isDesc;
                             else
                                 mCurSortPos = index;
-                            mListener.onSortChange(mCurSortPos, isDesc);
+                            mListener.onConditionChange(getDevice(),getYear(),getGenre(),getSortTypePos(),isDesc());
                             updateOrder();
                         }
                     }

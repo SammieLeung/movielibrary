@@ -23,6 +23,7 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -112,8 +113,11 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
                 .observeOn(Schedulers.from(mSingleThreadPool))
                 .map(mount_path -> {
                     Device device = mDeviceDao.querybyMountPath(mount_path);
-                    List<VideoFile> videoFiles = getNotScannedFiles(device);
-                    return videoFiles;
+                    if(device!=null) {
+                        List<VideoFile> videoFiles = getNotScannedFiles(device);
+                        return videoFiles;
+                    }
+                    return new ArrayList<VideoFile>();
                 })
                 .subscribe(new SimpleObserver<List<VideoFile>>() {
                     @Override

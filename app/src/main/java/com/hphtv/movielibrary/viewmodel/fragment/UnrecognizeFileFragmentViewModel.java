@@ -28,12 +28,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/6/25
  */
-public class UnrecognizeFileViewModel extends AndroidViewModel {
+public class UnrecognizeFileFragmentViewModel extends AndroidViewModel {
     public static final String UNRECOGNIZED_FILE = "unrecognizedFile";
     private ExecutorService mSingleThreadPool;
     private VideoFileDao mVideoFileDao;
 
-    public UnrecognizeFileViewModel(@NonNull @NotNull Application application) {
+    public UnrecognizeFileFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSingleThreadPool = Executors.newSingleThreadExecutor();
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();

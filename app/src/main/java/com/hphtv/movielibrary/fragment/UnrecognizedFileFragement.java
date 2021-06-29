@@ -9,8 +9,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
@@ -18,28 +16,27 @@ import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.UnrecognizedFileListAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.FLayoutFavoriteBinding;
+import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.viewmodel.fragment.UnrecognizeFileViewModel;
+import com.hphtv.movielibrary.viewmodel.fragment.UnrecognizeFileFragmentViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.rxjava3.core.Observable;
 
 /**
  * author: Sam Leung
  * date:  2021/6/25
  */
-public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileViewModel, FLayoutFavoriteBinding> {
-    public static final int COLUMS = 6;
+public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragmentViewModel, FLayoutFavoriteBinding> {
     public static final String TAG = UnrecognizedFileFragement.class.getSimpleName();
     private UnrecognizedFileListAdapter mAdapter;
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViewList;
 
     private ActivityResultLauncher mActivityResultLauncher;
 
-    public static UnrecognizedFileFragement newInstance() {
+    public static UnrecognizedFileFragement newInstance(int pos) {
         Bundle args = new Bundle();
+        args.putInt(ConstData.IntentKey.KEY_CUR_FRAGMENT, pos);
         UnrecognizedFileFragement fragment = new UnrecognizedFileFragement();
         fragment.setArguments(args);
         return fragment;
@@ -59,7 +56,7 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileViewM
     protected void onViewCreated() {
         mUnrecognizedFileDataViewList = new ArrayList<>();
         mAdapter = new UnrecognizedFileListAdapter(getContext(), mUnrecognizedFileDataViewList);
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), COLUMS, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), mColums, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mBinding.rvMovies.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener((BaseAdapter.OnRecyclerViewItemClickListener<UnrecognizedFileDataView>) (view, data) -> {
@@ -76,18 +73,25 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileViewM
     @Override
     public void onResume() {
         super.onResume();
-        LogUtil.v(TAG, "onResume");
-        getUnrecognizedFiles();
     }
 
     private void getUnrecognizedFiles() {
         mViewModel.prepareUnrecognizedFile(unrecognizedFileDataViewList -> {
             if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
-                mAdapter.addAll(unrecognizedFileDataViewList);
                 mBinding.tipsEmpty.setVisibility(View.GONE);
+                mAdapter.addAll(unrecognizedFileDataViewList);
             } else {
+                mAdapter.addAll(unrecognizedFileDataViewList);
                 mBinding.tipsEmpty.setVisibility(View.VISIBLE);
             }
+            notifyStopLoading();
         });
+    }
+
+    /**
+     * 刷新未识别内容
+     */
+    public void notifyUpdate() {
+        getUnrecognizedFiles();
     }
 }

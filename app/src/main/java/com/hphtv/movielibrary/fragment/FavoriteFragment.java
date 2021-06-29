@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.fragment;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
@@ -82,15 +82,15 @@ public class FavoriteFragment extends Fragment {
 //        mAdapter = new MovieLibraryAdapter(mContext, mWrapperList);
 //        mRVMovies.setAdapter(mAdapter);
 
-        mAdapter.setOnItemClickListener((view1, data) -> {
-            Intent intent = new Intent(mContext,
-                    MovieDetailActivity.class);
-            Bundle bundle = new Bundle();
-//                bundle.putSerializable("wrapper", wrapper);
-            bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-            intent.putExtras(bundle);
-            startActivityForResult(intent, 0);
-        });
+//        mAdapter.setOnItemClickListener((view1, data) -> {
+//            Intent intent = new Intent(mContext,
+//                    MovieDetailActivity.class);
+//            Bundle bundle = new Bundle();
+////                bundle.putSerializable("wrapper", wrapper);
+//            bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+//            intent.putExtras(bundle);
+//            startActivityForResult(intent, 0);
+//        });
 
     }
 

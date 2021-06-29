@@ -46,8 +46,8 @@ public class StorageHelper {
             _getVolumePaths = ReflectionTools.getMethod(StorageManager.class, "getVolumePaths");
             _getDirectory = ReflectionTools.getMethod(StorageVolume.class, "getDirectory");
             _getPath = ReflectionTools.getMethod(StorageVolume.class, "getPath");
-            _getType = ReflectionTools.getMethod(StorageManager.class, "getType");
-            _getDisk = ReflectionTools.getMethod(StorageManager.class, "getDisk");
+            _getType = ReflectionTools.getMethod(VolumeInfo, "getType");
+            _getDisk = ReflectionTools.getMethod(VolumeInfo, "getDisk");
             _TYPE_PUBLIC = VolumeInfo.getDeclaredField("TYPE_PUBLIC");
             _TYPE_PUBLIC.setAccessible(true);
             _path = VolumeInfo.getDeclaredField("path");
@@ -123,15 +123,15 @@ public class StorageHelper {
         StorageManager storageManager = (StorageManager) (context.getSystemService(Context.STORAGE_SERVICE));
         List<String> paths = new ArrayList<String>();
         try {
-            Method isDevice = DiskInfo.getMethod(method);
-            List<Object> volumes = (List<Object>) _getVolumes.invoke(storageManager);
+            Method isDevice = DiskInfo.getDeclaredMethod(method);
+            List<Object> volumes = (List<Object>) ReflectionTools.invoke(storageManager,_getVolumes);
             for (Object vol : volumes) {
-                int type = (int) _getType.invoke(vol);
+                int type = (int) ReflectionTools.invoke(vol,_getType);
                 int TYPE_PUBLIC = (int) _TYPE_PUBLIC.get(null);
                 if (type == TYPE_PUBLIC) {
-                    Object disk = _getDisk.invoke(vol);
+                    Object disk = ReflectionTools.invoke(vol,_getDisk);
                     if (disk != null) {
-                        boolean isPcie = (boolean) isDevice.invoke(disk);
+                        boolean isPcie = (boolean) ReflectionTools.invoke(disk,isDevice);
                         String path = (String) _path.get(vol);
                         if (isPcie && !TextUtils.isEmpty(path)) {
                             paths.add(path);

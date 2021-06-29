@@ -1,11 +1,11 @@
 package com.hphtv.movielibrary.fragment;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import android.util.Log;
@@ -93,20 +93,20 @@ public class HistoryFragment extends Fragment {
 //        mAdapter = new MovieLibraryAdapter(mContext, mWrapperList);
 //        mRVMovies.setAdapter(mAdapter);
 
-        mAdapter
-                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener<MovieDataView>() {
-                    @Override
-                    public void onItemClick(View view, MovieDataView dataView) {
-                        Intent intent = new Intent(mContext,
-                                MovieDetailActivity.class);
-                        Bundle bundle = new Bundle();
-//                        bundle.putSerializable("wrapper", wrapper);
-                        bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
-                        intent.putExtras(bundle);
-                        startActivityForResult(intent, 0);
-                    }
-
-                });
+//        mAdapter
+//                .setOnItemClickListener(new MovieLibraryAdapter.OnRecyclerViewItemClickListener<MovieDataView>() {
+//                    @Override
+//                    public void onItemClick(View view, MovieDataView dataView) {
+//                        Intent intent = new Intent(mContext,
+//                                MovieDetailActivity.class);
+//                        Bundle bundle = new Bundle();
+////                        bundle.putSerializable("wrapper", wrapper);
+//                        bundle.putInt("mode", ConstData.MovieDetailMode.MODE_WRAPPER);
+//                        intent.putExtras(bundle);
+//                        startActivityForResult(intent, 0);
+//                    }
+//
+//                });
 
     }
 

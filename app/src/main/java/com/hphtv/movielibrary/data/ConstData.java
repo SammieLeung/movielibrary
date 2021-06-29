@@ -198,11 +198,12 @@ public class ConstData {
 
     //7.---------------for MovieSearcherHelper -----------
     public interface IntentKey {
-        String IS_GET_MOVIE_LISTS = "MODE_LIST";
+//        String IS_GET_MOVIE_LISTS = "MODE_LIST";
         String KEY_MODE="mode";
         String KEY_MOVIE_ID="movie_id";
         String KEY_UNRECOGNIZE_FILE_KEYWORD="keyword";
 
+        String KEY_CUR_FRAGMENT="current_fragment";
 
     }
 
@@ -269,6 +270,10 @@ public class ConstData {
         String RESCAN_DEVICE="com.rockchips.mediacenter.rescan_device";
 
         String MOVIE_SCRAP_FINISH="action.movie.scrap.finish";
+
+        String START_LOADING="action.home.startloading";
+        String STOP_LOADING="action.home.stoploading";
+
     }
 
 

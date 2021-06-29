@@ -118,12 +118,13 @@
     <string name="tips">The MediaCenter is Empty! Click here to add Media Foler</string>
     <string name="left_menu_title_homepage">MediaCenter</string>
     <string name="left_menu_title_myvideos">My Videos</string>
-    <string name="left_menu_item_1_1">My Videos</string>
-    <string name="left_menu_item_1_2">History</string>
-    <string name="left_menu_item_1_3">Favorites</string>
-    <string name="left_menu_item_1_4">Video Manage</string>
-    <string name="left_menu_item_1_5">Abouts</string>
-    <string name="left_menu_item_1_6">Exit</string>
+    <string name="left_menu_title_movie">My Videos</string>
+    <string name="left_menu_title_unrecognizedfile">Unidentified</string>
+    <string name="left_menu_title_history">History</string>
+    <string name="left_menu_title_favorite">Favorites</string>
+    <string name="left_menu_title_manager">Settings</string>
+    <string name="left_menu_title_about">Abouts</string>
+    <string name="left_menu_title_exit">Exit</string>
     <string name="dm_btn_scan">Re-Scan</string>
     <string name="setting_status_scanning">Scanning...</string>
     <string name="device_manager_footer_bar_folder">"folder : "</string>
@@ -186,4 +187,10 @@
     <string name="api_mtime" translatable="false">Mtime</string>
     <string name="spinner_label">Scraper Source</string>
     <string name="setting_confirm_hide_encrypted_video">Do you need to hide encrypted video?</string>
+
+    <string name="device_internal_storage">Internal Storage</string>
+    <string name="device_udisk_name">U-Disk (%1$s)</string>
+    <string name="device_sdcard_name">TFCard (%1$s)</string>
+    <string name="device_ssd_name">M.2 SSD (%1$s)</string>
+    <string name="device_harddisk_name">HardDisk (%1$s)</string>
 </resources>

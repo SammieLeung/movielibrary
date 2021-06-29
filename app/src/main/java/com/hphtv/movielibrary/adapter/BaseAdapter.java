@@ -98,6 +98,10 @@ public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAda
         mList.addAll(data);
         notifyDataSetChanged();
     }
+    public void removeAll(){
+        mList.clear();
+        notifyDataSetChanged();
+    }
 
     private OnRecyclerViewItemClickListener mOnItemClickListener = null;
 

@@ -116,12 +116,13 @@
     <string name="tips">媒体中心为空！点击此处添加媒体文件夹</string>
     <string name="left_menu_title_homepage">媒体中心</string>
     <string name="left_menu_title_myvideos">我的视频</string>
-    <string name="left_menu_item_1_1">我的视频</string>
-    <string name="left_menu_item_1_2">播放历史</string>
-    <string name="left_menu_item_1_3">收藏夹</string>
-    <string name="left_menu_item_1_4">影库管理</string>
-    <string name="left_menu_item_1_5">关于</string>
-    <string name="left_menu_item_1_6">退出</string>
+    <string name="left_menu_title_movie">我的视频</string>
+    <string name="left_menu_title_unrecognizedfile">未识别影片</string>
+    <string name="left_menu_title_history">播放历史</string>
+    <string name="left_menu_title_favorite">收藏夹</string>
+    <string name="left_menu_title_manager">影库管理</string>
+    <string name="left_menu_title_about">关于</string>
+    <string name="left_menu_title_exit">退出</string>
     <string name="dm_btn_scan">重新扫描</string>
     <string name="setting_status_scanning">正在扫描...</string>
     <string name="device_manager_footer_bar_folder">"文件夹 : "</string>
@@ -179,4 +180,10 @@
     <string name="tx_choose_confirm">确定</string>
     <string name="spinner_label">搜刮器源</string>
     <string name="setting_confirm_hide_encrypted_video">需要隐藏加密视频吗?</string>
+
+    <string name="device_internal_storage">内置存储</string>
+    <string name="device_udisk_name">U盘 (%1$s)</string>
+    <string name="device_sdcard_name">TF卡 (%1$s)</string>
+    <string name="device_ssd_name">M.2 SSD (%1$s)</string>
+    <string name="device_harddisk_name">硬盘 (%1$s)</string>
 </resources>

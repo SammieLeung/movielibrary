@@ -52,9 +52,9 @@ import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
 import com.hphtv.movielibrary.fragment.UnrecognizedFileFragement;
 import com.hphtv.movielibrary.roomdb.entity.Device;
-import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService2;
+import com.hphtv.movielibrary.util.FormatterTools;
 import com.hphtv.movielibrary.view.CategoryView;
 import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
 
@@ -69,13 +69,15 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     public String mTagAll;
     private String[] mTitleArr;
+    private boolean needRefresh = true;
     //筛选器条目顺序
 
     public static final int HOME_PAGE_FRAGMENT = 0;
-    public static final int HISTORY_FRAGMENT = 1;
-    public static final int FAVORITE_FRAGMENT = 2;
-    public static final int FILE_MANAGER_FRAGMENT = 3;
-    public static final int ABOUTS_FRAGMENT = 4;
+    public static final int UNRECOGNIZED = 1;
+    public static final int HISTORY_FRAGMENT = 2;
+    public static final int FAVORITE_FRAGMENT = 3;
+    public static final int FILE_MANAGER_FRAGMENT = 4;
+    public static final int ABOUTS_FRAGMENT = 5;
 
     // 筛选条件
     private FileManagerFragment mFileManagerFragment;
@@ -158,8 +160,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      * 权限获取后调用
      */
     private void permissionGrant() {
-        initView();
-
+        init();
     }
 
     private void bindService() {
@@ -175,20 +176,31 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         intentFilter.addAction(ConstData.BroadCastMsg.DEVICE_DOWN);
         intentFilter.addAction(ConstData.BroadCastMsg.RESCAN_DEVICE);
         intentFilter.addAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
+        intentFilter.addAction(ConstData.BroadCastMsg.START_LOADING);
+        intentFilter.addAction(ConstData.BroadCastMsg.STOP_LOADING);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
     }
 
 
     /**
-     * 初始化组件
+     * 初始化
      */
-    private void initView() {
+    private void init() {
         LogUtil.v(TAG, "initView");
-        mBinding.viewSortbox.setOnClickListener(v -> PopUpDeviceWindow(v));
-
         prepareFragmentsAndViewpagers();
         prepareLeftMenu();
-        //搜索按钮事件
+        initButtons();
+        initDevicePopUpWindow();
+    }
+
+    /**
+     * 初始化其他按钮
+     */
+    private void initButtons() {
+        //弹出筛选窗口
+        mBinding.viewSortbox.setOnClickListener(v -> mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0));
+        //本地搜索按钮
         mBinding.btnSearch.setOnClickListener(v -> {
             Intent intent = new Intent(this, MovieSearchActivity.class);
             startActivity(intent);
@@ -208,8 +220,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                 ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
             }
         });
-        initDevicePopUpWindow();
-
     }
 
     /**
@@ -302,7 +312,64 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     /**
-     * 左侧菜单数据
+     * 初始化Fragment 和 Viewpager
+     */
+    private void prepareFragmentsAndViewpagers() {
+        if (mFileManagerFragment == null) {
+            mFileManagerFragment = new FileManagerFragment();
+        }
+        if (mHomePageFragment == null) {
+            mHomePageFragment = HomePageFragment.newInstance(HOME_PAGE_FRAGMENT);
+        }
+
+        if (mAboutsFragment == null) {
+            mAboutsFragment = new AboutsFragment();
+        }
+        if (mFavoriteFragment == null) {
+            mFavoriteFragment = new FavoriteFragment();
+        }
+        if (mHistoryFragment == null) {
+            mHistoryFragment = new HistoryFragment();
+        }
+
+        if (mUnrecognizedFileFragement == null) {
+            mUnrecognizedFileFragement = UnrecognizedFileFragement.newInstance(UNRECOGNIZED);
+        }
+        mFramentList = new ArrayList<>();
+        mFramentList.add(mHomePageFragment);
+        mFramentList.add(mUnrecognizedFileFragement);
+        mFramentList.add(mHistoryFragment);
+        mFramentList.add(mFavoriteFragment);
+        mFramentList.add(mFileManagerFragment);
+        mFramentList.add(mAboutsFragment);
+        //设置ViewPager
+        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(), mFramentList, mTitleArr);
+        mBinding.viewpager.setAdapter(mPageAdapter);
+        mBinding.viewpager.setOffscreenPageLimit(4);
+        mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                mBinding.leftmenuListview.setSelection(position);
+                if (position != HOME_PAGE_FRAGMENT) {
+                    mBinding.viewSortbox.setVisibility(View.GONE);
+                } else {
+                    mBinding.viewSortbox.setVisibility(View.VISIBLE);
+                }
+                LogUtil.v("onPageSelected " + position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
+    }
+
+    /**
+     * 初始化左侧菜单数据
      *
      * @return
      */
@@ -346,82 +413,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      */
     private void updateCateGoryView() {
         mCategoryView.setDevices(mViewModel.getConditionDevices()).setYears(mViewModel.getConditionYears()).setGenres(mViewModel.getConditionGenres()).create();
-        int sorttype = mCategoryView.getSortTypePos();
-        Device device = mCategoryView.getDevice();
-        String genre = mCategoryView.getGenre();
-        String year = mCategoryView.getYear();
-        boolean isDesc = mCategoryView.isDesc();
         updateDeviceText();
-        mViewModel.prepareMovies(device, year, genre, sorttype, isDesc, args -> {
-            stopLoading();
-            List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
-            mHomePageFragment.updateMovie(movieDataViews);
-        });
-    }
-
-    /**
-     * 初始化Fragment 和 Viewpager
-     */
-    private void prepareFragmentsAndViewpagers() {
-        if (mFileManagerFragment == null) {
-            mFileManagerFragment = new FileManagerFragment();
-        }
-        if (mHomePageFragment == null) {
-            mHomePageFragment = HomePageFragment.newInstance();
-        }
-
-        if (mAboutsFragment == null) {
-            mAboutsFragment = new AboutsFragment();
-        }
-        if (mFavoriteFragment == null) {
-            mFavoriteFragment = new FavoriteFragment();
-        }
-        if (mHistoryFragment == null) {
-            mHistoryFragment = new HistoryFragment();
-        }
-
-        if (mUnrecognizedFileFragement == null) {
-            mUnrecognizedFileFragement = UnrecognizedFileFragement.newInstance();
-        }
-        mFramentList = new ArrayList<>();
-        mFramentList.add(mHomePageFragment);
-        mFramentList.add(mUnrecognizedFileFragement);
-//        mFramentList.add(mHistoryFragment);
-//        mFramentList.add(mFavoriteFragment);
-//        mFramentList.add(mFileManagerFragment);
-//        mFramentList.add(mAboutsFragment);
-        //设置ViewPager
-        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(), mFramentList, mTitleArr);
-        mBinding.viewpager.setAdapter(mPageAdapter);
-        mBinding.viewpager.setOffscreenPageLimit(4);
-        mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                mBinding.leftmenuListview.setSelection(position);
-                if (position != HOME_PAGE_FRAGMENT) {
-                    mBinding.viewSortbox.setVisibility(View.GONE);
-                } else {
-                    mBinding.viewSortbox.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-            }
-        });
-    }
-
-    /**
-     * 弹出筛选
-     *
-     * @param v
-     */
-    private void PopUpDeviceWindow(View v) {
-        mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0);
+        notifyAllFragmentsUpdate();
     }
 
     /**
@@ -487,7 +480,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
         StringBuffer buffer = new StringBuffer();
         if (device != null)
-            buffer.append(device.name);
+            buffer.append(FormatterTools.getDeviceName(this, device));
         if (!TextUtils.isEmpty(year))
             buffer.append("|" + year);
         if (!TextUtils.isEmpty(genre))
@@ -499,6 +492,17 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
         mBinding.tvSortDevice.setText(buffer.toString());
     }
+
+    private void notifyAllFragmentsUpdate() {
+        int sorttype = mCategoryView.getSortTypePos();
+        Device device = mCategoryView.getDevice();
+        String genre = mCategoryView.getGenre();
+        String year = mCategoryView.getYear();
+        boolean isDesc = mCategoryView.isDesc();
+        mHomePageFragment.notifyUpdate(device, year, genre, sorttype, isDesc);
+        mUnrecognizedFileFragement.notifyUpdate();
+    }
+
 
     public MovieScanService2 getMovieSearchService() {
         return mScanService;
@@ -582,26 +586,22 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     };
 
     CategoryView.OnClickCategoryListener mOnClickCategoryListener = new CategoryView.OnClickCategoryListener() {
-        @Override
-        public void onSortChange(int sortType, boolean isDesc) {
-            startLoading();
-            mViewModel.prepareMovies(sortType, isDesc, args -> {
-                stopLoading();
-                updateDeviceText();
-                List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
-                mHomePageFragment.updateMovie(movieDataViews);
-            });
-        }
 
         @Override
-        public void onConditionChange(Device device, String year, String genre) {
-            startLoading();
-            mViewModel.prepareMovies(device, year, genre, args -> {
-                stopLoading();
+        public void onConditionChange(Device device, String year, String genre, int sortType, boolean isDesc) {
+            if (mHomePageFragment != null) {
+                startLoading();
                 updateDeviceText();
-                List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
-                mHomePageFragment.updateMovie(movieDataViews);
-            });
+                notifyAllFragmentsUpdate();
+            }
+
+//            mViewModel.prepareMovies(device, year, genre,sortType,isDesc, args -> {
+//
+//                List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
+//                mHomePageFragment.updateMovie(movieDataViews);
+//                stopLoading();
+//
+//            });
         }
 
     };
@@ -614,6 +614,10 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
             } else if (name.getClassName().equalsIgnoreCase(DeviceMonitorService.class.getCanonicalName())) {
                 mDeviceMonitorService = ((DeviceMonitorService.MonitorBinder) service).getService();
+                if (needRefresh) {
+                    needRefresh = false;
+                    postDelayMovieRefresh(0);
+                }
             }
         }
 
@@ -635,6 +639,20 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                 case ConstData.BroadCastMsg.DEVICE_UP:
                     startLoading();
                     break;
+                case ConstData.BroadCastMsg.START_LOADING:
+                    int cur_start = intent.getIntExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, 0);
+                    if (mBinding.viewpager.getCurrentItem() == cur_start) {
+                        LogUtil.v("response " + cur_start + " startLoading");
+                        startLoading();
+                    }
+                    break;
+                case ConstData.BroadCastMsg.STOP_LOADING:
+                    int cur_stop = intent.getIntExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, 0);
+                    if (mBinding.viewpager.getCurrentItem() == cur_stop) {
+                        LogUtil.v("response " + cur_stop + " stopLoading");
+                        stopLoading();
+                    }
+                    break;
                 case ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH:
                     postDelayMovieRefresh();
                     break;
@@ -648,5 +666,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         LogUtil.v(TAG, "onActivityResult " + requestCode + ":" + resultCode);
         switch (requestCode) {
         }
+        if (needRefresh)
+            postDelayMovieRefresh(0);
     }
 }
