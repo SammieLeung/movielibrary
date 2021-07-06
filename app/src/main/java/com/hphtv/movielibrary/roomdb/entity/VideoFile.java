@@ -32,4 +32,15 @@ public class VideoFile implements Serializable {
 
     public String keyword;
 
+    @Override
+    public String toString() {
+        return "VideoFile{" +
+                "vid=" + vid +
+                ", path='" + path + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", filename='" + filename + '\'' +
+                ", isScanned=" + isScanned +
+                ", keyword='" + keyword + '\'' +
+                '}';
+    }
 }

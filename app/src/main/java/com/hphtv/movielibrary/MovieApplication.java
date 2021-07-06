@@ -2,8 +2,10 @@ package com.hphtv.movielibrary;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.webkit.WebView;
 
+import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.umeng.analytics.MobclickAgent;
@@ -35,6 +37,8 @@ public class MovieApplication extends Application {
         helper.initWebView(true, cachePath);
         //友盟统计
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+        Intent service=new Intent(this, DeviceMonitorService.class);
+        startService(service);
     }
 
     @Override

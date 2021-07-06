@@ -29,62 +29,45 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
-
-
+            android:layout_gravity="center">
             <ImageView
-                android:id="@+id/detail_bg"
+                android:id="@+id/stage_photo"
                 android:layout_width="match_parent"
                 android:layout_height="494dp"
                 android:layout_alignParentBottom="true"
                 android:background="#CC000000"/>
-<!--                android:background="@mipmap/detail_bg" />-->
-        </RelativeLayout>
+            <!--                android:background="@mipmap/detail_bg" />-->
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center">
-
-            <RelativeLayout
-                android:id="@+id/ln_part1"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingBottom="118dp">
-
-                <ImageView
-                    android:id="@+id/iv_cover"
-                    android:layout_width="372dp"
-                    android:layout_height="514dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginLeft="60dip"
-                    android:layout_marginRight="60dip"
-                    android:background="@drawable/bg_for_detail_cover"
-                    android:elevation="6dp"
-                    android:padding="1dp"
-                    android:scaleType="fitXY" />
-
-
-            </RelativeLayout>
-
+            <ImageView
+                android:id="@+id/iv_cover"
+                android:layout_width="446dp"
+                android:layout_height="616dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="60dip"
+                android:layout_marginRight="60dip"
+                android:background="@drawable/bg_for_detail_cover"
+                android:elevation="6dp"
+                android:padding="1dp"
+                android:layout_marginBottom="60dp"
+                android:scaleType="fitXY" />
 
             <RelativeLayout
-                android:id="@+id/ln_info"
+                android:id="@+id/view_infogroup"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@id/ln_part1"
+                android:layout_alignTop="@id/stage_photo"
+                android:layout_toRightOf="@id/iv_cover"
                 android:orientation="vertical"
                 android:paddingRight="63.3dip"
+                android:layout_marginTop="-55dp"
                 android:paddingBottom="68dp">
 
                 <LinearLayout
-                    android:id="@+id/ln_part_of_btn"
+                    android:id="@+id/view_btngroup"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
                     android:layout_marginLeft="10.0dip"
-                    android:layout_marginBottom="371dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -128,9 +111,9 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_alignTop="@id/ln_part_of_btn"
+                    android:layout_alignTop="@id/view_btngroup"
                     android:layout_alignParentRight="true"
-                    android:layout_marginTop="176dp">
+                    android:layout_marginTop="146dp">
 
                     <RelativeLayout
                         android:id="@+id/title_group"
@@ -190,6 +173,7 @@
                     <TextView
                         android:id="@+id/tv_title_en"
                         android:text="@{wrapper.movie.otherTitle}"
+                        android:visibility="@{wrapper.movie.otherTitle==null?View.GONE:View.VISIBLE}"
                         android:layout_height="wrap_content"
                         android:textSize="26sp"
                         android:layout_below="@id/title_group"
@@ -298,7 +282,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:text="@string/main_actors"
+                            android:text="@{wrapper.actors!=null?@string/main_actors:@string/main_file_list}"
                             android:textColor="@color/tx_dedede"
                             android:textSize="18sp" />
 

@@ -38,10 +38,12 @@ import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
+import com.hphtv.movielibrary.scraper.mtime.respone.MtimeSuggestRespone;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
-import com.hphtv.movielibrary.scraper.mtime.MtimeSearchRespone;
+import com.hphtv.movielibrary.scraper.mtime.respone.MtimeUnionSearchRespone;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.functions.Supplier;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -119,7 +122,7 @@ public class MovieScanService2 extends Service {
     }
 
     private void initThreadPools() {
-        mSearchMovieExecutor = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
+        mSearchMovieExecutor = new ThreadPoolExecutor(8, 8, 0, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
         mMovieDetailExecutor = new ThreadPoolExecutor(4, 4, 0, TimeUnit.SECONDS, new LinkedBlockingDeque<>());
     }
 
@@ -183,19 +186,42 @@ public class MovieScanService2 extends Service {
 
     private void startSearch(VideoFile videoFile) {
         MovieSupplier movieSupplier = new MovieSupplier(videoFile);
-        RxJavaGcManager.getInstance().addDisposable(Observable.defer(movieSupplier)
-                .subscribeOn(Schedulers.from(mSearchMovieExecutor))
-                .observeOn(Schedulers.from(mMovieDetailExecutor))
-                .flatMap((Function<MovieNameInfo, ObservableSource<MtimeSearchRespone>>) movieNameInfo -> {
-                    String name = movieNameInfo.getName();
-                    if (!TextUtils.isEmpty(name))
-                        return MtimeApi2.SearchAMovieByApi(name);
-                    return null;
-                }).observeOn(Schedulers.from(mMovieDetailExecutor))
-                .map((Function<MtimeSearchRespone, String>) mtimeSearchRespone -> {
+        Observable.zip(
+                //unionSearch请求
+                Observable
+                        .defer(movieSupplier)
+                        .subscribeOn(Schedulers.from(mSearchMovieExecutor))
+                        .flatMap((Function<MovieNameInfo, ObservableSource<MtimeUnionSearchRespone>>) movieNameInfo -> {
+                            LogUtil.v(Thread.currentThread().getName(),"1 ...");
+
+                            String name = movieNameInfo.getName();
+                            if (!TextUtils.isEmpty(name))
+                                return MtimeApi2.unionSearch(name).observeOn(Schedulers.io());
+                            return null;
+                        }),
+                //suggest movie 请求
+                Observable
+                        .defer(movieSupplier)
+                        .subscribeOn(Schedulers.from(mSearchMovieExecutor))
+                        .flatMap((Function<MovieNameInfo, ObservableSource<MtimeSuggestRespone>>) movieNameInfo -> {
+                            LogUtil.v(Thread.currentThread().getName(),"2 ...");
+
+                            String name = movieNameInfo.getName();
+                            if (!TextUtils.isEmpty(name))
+                                return MtimeApi2.suggestMovies(name).observeOn(Schedulers.io());
+                            return null;
+                        }),
+                //获取最优匹配
+                (mtimeUnionSearchRespone, mtimeSuggestRespone) -> {
+                    LogUtil.v(Thread.currentThread().getName(),"获取最优匹配 ...");
                     String name = movieSupplier.keyword;
-                    if (mtimeSearchRespone != null) {
-                        List<Movie> movies = mtimeSearchRespone.toEntity();
+                    if (mtimeUnionSearchRespone != null) {
+                        List<Movie> unionSearchMovies = mtimeUnionSearchRespone.toEntity();
+                        List<Movie> suggestMovies = mtimeSuggestRespone.toEntity();
+                        List<Movie> movies = new ArrayList<>();
+                        movies.addAll(unionSearchMovies);
+                        movies.addAll(suggestMovies);
+
                         Movie mostSimilarMovie = null;
                         float maxSimilarity = 0;
                         for (Movie movie : movies) {
@@ -217,34 +243,33 @@ public class MovieScanService2 extends Service {
                     return "";
                 })
                 .observeOn(Schedulers.from(mMovieDetailExecutor))
-                .map((Function<String, MovieWrapper>) movieId -> {
-                    if(!TextUtils.isEmpty(movieId)) {
-                        MovieWrapper wrapper = MtimeApi2.getMovieDetail(movieId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                .map(movieId -> {
+                    LogUtil.v(Thread.currentThread().getName(),"获取详细电影 ...");
+
+                    //获取详细电影
+                    if (!TextUtils.isEmpty(movieId)) {
+                        MovieWrapper wrapper = MtimeApi2.getDetials(movieId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                         saveMovieWrapper(wrapper, videoFile);
                         return wrapper;
                     }
                     return new MovieWrapper();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<MovieWrapper>() {
+                .subscribeWith(new SimpleObserver<MovieWrapper>() {
                     @Override
-                    public void onNext(@NonNull MovieWrapper movieWrapper) {
-                        if(movieWrapper.movie!=null) {
-                            LogUtil.v(offset+":file[" +videoFile.filename+"] movie[" + movieWrapper.movie.title+"]");
-                        }else{
-                            LogUtil.v(offset+":file[" +videoFile.filename+"] movie[not found]");
+                    public void onAction(MovieWrapper movieWrapper) {
+                        if (movieWrapper.movie != null) {
+                            LogUtil.v(offset + ":file[" + videoFile.filename + "] movie[" + movieWrapper.movie.title + "]");
+                        } else {
+                            LogUtil.v(offset + ":file[" + videoFile.filename + "] movie[not found]");
                         }
                         offset++;
                         //TODO 发送广播
                     }
 
                     @Override
-                    public void onError(@NonNull Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
                     public void onComplete() {
+                        super.onComplete();
                         synchronized (MovieScanService2.this) {
                             if (offset == total) {
                                 //扫描结束
@@ -255,8 +280,7 @@ public class MovieScanService2 extends Service {
                             }
                         }
                     }
-                })
-        );
+                });
     }
 
     /**
@@ -296,9 +320,7 @@ public class MovieScanService2 extends Service {
                 MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
                 movieGenreCrossRef.genreId = genre_id;
                 movieGenreCrossRef.id = movie_id;
-                LogUtil.v("save genre " + movieGenreCrossRef.id + " " + movieGenreCrossRef.genreId);
-                long res = mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
-                LogUtil.v("save genre result " + res);
+                mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
             }
         }
 
@@ -340,8 +362,6 @@ public class MovieScanService2 extends Service {
         videoFile.isScanned = 1;
         LogUtil.v("saveMovieWrapper==>: " + videoFile.filename + " isScanned ");
         mVideoFileDao.update(videoFile);
-
-
     }
 
     public class MovieSupplier implements Supplier<Observable<MovieNameInfo>> {
@@ -358,7 +378,7 @@ public class MovieScanService2 extends Service {
             keyword = movieNameInfo.getName();
             mVideoFile.keyword = keyword;
             mVideoFileDao.update(mVideoFile);
-            LogUtil.v("MovieSupplier " + keyword);
+            LogUtil.v(Thread.currentThread().getName(), "MovieSupplier " + keyword);
             return Observable.just(movieNameInfo);
         }
     }

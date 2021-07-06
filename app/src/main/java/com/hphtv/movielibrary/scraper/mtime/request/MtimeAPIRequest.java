@@ -1,4 +1,8 @@
-package com.hphtv.movielibrary.scraper.mtime;
+package com.hphtv.movielibrary.scraper.mtime.request;
+
+import com.hphtv.movielibrary.scraper.mtime.respone.MtimeDetailRespone;
+import com.hphtv.movielibrary.scraper.mtime.respone.MtimeSuggestRespone;
+import com.hphtv.movielibrary.scraper.mtime.respone.MtimeUnionSearchRespone;
 
 import io.reactivex.rxjava3.core.Observable;
 import retrofit2.Call;
@@ -13,16 +17,16 @@ public interface MtimeAPIRequest {
 
 
     @GET("mtime-search/search/unionSearch?pageSize=20&searchType=0&locationId=290")
-    Call<MtimeSearchRespone> unioSearch(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex);
+    Call<MtimeUnionSearchRespone> unioSearch(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex);
 
     @GET("mtime-search/search/unionSearch?pageSize=20&searchType=0&locationId=290")
-    Observable<MtimeSearchRespone> unionSearchRx(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex);
+    Observable<MtimeUnionSearchRespone> unionSearchRx(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex);
 
     @GET("mtime-search/search/suggest?locationId=290&suggestType=1")
-    Call<MtimeSearchRespone> suggestMovie(@Query("keyword") String keyword);
+    Call<MtimeSuggestRespone> suggestMovie(@Query("keyword") String keyword);
 
     @GET("mtime-search/search/suggest?locationId=290&suggestType=1")
-    Observable<MtimeSearchRespone> suggestMovieRx(@Query("keyword") String keyword);
+    Observable<MtimeSuggestRespone> suggestMovieRx(@Query("keyword") String keyword);
 
     @GET("library/movie/detail.api")
     Observable<MtimeDetailRespone> movieDetailRx(@Query("movieId") String movieId);

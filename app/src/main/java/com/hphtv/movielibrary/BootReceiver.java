@@ -17,8 +17,7 @@ import com.hphtv.movielibrary.service.MovieScanService2;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent service=new Intent(context, DeviceMonitorService.class);
-        context.startService(service);
+
 //        Intent dlnaService=new Intent(context, DlnaControlService.class);
 //        context.startService(dlnaService);
     }

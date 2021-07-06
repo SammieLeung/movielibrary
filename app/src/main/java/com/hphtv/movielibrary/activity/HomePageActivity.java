@@ -664,7 +664,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     protected void onActivityResult(int requestCode, int resultCode, @Nullable @org.jetbrains.annotations.Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         LogUtil.v(TAG, "onActivityResult " + requestCode + ":" + resultCode);
-        switch (requestCode) {
+        switch (resultCode) {
+            case 1:needRefresh=true;
+            break;
         }
         if (needRefresh)
             postDelayMovieRefresh(0);

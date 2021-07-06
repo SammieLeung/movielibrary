@@ -53,7 +53,7 @@ public class CustomRadioDialogFragment extends DialogFragment {
     public static CustomRadioDialogFragment newInstance(MovieWrapper movieWrapper) {
         CustomRadioDialogFragment fragment = new CustomRadioDialogFragment();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(WRAPPER, (Serializable) movieWrapper);
+        bundle.putSerializable(WRAPPER,  movieWrapper);
         fragment.setArguments(bundle);
         return fragment;
     }

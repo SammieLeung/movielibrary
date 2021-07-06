@@ -46,4 +46,6 @@ public interface VideoFileDao {
             " GROUP BY keyword")
     public List<UnrecognizedFileDataView> queryUnrecognizedFiles();
 
+    @Query("SELECT * FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW + " WHERE keyword=:keyword")
+    public List<UnrecognizedFileDataView> queryUnrecognizedFilesByKeyword(String keyword);
 }

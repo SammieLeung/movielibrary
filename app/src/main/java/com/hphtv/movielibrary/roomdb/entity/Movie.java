@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.roomdb.entity;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -49,7 +50,8 @@ public class Movie  implements Serializable {
     @ColumnInfo(name = "last_playtime")
     public long lastPlayTime;//上次播放时间
 
-
+    @Ignore
+    public String tag;
     @Override
     public String toString() {
         return "Movie{" +

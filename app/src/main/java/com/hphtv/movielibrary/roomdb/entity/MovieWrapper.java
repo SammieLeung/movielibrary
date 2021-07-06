@@ -52,25 +52,29 @@ public class MovieWrapper implements Serializable {
 
     public String toGenreString() {
         StringBuffer sb = new StringBuffer();
-        for (Genre genre : genres) {
-            sb.append(genre.toString() + " ");
+        if (genres != null) {
+            for (Genre genre : genres) {
+                sb.append(genre.toString() + " ");
+            }
+            if (sb.length() > 0)
+                sb.replace(sb.lastIndexOf(" "), sb.length(), "");
         }
-        if (sb.length() > 0)
-            sb.replace(sb.lastIndexOf(" "), sb.length(), "");
         return sb.toString();
     }
 
     public String toActorString() {
         StringBuffer sb = new StringBuffer();
-        int i = 0;
-        for (Actor actor : actors) {
-            if (i >= 3)
-                break;
-            sb.append(actor.toString() + ",");
-            i++;
+        if(actors!=null) {
+            int i = 0;
+            for (Actor actor : actors) {
+                if (i >= 3)
+                    break;
+                sb.append(actor.toString() + ",");
+                i++;
+            }
+            if (sb.length() > 0)
+                sb.replace(sb.lastIndexOf(","), sb.length(), "");
         }
-        if (sb.length() > 0)
-            sb.replace(sb.lastIndexOf(","), sb.length(), "");
         return sb.toString();
     }
 }

@@ -23,8 +23,10 @@ import com.hphtv.movielibrary.adapter.MovieTrailerAdapter;
 import com.hphtv.movielibrary.adapter.MovieTrailerAdapter.OnRecyclerViewItemClickListener;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.util.VideoPlayTools;
@@ -104,10 +106,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             int mode = intent.getIntExtra(ConstData.IntentKey.KEY_MODE, -1);
             switch (mode) {
                 case ConstData.MovieDetailMode.MODE_WRAPPER:
+                    mBinding.btnFavorite.setVisibility(View.VISIBLE);
+                    mBinding.btnTrailer.setVisibility(View.VISIBLE);
+                    mBinding.btnRemove.setVisibility(View.VISIBLE);
                     long movieId = intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID, -1);
                     prepareMovieWrapper(movieId);
                     break;
                 case ConstData.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
+                    mBinding.btnFavorite.setVisibility(View.GONE);
+                    mBinding.btnTrailer.setVisibility(View.GONE);
+                    mBinding.btnRemove.setVisibility(View.GONE);
                     String unrecognizedFileKeyword = intent.getStringExtra(ConstData.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD);
                     prepareUnrecogizedFile(unrecognizedFileKeyword);
                     break;
@@ -136,7 +144,31 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     private void prepareUnrecogizedFile(String keyword) {
+        mViewModel.getUnrecogizedFile(keyword, unrecognizedFileDataViewList -> {
+            if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
+                Glide.with(this).load(R.mipmap.ic_poster_default).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
+                MovieWrapper movieWrapper = new MovieWrapper();
+                movieWrapper.videoFiles = new ArrayList<>();
+                StringBuffer stringBuffer = new StringBuffer();
+                unrecognizedFileDataViewList.sort((o1, o2) -> o1.filename.compareTo(o2.filename));
+                int i = 1;
+                for (UnrecognizedFileDataView dataView : unrecognizedFileDataViewList) {
+                    stringBuffer.append(i++ + ". " + dataView.filename + "\n");
+                    VideoFile videoFile = new VideoFile();
+                    videoFile.path = dataView.path;
+                    videoFile.filename = dataView.filename;
+                    movieWrapper.videoFiles.add(videoFile);
+                }
+                stringBuffer.substring(0, stringBuffer.length() - 1);
+                movieWrapper.movie = new Movie();
+                movieWrapper.movie.title = keyword;
+                movieWrapper.movie.plot = stringBuffer.toString();
+                movieWrapper.movie.poster = "";
 
+                mBinding.setWrapper(movieWrapper);
+
+            }
+        });
     }
 
     @Override
@@ -152,6 +184,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     @Override
     protected void onPause() {
         Log.v(TAG, "onPause()被调用");
+        stopLoading();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
@@ -682,10 +715,13 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 //                }
 //            }
 //        }).start();
-        setResult(1);
-        finish();
-        Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
-
+        startLoading();
+        mViewModel.removeMovieWrapper(() -> {
+            setResult(1);
+            stopLoading();
+            finish();
+            Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
+        });
     }
 
 //    /**
@@ -804,7 +840,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             @Override
             public void doPositiveClick(MovieWrapper movieWrapper, VideoFile videoFile) {
                 startLoading();
-                mViewModel.playingVideo(movieWrapper, videoFile, () -> stopLoading());
+                mViewModel.playingVideo(movieWrapper, videoFile);
             }
 
             @Override
@@ -837,6 +873,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         }
 
     }
+
 
     /**
      * @param requestCode
@@ -886,7 +923,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 if (mBinding.getWrapper() != null) {
                     if (mBinding.getWrapper().videoFiles.size() == 1) {
                         startLoading();
-                        mViewModel.playingVideo(mBinding.getWrapper(), mBinding.getWrapper().videoFiles.get(0), () -> stopLoading());
+                        mViewModel.playingVideo(mBinding.getWrapper(), mBinding.getWrapper().videoFiles.get(0));
                     } else if (mBinding.getWrapper().videoFiles.size() > 1) {
                         showRadioDialog();
                     }
