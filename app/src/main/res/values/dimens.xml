@@ -23,4 +23,12 @@
     <dimen name="btn_common_w">240dp</dimen>
     <dimen name="btn_common_h">100dp</dimen>
 
+    <dimen name="fragment_unionsearch_item_h">88dp</dimen>
+    <dimen name="unionsearch_movie_cover_w">118dp</dimen>
+    <dimen name="unionsearch_movie_cover_h">157dp</dimen>
+    <dimen name="unionsearch_movie_title_h">54dp</dimen>
+    <dimen name="unionsearch_movie_subtext_h">36dp</dimen>
+    <dimen name="unionsearch_movie_title_textsize">36sp</dimen>
+    <dimen name="unionsearch_movie_subtext_textsize">24sp</dimen>
+    <dimen name="fragment_unionsearch_margin">30dp</dimen>
 </resources>

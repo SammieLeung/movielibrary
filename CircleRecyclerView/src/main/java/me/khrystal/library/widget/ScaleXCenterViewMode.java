@@ -17,14 +17,14 @@ public class ScaleXCenterViewMode implements ItemViewMode {
         float scale = 1.27f;
         boolean isCenter = (boolean) v.getTag(R.string.tag_is_center);
         if (isCenter) {
-            ViewCompat.setScaleX(v, scale);
-            ViewCompat.setScaleY(v, scale);
+            v.setScaleX(scale);
+            v.setScaleY(scale);
             ViewCompat.setTranslationZ(v, 1);
             if (v.isShown())
                 v.requestFocus();
         } else {
-            ViewCompat.setScaleX(v, 1f);
-            ViewCompat.setScaleY(v, 1f);
+            v.setScaleX(1f);
+            v.setScaleY(1f);
             ViewCompat.setTranslationZ(v, 0);
         }
     }

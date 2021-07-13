@@ -112,6 +112,7 @@
                     android:background="@android:color/transparent"
                     android:drawableLeft="@drawable/ic_search"
                     android:focusable="true"
+                    android:textAllCaps="false"
                     android:text="@string/tx_search"
                     android:drawablePadding="12dp"
                     android:textColor="@color/tx_dbdbdb"

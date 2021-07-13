@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tv_keyword"
+            android:textSize="30sp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_unionsearch_item_h"
+            android:text="@string/keyword"
+            />
+        <EditText
+            android:id="@+id/et_keyword"
+            android:layout_toRightOf="@id/tv_keyword"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/fragment_unionsearch_item_h"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_unionsearch_result"
+            android:layout_width="match_parent"
+            android:layout_below="@id/et_keyword"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+</layout>

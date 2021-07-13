@@ -28,7 +28,6 @@ import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.fragment.dialog.ConfirmDialogFragment;
 import com.hphtv.movielibrary.fragment.dialog.CustomRadioDialogFragment;
@@ -593,52 +592,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     /**
      * 编辑封面信息
      */
-//    private void editVideoInfo() {
-//        final MovieEditFragment movieEditFragment = MovieEditFragment.newInstance();
-//        final Movie movie = mCurrentMovie;
-//
-//        String title = movie.getTitle();
-//        Rating rating = movie.getRating();
-//        String score = "";
-//        if (rating == null || rating.average == -1) {
-//            score = getResources().getString(R.string.rate_not);
-//        } else {
-//            score = String.valueOf(rating.average);
-//        }
-//        String img = null;
-//        if (movie.getImages() != null) {
-//            img = movie.getImages().large;
-//        }
-//        List<String> pathlist = new ArrayList<>();
-//        for (VideoFile videoFile : mVideoFileList) {
-//            pathlist.add(videoFile.getUri());
-//        }
-//        String[] paths = pathlist.toArray(new String[0]);
-//        String[] genres = movie.getGenres();
-//
-//        movieEditFragment.setPositiveListener(new MovieEditFragment.PositiveListener() {
-//            @Override
-//            public void OnPositivePress(View v) {
-//                movie.setTitle(movieEditFragment.getKeyword());
-//
-//                mCurrentMovie = movie;
-//                if (mScanService != null && mScanService.isRunning()) {
-//                    showIsScanningDialog();
-//                } else {
-//                    Intent intent = new Intent(MovieDetailActivity.this,
-//                            MovieSearchResultActivity.class);
-//                    Bundle bundle = new Bundle();
-//                    bundle.putInt("mode", ConstData.MovieDetailMode.MODE_EDIT);
-//                    bundle.putString("keyword", movieEditFragment.getKeyword());
-//                    bundle.putInt("api", mCurrentMovie.getApi());
-//                    intent.putExtras(bundle);
-//                    startActivityForResult(intent, 0);
-//                }
-//
-//            }
-//        });
-//        movieEditFragment.setInfo(title, score, img, paths, genres, "").show(getFragmentManager(), TAG);
-//    }
+    private void editVideoInfo() {
+
+    }
 
     /**
      * 播放视频
@@ -913,9 +869,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public OnClickListener mClickListener = view -> {
 
         switch (view.getId()) {
-//                case R.id.btb_edit:
-//                    editVideoInfo();
-//                    break;
+            case R.id.btn_edit:
+                    editVideoInfo();
+                    break;
             case R.id.btn_trailer:
                 showMovieTrailer();
                 break;

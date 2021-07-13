@@ -108,4 +108,18 @@ dependencies {
     implementation project(path: ':util')
     //Android-spinkit loading动画
     implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+    //Paging3
+    //    使用 Paging 库的优势
+    //    Paging 库包含以下功能：
+    //
+    //    分页数据的内存中缓存。该功能可确保您的应用在处理分页数据时高效利用系统资源。
+    //    内置的请求重复信息删除功能，可确保您的应用高效利用网络带宽和系统资源。
+    //    可配置的 RecyclerView 适配器，会在用户滚动到已加载数据的末尾时自动请求数据。
+    //    对 Kotlin 协程和 Flow 以及 LiveData 和 RxJava 的一流支持。
+    //    内置对错误处理功能的支持，包括刷新和重试功能。
+    def paging_version = "3.0.0"
+    implementation "androidx.paging:paging-runtime:$paging_version"
+    // optional - RxJava3 support
+    implementation "androidx.paging:paging-rxjava3:$paging_version"
+
 }

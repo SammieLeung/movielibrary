@@ -194,4 +194,5 @@
     <string name="device_sdcard_name">TFCard (%1$s)</string>
     <string name="device_ssd_name">M.2 SSD (%1$s)</string>
     <string name="device_harddisk_name">HardDisk (%1$s)</string>
+    <string name="keyword">Keyword</string>
 </resources>
