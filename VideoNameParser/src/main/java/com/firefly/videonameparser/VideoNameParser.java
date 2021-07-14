@@ -394,7 +394,8 @@ public class VideoNameParser {
 
 			Log.v(TAG, "seg3:"+seg);
 
-
+			//FooBar --> Foo Bar
+			seg = seg.replaceAll("[A-Z]", " $0").trim();
 			//String[] segSplit = seg.split("\\.| |-|;|_");
 			String[] segSplit = seg.split(SEGMENTS_SPLIT);
 			isSample = seg.matches("^sample") || seg.matches("^etrg") ;
