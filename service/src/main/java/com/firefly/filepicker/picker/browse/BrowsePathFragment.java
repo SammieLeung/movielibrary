@@ -76,7 +76,7 @@ public class BrowsePathFragment extends Fragment
         mTreeContainer = (RecyclerView) view.findViewById(R.id.container);
         mTypeContainer = (RecyclerView) view.findViewById(R.id.type_container);
         mFocusedDirView = (TextView) view.findViewById(R.id.focused_dir);
-        mIbtnBack=view.findViewById(R.id.ibtn_back);
+        mIbtnBack = view.findViewById(R.id.ibtn_back);
         mFocusedLastModifiedView = (TextView) view.findViewById(R.id.last_modified);
         mProgressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         mEmptyView = (RelativeLayout) view.findViewById(R.id.empty_view);
@@ -310,7 +310,7 @@ public class BrowsePathFragment extends Fragment
         dialog.setTitle(R.string.add_directory_dilog_title);
         dialog.setContentView(R.layout.dialog_add_directory_notice);
 
-        ((TextView)dialog.findViewById(R.id.selected_dir)).setText(node.getTitle());
+        ((TextView) dialog.findViewById(R.id.selected_dir)).setText(node.getTitle());
         final CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.private_checkbox);
         dialog.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
@@ -322,7 +322,7 @@ public class BrowsePathFragment extends Fragment
                 }
 
                 dialog.dismiss();
-        }
+            }
         });
         dialog.setNegativeButton(android.R.string.cancel, null);
         dialog.show();
@@ -403,7 +403,7 @@ public class BrowsePathFragment extends Fragment
 
     @Override
     public void onAddButtonClick(Node node) {
-        showAuthDialog(node,  true);
+        showAuthDialog(node, true);
     }
 
     @Override
@@ -437,10 +437,17 @@ public class BrowsePathFragment extends Fragment
             FileItem fileItem = (FileItem) node.getItem();
             lastModified = fileItem.getDate();
         }
-        File file= (File) node.getItem();
-        String text=node.getTitle();
-        if(file!=null&&file.isDirectory())
-            text=file.getPath();
+
+        String text;
+        if (node.getItem() instanceof File) {
+            File file = (File) node.getItem();
+            text = node.getTitle();
+            if (file != null && file.isDirectory())
+                text = file.getPath();
+        } else {
+            text = node.getTitle();
+        }
+
         mFocusedDirView.setText(getString(R.string.selected, focus ? text : "-"));
         mFocusedDirView.setSelected(true);
         mFocusedLastModifiedView.setText(
@@ -489,7 +496,7 @@ public class BrowsePathFragment extends Fragment
         }
     }
 
-    private void showAuthDialog(Node node,  boolean checkOnly) {
+    private void showAuthDialog(Node node, boolean checkOnly) {
         Bundle bundle = new Bundle();
         bundle.putBoolean("checkOnly", checkOnly);
         showAuthDialog(node, bundle);
