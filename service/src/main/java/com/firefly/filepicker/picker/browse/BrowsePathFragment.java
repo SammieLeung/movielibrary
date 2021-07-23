@@ -408,25 +408,7 @@ public class BrowsePathFragment extends Fragment
 
     @Override
     public void onLongClick(final Node node) {
-        if (node.getType() == Node.SAMBA) {
-            if (node.getItem() instanceof SmbFile) {
-                SmbFile smbFile = (SmbFile) node.getItem();
-
-                try {
-                    if (smbFile.getType() == SmbFile.TYPE_SHARE
-                            && !mPresenter.isAlreadyAuth(node)) {
-                        showAuthDialog(node, true);
-                    } else {
-                        mPresenter.onSelect(node, false, false);
-                    }
-                } catch (SmbException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (node.getType() != Node.SAMBA_CATEGORY
-                && node.getType() != Node.SAMBA_DEVICE) {
-            mPresenter.onSelect(node, false, false);
-        }
+        onSelectItem(node);
     }
 
     @Override
@@ -496,9 +478,39 @@ public class BrowsePathFragment extends Fragment
         }
     }
 
+
+    public void dispatchKeyMenu(){
+
+    }
+
+    private void onSelectItem(Node node) {
+        if (node.getType() == Node.SAMBA) {
+            if (node.getItem() instanceof SmbFile) {
+                SmbFile smbFile = (SmbFile) node.getItem();
+
+                try {
+                    if (smbFile.getType() == SmbFile.TYPE_SHARE
+                            && !mPresenter.isAlreadyAuth(node)) {
+                        showAuthDialog(node, true);
+                    } else {
+                        mPresenter.onSelect(node, false, false);
+                    }
+                } catch (SmbException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (node.getType() != Node.SAMBA_CATEGORY
+                && node.getType() != Node.SAMBA_DEVICE) {
+            mPresenter.onSelect(node, false, false);
+        }
+    }
+
     private void showAuthDialog(Node node, boolean checkOnly) {
         Bundle bundle = new Bundle();
         bundle.putBoolean("checkOnly", checkOnly);
         showAuthDialog(node, bundle);
     }
+
+
+
 }

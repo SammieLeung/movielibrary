@@ -2,9 +2,9 @@ package com.firefly.filepicker.picker.browse;
 
 import android.content.Context;
 import android.os.ConditionVariable;
-import android.os.Environment;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +21,8 @@ import org.fourthline.cling.support.model.item.Item;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -41,7 +43,6 @@ public class FileAndDeviceListAdapter
     public FileAndDeviceListAdapter(Context context, ItemEventListener listener) {
         mContext = context;
         mListener = listener;
-
         setHasStableIds(true);
     }
 
@@ -116,36 +117,8 @@ public class FileAndDeviceListAdapter
         } else {
             holder.itemView.setBackgroundResource(R.drawable.item_odd_selector);
         }
+        holder.itemView.setTag(node);
 
-        holder.itemView.setOnHoverListener(new View.OnHoverListener() {
-            @Override
-            public boolean onHover(View v, MotionEvent event) {
-                mListener.onFocusChange(node, true);
-                return false;
-            }
-        });
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onClick(node);
-            }
-        });
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (!BrowsePathFragment.PARENT_NODE_ID.equals(node.getId())) {
-                    mListener.onLongClick(node);
-                    return true;
-                }
-                return false;
-            }
-        });
-        holder.itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                mListener.onFocusChange(node, hasFocus);
-            }
-        });
     }
 
     @Override
@@ -198,7 +171,10 @@ public class FileAndDeviceListAdapter
     }
 
     public void setData(List<Node> data) {
-        mData = data;
+        int oldSize = mData.size();
+        mData.clear();
+        notifyItemRangeRemoved(0, oldSize);
+        mData.addAll(data);
         notifyDataSetChanged();
     }
 
@@ -218,6 +194,70 @@ public class FileAndDeviceListAdapter
             mIcon = (ImageView) itemView.findViewById(R.id.icon);
             mTitle = (TextView) itemView.findViewById(R.id.title);
             mDate = (TextView) itemView.findViewById(R.id.date);
+            itemView.setOnHoverListener(new View.OnHoverListener() {
+                @Override
+                public boolean onHover(View v, MotionEvent event) {
+                    if (v.getTag() == null)
+                        return false;
+                    Node node = (Node) v.getTag();
+                    mListener.onFocusChange(node, true);
+                    return false;
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.getTag() == null)
+                        return;
+                    Node node = (Node) v.getTag();
+                    if (mListener != null)
+                        mListener.onClick(node);
+                }
+            });
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (v.getTag() == null)
+                        return false;
+                    Node node = (Node) v.getTag();
+                    if (!BrowsePathFragment.PARENT_NODE_ID.equals(node.getId())) {
+                        if (mListener != null)
+                            mListener.onLongClick(node);
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            itemView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (v.getTag() == null)
+                        return;
+                    Node node = (Node) v.getTag();
+                    if (mListener != null)
+                        mListener.onFocusChange(node, hasFocus);
+                }
+            });
+            itemView.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (v.getTag() == null)
+                        return false;
+                    Node node = (Node) v.getTag();
+                    if (keyCode == KeyEvent.KEYCODE_MENU) {
+                        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                            if (!BrowsePathFragment.PARENT_NODE_ID.equals(node.getId())) {
+                                if (mListener != null)
+                                    mListener.onLongClick(node);
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
         }
+
     }
+
 }

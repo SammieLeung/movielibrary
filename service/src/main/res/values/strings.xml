@@ -6,7 +6,7 @@
     <string name="dlna_node" translatable="false">DLNA</string>
     <string name="samba_node" translatable="false">Samba</string>
     <string name="notice_for_request_permission">Please grant the permision or the app can\'t work.</string>
-    <string name="select_dir_notice">Long press to confirm</string>
+    <string name="select_dir_notice">Long press OK/Menu to select</string>
     <string name="add_directory">Add Directory</string>
     <string name="directory">Directory: %1$s</string>
     <string name="last_modify_date">Modified: %1$s</string>

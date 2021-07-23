@@ -136,10 +136,19 @@ public class BrowsePathActivity extends AppCompatActivity {
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_BACK:
                 case KeyEvent.KEYCODE_BUTTON_B:
+                case KeyEvent.KEYCODE_ESCAPE:
                     break;
                 default:
                     return true;
             }
+        }else{
+           switch (event.getKeyCode()){
+               case KeyEvent.KEYCODE_MENU:
+               case KeyEvent.KEYCODE_BUTTON_SELECT:
+               case KeyEvent.KEYCODE_BUTTON_START:
+                   mFragment.dispatchKeyMenu();
+                   break;
+           }
         }
 
         return super.dispatchKeyEvent(event);
