@@ -4,12 +4,12 @@
     <string name="action_settings">设置</string>
     <string name="device">存储设备</string>
     <string name="notice_for_request_permission">为使app正常运行，请赋予app权限</string>
-    <string name="select_dir_notice">长按确定/菜单键选择</string>
+    <string name="select_dir_notice">长按/菜单键选择</string>
     <string name="add_directory">添加文件夹</string>
     <string name="directory">文件夹: %1$s</string>
     <string name="last_modify_date">修改日期: %1$s</string>
     <string name="make_private">设为私密文件夹</string>
-    <string name="add_directory_dilog_title">温馨提示</string>
+    <string name="add_directory_dilog_title">选择文件夹</string>
     <string name="samba_access_to">访问: %1$s</string>
     <string name="anonymous_access">匿名访问</string>
     <string name="username">用户名</string>
