@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
@@ -51,6 +52,7 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int WRAPPER_TITLE = 7;
     public static final int MOVIE_WRAPPER = 8;
     public static final int FAVORITE = 9;
+    public static final int PLAYVIDEO2 = 10;
 
     private int api_version;
 
@@ -66,6 +68,7 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(prefix, "movie_info/#", MOVIE_INFO);
         matcher.addURI(prefix, "file/wrapper_id/#", FILE_LIST);
         matcher.addURI(prefix, "play/vid/#", PLAYVIDEO);
+        matcher.addURI(prefix, "play2/vid/#", PLAYVIDEO2);
         matcher.addURI(prefix, "genres", GENRES);
         matcher.addURI(prefix, "movie_numbers", MOVIE_NUMBERS);
         matcher.addURI(prefix, "wrapper_title", WRAPPER_TITLE);
@@ -109,6 +112,8 @@ public class MovieLibraryProvider extends ContentProvider {
             case FAVORITE:
                 reslut = getFavorite(uri);
                 break;
+            case PLAYVIDEO2:
+                reslut = playVideo2(uri);
 
         }
         return reslut;
@@ -188,7 +193,24 @@ public class MovieLibraryProvider extends ContentProvider {
         long id = ContentUris.parseId(uri);
         Cursor cursor = mVideoFileDao.select("id=?", new String[]{String.valueOf(id)}, null);
         final VideoFile file = (new VideoFileDao(getContext())).parseList(cursor).get(0);
-        long wrapper_id = file.getWrapper_id();
+        savePlayHistory(file);
+        VideoPlayTools.play(getContext(), file);
+        return cursor;
+    }
+
+    private Cursor playVideo2(Uri uri) {
+        long id = ContentUris.parseId(uri);
+        Cursor cursor = mVideoFileDao.select("id=?", new String[]{String.valueOf(id)}, null);
+        final VideoFile file = (new VideoFileDao(getContext())).parseList(cursor).get(0);
+        savePlayHistory(file);
+        MatrixCursor mixCursor = new MatrixCursor(new String[]{"path", "name"}, 1);
+        mixCursor.addRow(new Object[]{file.getUri(), file.getFilename()});
+        return mixCursor;
+    }
+
+    private void savePlayHistory(VideoFile videoFile) {
+
+        long wrapper_id = videoFile.getWrapper_id();
         if (wrapper_id > 0) {
             MovieWrapperDao dao = new MovieWrapperDao(getContext());
             PosterProviderDao posterProviderDao = new PosterProviderDao(getContext());
@@ -216,7 +238,7 @@ public class MovieLibraryProvider extends ContentProvider {
             } else {
                 long currentTime = System.currentTimeMillis();
                 History history = new History();
-                history.setWrapper_id(file.getId());
+                history.setWrapper_id(videoFile.getId());
                 history.setTime("0");
                 history.setLast_play_time(String.valueOf(currentTime));
                 ContentValues contentValues = historyDao.parseContentValues(history);
@@ -224,7 +246,7 @@ public class MovieLibraryProvider extends ContentProvider {
             }
         } else {
             PosterProviderDao posterProviderDao = new PosterProviderDao(getContext());
-            String poster = file.getThumbnail();
+            String poster = videoFile.getThumbnail();
             if (poster != null) {
                 posterProviderDao.deleteAll();
                 PosterProviderBean posterProviderBean = new PosterProviderBean();
@@ -250,8 +272,6 @@ public class MovieLibraryProvider extends ContentProvider {
                 historyDao.insert(contentValues);
             }
         }
-        VideoPlayTools.play(getContext(), file);
-        return cursor;
     }
 
     private Cursor getGenres(String selection, String[] selectionArgs) {
