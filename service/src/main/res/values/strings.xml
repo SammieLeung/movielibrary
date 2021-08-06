@@ -30,8 +30,8 @@
     <string name="url_is_invalid">Url is invalid.</string>
     <string name="must_end_with_divide">Url must ends with \"/\".</string>
     <string name="external_storage">Internal Storage</string>
-    <string name="udisk_name">U-Disk (%1$s)</string>
-    <string name="sdcard_name">TFCard (%1$s)</string>
-    <string name="pcie_name">M.2 SSD (%1$s)</string>
-    <string name="sata_name">HardDisk (%1$s)</string>
+    <string name="udisk_name">U-Disk(%1$s)</string>
+    <string name="sdcard_name">TFCard(%1$s)</string>
+    <string name="pcie_name">M.2 SSD(%1$s)</string>
+    <string name="sata_name">HDD(%1$s)</string>
 </resources>

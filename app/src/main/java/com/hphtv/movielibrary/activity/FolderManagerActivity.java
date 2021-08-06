@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.firelfy.util.Md5Utils;
 import com.firelfy.util.SharePreferencesTools;
+import com.firefly.filepicker.utils.Utils;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.DirectoryManagerAdapter;
@@ -780,7 +781,7 @@ public class FolderManagerActivity extends AppCompatActivity implements Compound
 
     private void setFooter(String device, String location) {
         if (mScanService != null && !mScanService.isRunning()) {
-            mTextViewLocation.setText(device + ":" + location);
+            mTextViewLocation.setText(Utils.translatePath(this,  location));
         }
     }
 
