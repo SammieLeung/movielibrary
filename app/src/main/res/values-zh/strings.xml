@@ -113,8 +113,8 @@
     <string name="tx_movie_for_lib">全部电影</string>
     <string name="tx_tv_for_lib">全部剧集</string>
     <string name="tx_others_for_lib">全部视频</string>
-    <string name="tips">媒体中心为空！点击此处添加媒体文件夹</string>
-    <string name="left_menu_title_homepage">媒体中心</string>
+    <string name="tips">影库为空！点击此处添加媒体文件夹</string>
+    <string name="left_menu_title_homepage">影库</string>
     <string name="left_menu_title_myvideos">我的视频</string>
     <string name="left_menu_title_movie">我的视频</string>
     <string name="left_menu_title_unrecognizedfile">未识别影片</string>

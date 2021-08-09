@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="refresh_text">Loading</string>
-    <string name="app_name">MediaCenter</string>
+    <string name="app_name">Movie Library</string>
     <string name="action_settings">Settings</string>
     <string name="unit_year">year</string>
     <string name="minutes">minutes</string>
@@ -115,8 +115,8 @@
     <string name="tx_movie_for_lib">Movies</string>
     <string name="tx_tv_for_lib">Series</string>
     <string name="tx_others_for_lib">Others</string>
-    <string name="tips">The MediaCenter is Empty! Click here to add Media Foler</string>
-    <string name="left_menu_title_homepage">MediaCenter</string>
+    <string name="tips">The Movie Library is Empty! Click here to add Media Foler</string>
+    <string name="left_menu_title_homepage">Movie Library</string>
     <string name="left_menu_title_myvideos">My Videos</string>
     <string name="left_menu_title_movie">My Videos</string>
     <string name="left_menu_title_unrecognizedfile">Unidentified</string>
