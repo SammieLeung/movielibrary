@@ -38,6 +38,7 @@ import org.fourthline.cling.support.model.DIDLContent;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
+import org.seamless.util.logging.LoggingUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -187,7 +188,6 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @Override
     public void getChildren(Node node) {
         setLoadingViewVisible(true);
-
         switch (node.getType()) {
             case Node.EXTERNAL_CATEGORY:
             case Node.EXTERNAL_DEVICE:
@@ -198,6 +198,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             case Node.USB_DEVICE:
                 if (node.getType() == Node.EXTERNAL_CATEGORY) {
                     localDevice(node);
+                } else if (mSelectType == SELECT_DEVICE) {
+                    onSelect(node, false, false);
                 } else if (mSelectType == SELECT_DIR) {
                     localPath(node);
                 } else {
@@ -233,7 +235,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     @Override
     public void onSelect(Node node, boolean isPrivate, boolean confirm) {
-        if (mSelectType == SELECT_DIR) {
+        if (mSelectType == SELECT_DIR || mSelectType == SELECT_DEVICE) {
             if (!mEnableSelectConfirm) {//设置是否开启确认选择窗口
                 onSelectDir(node, false);
             } else {
@@ -250,7 +252,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     @Override
     public void setBrowseType(int type) {
-        if (type != SELECT_DIR && type != SELECT_FILE) {
+        if (type != SELECT_DIR && type != SELECT_FILE && type != SELECT_DEVICE) {
             throw new IllegalArgumentException("The parameter browseType is invalid.");
         }
 

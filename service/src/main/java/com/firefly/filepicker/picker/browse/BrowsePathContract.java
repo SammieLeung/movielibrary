@@ -28,6 +28,7 @@ public interface BrowsePathContract {
         @interface SelectType {}
         int SELECT_DIR = 0;
         int SELECT_FILE = 1;
+        int SELECT_DEVICE=2;
 
         void getChildren(Node node);
         void checkAuthData(Node node, Bundle data);
