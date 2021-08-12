@@ -1,3 +1,6 @@
 [submodule "dlna/cling"]
 	path = dlna/cling
 	url = https://github.com/4thline/cling
+[submodule "stationKit"]
+	path = stationKit
+	url = ssh://git@git.t-firefly.com:8022/stationosapp/stationuniversaldevelopmentkit.git
