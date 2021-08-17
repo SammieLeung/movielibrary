@@ -5,14 +5,14 @@
     <string name="action_settings">Settings</string>
     <string name="unit_year">年</string>
     <string name="minutes">分钟</string>
-    <string name="actor">演员:</string>
+    <string name="actor">主演:</string>
     <string name="genres">类型:</string>
     <string name="date">年份:</string>
     <string name="duration">片长:</string>
     <string name="episodes">集数:</string>
     <string name="production_companies">出品:</string>
     <string name="language">语言:</string>
-    <string name="pub_dates">首映:</string>
+    <string name="pub_dates">上映时间:</string>
     <string name="pre_dates">首播:</string>
     <string name="video_detail_path">位置:</string>
     <string name="play">播放</string>
@@ -78,6 +78,8 @@
     <string name="order_score">评分</string>
     <string name="order_addtime">添加时间</string>
 
+    <string name="toastmsg_no_trailer_found">找不到预告片</string>
+
     <string name="exit_toast">再按一次返回键退出程序</string>
     <string name="dm_tx_status">状态</string>
     <string name="dm_tx_folder">文件夹</string>
@@ -87,7 +89,7 @@
     <string name="cb_all">全选</string>
     <string name="cb_private">私密</string>
     <string name="cb_disconnect">断开</string>
-    <string name="title_file_manager">海报匹配</string>
+    <string name="title_file_manager">文件夹管理</string>
     <string name="lb_setting">设置</string>
     <string name="setting_confirm_delete">此操作不会删除你的文件，但会清除你的设备记录和电影信息记录。</string>
     <string name="setting_status_not_add">未扫描</string>
@@ -107,6 +109,7 @@
     <string name="video_type_movie">电影</string>
     <string name="video_type_others">其他</string>
     <string name="more">更多</string>
+
     <string name="tx_search_input_hint">输入影片关键字</string>
     <string name="tx_under_t9_hints">* 输入关键字,如:电影-> DY</string>
     <string name="local_search_empty_tips">搜索你想要的电影</string>
@@ -128,25 +131,31 @@
     <string name="device_manager_footer_bar_folder">"文件夹 : "</string>
     <string name="device_manager_footer_bar_path">"位置 : "</string>
     <string name="title_folder_add">添加文件夹到库</string>
-    <string name="title_show_private">显示私密文件</string>
+    <string name="btn_show_hidden_folder">显示私密文件</string>
     <string name="title_change_password">修改密码</string>
-    <string name="psw_input">私密密码</string>
-    <string name="psw_change">密码修改</string>
-    <string name="psw_set">密码设置</string>
-    <string name="psw_tips_psw_err">" * 密码错误,请重新输入"</string>
-    <string name="psw_tips_psw_unmatch">* 密码不一致,请重新输入</string>
-    <string name="psw_hints_input">请输入密码</string>
-    <string name="psw_hints_set_1">请输入一个4-8位的密码</string>
-    <string name="psw_hints_set_2">确认密码</string>
-    <string name="psw_hints_change_1">旧密码</string>
-    <string name="psw_hints_change_2">新密码</string>
-    <string name="psw_hints_change_3">重复新密码</string>
-    <string name="psw_tips_psw_len">" * 请输入一个4-8位的密码"</string>
+    <string name="title_input_psw">输入密码</string>
+    <string name="title_change_psw">修改密码</string>
+    <string name="title_set_initial_psw">设置初始密码</string>
+
+    <string name="errtips_psw_invaild">* 密码必须由4位数字组成</string>
+    <string name="errtips_psw_error">* 密码错误</string>
+    <string name="errtips_psw_not_new">* 新密码不能与原密码相同</string>
+    <string name="errtips_psw_inconsistent">* 两次输入的密码不一致</string>
+
+    <string name="hint_enter_psw">请输入密码</string>
+    <string name="hint_input4digit_psw">输入一个4位密码</string>
+    <string name="hint_confirm_psw">确认新密码</string>
+    <string name="hint_old_psw">旧密码</string>
+    <string name="hint_new_psw">新密码</string>
+
     <string name="psw_set_success">新密码设置成功!</string>
     <string name="tx_private_for_lib">私密视频</string>
     <string name="tips_for_private_folder">非本地文件夹无法设为私密</string>
     <string name="checkbox_del_video_file">清除文件信息(不会删除文件)?</string>
     <string name="toast_del_success">删除成功！</string>
+    <string name="toast_UnknownHostException">网络错误！</string>
+    <string name="toast_loadmore_end">到底了~</string>
+
     <string name="title_hide_private">隐藏私密文件</string>
     <string name="tips_for_show_private_videos">已经显示私密视频</string>
     <string name="tips_for_hide_private_videos">已经隐藏私密视频</string>
@@ -168,9 +177,7 @@
     <string name="main_actors">主要演员:</string>
     <string name="main_file_list">文件列表:</string>
     <string name="tx_genres">类型:</string>
-    <string name="t_chip">天启智能科技有限公司</string>
-    <string name="tx_author">制作者</string>
-    <string name="tx_version">版本</string>
+    <string name="tx_version">版本:</string>
     <string name="tips2">暂无影片</string>
     <string name="tx_search_result">成功:%1$d 失败:%2$d</string>
     <string name="tx_favorite">收藏</string>
@@ -188,5 +195,13 @@
     <string name="device_ssd_name">M.2 SSD (%1$s)</string>
     <string name="device_harddisk_name">硬盘 (%1$s)</string>
 
+    <string name="btn_search">搜索</string>
     <string name="keyword">关键字</string>
+
+    <string name="folder_dialog_title_added_folder">已添加文件夹</string>
+    <string name="folder_dialog_title_hidden_folder">隐藏文件夹</string>
+
+    <string name="folder_item_delete">删除</string>
+    <string name="folder_item_add_to_hidden">添加到私密</string>
+    <string name="folder_item_move_out">移出私密</string>
 </resources>

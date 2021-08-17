@@ -10,8 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.firelfy.util.EditorDistance;
-import com.firelfy.util.LogUtil;
+import com.hphtv.movielibrary.scraper.ScraperHelper;
+import com.station.kit.util.EditorDistance;
+import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
@@ -29,20 +30,19 @@ import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.MovieActorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieDirectorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieGenreCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieVideoFileCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
 import com.hphtv.movielibrary.scraper.mtime.respone.MtimeSuggestRespone;
 import com.hphtv.movielibrary.util.FileScanUtil;
-import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
+import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.scraper.mtime.respone.MtimeUnionSearchRespone;
-import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import java.util.ArrayList;
@@ -53,13 +53,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.functions.Supplier;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -93,6 +90,7 @@ public class MovieScanService2 extends Service {
         init();
         initDao();
         initThreadPools();
+        ScraperHelper.getInstance().setScanService2(this);
     }
 
     @Override
@@ -192,7 +190,7 @@ public class MovieScanService2 extends Service {
                         .defer(movieSupplier)
                         .subscribeOn(Schedulers.from(mSearchMovieExecutor))
                         .flatMap((Function<MovieNameInfo, ObservableSource<MtimeUnionSearchRespone>>) movieNameInfo -> {
-                            LogUtil.v(Thread.currentThread().getName(),"1 ...");
+                            LogUtil.v(Thread.currentThread().getName(), "1 ...");
 
                             String name = movieNameInfo.getName();
                             if (!TextUtils.isEmpty(name))
@@ -204,7 +202,7 @@ public class MovieScanService2 extends Service {
                         .defer(movieSupplier)
                         .subscribeOn(Schedulers.from(mSearchMovieExecutor))
                         .flatMap((Function<MovieNameInfo, ObservableSource<MtimeSuggestRespone>>) movieNameInfo -> {
-                            LogUtil.v(Thread.currentThread().getName(),"2 ...");
+                            LogUtil.v(Thread.currentThread().getName(), "2 ...");
 
                             String name = movieNameInfo.getName();
                             if (!TextUtils.isEmpty(name))
@@ -213,7 +211,7 @@ public class MovieScanService2 extends Service {
                         }),
                 //获取最优匹配
                 (mtimeUnionSearchRespone, mtimeSuggestRespone) -> {
-                    LogUtil.v(Thread.currentThread().getName(),"获取最优匹配 ...");
+                    LogUtil.v(Thread.currentThread().getName(), "获取最优匹配 ...");
                     String name = movieSupplier.keyword;
                     if (mtimeUnionSearchRespone != null) {
                         List<Movie> unionSearchMovies = mtimeUnionSearchRespone.toEntity();
@@ -244,7 +242,7 @@ public class MovieScanService2 extends Service {
                 })
                 .observeOn(Schedulers.from(mMovieDetailExecutor))
                 .map(movieId -> {
-                    LogUtil.v(Thread.currentThread().getName(),"获取详细电影 ...");
+                    LogUtil.v(Thread.currentThread().getName(), "获取详细电影 ...");
 
                     //获取详细电影
                     if (!TextUtils.isEmpty(movieId)) {
@@ -297,7 +295,7 @@ public class MovieScanService2 extends Service {
         List<Trailer> trailerList = movieWrapper.trailers;
         List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
         //插入电影到数据库
-        movie.pinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.title);
+        movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
         mMovieDao.insertOrIgnoreMovie(movie);
         mGenreDao.insertGenres(genreList);
@@ -335,7 +333,7 @@ public class MovieScanService2 extends Service {
 
         if (director != null) {
             MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
-            movieDirectorCrossRef.directorId = director.directorId;
+            movieDirectorCrossRef.directorId = director.director_id;
             movieDirectorCrossRef.id = movie_id;
             mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
         }
@@ -354,10 +352,11 @@ public class MovieScanService2 extends Service {
             }
         }
 
+
         MovieVideoFileCrossRef movieVideoFileCrossRef = new MovieVideoFileCrossRef();
         movieVideoFileCrossRef.id = movie_id;
         movieVideoFileCrossRef.path = videoFile.path;
-        mMovieVideofileCrossRefDao.insertMovieVideofileCrossRef(movieVideoFileCrossRef);
+        mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
 
         videoFile.isScanned = 1;
         LogUtil.v("saveMovieWrapper==>: " + videoFile.filename + " isScanned ");

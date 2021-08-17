@@ -10,8 +10,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.firelfy.util.LogUtil;
-import com.firelfy.util.SharePreferencesTools;
+import com.station.kit.util.LogUtil;
+import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;

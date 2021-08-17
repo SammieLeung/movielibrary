@@ -13,10 +13,9 @@ import java.io.Serializable;
  * date:  2021/5/27
  */
 @Entity(tableName = TABLE.DIRECTOR)
-public class Director  implements Serializable {
+public class Director implements Serializable {
     @PrimaryKey
-    @ColumnInfo(name = "director_id")
-    public long directorId;
+    public long director_id;
     public String name;
     @ColumnInfo(name = "name_en")
     public String nameEn;
@@ -24,6 +23,6 @@ public class Director  implements Serializable {
 
     @Override
     public String toString() {
-        return name+"("+nameEn+")";
+        return name + "(" + nameEn + ")";
     }
 }

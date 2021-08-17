@@ -8,7 +8,7 @@ import androidx.room.Update;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
-import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
 import java.util.List;
@@ -35,12 +35,17 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);
 
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path in (:paths)")
+    public List<VideoFile> queryByPaths(String... paths);
+
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId and path not in (:paths) ")
-    public void deleteByDeviceId(String deviceId, String[] paths);
+    public void deleteByDeviceId(String deviceId, List<String> paths);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE)
     public void deleteAll();
 
+    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE :currentTime - add_time > 604800000 ")
+    public int deleteOutdated(long currentTime);
 
     @Query("SELECT * FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW +
             " GROUP BY keyword")

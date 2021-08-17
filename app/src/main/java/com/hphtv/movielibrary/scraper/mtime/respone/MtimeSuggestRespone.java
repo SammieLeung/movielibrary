@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.scraper.mtime.respone;
 
+import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
@@ -38,6 +39,7 @@ public class MtimeSuggestRespone implements ResponeEntity<List<Movie>>{
                 movie.movieId = (String.valueOf(movieId));
                 movie.title = titleCn;
                 movie.otherTitle = titleEn;
+                movie.source= ConstData.ScraperSource.MTIME;
                 return movie;
             }
         }

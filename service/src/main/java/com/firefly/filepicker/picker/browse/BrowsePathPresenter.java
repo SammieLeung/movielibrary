@@ -25,7 +25,7 @@ import com.firefly.filepicker.utils.Base64Helper;
 import com.firefly.filepicker.utils.MediaDirHelper;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.firefly.filepicker.utils.SmbFileHelper;
-import com.firelfy.util.StorageHelper;
+import com.station.kit.util.StorageHelper;
 
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;

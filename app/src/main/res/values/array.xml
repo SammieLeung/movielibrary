@@ -6,7 +6,6 @@
         <item>@string/left_menu_title_history</item>
         <item>@string/left_menu_title_favorite</item>
         <item>@string/left_menu_title_manager</item>
-        <item>@string/left_menu_title_about</item>
         <item>@string/left_menu_title_exit</item>
     </string-array>
 
@@ -16,7 +15,6 @@
         <item>@drawable/ic_history</item>
         <item>@drawable/ic_favorite</item>
         <item>@drawable/ic_setting</item>
-        <item>@drawable/ic_abouts</item>
         <item>@drawable/ic_exit</item>
     </string-array>
 
@@ -46,14 +44,12 @@
         <item>@string/left_menu_title_history</item>
         <item>@string/left_menu_title_favorite</item>
         <item>@string/left_menu_title_manager</item>
-        <item>@string/left_menu_title_about</item>
     </string-array>
 
     <string-array name="api_group" translatable="false">
         <item>@string/api_douban</item>
         <item>@string/api_imdb</item>
         <item>@string/api_mtime</item>
-
     </string-array>
 
 </resources>

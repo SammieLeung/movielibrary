@@ -13,7 +13,8 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firefly.filepicker.data.bean.DocumentMetadata;
-import com.firelfy.util.LogUtil;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.databinding.MovieLibraryItemBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +29,12 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAdapter.ViewHolder> extends RecyclerView.Adapter<VH> implements View.OnClickListener {
+public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAdapter.ViewHolder,T> extends RecyclerView.Adapter<VH> implements View.OnClickListener {
     public static final float SCALE_SIZE = 1.2f;
     protected Context mContext;
-    protected List mList;
-    public BaseAdapter(Context context,Class vh,List list) {
+    protected List<T> mList;
+
+    public BaseAdapter(Context context,List<T> list) {
         mContext = context;
         mList = list;
     }
@@ -102,6 +104,18 @@ public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAda
         mList.clear();
         notifyDataSetChanged();
     }
+
+    /**
+     * 添加数据
+     *
+     * @param data
+     * @param position
+     */
+    public void addItem(T data, int position) {
+        mList.add(position, data);
+        notifyItemInserted(position); // Attention!
+    }
+
 
     private OnRecyclerViewItemClickListener mOnItemClickListener = null;
 

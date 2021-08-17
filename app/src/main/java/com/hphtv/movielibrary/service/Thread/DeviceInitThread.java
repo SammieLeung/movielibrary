@@ -2,8 +2,8 @@ package com.hphtv.movielibrary.service.Thread;
 
 import android.text.TextUtils;
 
-import com.firelfy.util.LogUtil;
-import com.firelfy.util.StorageHelper;
+import com.station.kit.util.LogUtil;
+import com.station.kit.util.StorageHelper;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -57,6 +57,7 @@ public class DeviceInitThread extends Thread {
                 mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
+
         //扫描USB设备
         if (allUsbPaths != null && allUsbPaths.size() > 0) {
             for (String path : allUsbPaths) {
@@ -94,5 +95,8 @@ public class DeviceInitThread extends Thread {
             int state = ConstData.DeviceMountState.MOUNTED;
             mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
         }
+
+        int ret = mVideoFileDao.deleteOutdated(System.currentTimeMillis());
+        LogUtil.v(TAG, "delete outdated videofile " + ret);
     }
 }

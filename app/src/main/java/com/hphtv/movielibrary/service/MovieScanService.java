@@ -19,8 +19,7 @@ import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
 import com.firefly.videonameparser.utils.StringUtils;
-import com.firelfy.util.LogUtil;
-import com.hphtv.movielibrary.MovieApplication;
+import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.sqlite.bean.Device;
 import com.hphtv.movielibrary.sqlite.bean.Directory;
@@ -33,17 +32,14 @@ import com.hphtv.movielibrary.sqlite.bean.scraperBean.SimpleMovie;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.listener.ScanProgressListener;
 import com.hphtv.movielibrary.listener.WebviewListener;
-import com.hphtv.movielibrary.scraper.douban.DoubanApi;
-import com.hphtv.movielibrary.scraper.imdb.ImdbApi;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApi;
 import com.hphtv.movielibrary.sqlite.dao.DirectoryDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieDao;
 import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
 import com.hphtv.movielibrary.sqlite.dao.VideoFileDao;
 import com.hphtv.movielibrary.util.BroadcastHelper;
-import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.FileScanUtil;
-import com.hphtv.movielibrary.util.MyPinyinParseAndMatchUtil;
+import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -59,7 +55,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 public class MovieScanService extends Service {
-    @IntDef({ConstData.Scraper.UNKNOW, ConstData.Scraper.DOUBAN, ConstData.Scraper.IMDB, ConstData.Scraper.MTIME})
+    @IntDef({ConstData.Scraper.UNKNOW,ConstData.Scraper.MTIME})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Api {
     }
@@ -76,7 +72,6 @@ public class MovieScanService extends Service {
 
     public static final String TAG = "MovieScanService";
     public ScanBinder binder = new ScanBinder();
-    DoubanMovieSearchHelper searchHelper;
     public ScanProgressListener mScanProgressListener;
 
     VideoFileDao mVideoFileDao;
@@ -122,10 +117,6 @@ public class MovieScanService extends Service {
         mDirectoryDao = new DirectoryDao(this);
         mMediaMetadataRetriever = new MediaMetadataRetriever();
         Log.i(TAG, "onCreate方法被调用!");
-        if (searchHelper == null) {
-            searchHelper = ((MovieApplication) getApplication()).getSearchHelper();
-            searchHelper.registerWebviewListener(mWebviewListener);
-        }
         super.onCreate();
     }
 
@@ -290,7 +281,7 @@ public class MovieScanService extends Service {
                 videoFile.setDev_id(device.getId());
                 videoFile.setDir_id(directory.getId());
                 videoFile.setSearchName(mni.getName());
-                videoFile.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(mni.getName()));
+                videoFile.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(mni.getName()));
                 videoFile = saveVideoFile(videoFile, directory, device);
                 final ParseFile parseFile = new ParseFile();
                 parseFile.setMni(mni);
@@ -530,13 +521,13 @@ public class MovieScanService extends Service {
                         scraperInfoList.add(scraperInfo);
                         if (!TextUtils.isEmpty(movie.getTitle())) {
                             movieWrapper.setTitle(movie.getTitle());
-                            movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle()));
+                            movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(movie.getTitle()));
                         } else if (!TextUtils.isEmpty(movie.getOriginalTitle())) {
                             movieWrapper.setTitle(movie.getOriginalTitle());
-                            movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getOriginalTitle()));
+                            movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(movie.getOriginalTitle()));
                         } else {
                             movieWrapper.setTitle(parseFile.getMni().getName());
-                            movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(parseFile.getMni().getName()));
+                            movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(parseFile.getMni().getName()));
                         }
                         if (movie.getRating() != null)
                             movieWrapper.setAverage(String.valueOf(movie.getRating().average));
@@ -630,13 +621,13 @@ public class MovieScanService extends Service {
                     movieWrapper.setPoster(movie.getImages().large);
                 if (!TextUtils.isEmpty(movie.getTitle())) {
                     movieWrapper.setTitle(movie.getTitle());
-                    movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle()));
+                    movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(movie.getTitle()));
                 } else if (!TextUtils.isEmpty(movie.getOriginalTitle())) {
                     movieWrapper.setTitle(movie.getOriginalTitle());
-                    movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getOriginalTitle()));
+                    movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(movie.getOriginalTitle()));
                 } else {
                     movieWrapper.setTitle(parseFile.getMni().getName());
-                    movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(movie.getOriginalTitle()));
+                    movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(movie.getOriginalTitle()));
                 }
                 if (movie.getRating() != null)
                     movieWrapper.setAverage(String.valueOf(movie.getRating().average));
@@ -676,7 +667,7 @@ public class MovieScanService extends Service {
                 movieWrapper.setDevIds(new Long[]{device_id});
                 movieWrapper.setDirIds(new Long[]{dir_id});
                 movieWrapper.setTitle(parseFile.getMni().getName());
-                movieWrapper.setTitlePinyin(MyPinyinParseAndMatchUtil.parsePinyin(parseFile.getMni().getName()));
+                movieWrapper.setTitlePinyin(PinyinParseAndMatchTools.parsePinyin(parseFile.getMni().getName()));
                 movieWrapper.setAverage("-1");
                 long rowId = mMovieWrapperDao.insert(mMovieWrapperDao.parseContentValues(movieWrapper));
                 if (rowId > 0) {
@@ -774,28 +765,6 @@ public class MovieScanService extends Service {
             }
 
             switch (api) {
-                case ConstData.Scraper.DOUBAN:
-                    if (search_url == null && movie != null)
-                        search_url = movie.getAlt();
-                    if (TextUtils.isEmpty(search_url))
-                        return null;
-                    movie = DoubanApi
-                            .parserMovieInfo(search_url);// 解析电影信息(耗时几秒)
-                    break;
-                case ConstData.Scraper.IMDB:
-                    if (mode == MODE_GETINFO) {
-                        if (!TextUtils.isEmpty(exist_movie_id))
-                            movie = ImdbApi.parserMovieInfoById(exist_movie_id);
-                        else
-                            return null;
-                    } else {
-                        if (TextUtils.isEmpty(id)) {
-                            return null;
-                        }
-                        movie = ImdbApi.parserMovieInfoById(id);
-                    }
-
-                    break;
                 case ConstData.Scraper.MTIME:
                     if (mode == MODE_GETINFO) {
                         if (!TextUtils.isEmpty(exist_movie_id))
@@ -823,7 +792,7 @@ public class MovieScanService extends Service {
             if (TextUtils.isEmpty(movie.getAddtime())) {
                 movie.setAddtime(String.valueOf(currentTime));
             }
-            String titlepinyin = MyPinyinParseAndMatchUtil.parsePinyin(movie.getTitle());
+            String titlepinyin = PinyinParseAndMatchTools.parsePinyin(movie.getTitle());
             movie.setTitlePinyin(titlepinyin);
             movie.setWrapper_id(exist_wrapper_id);
             ContentValues contentValues = mMovieDao

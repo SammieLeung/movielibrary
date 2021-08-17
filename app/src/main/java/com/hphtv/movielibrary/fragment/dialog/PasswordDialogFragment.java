@@ -2,187 +2,264 @@ package com.hphtv.movielibrary.fragment.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import androidx.fragment.app.DialogFragment;
-
-import com.firelfy.util.DensityUtil;
-import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.databinding.ComponentPasswordDialogFragmentBinding;
+import com.hphtv.movielibrary.databinding.PswEdittextItemBinding;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.hphtv.movielibrary.viewmodel.fragment.PasswordDialogFragmentViewModel;
+import com.jakewharton.rxbinding4.widget.RxTextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.core.Observable;
+
+import static com.hphtv.movielibrary.viewmodel.fragment.PasswordDialogFragmentViewModel.IS_NOT_VAILD;
+import static com.hphtv.movielibrary.viewmodel.fragment.PasswordDialogFragmentViewModel.NOT_A_NEW_PASSWORD;
+import static com.hphtv.movielibrary.viewmodel.fragment.PasswordDialogFragmentViewModel.PASSWORD_ERROR;
+import static com.hphtv.movielibrary.viewmodel.fragment.PasswordDialogFragmentViewModel.PASSWORD_INCONSISTENT;
 
 /**
  * Created by tchip on 18-3-20.
  */
 
-public class PasswordDialogFragment extends DialogFragment {
+public class PasswordDialogFragment extends BaseDialogFragment<PasswordDialogFragmentViewModel, ComponentPasswordDialogFragmentBinding> implements View.OnClickListener {
     public static final String TAG = PasswordDialogFragment.class.getSimpleName();
-    private List<EditText> editTextList;
-    private List<String> hintList;
-    private View view;
-    private Button btn_yes;
-    private Button btn_no;
-    private LinearLayout edit_group;
-    private TextView tips;
-    private TextView tv_title;
-    private String title;
-    private List<String> errorMsg;
-    private Context context;
+    public static final int ENTER_PASSWORD_DIALOG = 1;
+    public static final int SET_INITAL_PASSWORD = 2;
+    public static final int CHANGE_PASSWORD = 3;
+    private int mDialogType = ENTER_PASSWORD_DIALOG;
+    private List<EditText> mEditTextList;
+    private List<Integer> mHintStringResList;
+    private int mTitleRes;
+    private List<Integer> mErrorMsgResList;
 
-    public static PasswordDialogFragment newInstance(Context context) {
+    public static PasswordDialogFragment newInstance() {
+        Bundle args = new Bundle();
         PasswordDialogFragment fragment = new PasswordDialogFragment();
-        fragment.context = context;
+        fragment.setArguments(args);
         return fragment;
     }
 
-    public PasswordDialogFragment addPswEditText(String hint) {
-        if (hintList == null) {
-            hintList = new ArrayList<>();
-            editTextList = new ArrayList<>();
+    @Override
+    protected void onViewCreated() {
+        prepareErrorTips();
+        prepareTitleAndHints();
+        mBinding.tvTitle.setText(getContext().getString(mTitleRes));
+        List<Observable<CharSequence>> observableList = new ArrayList<>();
+        for (int i = 0; i < mHintStringResList.size(); i++) {
+            PswEdittextItemBinding pswBinding = PswEdittextItemBinding.inflate(getLayoutInflater(), mBinding.viewEdittextGroup, false);
+            pswBinding.editText.setHint(mHintStringResList.get(i));
+            Observable<CharSequence> observable = RxTextView.textChanges(pswBinding.editText).skip(1);
+            mBinding.viewEdittextGroup.addView(pswBinding.editText);
+            mEditTextList.add(pswBinding.editText);
+            observableList.add(observable);
         }
-        hintList.add(hint);
-        return this;
+        mBinding.btnYes.setOnClickListener(this);
+        mBinding.btnNo.setOnClickListener(this);
+        mViewModel.verifyPasswords(observableList, new SimpleObserver<Integer>() {
+            @Override
+            public void onAction(Integer flag) {
+                if ((flag & IS_NOT_VAILD) == IS_NOT_VAILD) {
+                    passwordInvaild();
+                } else if ((flag & PASSWORD_ERROR) == PASSWORD_ERROR) {
+                    passwordError();
+                } else if ((flag & NOT_A_NEW_PASSWORD) == NOT_A_NEW_PASSWORD) {
+                    passwordNotNew();
+                } else if ((flag & PASSWORD_INCONSISTENT) == PASSWORD_INCONSISTENT) {
+                    passwordInconsistent();
+                } else {
+                    passwordPassed();
+                }
+            }
+        });
     }
 
-    public PasswordDialogFragment addTips(String tips) {
-        if (errorMsg == null) {
-            errorMsg = new ArrayList<>();
-        }
-        errorMsg.add(tips);
-        return this;
-    }
 
-    public PasswordDialogFragment setTitle(String title) {
-        this.title = title;
-        return this;
+    @Override
+    public void onStart() {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null) {
+            dialog.getWindow().setLayout(getResources().getDimensionPixelOffset(R.dimen.dialogfragment_w), ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        view = inflater.inflate(R.layout.component_password_dialog_fragment, null);
-        btn_yes = (Button) view.findViewById(R.id.btn_yes);
-        btn_no = (Button) view.findViewById(R.id.btn_no);
-        edit_group = (LinearLayout) view.findViewById(R.id.edit_group);
-        tv_title = (TextView) view.findViewById(R.id.title);
-        tv_title.setText(title);
-        tips = (TextView) view.findViewById(R.id.tips);
-        for (int i = 0; i < hintList.size(); i++) {
-            EditText editText = (EditText) inflater.inflate(R.layout.psw_edittext_item, edit_group, false);
-            editText.setHint(hintList.get(i));
-            edit_group.addView(editText);
-            editTextList.add(editText);
-        }
-        btn_yes.setOnClickListener(mOnClickListener);
-        btn_no.setOnClickListener(mOnClickListener);
-        Dialog dialog = new Dialog(getActivity(), R.style.DialogStyle_transparent);
-        dialog.setContentView(view);
-        dialog.getWindow().setLayout(DensityUtil.dip2px(context,394), RelativeLayout.LayoutParams.WRAP_CONTENT);
-        return dialog;
-    }
-
-
-    public void showTips(int i) {
-        if (errorMsg != null && i < errorMsg.size()) {
-            tips.setText(errorMsg.get(i));
-        }
-    }
-
-    public void hideTips() {
-        try {
-            tips.setText(null);
-        } catch (Exception e) {
-
-        }
-
-    }
-
-    View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.btn_yes:
-                    listener.onConfirm(editTextList);
-                    break;
-                case R.id.btn_no:
-                    listener.onCancle();
-                    dismiss();
-                    break;
-            }
-        }
-    };
-
-    public interface OnClickListener {
-        public void onConfirm(List<EditText> editTextList);
-
-        public void onCancle();
-    }
-
-    private OnClickListener listener;
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.listener = listener;
+    protected int getLayoutId() {
+        return R.layout.component_password_dialog_fragment;
     }
 
     @Override
     public void dismiss() {
-        LogUtil.v(TAG, "dismiss()");
         InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            imm.hideSoftInputFromWindow(getView().getWindowToken(), 0);
         }
         super.dismiss();
     }
 
+    public void initSharePreferenceSavePasswordKey(String sharePreferenceSavePasswordKey) {
+        mViewModel.initSharePreferenceSavePasswordKey(sharePreferenceSavePasswordKey);
+    }
+
+    public PasswordDialogFragment newEnterPassword() {
+        mDialogType = ENTER_PASSWORD_DIALOG;
+        return this;
+    }
+
+    public PasswordDialogFragment newSetInitialPassword() {
+        mDialogType = SET_INITAL_PASSWORD;
+        return this;
+    }
+
+    public PasswordDialogFragment newChangePassword() {
+        mDialogType = CHANGE_PASSWORD;
+        return this;
+    }
+
+    private void prepareTitleAndHints() {
+        switch (mDialogType) {
+            case ENTER_PASSWORD_DIALOG:
+                if (mViewModel.isPasswordEmpty()) {
+                    mDialogType = SET_INITAL_PASSWORD;
+                    prepareTitleAndHints();
+                } else {
+                    setTitle(R.string.title_input_psw)
+                            .addHint(R.string.hint_enter_psw);
+                }
+                break;
+            case SET_INITAL_PASSWORD:
+                setTitle(R.string.title_set_initial_psw)
+                        .addHint(R.string.hint_input4digit_psw)
+                        .addHint(R.string.hint_confirm_psw);
+                break;
+            case CHANGE_PASSWORD:
+                if(mViewModel.isPasswordEmpty()){
+                    mDialogType = SET_INITAL_PASSWORD;
+                    prepareTitleAndHints();
+                }else{
+                    setTitle(R.string.title_change_psw)
+                            .addHint(R.string.hint_old_psw)
+                            .addHint(R.string.hint_new_psw)
+                            .addHint(R.string.hint_confirm_psw);
+                }
+                break;
+        }
+    }
+
+    private PasswordDialogFragment prepareErrorTips() {
+        if (mErrorMsgResList == null) {
+            mErrorMsgResList = new ArrayList<>();
+        }
+        mErrorMsgResList.add(R.string.errtips_psw_invaild);
+        mErrorMsgResList.add(R.string.errtips_psw_error);
+        mErrorMsgResList.add(R.string.errtips_psw_not_new);
+        mErrorMsgResList.add(R.string.errtips_psw_inconsistent);
+        return this;
+    }
+
+    private void passwordInvaild() {
+        showTips(0);
+
+    }
+
+    private void passwordError() {
+        showTips(1);
+    }
+
+    private void passwordNotNew() {
+        showTips(2);
+
+    }
+
+    private void passwordInconsistent() {
+        showTips(3);
+    }
+
+    private void passwordPassed() {
+        hideTips();
+    }
+
+    public PasswordDialogFragment addHint(int hint) {
+        if (mHintStringResList == null) {
+            mHintStringResList = new ArrayList<>();
+            mEditTextList = new ArrayList<>();
+        }
+        mHintStringResList.add(hint);
+        return this;
+    }
+
+
+    public PasswordDialogFragment setTitle(int res) {
+        this.mTitleRes = res;
+        return this;
+    }
+
+    public void showTips(int i) {
+        if (mErrorMsgResList != null && i < mErrorMsgResList.size()) {
+            mBinding.tvTips.setText(mErrorMsgResList.get(i));
+        }
+        mBinding.btnYes.setEnabled(false);
+    }
+
+    public void hideTips() {
+        try {
+            mBinding.tvTips.setText(null);
+            mBinding.btnYes.setEnabled(true);
+        } catch (Exception e) {
+
+        }
+    }
+
+
     @Override
-    public void onCancel(DialogInterface dialog) {
-        LogUtil.v(TAG, "onCancle()");
-        listener.onCancle();
-        super.onCancel(dialog);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_yes:
+                if (mOnClickListener != null) {
+                    int count = mEditTextList.size();
+                    switch (count) {
+                        case 1:
+                            mOnClickListener.isVaildPassword();
+                            break;
+                        case 2:
+                            mViewModel.setPassword(mEditTextList.get(0).getText().toString());
+                            mOnClickListener.updatePassword(mEditTextList.get(0).getText().toString());
+                            break;
+                        case 3:
+                            mViewModel.setPassword(mEditTextList.get(0).getText().toString());
+                            mOnClickListener.updatePassword(mEditTextList.get(1).getText().toString());
+                            break;
+                    }
+
+                }
+                break;
+            case R.id.btn_no:
+                if (mOnClickListener != null)
+                    mOnClickListener.onCancel();
+                break;
+        }
+        dismiss();
     }
 
+    public interface OnClickListener {
+        void isVaildPassword();
 
-    public PasswordDialogFragment InputPassword() {
+        void updatePassword(String text);
 
-        String title = context.getResources().getString(R.string.psw_input);
-        String et_hint1 = context.getResources().getString(R.string.psw_hints_input);
-
-        String tips_1 = context.getResources().getString(R.string.psw_tips_psw_len);
-        String tips_2 = context.getResources().getString(R.string.psw_tips_psw_err);
-        return this.setTitle(title).addTips(tips_1).addTips(tips_2).addPswEditText(et_hint1);
+        void onCancel();
     }
 
-    public PasswordDialogFragment ChangePassword() {
+    private OnClickListener mOnClickListener;
 
-        String title = context.getResources().getString(R.string.psw_change);
-        String et_hint1 = context.getResources().getString(R.string.psw_hints_change_1);
-        String et_hint2 = context.getResources().getString(R.string.psw_hints_change_2);
-        String et_hint3 = context.getResources().getString(R.string.psw_hints_change_3);
-        String tips_1 = context.getResources().getString(R.string.psw_tips_psw_len);
-        String tips_2 = context.getResources().getString(R.string.psw_tips_psw_unmatch);
-        String tips_3 = context.getResources().getString(R.string.psw_tips_psw_err);
-        return this.setTitle(title).addTips(tips_1).addTips(tips_2).addTips(tips_3).addPswEditText(et_hint1).addPswEditText(et_hint2).addPswEditText(et_hint3);
-    }
-
-
-    public PasswordDialogFragment SetPassword() {
-
-        String title = context.getResources().getString(R.string.psw_set);
-        String et_hint1 = context.getResources().getString(R.string.psw_hints_set_1);
-        String et_hint2 = context.getResources().getString(R.string.psw_hints_set_2);
-        String tips_1 = context.getResources().getString(R.string.psw_tips_psw_len);
-        String tips_2 = context.getResources().getString(R.string.psw_tips_psw_unmatch);
-        return this.setTitle(title).addTips(tips_1).addTips(tips_2).addPswEditText(et_hint1).addPswEditText(et_hint2);
+    public void setOnClickListener(OnClickListener listener) {
+        this.mOnClickListener = listener;
     }
 }

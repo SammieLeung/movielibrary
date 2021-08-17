@@ -44,8 +44,8 @@ public class CustomSelectorDialogFragment extends DialogFragment {
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
         view = inflater.inflate(R.layout.component_button_list_dialog_fragment,null);
-        contentPanel = (LinearLayout) view.findViewById(R.id.contentPanel);
-        TextView titleView = (TextView) view.findViewById(R.id.title);
+        contentPanel = (LinearLayout) view.findViewById(R.id.view_content);
+        TextView titleView = (TextView) view.findViewById(R.id.tv_title);
         titleView.setText(title);
         List<String> list = getArguments().getStringArrayList("text");
         if (list != null) {

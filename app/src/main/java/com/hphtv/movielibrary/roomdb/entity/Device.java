@@ -15,20 +15,19 @@ import java.util.UUID;
  * date:  2021/5/20
  */
 
-@Entity(tableName = TABLE.DEVICE)
+@Entity(tableName = TABLE.DEVICE,indices = {@Index(value = {"path"},unique = true)})
 public class Device {
 
     @PrimaryKey
     @NonNull
+    @ColumnInfo(name = "id")
     public String id = UUID.randomUUID().toString();
     @ColumnInfo(name = "name")
     public String name;
     @ColumnInfo(name = "type")
     public int type;
-    @ColumnInfo(name = "local_path")
-    public String localPath;
-    @ColumnInfo(name = "network_path")
-    public String networkPath;
+    @ColumnInfo(name = "path")
+    public String path;
     @ColumnInfo(name = "connect_state")
     public int connectState;
     @ColumnInfo(name = "file_count")

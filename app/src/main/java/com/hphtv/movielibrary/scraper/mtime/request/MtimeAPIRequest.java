@@ -19,8 +19,8 @@ public interface MtimeAPIRequest {
     @GET("mtime-search/search/unionSearch?pageSize=20&searchType=0&locationId=290")
     Call<MtimeUnionSearchRespone> unioSearch(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex);
 
-    @GET("mtime-search/search/unionSearch?pageSize=20&searchType=0&locationId=290")
-    Observable<MtimeUnionSearchRespone> unionSearchRx(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex);
+    @GET("mtime-search/search/unionSearch?searchType=0")
+    Observable<MtimeUnionSearchRespone> unionSearchRx(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex,@Query("pageSize") int pageSize);
 
     @GET("mtime-search/search/unionSearch?searchType=0&locationId=290")
     Single<MtimeUnionSearchRespone> unionSearchSingleRx(@Query("keyword") String keyword, @Query("pageIndex") int pageIndex,@Query("pageSize") int pageSize);

@@ -12,8 +12,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.firelfy.util.LogUtil;
-import com.firelfy.util.SharePreferencesTools;
+import com.station.kit.util.LogUtil;
+import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.sqlite.bean.Favorite;
 import com.hphtv.movielibrary.sqlite.bean.History;
@@ -163,7 +163,7 @@ public class DeviceControlService extends Service {
                 mHistoryDao.insert(contentValues);
             }
         }
-        VideoPlayTools.play(this, file);
+        VideoPlayTools.play(this, file.getUri(),file.getFilename());
     }
 
     private synchronized boolean setFavorite(long id, int isFavorite) {

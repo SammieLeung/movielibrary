@@ -7,6 +7,7 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.annotations.Until;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
 import java.io.Serializable;
@@ -52,6 +53,9 @@ public class Movie  implements Serializable {
 
     @Ignore
     public String tag;
+    @Ignore
+    public String tag2;
+
     @Override
     public String toString() {
         return "Movie{" +

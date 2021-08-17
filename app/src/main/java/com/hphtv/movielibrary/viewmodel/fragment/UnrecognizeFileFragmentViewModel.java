@@ -1,18 +1,14 @@
 package com.hphtv.movielibrary.viewmodel.fragment;
 
 import android.app.Application;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
-import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
-import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -56,7 +52,7 @@ public class UnrecognizeFileFragmentViewModel extends AndroidViewModel {
     }
 
     public interface Callback {
-        public void runOnUIThread(List<UnrecognizedFileDataView> unrecognizedFileDataViewList);
+         void runOnUIThread(List<UnrecognizedFileDataView> unrecognizedFileDataViewList);
     }
 
 }

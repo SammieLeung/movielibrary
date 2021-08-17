@@ -3,7 +3,7 @@ package com.hphtv.movielibrary.util;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
-import com.firelfy.util.LogUtil;
+import com.station.kit.util.LogUtil;
 
 import java.util.HashMap;
 

@@ -37,16 +37,16 @@ public class RecyclerViewWithMouseScroll extends RecyclerView {
                 if (vscroll != 0) {
                     final int delta = -1
                             * (int) (vscroll * mVerticalScrollFactor);
-                    Log.v(TAG, "onGenericMotionEvent()==>");
-                    if (ViewCompat
-                            .canScrollVertically(this, delta > 0 ? 1 : -1)) {
-                        scrollBy(0, delta);
+//                    Log.v(TAG, "onGenericMotionEvent()==>");
+
+                    if (canScrollVertically(delta > 0 ? 1 : -1)) {
+                        smoothScrollBy(0, delta);
                         Log.v(TAG, "canScrollVertically");
                         return true;
 
-                    } else if (ViewCompat.canScrollHorizontally(this, delta > 0 ? 1 : -1)) {
+                    } else if (canScrollHorizontally( delta > 0 ? 1 : -1)) {
                         Log.v(TAG, "canScrollHorizontally");
-                        scrollBy(delta * 2, 0);
+                        smoothScrollBy(delta * 2, 0);
                         return true;
                     }
                 }

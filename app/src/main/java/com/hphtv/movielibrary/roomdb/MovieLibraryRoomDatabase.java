@@ -2,9 +2,12 @@ package com.hphtv.movielibrary.roomdb;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -24,18 +27,18 @@ import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.MovieActorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.MovieDirectorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieGenreCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieVideoFileCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
-import com.hphtv.movielibrary.roomdb.entity.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
-import org.fourthline.cling.support.model.container.MovieGenre;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * author: Sam Leung
@@ -44,7 +47,7 @@ import org.fourthline.cling.support.model.container.MovieGenre;
 
 @Database(entities = {Actor.class, Device.class, Director.class, Genre.class, Movie.class, MovieActorCrossRef.class,
         MovieDirectorCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
-        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class}, views = {MovieDataView.class, UnrecognizedFileDataView.class}, version = 2)
+        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class}, views = {MovieDataView.class, UnrecognizedFileDataView.class}, version = 1)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO
@@ -81,6 +84,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                     sInstance = Room.databaseBuilder(
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
+//                            .createFromAsset("database/moviedb_v2_version_1.db")
+//                            .addMigrations(MIGRATION_1_2,MIGRATION_2_3)
                             .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -88,5 +93,19 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         }
         return sInstance;
     }
+
+    static final Migration MIGRATION_1_2=new Migration(1,2) {
+        @Override
+        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE UNIQUE INDEX `index_scan_directory_path` ON `scan_directory` (`path`)");
+        }
+    };
+
+    static final Migration MIGRATION_2_3=new Migration(2,3) {
+        @Override
+        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE `videofile` ADD COLUMN `dir_path` TEXT");
+        }
+    };
 
 }

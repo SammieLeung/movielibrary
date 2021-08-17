@@ -14,6 +14,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.MovieTrailerItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.util.GlideTools;
 
 import java.util.List;
 
@@ -53,8 +54,9 @@ public class MovieTrailerAdapter extends
         }
         Trailer trailer = list.get(position);
         viewHolder.mTrailerItemBinding.tvTitle.setText(trailer.title);
-            Glide.with(context).load(trailer.img)
-                    .apply(RequestOptions.placeholderOf(R.mipmap.ic_poster_default)).into(viewHolder.mTrailerItemBinding.ivPhoto);
+
+        GlideTools.GlideWrapper(context,trailer.img)
+                .into(viewHolder.mTrailerItemBinding.ivPhoto);
 
         //将数据保存在itemView的Tag中，以便点击时进行获取
         viewHolder.itemView.setTag(list.get(position));
@@ -65,6 +67,10 @@ public class MovieTrailerAdapter extends
     @Override
     public int getItemCount() {
         return mIsNotLoop ? list.size() : Integer.MAX_VALUE;
+    }
+
+    public int getRealItemCount(){
+        return list.size();
     }
 
     // 自定义的ViewHolder，持有每个Item的的所有界面元素
@@ -79,6 +85,7 @@ public class MovieTrailerAdapter extends
 
 
     public void addItems(List<Trailer> list) {
+        this.list.clear();
         if(list!=null) {
             this.list.addAll(list);
             notifyDataSetChanged();
@@ -89,13 +96,6 @@ public class MovieTrailerAdapter extends
     @Override
     public long getItemId(int position) {
         return super.getItemId(position);
-    }
-
-    public void removeAll() {
-        int size = list.size();
-        list.clear();
-        notifyItemRangeRemoved(0, size);
-
     }
 
     public interface OnRecyclerViewItemClickListener {

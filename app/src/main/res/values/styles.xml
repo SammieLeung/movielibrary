@@ -10,8 +10,6 @@
 
     <style name="star" parent="@android:style/Widget.Holo.RatingBar.Indicator">
         <item name="android:progressDrawable">@drawable/ly_star</item>
-        <item name="android:maxHeight">24dp</item>
-        <item name="android:minHeight">24dp</item>
     </style>
     <style name="star2" parent="@android:style/Widget.Holo.RatingBar.Indicator">
         <item name="android:progressDrawable">@drawable/ly_star_s</item>
@@ -49,11 +47,7 @@
     <declare-styleable name="FloatKeyboard">
         <attr name="offsetDis" format="dimension" />
     </declare-styleable>
-    <style name="RadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:button">@null</item>
-        <item name="android:background">@drawable/st_radio_btn_1</item>
-    </style>
-    
+
     <style name="Theme.Transparent" parent="Theme.AppCompat.Dialog">
         <item name="android:windowIsTranslucent">true</item>//此对话框的背景
         <item name="android:windowBackground">@android:color/transparent</item>//对话框是否透明
@@ -77,5 +71,17 @@
         <item name="android:textColor">@color/selector_category_text</item>
         <item name="android:textSize">18.6sp</item>
         <item name="dtbDrawableTopSize">46dp</item>
+    </style>
+
+    <style name="foler_dialog_title">
+        <item name="android:layout_width">@dimen/folder_dialog_title_label_w</item>
+        <item name="android:layout_height">@dimen/folder_dialog_title_label_h</item>
+        <item name="android:textSize">@dimen/folder_dialog_textsize</item>
+        <item name="android:layout_marginTop">@dimen/folder_dialog_padding_x2</item>
+    </style>
+
+    <style name="folder_item_text">
+        <item name="android:textSize">@dimen/folder_dialog_item_textsize</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 </resources>

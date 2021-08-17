@@ -20,9 +20,10 @@ import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.firelfy.util.LogUtil;
+import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.viewmodel.DeviceMonitorViewModel;
+import com.station.kit.util.StorageHelper;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -39,6 +40,10 @@ public class DeviceMonitorService extends Service {
     private DeviceMonitorViewModel mDeviceMonitorViewModel;
     private StorageManager mStorageManager;
     private MovieScanService2 mMovieScanService;
+    /**
+     * 处理Android 11设备挂载/卸载回调
+     */
+    Object mStorageVolumeCallback;
 
     /**
      * 1.监听设备挂载广播
@@ -47,7 +52,7 @@ public class DeviceMonitorService extends Service {
      */
     @Override
     public void onCreate() {
-        LogUtil.v(TAG,"OnCreate");
+        LogUtil.v(TAG, "OnCreate");
         super.onCreate();
         mDeviceMonitorViewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication()).create(DeviceMonitorViewModel.class);
         bindRegisterReceivers();
@@ -58,7 +63,7 @@ public class DeviceMonitorService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        LogUtil.v(TAG,"onBind");
+        LogUtil.v(TAG, "onBind");
         if (mBinder == null)
             mBinder = new MonitorBinder();
         return mBinder;
@@ -67,7 +72,7 @@ public class DeviceMonitorService extends Service {
 
     @Override
     public void onDestroy() {
-        LogUtil.v(TAG,"onDestroy");
+        LogUtil.v(TAG, "onDestroy");
         super.onDestroy();
         unRegisterReceivers();
         unbindServices();
@@ -88,7 +93,7 @@ public class DeviceMonitorService extends Service {
      */
     private void bindRegisterReceivers() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            mStorageVolumeCallback=new StorageManager.StorageVolumeCallback() {
+            mStorageVolumeCallback = new StorageManager.StorageVolumeCallback() {
                 @Override
                 public void onStateChanged(@NonNull StorageVolume volume) {
                     super.onStateChanged(volume);
@@ -125,6 +130,7 @@ public class DeviceMonitorService extends Service {
         IntentFilter localFilter = new IntentFilter();
         localFilter.addAction(ConstData.BroadCastMsg.DEVICE_UP);
         localFilter.addAction(ConstData.BroadCastMsg.DEVICE_DOWN);
+        localFilter.addAction(ConstData.BroadCastMsg.RESCAN_DEVICE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
     }
 
@@ -176,19 +182,17 @@ public class DeviceMonitorService extends Service {
                 //本地广播
                 case ConstData.BroadCastMsg.DEVICE_UP:
                     String mountPath = intent.getStringExtra(ConstData.DeviceMountMsg.DEVICE_MOUNT_PATH);
-                    LogUtil.v("currentPath="+mountPath);
+                    LogUtil.v("currentPath=" + mountPath);
                     mDeviceMonitorViewModel.startScanWithNotScannedFiles(mMovieScanService, mountPath);
                     break;
                 case ConstData.BroadCastMsg.DEVICE_DOWN:
                     break;
+                case ConstData.BroadCastMsg.RESCAN_DEVICE:
+                  mDeviceMonitorViewModel.reScanDevices();
+                    break;
             }
         }
     };
-
-    /**
-     * 处理Android 11设备挂载/卸载回调
-     */
-            Object mStorageVolumeCallback;
 
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -202,7 +206,6 @@ public class DeviceMonitorService extends Service {
 
         }
     };
-
 
     public class MonitorBinder extends Binder {
         public DeviceMonitorService getService() {

@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
-import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +80,7 @@ public class HomePageFragementViewModel extends AndroidViewModel {
                         genre = mGenre;
 
                     int sortType = mSortType;
-                    List<MovieDataView> list = mMovieDao.queryMoiveDataView(device_id, year, genre, sortType, isDesc);
+                    List<MovieDataView> list = mMovieDao.queryMovieDataView(device_id, year, genre, sortType, isDesc);
                     return list;
                 })
                 .observeOn(AndroidSchedulers.mainThread())

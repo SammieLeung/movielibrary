@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -21,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.MovieLibraryAdapter;
+import com.hphtv.movielibrary.activity.AppBaseActivity;
 import com.hphtv.movielibrary.data.ConstData;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,30 +37,25 @@ import java.lang.reflect.Type;
 public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends Fragment {
     protected VDB mBinding;
     protected VM mViewModel;
+    protected int mColums = 6;
 
-
-    protected int mColums = 8;
     protected Handler mHandler = new Handler(Looper.getMainLooper());
-    protected ActivityResultLauncher mActivityResultLauncher;
-    protected int mPosition=0;
+    private ActivityResultLauncher mActivityResultLauncher;
+    protected int mPosition = 0;
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle=getArguments();
-        if(bundle!=null){
-            mPosition=bundle.getInt(ConstData.IntentKey.KEY_CUR_FRAGMENT,0);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            mPosition = bundle.getInt(ConstData.IntentKey.KEY_CUR_FRAGMENT, 0);
         }
-        ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
-        mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
-            Log.v(getClass().getSimpleName(),"onActivityResult resultCode=" + result.getResultCode());
-        });
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        mBinding= DataBindingUtil.inflate(inflater,R.layout.f_layout_favorite,container,false);
+        mBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
         return mBinding.getRoot();
     }
 
@@ -69,16 +65,44 @@ public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends View
         mBinding.setLifecycleOwner(this);
         createAndroidViewModel();
         onViewCreated();
+        registerForActivityResult();
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
     }
+
+    private void registerForActivityResult() {
+        ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
+        mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
+            Log.v(BaseFragment.this.getClass().getSimpleName(), "onActivityResult resultCode=" + result.getResultCode());
+            onActivityResultCallback(result);
+        });
+    }
+
+
+    protected int getLayoutId(){
+        return R.layout.f_layout_movie;
+    }
     /**
      * 处理onCreate()
      */
     protected abstract void onViewCreated();
+
+    protected void onActivityResultCallback(ActivityResult result) {
+    }
+
+    //以前的startActivityForResult
+    protected void startActivityForResult(Intent intent) {
+        mActivityResultLauncher.launch(intent);
+    }
+
+    protected void startActivityForResultFromParent(Intent intent) {
+        if(getAppBaseActivity()!=null)
+            getAppBaseActivity().startActivityForResult(intent);
+    }
 
     private void createAndroidViewModel() {
         if (mViewModel == null) {
@@ -90,21 +114,29 @@ public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends View
                 //如果没有指定泛型参数，则默认使用BaseViewModel
                 modelClass = AndroidViewModel.class;
             }
-            mViewModel = (VM)   new ViewModelProvider.AndroidViewModelFactory(getActivity().getApplication()).create(modelClass);
+            mViewModel = (VM) new ViewModelProvider.AndroidViewModelFactory(getActivity().getApplication()).create(modelClass);
         }
     }
 
-    protected void notifyStartLoading(){
-        Intent intent=new Intent();
+    protected void notifyStartLoading() {
+        Intent intent = new Intent();
         intent.setAction(ConstData.BroadCastMsg.START_LOADING);
-        intent.putExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT,mPosition);
+        intent.putExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, mPosition);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
-    protected void notifyStopLoading(){
-        Intent intent=new Intent();
-        intent.setAction(ConstData.BroadCastMsg.STOP_LOADING);
-        intent.putExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT,mPosition);
-        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+    protected void notifyStopLoading() {
+        getAppBaseActivity().stopLoading();
+//        Intent intent = new Intent();
+//        intent.setAction(ConstData.BroadCastMsg.STOP_LOADING);
+//        intent.putExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, mPosition);
+//        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+    }
+
+    protected AppBaseActivity getAppBaseActivity() {
+        if (getActivity() instanceof AppBaseActivity) {
+            return (AppBaseActivity) getActivity();
+        }
+        return null;
     }
 }

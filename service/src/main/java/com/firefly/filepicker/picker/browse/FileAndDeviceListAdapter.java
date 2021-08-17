@@ -21,8 +21,6 @@ import org.fourthline.cling.support.model.item.Item;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -192,7 +190,7 @@ public class FileAndDeviceListAdapter
             super(itemView);
 
             mIcon = (ImageView) itemView.findViewById(R.id.icon);
-            mTitle = (TextView) itemView.findViewById(R.id.title);
+            mTitle = (TextView) itemView.findViewById(R.id.tv_title);
             mDate = (TextView) itemView.findViewById(R.id.date);
             itemView.setOnHoverListener(new View.OnHoverListener() {
                 @Override

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@drawable/background_corners"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btn_exit"
+            android:layout_width="@dimen/folder_dialog_folderitem_button_w"
+            android:layout_height="@dimen/folder_dialog_folderitem_button_h"
+            android:layout_marginBottom="@dimen/folder_dialog_padding"
+            android:text="@string/btn_exit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="@id/rv_hidden_folder" />
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/rv_hidden_folder"
+            app:layout_constraintLeft_toLeftOf="@id/rv_hidden_folder"
+            app:layout_constraintRight_toRightOf="@id/rv_hidden_folder"
+            app:layout_constraintTop_toTopOf="@id/rv_hidden_folder">
+
+            <Button
+                android:id="@+id/btn_show_hidden"
+                android:visibility="@{show_hidden?View.GONE:View.VISIBLE}"
+                android:layout_width="@dimen/folder_dialog_folderitem_button_w"
+                android:layout_height="@dimen/folder_dialog_folderitem_button_h"
+                android:layout_centerInParent="true"
+                android:text="@string/btn_show_hidden_folder" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_added"
+            style="@style/foler_dialog_title"
+            android:text="@string/folder_dialog_title_added_folder"
+            app:layout_constraintLeft_toLeftOf="@id/rv_added_folders"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_hidden"
+            style="@style/foler_dialog_title"
+            android:text="@string/folder_dialog_title_hidden_folder"
+            app:layout_constraintLeft_toLeftOf="@id/rv_hidden_folder"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_added_folders"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/folder_dialog_padding_x2"
+            android:layout_marginRight="@dimen/folder_dialog_padding"
+            android:layout_marginBottom="@dimen/folder_dialog_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_exit"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/rv_hidden_folder"
+            app:layout_constraintTop_toBottomOf="@id/tv_added" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:visibility="@{show_hidden?View.VISIBLE:View.INVISIBLE}"
+            android:id="@+id/rv_hidden_folder"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/folder_dialog_padding"
+            android:layout_marginRight="@dimen/folder_dialog_padding_x2"
+            android:layout_marginBottom="@dimen/folder_dialog_padding"
+            app:layout_constraintBottom_toTopOf="@id/btn_exit"
+            app:layout_constraintLeft_toRightOf="@id/rv_added_folders"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_hidden"
+            app:layout_constraintWidth_percent="0.45" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="show_hidden"
+            type="Boolean"></variable>
+    </data>
+
+</layout>

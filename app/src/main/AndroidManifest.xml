@@ -42,7 +42,6 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MovieSearchResultActivity"></activity>
 
 
         <service android:name=".service.MovieScanService"></service>
@@ -65,10 +64,7 @@
             </intent-filter>
         </receiver>
 
-        <activity
-            android:name=".activity.FolderManagerActivity"
-            android:theme="@style/Theme.Transparent"></activity>
-        <activity android:name=".activity.MovieSearchActivity"></activity>
+        <activity android:name=".activity.PinyinSearchActivity"></activity>
 
         <meta-data
             android:name="UMENG_APPKEY"

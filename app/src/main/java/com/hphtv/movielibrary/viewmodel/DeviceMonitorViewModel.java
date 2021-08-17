@@ -7,8 +7,10 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.firelfy.util.LogUtil;
-import com.firelfy.util.StorageHelper;
+import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
+import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
+import com.station.kit.util.LogUtil;
+import com.station.kit.util.StorageHelper;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -33,7 +35,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -54,6 +58,7 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
 
     private DeviceDao mDeviceDao;
     private VideoFileDao mVideoFileDao;
+    private ScanDirectoryDao mScanDirectoryDao;
     private int mScanFlag = 0;
 
     public DeviceMonitorViewModel(@NonNull @NotNull Application application) {
@@ -69,6 +74,7 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
         MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
         mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
         mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
+        mScanDirectoryDao = movieLibraryRoomDatabase.getScanDirectoryDao();
     }
 
     //初始化线程池
@@ -93,6 +99,11 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
         }
     }
 
+    public void reScanDevices(){
+        mScanFlag=0;
+        scanDevices();
+    }
+
     /**
      * 设备挂载处理线程
      *
@@ -107,13 +118,17 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
         mDeviceMountExecutor.execute(new DeviceMountThread(deviceName, deviceType, localPath, isFromNetwork, networkPath, mountState));
     }
 
+    public Future<Boolean> executeOnFileScanThread(Device device) {
+        return mFileScanExecutor.submit(new FileScanThread(getApplication(), device));
+    }
+
     public void startScanWithNotScannedFiles(MovieScanService2 scanService, String mountPath) {
         Observable.just(mountPath)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(Schedulers.from(mSingleThreadPool))
                 .map(mount_path -> {
                     Device device = mDeviceDao.querybyMountPath(mount_path);
-                    if(device!=null) {
+                    if (device != null) {
                         List<VideoFile> videoFiles = getNotScannedFiles(device);
                         return videoFiles;
                     }
@@ -190,8 +205,9 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
 
                 broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_UP);
                 broadIntent.putExtra(ConstData.DeviceMountMsg.DEVICE_ID, device.id);
+
                 //启动文件扫描线程。
-                Future<Boolean> scan = mFileScanExecutor.submit(new FileScanThread(getApplication(), device));
+                Future<Boolean> scan = executeOnFileScanThread(device);
                 try {
                     if (scan.get()) {
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(broadIntent);
@@ -206,11 +222,11 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
                 broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_DOWN);
                 LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(broadIntent);
             }
+            LogUtil.v("mount " + mDeviceName + " finish");
 
         }
 
         /**
-         *
          * @param mountPath
          * @param netWorkPath
          * @param deviceType
@@ -222,9 +238,8 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
             File file = new File(mountPath);
             if (!file.exists())//不是本地挂载设备返回null
                 return null;
-            device.localPath = mountPath;
+            device.path = mountPath;
             device.name = name;
-            device.networkPath = netWorkPath;
 
             //获取设备具体类型
             if (deviceType == ConstData.DeviceType.DEVICE_TYPE_LOCAL) {

@@ -1,21 +1,16 @@
 package com.hphtv.movielibrary.viewmodel;
 
 import android.app.Application;
-import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
-import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
-import com.hphtv.movielibrary.roomdb.entity.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.service.MovieScanService2;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +22,6 @@ import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -46,14 +40,7 @@ public class HomepageViewModel extends AndroidViewModel {
 
     private List<Device> mConditionDevices = new ArrayList<>();
 
-
-
-//
-//    private Device mDevice;
-//    private String mYear;
-//    private String mGenre;
-//    private int mSortType;
-//    private boolean isDesc = false;
+    private MutableLiveData<Integer> mCurrentFragmentPos=new MutableLiveData<>();
 
     public HomepageViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -134,50 +121,11 @@ public class HomepageViewModel extends AndroidViewModel {
     }
 
 
-//    public void prepareMovies(Device device, String year, String genre, int sortType, boolean isDesc, Callback callback) {
-//        mDevice = device;
-//        mYear = year;
-//        mGenre = genre;
-//        mSortType = sortType;
-//        this.isDesc = isDesc;
-//        prepareMovies(callback);
-//    }
-//
-//    public void prepareMovies(Callback callback) {
-//        Observable.just(GET_HOMEPAGE_MOVIE)
-//                .subscribeOn(Schedulers.from(mSingleThreadPool))
-//                .map(s -> {
-//                    String device_id = null;
-//                    String year = null;
-//                    String genre = null;
-//                    if (mDevice != null)
-//                        device_id = mDevice.id;
-//                    if (!TextUtils.isEmpty(mYear))
-//                        year = mYear;
-//                    if (!TextUtils.isEmpty(mGenre))
-//                        genre = mGenre;
-//
-//                    int sortType = mSortType;
-//                    List<MovieDataView> list = mMovieDao.queryMoiveDataView(device_id, year, genre, sortType, isDesc);
-//                    return list;
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-//                    @Override
-//                    public void onAction(List<MovieDataView> movieDataViews) {
-//                        callback.runOnUIThread(movieDataViews);
-//                    }
-//                });
-//    }
 
 
 
     public static final String GET_NOT_SCAN_VIDEOFILES = "get_not_scan_videofiles";
     public static final String PREPARE_CONDITIONS = "prepare_conditions";
-
-    public static final String GET_NOT_SCANNED_VIDEOFILE = "event2";
-    public static final String GET_HOMEPAGE_MOVIE = "event4";
-
 
 
     public List<String> getConditionGenres() {
@@ -190,6 +138,10 @@ public class HomepageViewModel extends AndroidViewModel {
 
     public List<Device> getConditionDevices() {
         return mConditionDevices;
+    }
+
+    public MutableLiveData<Integer> getCurrentFragmentPos() {
+        return mCurrentFragmentPos;
     }
 
     public interface Callback {

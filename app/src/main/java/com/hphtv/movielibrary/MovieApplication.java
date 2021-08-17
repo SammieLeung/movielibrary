@@ -3,41 +3,38 @@ package com.hphtv.movielibrary;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Intent;
-import android.webkit.WebView;
 
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.util.DoubanMovieSearchHelper;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.umeng.analytics.MobclickAgent;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MovieApplication extends Application {
     public static final boolean DEBUG = true;
     public static final String TAG = MovieApplication.class.getSimpleName();
     private boolean isShowEncrypted = false;
-    private DoubanMovieSearchHelper helper;
-    private WebView webview;
-    private String cachePath;
-    private static final String APP_CACHE_DIRNAME = "/webcache";
-    private List<Activity> activitys = new LinkedList<Activity>();
     private static MovieApplication sMovieApplication;
     @Override
     public void onCreate() {
         super.onCreate();
         sMovieApplication =this;
-        webview = new WebView(MovieApplication.this);
-        cachePath = getFilesDir().getAbsolutePath()
-                + APP_CACHE_DIRNAME;
-        helper = DoubanMovieSearchHelper.getInstance();
-        helper.setContext(sMovieApplication);
-        helper.setmWebview(webview);
-        //开启数据缓存
-        helper.initWebView(true, cachePath);
+        init();
+    }
+
+    private void init(){
         //友盟统计
-        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
-        Intent service=new Intent(this, DeviceMonitorService.class);
+        MobclickAgent.setScenarioType(sMovieApplication, MobclickAgent.EScenarioType.E_UM_NORMAL);
+        Intent service=new Intent(sMovieApplication, DeviceMonitorService.class);
         startService(service);
     }
 
@@ -47,44 +44,6 @@ public class MovieApplication extends Application {
         RxJavaGcManager.getInstance().clearDisposable();
     }
 
-    public DoubanMovieSearchHelper getSearchHelper() {
-        return helper;
-    }
-
-    // 添加Activity到容器中
-    public void addActivity(Activity activity) {
-        if (activitys != null && activitys.size() > 0) {
-            if (!activitys.contains(activity)) {
-                activitys.add(activity);
-            }
-        } else {
-            activitys.add(activity);
-        }
-    }
-
-    public void removeActivity(Activity activity) {
-        if (activitys != null && activitys.size() > 0) {
-            if (activitys.contains(activity)) {
-                activitys.remove(activity);
-            }
-        }
-    }
-
-
-
-    // 遍历所有Activity并finish
-    public void exit() {
-        if (activitys != null && activitys.size() > 0) {
-            for (Activity activity : activitys) {
-                activity.finish();
-            }
-        }
-        System.exit(0);
-    }
-
-    public void moveToBack(Activity context) {
-        context.moveTaskToBack(true);
-    }
 
     public boolean isShowEncrypted() {
         return isShowEncrypted;

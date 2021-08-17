@@ -24,7 +24,7 @@
 
 
             <RelativeLayout
-                android:id="@+id/contentPanel"
+                android:id="@+id/view_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/c60000000">

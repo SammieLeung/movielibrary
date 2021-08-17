@@ -9,22 +9,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConstData {
 
-    public static final String AUTHORITIES = "com.hphtv.movielibrary.fileprovider";
+    public static final long GLIDE_CACHE_VERSION = System.currentTimeMillis() / 86400000;
+    ;
     /**
      * 设备路径与id映射
      */
-    public static final ConcurrentHashMap<String,Object> devicePathIDs=new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, Object> devicePathIDs = new ConcurrentHashMap<>();
 
     //--------------HashMap keys------------
     //1.for LeftMenuListAdapter and HomePageActivity
     public static final String ICON = "left_menu_icon";
     public static final String TEXT = "left_menu_text";
-
-
-    //2.--------------for Device--------------
-    //2.1 Device Api
-    public static final String LOCAL = "local";
-
 
     //3.--------------for DirectoryManagerAdapter--------------
     //3.1 for HashMap key
@@ -32,7 +27,7 @@ public class ConstData {
      * 设备对象
      */
     public static final String DEVICE = "device";
-    public static final String DIRECTORY="directory";
+    public static final String DIRECTORY = "directory";
     /**
      * 设备是否被选择
      */
@@ -59,15 +54,14 @@ public class ConstData {
      * 搜刮器
      */
     public interface Scraper {
-        int UNKNOW=-1;
-        int DOUBAN = 0;
-        int IMDB = 1;
+        int UNKNOW = -1;
         int MTIME = 2;
+        int OMDB = 3;
     }
 
-    public interface ScraperSource{
-        String MTIME="mtime";
-        String OMDB="omdb";
+    public interface ScraperSource {
+        String MTIME = "mtime";
+        String OMDB = "omdb";
     }
 
     public interface DirectoryState {
@@ -79,10 +73,11 @@ public class ConstData {
         int UNSCAN = 2;
     }
 
-    public interface VideoFile{
-        int IS_MATCHED=1;
-        int UN_MATCHED=0;
+    public interface VideoFile {
+        int IS_MATCHED = 1;
+        int UN_MATCHED = 0;
     }
+
     /**
      * 设备连接状态
      */
@@ -116,14 +111,14 @@ public class ConstData {
         /**
          * pcie
          */
-        int DEVICE_TYPE_PCIE=4;
+        int DEVICE_TYPE_PCIE = 4;
         /**
          * hardDisk
          */
-        int DEVICE_TYPE_HARD_DISK=5;
+        int DEVICE_TYPE_HARD_DISK = 5;
 
         int DEVICE_TYPE_DLNA = 6;
-        int DEVICE_TYPE_SMB =7;
+        int DEVICE_TYPE_SMB = 7;
     }
 
     public interface EncryptState {
@@ -175,35 +170,19 @@ public class ConstData {
         /*只查看电影信息但不保存*/
         int MODE_OUTSIDE = 2;
         /*通过MovieWrapper打开*/
-        int MODE_WRAPPER=4;
-        int MODE_UNRECOGNIZEDFILE=5;
-    }
-
-    //6. --------------for movie and videofile-------------
-    public interface MapKey {
-        String KEY_MOVIE = "movie";
-        String KEY_VIDEOFILE = "videofile";
-        String KEY_TITLE = "title";
-        String KEY_SUBTYPE = "subtype";
-
-        String KEY_DEVICE_LIST = "key_devcie_list";
-
-        //MovieScanService FileInfo
-        String KEY_MNI = "key_mni";
-        String KEY_FILE = "key_video_file";
-        String KEY_PHRASENAME = "key_phrase_name";
-
+        int MODE_WRAPPER = 4;
+        int MODE_UNRECOGNIZEDFILE = 5;
     }
 
 
     //7.---------------for MovieSearcherHelper -----------
     public interface IntentKey {
-//        String IS_GET_MOVIE_LISTS = "MODE_LIST";
-        String KEY_MODE="mode";
-        String KEY_MOVIE_ID="movie_id";
-        String KEY_UNRECOGNIZE_FILE_KEYWORD="keyword";
+        //        String IS_GET_MOVIE_LISTS = "MODE_LIST";
+        String KEY_MODE = "mode";
+        String KEY_MOVIE_ID = "movie_id";
+        String KEY_UNRECOGNIZE_FILE_KEYWORD = "keyword";
 
-        String KEY_CUR_FRAGMENT="current_fragment";
+        String KEY_CUR_FRAGMENT = "current_fragment";
 
     }
 
@@ -240,22 +219,8 @@ public class ConstData {
         String DEVICE_ID = "device_id";
     }
 
-    public interface MovieSubType {
-        public static final String TV = "tv series";
-        public static final String MOVIE = "movie";
-        public static final String OTHERS = "others";
-        public static final String CHILDREN = "children";
-        public static final String SHOW = "show";
-        public static final String PRIVATE = "private video";
-        public static final String UNMATCHED = "unmatched";
-        public static final String FAVORITE = "favorite";
-        public static final String HISTORY = "history";
-        public static final String ALL = "all";
-    }
-
-
     /*---------------------本地广播-----------------------------*/
-    public static final String ACTION_FAVORITE_MOVIE_CHANGE="action.favorite.movie.change";
+    public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
 
     public interface BroadCastMsg {
         /**
@@ -263,31 +228,33 @@ public class ConstData {
          */
         String DEVICE_UP = "action_mounted";
         String DEVICE_DOWN = "action_unmounted";
+        String FILE_SCAN = "file_scan";
 
         /**
          * 重新扫描设备
          */
-        String RESCAN_DEVICE="com.rockchips.mediacenter.rescan_device";
+        String RESCAN_DEVICE = "com.rockchips.mediacenter.rescan_device";
 
-        String MOVIE_SCRAP_FINISH="action.movie.scrap.finish";
+        String MOVIE_SCRAP_FINISH = "action.movie.scrap.finish";
+        String FOLDER_REFRESH = "action.movie.folder.refresh";
+        String START_LOADING = "action.home.startloading";
+        String STOP_LOADING = "action.home.stoploading";
 
-        String START_LOADING="action.home.startloading";
-        String STOP_LOADING="action.home.stoploading";
 
     }
 
 
     public interface SharePreferenceKeys {
-        String DEVICE="sort_device";
-        String YEAR="sort_year";
-        String GENRE="sort_genre";
-        String SORTTYPE="sort_type";
-        String SORT_BY_DESC="sort_desc";
+        String DEVICE = "sort_device";
+        String YEAR = "sort_year";
+        String GENRE = "sort_genre";
+        String SORTTYPE = "sort_type";
+        String SORT_BY_DESC = "sort_desc";
 
-        String PASSWORD="password";
-        String MOVIE_DB_UPDATE="movie_db_update";
+        String PASSWORD = "password";
+        String MOVIE_DB_UPDATE = "movie_db_update";
 
-        String LAST_POTSER="last_poster";
+        String LAST_POTSER = "last_poster";
     }
 
 }

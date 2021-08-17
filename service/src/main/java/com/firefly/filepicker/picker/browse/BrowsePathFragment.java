@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,17 +27,11 @@ import com.firefly.filepicker.commom.widgets.FPDialog;
 import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.filepicker.data.bean.Node;
 import com.firefly.filepicker.utils.SmbFileHelper;
-import com.firefly.filepicker.utils.StorageHelper;
 import com.firefly.filepicker.utils.Utils;
 
-import org.seamless.util.logging.LoggingUtil;
-
-import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -89,7 +82,7 @@ public class BrowsePathFragment extends Fragment
         mEmptyView = (RelativeLayout) view.findViewById(R.id.empty_view);
 
         if (!TextUtils.isEmpty(mTitle)) {
-            TextView titleView = (TextView) view.findViewById(R.id.title);
+            TextView titleView = (TextView) view.findViewById(R.id.tv_title);
             titleView.setText(mTitle);
         }
 

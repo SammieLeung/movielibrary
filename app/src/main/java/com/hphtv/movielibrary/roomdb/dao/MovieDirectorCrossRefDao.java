@@ -4,10 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 
-import com.hphtv.movielibrary.roomdb.entity.MovieActorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.MovieDirectorCrossRef;
-
-import java.util.List;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 
 /**
  * author: Sam Leung

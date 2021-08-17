@@ -1,123 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fkeyboard="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/c2b323e">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fkeyboard="http://schemas.android.com/apk/res-auto">
 
+    <data>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-        <RelativeLayout
-            android:layout_width="262dp"
-            android:layout_height="match_parent"
-            android:background="@color/c30000000">
-
-
-            <FrameLayout
-                android:layout_width="262dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="120dp">
-
-
-                <RelativeLayout
-                    android:layout_width="209dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="26dp"
-                    android:layout_marginRight="26dp">
-
-                    <EditText
-                        android:id="@+id/et_search"
-                        android:layout_width="match_parent"
-                        android:layout_height="65dp"
-                        android:background="@color/c20000000"
-                        android:hint="@string/tx_search_input_hint"
-                        android:paddingLeft="10dp"
-                        android:paddingRight="10dp"
-                        android:textSize="20sp" />
-
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_kb_t9"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/et_search"
-                        android:layout_marginTop="20dp">
-
-                    </androidx.recyclerview.widget.RecyclerView>
-
-                </RelativeLayout>
-
-
-                <com.hphtv.movielibrary.view.FloatKeyboard
-                    android:id="@+id/float_keboard"
-                    android:layout_width="@dimen/fkeyboard_width"
-                    android:layout_height="@dimen/fkeyboard_width"
-                    android:background="@mipmap/search_pop_win_bg"
-                    fkeyboard:offsetDis="@dimen/fkeyboard_width">
-
-                </com.hphtv.movielibrary.view.FloatKeyboard>
-
-
-            </FrameLayout>
-
-            <ImageButton
-                android:id="@+id/ibtn_back"
-                android:src="@drawable/ic_back"
-                android:background="@drawable/round_button_bg"
-                android:layout_alignParentBottom="true"
-                android:layout_width="100dp"
-                android:layout_margin="26dp"
-                android:layout_height="40dp"></ImageButton>
-        </RelativeLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true">
-
-            <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
-                android:id="@+id/rv_search_movies"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="58dp"
-                android:layout_marginRight="58dp"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
-
-            <TextView
-                android:id="@+id/tv_empty_tips"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/local_search_empty_tips"
-                android:textSize="20sp" />
-        </RelativeLayout>
-
-
-    </LinearLayout>
+    </data>
 
     <RelativeLayout
-        android:id="@+id/ml_head"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_alignParentTop="true"
-        android:paddingLeft="14dp"
-        android:paddingRight="58dp">
+        android:layout_height="match_parent"
+        android:background="@color/c2b323e">
 
-        <TextView
-            android:id="@+id/lb_title"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:gravity="center_vertical"
-            android:text="@string/tx_search"
-            android:textColor="@color/tx_E0E0E0"
-            android:textSize="30sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
 
+            <RelativeLayout
+                android:layout_width="262dp"
+                android:layout_height="match_parent"
+                android:background="@color/c30000000">
+
+
+                <FrameLayout
+                    android:id="@+id/view_t9_group"
+                    android:layout_width="262dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="120dp">
+
+
+                    <RelativeLayout
+                        android:id="@+id/view_inputgroup"
+                        android:layout_width="209dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="26dp"
+                        android:layout_marginRight="26dp">
+
+                        <EditText
+                            android:id="@+id/et_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="65dp"
+                            android:focusable="false"
+                            android:enabled="false"
+                            android:background="@color/c20000000"
+                            android:hint="@string/tx_search_input_hint"
+                            android:paddingLeft="10dp"
+                            android:paddingRight="10dp"
+                            android:textSize="20sp" />
+
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_keyboard_t9"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/et_search"
+                            android:layout_marginTop="20dp">
+
+                        </androidx.recyclerview.widget.RecyclerView>
+
+                    </RelativeLayout>
+
+
+                    <com.hphtv.movielibrary.view.FloatKeyboard
+                        android:id="@+id/floatkeyboard"
+                        android:layout_width="@dimen/fkeyboard_width"
+                        android:layout_height="@dimen/fkeyboard_width"
+                        android:visibility="gone"
+                        android:background="@mipmap/search_pop_win_bg"
+                        fkeyboard:offsetDis="@dimen/fkeyboard_width">
+
+                    </com.hphtv.movielibrary.view.FloatKeyboard>
+
+
+                </FrameLayout>
+
+                <ImageButton
+                    android:id="@+id/btn_exit"
+                    android:src="@drawable/ic_back"
+                    android:background="@drawable/round_button_bg"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="100dp"
+                    android:layout_margin="26dp"
+                    android:layout_height="40dp"></ImageButton>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
+
+                <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
+                    android:id="@+id/rv_search_movies"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="58dp"
+                    android:layout_marginRight="58dp"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
+
+                <TextView
+                    android:id="@+id/tv_empty_tips"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/local_search_empty_tips"
+                    android:textSize="20sp" />
+            </RelativeLayout>
+
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/ml_head"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentTop="true"
+            android:paddingLeft="14dp"
+            android:paddingRight="58dp">
+
+            <TextView
+                android:id="@+id/lb_title"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_vertical"
+                android:text="@string/tx_search"
+                android:textColor="@color/tx_E0E0E0"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
     </RelativeLayout>
-</RelativeLayout>
+</layout>

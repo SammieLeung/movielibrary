@@ -1,110 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/view_folder_manager"
+            android:layout_width="384dp"
+            android:layout_height="84dp"
+            android:background="@drawable/st_bg_layout_setting_btn"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+           >
+
+            <ImageView
+                android:id="@+id/img_device_setting"
+                android:layout_marginLeft="@dimen/folder_dialog_padding_x2"
+                android:layout_width="@dimen/folder_dialog_img_w"
+                android:layout_height="@dimen/folder_dialog_img_w"
+                android:layout_centerVertical="true"
+                android:duplicateParentState="true"
+                android:src="@drawable/ic_folder_manager" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/img_device_setting"
+                android:gravity="center"
+                android:text="@string/title_file_manager"
+                android:textColor="@color/tx_fff"
+                android:textSize="28sp"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginTop="@dimen/folder_dialog_padding_x2"
+            android:id="@+id/view_change_password"
+            android:layout_width="384dp"
+            android:layout_height="84dp"
+            android:background="@drawable/st_bg_layout_setting_btn"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <ImageView
+                android:id="@+id/img_change_password"
+                android:layout_marginLeft="@dimen/folder_dialog_padding_x2"
+                android:layout_width="@dimen/folder_dialog_img_w"
+                android:layout_height="@dimen/folder_dialog_img_w"
+                android:layout_centerVertical="true"
+                android:duplicateParentState="true"
+                android:src="@drawable/ic_private_folder" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/img_change_password"
+                android:gravity="center"
+                android:text="@string/title_change_password"
+                android:textColor="@color/tx_fff"
+                android:textSize="28sp"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_marginTop="@dimen/folder_dialog_padding_x2"
+            android:id="@+id/view_version"
+            android:layout_width="384dp"
+            android:layout_height="84dp"
+            android:background="@drawable/st_bg_layout_setting_btn"
+            android:focusable="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <TextView
+                android:id="@+id/tv_label"
+                android:layout_marginLeft="@dimen/folder_dialog_padding_x2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:textColor="@color/tx_fff"
+                android:text="@string/tx_version"
+                android:textSize="28sp"
+                android:src="@drawable/ic_private_folder" />
+
+            <TextView
+                android:id="@+id/tv_version"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toEndOf="@id/tv_label"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:textColor="@color/tx_fff"
+
+                />
+        </RelativeLayout>
 
 
-    <RelativeLayout
+    </LinearLayout>
 
-        android:id="@+id/setting_folder_add"
-        android:layout_width="198dp"
-        android:layout_height="198dp"
-        android:layout_margin="36dp"
+    <data>
 
-        android:background="@drawable/st_bg_layout_setting_btn"
-        android:focusable="true">
-
-
-        <ImageView
-            android:id="@+id/img_folder_add"
-            android:layout_width="96dp"
-            android:layout_height="106dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_add_folder" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="68dp"
-            android:layout_below="@id/img_folder_add"
-            android:gravity="center_horizontal"
-            android:padding="8.5dp"
-            android:text="@string/title_folder_add"
-            android:textColor="@color/tx_fff"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/setting_device_manager"
-        android:layout_width="198dp"
-        android:layout_height="198dp"
-        android:layout_margin="36dp"
-        android:layout_toRightOf="@id/setting_folder_add"
-        android:background="@drawable/st_bg_layout_setting_btn"
-
-        android:focusable="true">
-
-
-        <ImageView
-            android:id="@+id/img_device_setting"
-            android:layout_width="96dp"
-            android:layout_height="106dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_folder_manager" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="68dp"
-            android:layout_below="@id/img_device_setting"
-            android:gravity="center_horizontal"
-            android:padding="8.5dp"
-            android:text="@string/title_file_manager"
-            android:textColor="@color/tx_fff"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-
-    </RelativeLayout>
-
-    <RelativeLayout
-
-        android:id="@+id/private_setting"
-        android:layout_width="198dp"
-        android:layout_height="198dp"
-        android:layout_margin="36dp"
-        android:layout_toRightOf="@id/setting_device_manager"
-        android:background="@drawable/st_bg_layout_setting_btn"
-
-        android:focusable="true">
-
-
-        <ImageView
-            android:id="@+id/img_private_setting"
-            android:layout_width="96dp"
-            android:layout_height="106dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:duplicateParentState="true"
-            android:src="@drawable/ic_private_folder" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="68dp"
-            android:layout_below="@id/img_private_setting"
-            android:gravity="center_horizontal"
-            android:padding="8.5dp"
-            android:text="@string/title_encryption_setting"
-            android:textColor="@color/tx_fff"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
-</RelativeLayout>
+    </data>
+</layout>

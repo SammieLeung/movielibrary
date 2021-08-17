@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="folder"
+            type="String" />
+        <variable
+            name="option"
+            type="boolean" />
+        <variable
+            name="btn_move_text"
+            type="String" />
+    </data>
+
+    <RelativeLayout
+        android:focusable="false"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/folder_dialog_folderitem_h">
+
+        <TextView
+            android:focusable="true"
+            android:id="@+id/tv_folder"
+            style="@style/folder_item_text"
+            android:paddingLeft="@dimen/folder_dialog_padding_x2"
+            android:paddingRight="@dimen/folder_dialog_padding_x2"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:background="@drawable/blue_stroke_select_bg_2"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@id/btn_delete"
+            android:text="@{folder}"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/folder_dialog_folderitem_h">
+
+        </TextView>
+
+        <Button
+            android:id="@+id/btn_delete"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_toStartOf="@id/btn_move"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/folder_item_delete" />
+
+        <Button
+            android:text="@{btn_move_text}"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/btn_move"
+            android:layout_width="0dp"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:layout_height="match_parent" />
+    </RelativeLayout>
+</layout>

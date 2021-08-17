@@ -26,11 +26,16 @@ public class VideoFile implements Serializable {
     public String path;
     @ColumnInfo(name = "device_id")
     public String deviceId;
+    @ColumnInfo(name = "dir_path")
+    public String dirPath;
     public String filename;
     @ColumnInfo(name = "is_scanned")
     public int isScanned;
 
     public String keyword;
+
+    @ColumnInfo(name = "add_time")
+    public long addTime;
 
     @Override
     public String toString() {
@@ -38,9 +43,11 @@ public class VideoFile implements Serializable {
                 "vid=" + vid +
                 ", path='" + path + '\'' +
                 ", deviceId='" + deviceId + '\'' +
+                ", dirPath='" + dirPath + '\'' +
                 ", filename='" + filename + '\'' +
                 ", isScanned=" + isScanned +
                 ", keyword='" + keyword + '\'' +
+                ", addTime=" + addTime +
                 '}';
     }
 }

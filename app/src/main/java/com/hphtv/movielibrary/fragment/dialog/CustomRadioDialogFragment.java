@@ -17,15 +17,14 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 
-import com.firelfy.util.DensityUtil;
+import com.station.kit.util.DensityUtil;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ComponentMyRadioDialogFragmentBinding;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,7 +113,7 @@ public class CustomRadioDialogFragment extends DialogFragment {
         if (!TextUtils.isEmpty(mConfirmText))
             mBinding.btnPlay.setText(mConfirmText);
         if (!TextUtils.isEmpty(mTitle))
-            mBinding.title.setText(mTitle);
+            mBinding.tvTitle.setText(mTitle);
     }
 
 

@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.hphtv.movielibrary.roomdb.entity.MovieWrapper"></import>
+        <import type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper"></import>
         <import type="android.text.TextUtils"/>
         <import type="android.view.View"/>
         <variable
             name="wrapper"
-            type="MovieWrapper" />
+            type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper" />
     </data>
 
     <FrameLayout

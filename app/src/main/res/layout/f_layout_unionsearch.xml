@@ -1,33 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+    <LinearLayout
+        android:id="@+id/rl_search_dialog_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/c2b323e"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="711dp"
+            android:layout_height="wrap_content">
+
+            <Button
+                style="@style/DrawTopButtonStyle"
+                android:id="@+id/btn_search"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="@string/btn_search"
+                android:textAllCaps="false" />
+
+            <EditText
+                android:id="@+id/et_box_name"
+                android:layout_width="match_parent"
+                android:layout_height="38.6dp"
+                android:layout_toLeftOf="@id/btn_search"
+                android:background="@drawable/et_bg"
+                android:hint="@string/hint"
+                android:imeOptions="actionSearch"
+                android:maxLength="100"
+                android:paddingLeft="38.6dp"
+                android:singleLine="true"
+                android:textColor="#dddddd"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="38.6dp"
+                android:scaleType="center"
+                android:src="@mipmap/search" />
+        </RelativeLayout>
+
+
+        <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
+            android:id="@+id/recyclerview_search_result"
+            android:layout_width="711dp"
+            android:layout_height="match_parent"
+            android:layout_below="@id/et_box_name"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
+
+    </LinearLayout>
+
     <data>
 
     </data>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/tv_keyword"
-            android:textSize="30sp"
-            android:gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/fragment_unionsearch_item_h"
-            android:text="@string/keyword"
-            />
-        <EditText
-            android:id="@+id/et_keyword"
-            android:layout_toRightOf="@id/tv_keyword"
-            android:layout_alignParentRight="true"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/fragment_unionsearch_item_h"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_unionsearch_result"
-            android:layout_width="match_parent"
-            android:layout_below="@id/et_keyword"
-            android:layout_height="match_parent"/>
-
-    </RelativeLayout>
 </layout>

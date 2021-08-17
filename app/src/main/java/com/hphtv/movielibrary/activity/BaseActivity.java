@@ -1,8 +1,9 @@
 package com.hphtv.movielibrary.activity;
 
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.firelfy.util.LogUtil;
+import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.fragment.dialog.LoadingDialogFragment;
 
 /**
@@ -12,7 +13,7 @@ import com.hphtv.movielibrary.fragment.dialog.LoadingDialogFragment;
 public class BaseActivity extends AppCompatActivity {
     public final String TAG = this.getClass().getSimpleName();
     LoadingDialogFragment mLoadingDialogFragment;
-    protected void startLoading() {
+    public void startLoading() {
         LogUtil.v(TAG,"startLoading");
         if(mLoadingDialogFragment==null){
             mLoadingDialogFragment=new LoadingDialogFragment();
@@ -21,12 +22,18 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    protected void stopLoading() {
-        LogUtil.v(TAG, "stopLoading");
+    public void stopLoading() {
         if(mLoadingDialogFragment!=null){
+            LogUtil.v(TAG, "stopLoading");
             mLoadingDialogFragment.dismiss();
             mLoadingDialogFragment=null;
         }
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        stopLoading();
+    }
 }

@@ -12,7 +12,7 @@
         android:id="@+id/iv_img"
         android:layout_width="195.6dp"
         android:layout_height="250.3dp"
-        android:background="@drawable/st_movie_select_bg"
+        android:background="@drawable/blue_stroke_select_bg"
         android:padding="17dp"
         android:scaleType="fitXY"
         android:layout_above="@+id/tv_title"/>

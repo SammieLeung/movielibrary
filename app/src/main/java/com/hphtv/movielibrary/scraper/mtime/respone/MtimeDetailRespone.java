@@ -4,7 +4,7 @@ package com.hphtv.movielibrary.scraper.mtime.respone;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
@@ -81,7 +81,7 @@ public class MtimeDetailRespone implements ResponeEntity<MovieWrapper> {
                 if (director != null) {
                     t_director.name = director.name;
                     t_director.img = director.img;
-                    t_director.directorId = director.directorId;
+                    t_director.director_id = director.directorId;
                     t_director.nameEn = director.nameEn;
                 }
 

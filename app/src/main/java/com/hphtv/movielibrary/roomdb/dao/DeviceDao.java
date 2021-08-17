@@ -26,7 +26,7 @@ public interface DeviceDao {
     @Update
     public void updateDevice(Device... devices);
 
-    @Query("SELECT * FROM " + TABLE.DEVICE + " WHERE local_path =:mountpath")
+    @Query("SELECT * FROM " + TABLE.DEVICE + " WHERE path =:mountpath")
     public Device querybyMountPath(String mountpath);
 
     @Query("SELECT * FROM "+TABLE.DEVICE)

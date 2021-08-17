@@ -1,9 +1,7 @@
 package com.hphtv.movielibrary.service.Thread;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -12,8 +10,7 @@ import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.roomdb.entity.MovieWrapper;
-import com.hphtv.movielibrary.service.DeviceMonitorService;
+import com.station.kit.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -30,6 +27,7 @@ import java.util.concurrent.Callable;
  */
 public class FileScanThread implements Callable<Boolean> {
     public static final String TAG = FileScanThread.class.getSimpleName();
+    private boolean isContainsSubfolder = true;
     private String mPath;
     private Device mDevice;
     /**
@@ -48,13 +46,14 @@ public class FileScanThread implements Callable<Boolean> {
     private static final int MAX_DIRS = 2000;
     private ArrayList<ScanDirectory> mTmpScanDirectories = new ArrayList<>();
     private ArrayList<VideoFile> mVideoFiles = new ArrayList<>();
-    private ArrayList<MovieWrapper> mVideoFile__movies = new ArrayList<>();
+    private List<String> mTmpVideoFilePaths = new ArrayList<>();
+
     private boolean mIsOverMaxDirs = false;
 
     public FileScanThread(Context context, Device device) {
         this.mDevice = device;
-        this.mPath = mDevice.localPath;
-        this.mScanDirectories.add(new ScanDirectory(mPath, mDevice.id));
+        this.mPath = mDevice.path;
+//        this.mScanDirectories.add(new ScanDirectory(mPath, mDevice.id));
         this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
         this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
         this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
@@ -62,6 +61,22 @@ public class FileScanThread implements Callable<Boolean> {
 
     @Override
     public Boolean call() throws Exception {
+        mScanDirectories.addAll(mScanDirectoryDao.queryScanDirByDevicePath(mDevice.path));
+//        if (mScanDirectories.size() == 0 && mPath.equals(StorageHelper.getFlashStoragePath(MovieApplication.getInstance()))) {
+//            ScanDirectory scanDirectory = new ScanDirectory(new File(mPath, "/Station/Download").toString(), mDevice.id);
+//            ScanDirectory scanDirectory2 = new ScanDirectory(new File(mPath, "/Download").toString(), mDevice.id);
+//            ScanDirectory scanDirectory3 = new ScanDirectory(new File(mPath, "/Movies").toString(), mDevice.id);
+//
+//            scanDirectory.isUserAdd=false;
+//            scanDirectory2.isUserAdd=false;
+//            scanDirectory3.isUserAdd=false;
+//
+//            mScanDirectoryDao.insertScanDirectories(scanDirectory,scanDirectory2,scanDirectory3);
+//
+//            mScanDirectories.add(scanDirectory);
+//            mScanDirectories.add(scanDirectory2);
+//            mScanDirectories.add(scanDirectory3);
+//        }
         int videoCount = 0;
         while (!mScanDirectories.isEmpty()) {
             boolean nomediaFlag = false;
@@ -79,7 +94,8 @@ public class FileScanThread implements Callable<Boolean> {
                 loadScanDirectoriesFromDB();
             }
             //获取待扫描设备队列的一个设备。
-            File dirFile = new File(mScanDirectories.remove().path);
+            ScanDirectory scanDirectory=mScanDirectories.remove();
+            File dirFile = new File(scanDirectory.path);
 //            Log.i(TAG, "scanDirectory->dirFile:" + dirFile);
             //初始化当前文件夹下的媒体文件数量
 
@@ -87,38 +103,69 @@ public class FileScanThread implements Callable<Boolean> {
                 File[] subFiles = dirFile.listFiles();//获取子文件
                 if (subFiles == null || subFiles.length == 0)
                     continue;
+//                for (File subFile : subFiles) {
+//                    if (subFile.exists() && subFile.isFile() && isNomedia(subFile)) {
+//                        nomediaFlag = true;
+//                        break;
+//                    }
+//                }
+//
+//                if(nomediaFlag){
+//                    if(!isContainsSubfolder)
+//                    {
+//                        for (File subFile : subFiles) {
+//                            if (!subFile.exists())//判断子文件是否存在
+//                                continue;
+//                            //文件夹加入待扫描队列
+//                            if (subFile.isDirectory()) {
+//                                if (mIsOverMaxDirs) {//当前扫描目录队列超过1000个则先缓存
+//                                    mTmpScanDirectories.add(new ScanDirectory(subFile.getPath(), mDevice.id));
+//                                    if (mTmpScanDirectories.size() >= MAX_DIRS / 2) {//暂存1000个
+//                                        mScanDirectoryDao.insertScanDirectories(mTmpScanDirectories.toArray(new ScanDirectory[0]));
+//                                    }
+//                                } else {
+//                                    mScanDirectories.add(new ScanDirectory(subFile.getPath(), mDevice.id));
+//                                }
+//                            }
+//                        }
+//                    }
+//                }else{
                 for (File subFile : subFiles) {
                     if (!subFile.exists())//判断子文件是否存在
                         continue;
                     //文件夹加入待扫描队列
                     if (subFile.isDirectory()) {
                         if (mIsOverMaxDirs) {//当前扫描目录队列超过1000个则先缓存
-                            mTmpScanDirectories.add(new ScanDirectory(subFile.getPath(), mDevice.id));
+                            ScanDirectory tmpScanDirectory=new ScanDirectory(subFile.getPath(), mDevice.path);
+                            tmpScanDirectory.parentPath=scanDirectory.parentPath;
+                            mTmpScanDirectories.add(tmpScanDirectory);
                             if (mTmpScanDirectories.size() >= MAX_DIRS / 2) {//暂存1000个
                                 mScanDirectoryDao.insertScanDirectories(mTmpScanDirectories.toArray(new ScanDirectory[0]));
                             }
                         } else {
-                            mScanDirectories.add(new ScanDirectory(subFile.getPath(), mDevice.id));
+                            ScanDirectory tmpScanDirectory=new ScanDirectory(subFile.getPath(), mDevice.path);
+                            tmpScanDirectory.parentPath=scanDirectory.parentPath;
+                            mScanDirectories.add(tmpScanDirectory);
                         }
-                    } else if (!nomediaFlag) {
+                    } else {
                         //获取文件信息，传入文件信息暂存列表
-                        if (isNomedia(subFile)) {
-                            nomediaFlag = true;
-                            continue;
-                        }
-                        VideoFile videoFile = buildVideoInfoFromFile(subFile, mDevice);
+                        VideoFile videoFile = buildVideoInfoFromFile(subFile, mDevice,scanDirectory);
                         if (videoFile != null) {
                             ++videoCount;
                             mVideoFiles.add(videoFile);
+                            mTmpVideoFilePaths.add(videoFile.path);
                         }
                     }
                 }
                 mDevice.fileCount = (videoCount);
                 mDeviceDao.updateDevice(mDevice);
+//                }
+
             }
         }
         //队列结束保存文件信息入库
         saveVideoFileInfotoDB();
+        LogUtil.v("fileScanThread " + mDevice.name);
         return true;
     }
 
@@ -136,7 +183,7 @@ public class FileScanThread implements Callable<Boolean> {
      * @param device
      * @return
      */
-    private VideoFile buildVideoInfoFromFile(File file, Device device) {
+    private VideoFile buildVideoInfoFromFile(File file, Device device,ScanDirectory scanDirectory) {
         String path = file.getPath();
         int dotIndex = path.lastIndexOf(".");
         if (dotIndex < 0)
@@ -151,6 +198,7 @@ public class FileScanThread implements Callable<Boolean> {
             videoFile.deviceId = (device.id);
             videoFile.filename = (fileName);
             videoFile.path = (file.getPath());
+            videoFile.dirPath=scanDirectory.parentPath;
             return videoFile;
         }
         return null;
@@ -161,7 +209,7 @@ public class FileScanThread implements Callable<Boolean> {
      * 从数据库将数据读入扫描目录队列
      */
     private void loadScanDirectoriesFromDB() {
-        List<ScanDirectory> dbScanDirectories = mScanDirectoryDao.queryScanDirectories(mDevice.id, MAX_DIRS - mScanDirectories.size());
+        List<ScanDirectory> dbScanDirectories = mScanDirectoryDao.queryTmpScanDirectories(mDevice.path, MAX_DIRS - mScanDirectories.size());
         if (dbScanDirectories != null && dbScanDirectories.size() > 0) {
             for (ScanDirectory itemDirectory : dbScanDirectories) {
                 mScanDirectories.add(itemDirectory);
@@ -177,23 +225,22 @@ public class FileScanThread implements Callable<Boolean> {
      */
     private void saveVideoFileInfotoDB() {
         if (!mVideoFiles.isEmpty()) {
-            String[] paths = new String[mVideoFiles.size()];
-            int i = 0;
             for (VideoFile videoFile : mVideoFiles) {
                 VideoFile tVideoFile = mVideoFileDao.queryByPath(videoFile.path);
                 if (tVideoFile != null) {
                     videoFile.vid = tVideoFile.vid;
-                    videoFile.isScanned=tVideoFile.isScanned;
-                }
-                int ret = mVideoFileDao.update(videoFile);
-                if (ret == 0)
+                    videoFile.isScanned = tVideoFile.isScanned;
+                    videoFile.keyword = tVideoFile.keyword;
+                    videoFile.addTime = System.currentTimeMillis();
+                    mVideoFileDao.update(videoFile);
+                } else {
+                    videoFile.addTime = System.currentTimeMillis();
                     mVideoFileDao.insertOrIgnore(videoFile);
-                paths[i++] = videoFile.path;
+                }
+
             }
-            mVideoFileDao.deleteByDeviceId(mDevice.id, paths);
             mVideoFiles.clear();
         }
-
     }
 
 }

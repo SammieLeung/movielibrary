@@ -76,6 +76,10 @@
     <string name="order_year">Year</string>
     <string name="order_score">Score</string>
     <string name="order_addtime">Add time</string>
+
+    <string name="toastmsg_no_trailer_found">No trailer found!</string>
+
+
     <string name="exit_toast">press the BACK key again  to exit</string>
     <string name="dm_tx_status">Status</string>
     <string name="dm_tx_folder">Folder</string>
@@ -85,7 +89,7 @@
     <string name="cb_all">All</string>
     <string name="cb_private">Private Folder</string>
     <string name="cb_disconnect">Disconnect</string>
-    <string name="title_file_manager">Get Movie Poster</string>
+    <string name="title_file_manager">Folder Manager</string>
     <string name="lb_setting">Setting</string>
     <string name="setting_confirm_delete">This operation will not delete your files, but it will clear your device records and movie information records.</string>
     <string name="setting_status_not_add">not scan</string>
@@ -131,24 +135,30 @@
     <string name="device_manager_footer_bar_path">"location : "</string>
     <string name="title_folder_add">Add Folder To Library</string>
     <string name="title_change_password">Change Password</string>
-    <string name="title_show_private">Display Private Videos</string>
-    <string name="psw_set">Password Setting</string>
-    <string name="psw_change">Change Password</string>
-    <string name="psw_input">Input Password</string>
-    <string name="psw_tips_psw_err">" * Wrong password, please re-enter"</string>
-    <string name="psw_tips_psw_unmatch">* The passwords are inconsistent. Please re enter</string>
-    <string name="psw_hints_input">Please enter your password</string>
-    <string name="psw_hints_set_1">Please enter a 4-8 digit password</string>
-    <string name="psw_hints_set_2">Confirm password</string>
-    <string name="psw_hints_change_1">Old password</string>
-    <string name="psw_hints_change_2">New password</string>
-    <string name="psw_hints_change_3">Repeat the new password</string>
-    <string name="psw_tips_psw_len">* Please enter a 4-8 digit password</string>
+    <string name="btn_show_hidden_folder">Show Hidden Folder</string>
+
+    <string name="title_set_initial_psw">Set Initial Password</string>
+    <string name="title_change_psw">Change Password</string>
+    <string name="title_input_psw">Enter Password</string>
+
+    <string name="errtips_psw_invaild">* Use 8 digits as your password</string>
+    <string name="errtips_psw_error">* Wrong password</string>
+    <string name="errtips_psw_not_new">* New password can\'t be the same as the original</string>
+    <string name="errtips_psw_inconsistent">* Passwords didn\'t match</string>
+
+    <string name="hint_enter_psw">Enter your password</string>
+    <string name="hint_input4digit_psw">Enter a 4-digit password</string>
+    <string name="hint_confirm_psw">Confirm new password</string>
+    <string name="hint_old_psw">Old password</string>
+    <string name="hint_new_psw">New password</string>
+
     <string name="psw_set_success">New password has been set up successfully!</string>
     <string name="tx_private_for_lib">Private Videos</string>
     <string name="tips_for_private_folder">Cannot make non-local folder private</string>
     <string name="checkbox_del_video_file">Clear file information (do not delete files)?</string>
     <string name="toast_del_success">Delete Success!</string>
+    <string name="toast_UnknownHostException">Network error!</string>
+    <string name="toast_loadmore_end">It\'s the end~</string>
     <string name="title_hide_private">Hide Pirvate Videos</string>
     <string name="tips_for_hide_private_videos">Private videos have been hidden</string>
     <string name="tips_for_show_private_videos">Private videos have been shown</string>
@@ -170,9 +180,7 @@
     <string name="main_actors">Main Actors:</string>
     <string name="main_file_list">File List:</string>
     <string name="tx_genres">Genres:</string>
-    <string name="t_chip">T-chip Intelligent Technology Co., Ltd.</string>
-    <string name="tx_author">Author</string>
-    <string name="tx_version">Version</string>
+    <string name="tx_version">Ver:</string>
     <string name="tips2">No Movie</string>
     <string name="tag_is_movie" translatable="false">1</string>
     <string name="tx_search_result">Success :%1$d Failed:%2$d</string>
@@ -194,5 +202,15 @@
     <string name="device_sdcard_name">TFCard (%1$s)</string>
     <string name="device_ssd_name">M.2 SSD (%1$s)</string>
     <string name="device_harddisk_name">HardDisk (%1$s)</string>
+
+    <string name="btn_search">Search</string>
     <string name="keyword">Keyword</string>
+
+    <string name="folder_dialog_title_added_folder">Added Folder</string>
+    <string name="folder_dialog_title_hidden_folder">Hidden Folder</string>
+
+    <string name="folder_item_delete">Delete</string>
+    <string name="folder_item_add_to_hidden">Add to private</string>
+    <string name="folder_item_move_out">Move out</string>
+
 </resources>

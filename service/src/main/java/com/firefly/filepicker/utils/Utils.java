@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 
 import com.firefly.filepicker.R;
+import com.station.kit.util.StorageHelper;
 
 import java.util.List;
 import java.util.regex.Matcher;

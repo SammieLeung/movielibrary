@@ -5,59 +5,12 @@
     android:layout_marginLeft="54dp"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/api_group"
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/spinner_label"
-            android:textColor="@color/tx_fff"
-            android:textSize="24sp" />
-        <Spinner
-            android:id="@+id/api_spinner"
-            android:layout_width="300dp"
-            android:layout_height="50dp"
-            android:entries="@array/api_group"
-            android:focusable="true"
-            android:popupBackground="@drawable/search_bg2"></Spinner>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/author_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/api_group"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/tx_author"
-            android:textColor="@color/tx_fff"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/tv_author"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/t_chip"
-            android:textColor="@color/tx_CCCCCC"
-            android:textSize="18sp" />
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/version_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/author_group"
         android:layout_marginTop="20dp"
         android:orientation="vertical">
 

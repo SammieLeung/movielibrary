@@ -194,7 +194,7 @@ public class MovieLibraryProvider extends ContentProvider {
         Cursor cursor = mVideoFileDao.select("id=?", new String[]{String.valueOf(id)}, null);
         final VideoFile file = (new VideoFileDao(getContext())).parseList(cursor).get(0);
         savePlayHistory(file);
-        VideoPlayTools.play(getContext(), file);
+        VideoPlayTools.play(getContext(), file.getUri(),file.getFilename());
         return cursor;
     }
 

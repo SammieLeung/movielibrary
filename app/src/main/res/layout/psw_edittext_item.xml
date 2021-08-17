@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<EditText xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="46dp"
-    android:ems="10"
-    android:paddingLeft="15dp"
-    android:paddingRight="15dp"
-    android:maxLength="8"
-    android:imeOptions="actionNext"
-    android:layout_marginTop="24dp"
-    android:textColor="@color/selector_dialog_edit_text"
-    android:textSize="16sp"
-    android:textColorHint="@color/tx_cacaca"
-    android:background="@drawable/background_corners_for_edittext"
-    android:inputType="textPassword" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <EditText
+        android:id="@+id/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:ems="10"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:maxLength="4"
+        android:imeOptions="actionNext"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/selector_dialog_edit_text"
+        android:textSize="16sp"
+        android:textColorHint="@color/tx_cacaca"
+        android:background="@drawable/background_corners_for_edittext"
+        android:inputType="numberPassword" />
+</layout>

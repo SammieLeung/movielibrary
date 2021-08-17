@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/title_group"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/c292d35"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/lb_sort_device"
+                    android:textColor="@color/tx_fff"
+                    android:textSize="24dp" />
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/lb_sort_year"
+                    android:textColor="@color/tx_fff"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/lb_sort_type"
+                    android:textColor="@color/tx_fff"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/lb_sort_order"
+                    android:textColor="@color/tx_fff"
+                    android:textSize="24dp" />
+            </LinearLayout>
+
+            <com.hphtv.movielibrary.view.CategoryView
+                android:id="@+id/categoryview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/c1d1e20"
+                android:orientation="horizontal"
+                android:paddingBottom="38dp"
+                android:paddingTop="12dp">
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2">
+
+
+                    <Button
+
+                        android:id="@+id/btn_reset"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="match_parent"
+                        android:layout_height="42dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_toLeftOf="@+id/line"
+                        android:background="@drawable/selector_category_bg"
+                        android:drawableLeft="@mipmap/ic_reset"
+                        android:drawablePadding="10dp"
+                        android:paddingLeft="50dp"
+                        android:gravity="left|center_vertical"
+                        android:text="@string/tx_for_reset_cate"
+                        android:textColor="@color/selector_category_text"
+                        android:textSize="18sp" />
+
+                    <View
+                        android:layout_alignParentRight="true"
+                        android:id="@id/line"
+                        android:layout_width="1px"
+                        android:layout_height="match_parent"
+                        android:background="@color/c33ffffff" />
+                </RelativeLayout>
+
+                <include layout="@layout/movie_library_sort_layout_item" />
+
+
+                <include layout="@layout/movie_library_sort_layout_item" />
+
+                <include layout="@layout/movie_library_sort_layout_item" />
+
+                <include
+                    layout="@layout/movie_library_sort_layout_item"
+                    android:id="@+id/sort_group" />
+            </com.hphtv.movielibrary.view.CategoryView>
+
+        </LinearLayout>
+    </RelativeLayout>
+</layout>
+

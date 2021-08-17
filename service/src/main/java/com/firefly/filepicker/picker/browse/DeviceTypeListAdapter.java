@@ -120,7 +120,7 @@ public class DeviceTypeListAdapter extends RecyclerView.Adapter<DeviceTypeListAd
             super(itemView);
 
             mIconView = (ImageView) itemView.findViewById(R.id.icon);
-            mTitle = (TextView) itemView.findViewById(R.id.title);
+            mTitle = (TextView) itemView.findViewById(R.id.tv_title);
             mInfoView = itemView.findViewById(R.id.row_info);
             mAddButton = (ImageButton) itemView.findViewById(R.id.add_button);
         }

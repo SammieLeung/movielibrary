@@ -19,7 +19,7 @@ import com.firefly.filepicker.data.bean.xml.SaveItem;
 import com.firefly.filepicker.data.source.IScanFiles;
 import com.firefly.filepicker.utils.Base64Helper;
 import com.firefly.filepicker.utils.MediaDirHelper;
-import com.firelfy.util.StorageHelper;
+import com.station.kit.util.StorageHelper;
 
 import org.fourthline.cling.model.meta.Device;
 

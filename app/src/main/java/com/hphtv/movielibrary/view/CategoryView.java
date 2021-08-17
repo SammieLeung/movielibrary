@@ -12,10 +12,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -24,15 +21,15 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import androidx.annotation.NonNull;
 
-import com.firelfy.util.DensityUtil;
-import com.firelfy.util.SharePreferencesTools;
+import com.station.kit.util.DensityUtil;
+import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.util.FormatterTools;
 
 public class CategoryView extends LinearLayout implements
-        OnCheckedChangeListener, OnTouchListener {
+        OnCheckedChangeListener, View.OnClickListener {
 
 
     public static final String DESC = "↓";
@@ -50,7 +47,6 @@ public class CategoryView extends LinearLayout implements
 
     private RadioGroup mSortRadioGroup;
     private UIHandler mUIHandler = new UIHandler();
-
 
     public CategoryView(Context context) {
         this(context, null);
@@ -123,7 +119,7 @@ public class CategoryView extends LinearLayout implements
         boolean isDesc = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.SORT_BY_DESC, false);
         int i = 0;
         for (Device device : mDevices) {
-            if (devicePath.equalsIgnoreCase(device.localPath)) {
+            if (devicePath.equalsIgnoreCase(device.path)) {
                 mCurDevPos = i;
             }//TODO network 设备考虑
             i++;
@@ -138,7 +134,7 @@ public class CategoryView extends LinearLayout implements
         mSortFilters = new ArrayList<>();
         mSortFilters.add(getResources().getString(R.string.order_name));
         mSortFilters.add(getResources().getString(R.string.order_score));
-        mSortFilters.add(getResources().getString(R.string.order_type));
+//        mSortFilters.add(getResources().getString(R.string.order_type));
         mSortFilters.add(getResources().getString(R.string.order_year));
         mSortFilters.add(getResources().getString(R.string.order_addtime));
     }
@@ -223,7 +219,7 @@ public class CategoryView extends LinearLayout implements
             for (String sortFilter : mSortFilters) {
                 int i = mSortFilters.indexOf(sortFilter);
                 bt = newRadioButton(sortFilter);// 实例化新的RadioButton
-                bt.setOnTouchListener(this);// 为每个radiobutton设置监听器
+                bt.setOnClickListener(this);
                 mSortRadioGroup.addView(bt);
                 if (i == mCurSortPos)
                     bt.setChecked(true);
@@ -330,6 +326,19 @@ public class CategoryView extends LinearLayout implements
         mCurDevPos = -1;
     }
 
+    @Override
+    public void onClick(View v) {
+        if (mListener != null) {
+            int pos = mSortRadioGroup.indexOfChild(v);
+            if (mCurSortPos == pos)
+                isDesc = !isDesc;
+            else
+                mCurSortPos = pos;
+            mListener.onConditionChange(getDevice(),getYear(),getGenre(),getSortTypePos(),isDesc());
+            updateOrder();
+        }
+    }
+
     /**
      * 回调接口
      */
@@ -338,44 +347,6 @@ public class CategoryView extends LinearLayout implements
         public void onConditionChange(Device device, String year, String genre,int sortType, boolean isDesc);
     }
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (mListener != null) {
-                int pos = mSortRadioGroup.indexOfChild(v);
-                if (mCurSortPos == pos)
-                    isDesc = !isDesc;
-                else
-                    mCurSortPos = pos;
-                mListener.onConditionChange(getDevice(),getYear(),getGenre(),getSortTypePos(),isDesc());
-                updateOrder();
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mListener != null) {
-            if ((event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER)) {
-                if (event.getAction() == KeyEvent.ACTION_UP) {
-                    View view = getFocusedChild();
-                    if (view != null) {
-                        int index = mSortRadioGroup.indexOfChild(view);
-                        if (index != -1) {
-                            if (mCurSortPos == index)
-                                isDesc = !isDesc;
-                            else
-                                mCurSortPos = index;
-                            mListener.onConditionChange(getDevice(),getYear(),getGenre(),getSortTypePos(),isDesc());
-                            updateOrder();
-                        }
-                    }
-                }
-            }
-        }
-        return super.dispatchKeyEvent(event);
-    }
 
     public interface ConditionNameGetter {
         public String getName(Object obj);

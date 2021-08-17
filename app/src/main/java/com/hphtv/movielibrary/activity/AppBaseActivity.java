@@ -1,17 +1,21 @@
 package com.hphtv.movielibrary.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.firelfy.util.LogUtil;
 import com.hphtv.movielibrary.MovieApplication;
-import com.hphtv.movielibrary.fragment.dialog.LoadingDialogFragment;
+import com.hphtv.movielibrary.fragment.BaseFragment;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -23,6 +27,7 @@ import java.lang.reflect.Type;
 public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseActivity {
     protected VDB mBinding;
     protected VM mViewModel;
+    private ActivityResultLauncher mActivityResultLauncher;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,6 +37,11 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         createAndroidViewModel();
         processLogic();
         init();
+        ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
+        mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
+            Log.v(AppBaseActivity.this.getClass().getSimpleName(), "onActivityResult resultCode=" + result.getResultCode());
+           onActivityResultCallback(result);
+        });
     }
 
     /**
@@ -45,7 +55,12 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
      * 处理onCreate()
      */
     protected abstract void processLogic();
+    protected void onActivityResultCallback(ActivityResult result){
 
+    };
+    public void startActivityForResult(Intent intent){
+        mActivityResultLauncher.launch(intent);
+    }
     /**
      * 创建ViewModel
      */
@@ -85,5 +100,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         return MovieApplication.getInstance();
     }
 
-
+    public VM getViewModel() {
+        return mViewModel;
+    }
 }
