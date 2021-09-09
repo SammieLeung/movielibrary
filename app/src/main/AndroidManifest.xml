@@ -45,7 +45,6 @@
 
 
         <service android:name=".service.MovieScanService"></service>
-        <service android:name=".service.MovieScanService2"></service>
 
         <service android:name=".service.DeviceMonitorService"></service>
         <service android:name=".service.DlnaControlService"></service>

@@ -4,11 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.service.DlnaControlService;
-import com.hphtv.movielibrary.service.MovieScanService;
-import com.hphtv.movielibrary.service.MovieScanService2;
-
 /**
  * 接收开机广播启动电影匹配服务
  * Created by tchip on 17-11-13.

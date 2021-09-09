@@ -23,7 +23,8 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
+import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
+import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.ConstData;
@@ -75,7 +76,6 @@ public class MovieDetailViewModel extends AndroidViewModel {
     private MovieWrapper mMovieWrapper;
     private int mCurrentMode;
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViewList;
-
 
 
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
@@ -132,22 +132,22 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-    public void setFavorite(MovieWrapper movieWrapper,Callback2 callback2) {
+    public void setFavorite(MovieWrapper movieWrapper, Callback2 callback2) {
         Observable.just(movieWrapper)
                 .map(new Function<MovieWrapper, Boolean>() {
                     @Override
                     public Boolean apply(MovieWrapper wrapper) throws Throwable {
-                        boolean isFavorite=!wrapper.movie.isFavorite;
-                        long id=wrapper.movie.id;
-                        mMovieDao.updateFavorite(isFavorite,id);
-                        boolean is_favorite=  mMovieDao.queryFavorite(id);
+                        boolean isFavorite = !wrapper.movie.isFavorite;
+                        long id = wrapper.movie.id;
+                        mMovieDao.updateFavorite(isFavorite, id);
+                        boolean is_favorite = mMovieDao.queryFavorite(id);
                         return is_favorite;
                     }
                 })
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isFavorite -> {
-                    if(callback2!=null)
+                    if (callback2 != null)
                         callback2.runOnUIThread(isFavorite);
                 });
     }
@@ -191,25 +191,31 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-    public void selectMovie(String source, String movie_id,MovieWrapperCallback movieWrapperCallback) {
+    public void selectMovie(String source, String movie_id, MovieWrapperCallback movieWrapperCallback) {
 
-        Observable.just(FROM_NETWORK)
-                .map(s -> {
-                    switch (source) {
-                        case ConstData.ScraperSource.MTIME:
-                            MovieWrapper mtimeWrapper = MtimeApi2.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
-                            return mtimeWrapper;
+        Observable.just(source)
+                .map(new Function<String, MovieWrapper>() {
+                    @Override
+                    public MovieWrapper apply(String _source) throws Throwable {
+                        switch (_source) {
+                            case ConstData.ScraperSource.MTIME:
+                                MovieWrapper mtimeWrapper = MtimeApiService.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                                return mtimeWrapper;
+                            case ConstData.ScraperSource.OMDB:
+                                MovieWrapper omdbWrapper = OmdbApiService.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                                return omdbWrapper;
+                        }
+                        return null;
                     }
-                    return null;
                 })
                 .doOnNext(wrapper -> {
                     String[] paths;
-                    if(mCurrentMode==ConstData.MovieDetailMode.MODE_WRAPPER){
+                    if (mCurrentMode == ConstData.MovieDetailMode.MODE_WRAPPER) {
                         paths = new String[mMovieWrapper.videoFiles.size()];
                         for (int i = 0; i < paths.length; i++) {
                             paths[i] = mMovieWrapper.videoFiles.get(i).path;
                         }
-                    }else {
+                    } else {
                         paths = new String[mUnrecognizedFileDataViewList.size()];
                         for (int i = 0; i < paths.length; i++) {
                             paths[i] = mUnrecognizedFileDataViewList.get(i).path;
@@ -217,13 +223,13 @@ public class MovieDetailViewModel extends AndroidViewModel {
                     }
                     List<VideoFile> videoFiles = mVideoFileDao.queryByPaths(paths);
                     wrapper.videoFiles = videoFiles;
-                    saveMovieWrapper(wrapper, videoFiles);
+                    saveMovieWrapper(wrapper, videoFiles,source);
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<MovieWrapper>() {
                     @Override
                     public void onAction(MovieWrapper movieWrapper) {
-                        if(movieWrapperCallback!=null)
+                        if (movieWrapperCallback != null)
                             movieWrapperCallback.runOnUIThread(movieWrapper);
                     }
                 });
@@ -235,11 +241,11 @@ public class MovieDetailViewModel extends AndroidViewModel {
      *
      * @param movieWrapper
      */
-    private void saveMovieWrapper(MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
+    private void saveMovieWrapper(MovieWrapper movieWrapper, List<VideoFile> videoFileList,String source) {
         //获取各个实体类
         Movie movie = movieWrapper.movie;
         List<Genre> genreList = movieWrapper.genres;
-        Director director = movieWrapper.director;
+        List<Director> directorList = movieWrapper.directors;
         List<Actor> actorList = movieWrapper.actors;
         List<Trailer> trailerList = movieWrapper.trailers;
         List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
@@ -249,7 +255,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         mMovieDao.insertOrIgnoreMovie(movie);
         mGenreDao.insertGenres(genreList);
         mActorDao.insertActors(actorList);
-        mDirectorDao.insertDirector(director);
+        mDirectorDao.insertDirectors(directorList);
 
         List<String> querySelectionGenreNames = new ArrayList<>();
         for (Genre genre : genreList) {
@@ -280,11 +286,13 @@ public class MovieDetailViewModel extends AndroidViewModel {
             }
         }
 
-        if (director != null) {
-            MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
-            movieDirectorCrossRef.directorId = director.director_id;
-            movieDirectorCrossRef.id = movie_id;
-            mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
+        for (Director director : directorList) {
+            if (director != null) {
+                MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
+                movieDirectorCrossRef.directorId = director.director_id;
+                movieDirectorCrossRef.id = movie_id;
+                mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
+            }
         }
 
         for (Trailer trailer : trailerList) {
@@ -305,6 +313,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
             MovieVideoFileCrossRef movieVideoFileCrossRef = new MovieVideoFileCrossRef();
             movieVideoFileCrossRef.id = movie_id;
             movieVideoFileCrossRef.path = videoFile.path;
+            movieVideoFileCrossRef.source = source;
             mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
             videoFile.isScanned = 1;
             mVideoFileDao.update(videoFile);

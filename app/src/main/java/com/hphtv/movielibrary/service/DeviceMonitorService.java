@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.service;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -16,14 +15,12 @@ import android.os.storage.StorageVolume;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.viewmodel.DeviceMonitorViewModel;
-import com.station.kit.util.StorageHelper;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -39,7 +36,7 @@ public class DeviceMonitorService extends Service {
     private MonitorBinder mBinder;
     private DeviceMonitorViewModel mDeviceMonitorViewModel;
     private StorageManager mStorageManager;
-    private MovieScanService2 mMovieScanService;
+    private MovieScanService mMovieScanService;
     /**
      * 处理Android 11设备挂载/卸载回调
      */
@@ -80,7 +77,7 @@ public class DeviceMonitorService extends Service {
 
     private void bindServices() {
         Intent intent = new Intent();
-        intent.setClass(this, MovieScanService2.class);
+        intent.setClass(this, MovieScanService.class);
         bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -197,7 +194,7 @@ public class DeviceMonitorService extends Service {
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mMovieScanService = ((MovieScanService2.ScanBinder) service).getService();
+            mMovieScanService = ((MovieScanService.ScanBinder) service).getService();
             mDeviceMonitorViewModel.scanDevices();
         }
 

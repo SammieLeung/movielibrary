@@ -10,8 +10,7 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.MovieSearchAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApi;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApi2;
+import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
@@ -24,7 +23,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -34,14 +32,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MovieSearchFragmentViewModel extends AndroidViewModel {
     private int pageSize = 9;
     private int mCurrentPage;
-    private int mApi;
+    private String mSource;
 
     private String mCurrentKeyword;
     private LinkedList<Movie> mMovieLinkedList;
 
     public MovieSearchFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
-        mApi=ConstData.Scraper.MTIME;
+        mSource =ConstData.ScraperSource.MTIME;
         mMovieLinkedList=new LinkedList<>();
     }
 
@@ -51,9 +49,9 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
         mCurrentKeyword = keyword.trim();
         mMovieLinkedList.clear();
         mCurrentPage=1;
-        switch (mApi) {
-            case ConstData.Scraper.MTIME:
-                notifyNewSearch(MtimeApi2.unionSearch(mCurrentKeyword, mCurrentPage, pageSize * 3), adapter);
+        switch (mSource) {
+            case ConstData.ScraperSource.MTIME:
+                 notifyNewSearch(MtimeApiService.unionSearch(mCurrentKeyword, mCurrentPage, pageSize * 3), adapter);
                 break;
         }
         mCurrentPage=3;
@@ -62,9 +60,9 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
     public void loading(MovieSearchAdapter adapter) {
         if(TextUtils.isEmpty(mCurrentKeyword))
             return;
-        switch (mApi) {
-            case ConstData.Scraper.MTIME:
-                notifyLoadingMore(MtimeApi2.unionSearch(mCurrentKeyword, mCurrentPage+1, pageSize ), adapter);
+        switch (mSource) {
+            case ConstData.ScraperSource.MTIME:
+                notifyLoadingMore(MtimeApiService.unionSearch(mCurrentKeyword, mCurrentPage+1, pageSize ), adapter);
                 break;
         }
 

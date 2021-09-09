@@ -35,7 +35,7 @@ public class MovieWrapper implements Serializable {
     @Relation(parentColumn = "id",
             entityColumn = "director_id",
             associateBy = @Junction(MovieDirectorCrossRef.class))
-    public Director director;//导演，多对多关系
+    public List<Director> directors;//导演，多对多关系
 
     @Relation(parentColumn = "id",
             entityColumn = "actor_id",

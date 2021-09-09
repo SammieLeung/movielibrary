@@ -60,8 +60,8 @@ public class ConstData {
     }
 
     public interface ScraperSource {
-        String MTIME = "mtime";
-        String OMDB = "omdb";
+        String MTIME = "MTime";
+        String OMDB = "OMDB";
     }
 
     public interface DirectoryState {

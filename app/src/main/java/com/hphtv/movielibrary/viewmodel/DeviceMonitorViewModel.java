@@ -8,7 +8,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
-import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
 import com.hphtv.movielibrary.data.ConstData;
@@ -17,7 +16,7 @@ import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.service.MovieScanService2;
+import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.FileScanThread;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -35,9 +34,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -122,7 +119,7 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
         return mFileScanExecutor.submit(new FileScanThread(getApplication(), device));
     }
 
-    public void startScanWithNotScannedFiles(MovieScanService2 scanService, String mountPath) {
+    public void startScanWithNotScannedFiles(MovieScanService scanService, String mountPath) {
         Observable.just(mountPath)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(Schedulers.from(mSingleThreadPool))

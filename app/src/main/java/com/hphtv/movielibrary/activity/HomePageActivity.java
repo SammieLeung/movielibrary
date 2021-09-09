@@ -35,7 +35,6 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
@@ -45,16 +44,14 @@ import com.hphtv.movielibrary.adapter.QuickFragmentPageAdapter;
 import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.ActivityHomepageBinding;
 import com.hphtv.movielibrary.databinding.MovieLibraryMovieFiltersLayoutBinding;
-import com.hphtv.movielibrary.fragment.AboutsFragment;
 import com.hphtv.movielibrary.fragment.FavoriteFragment;
 import com.hphtv.movielibrary.fragment.FileManagerFragment;
-import com.hphtv.movielibrary.fragment.dialog.FolderManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
 import com.hphtv.movielibrary.fragment.UnrecognizedFileFragement;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.service.MovieScanService2;
+import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.util.FormatterTools;
 import com.hphtv.movielibrary.view.CategoryView;
 import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
@@ -95,7 +92,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     private LeftMenuListAdapter mLeftMenuAdapter;
 
     private PopupWindow mPopupWindow;
-    private MovieScanService2 mScanService;
+    private MovieScanService mScanService;
     private DeviceMonitorService mDeviceMonitorService;
 
     private Boolean isExit = false;
@@ -516,7 +513,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
 
-    public MovieScanService2 getMovieSearchService() {
+    public MovieScanService getMovieSearchService() {
         return mScanService;
     }
 
@@ -619,8 +616,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if (name.getClassName().equalsIgnoreCase(MovieScanService2.class.getCanonicalName())) {
-                mScanService = ((MovieScanService2.ScanBinder) service).getService();
+            if (name.getClassName().equalsIgnoreCase(MovieScanService.class.getCanonicalName())) {
+                mScanService = ((MovieScanService.ScanBinder) service).getService();
             } else if (name.getClassName().equalsIgnoreCase(DeviceMonitorService.class.getCanonicalName())) {
                 mDeviceMonitorService = ((DeviceMonitorService.MonitorBinder) service).getService();
                 if (needRefresh) {
