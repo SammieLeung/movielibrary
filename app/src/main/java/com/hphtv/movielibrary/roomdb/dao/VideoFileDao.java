@@ -26,6 +26,20 @@ public interface VideoFileDao {
     @Update
     public int update(VideoFile videoFile);
 
+    /**
+     * 根据文件路径设置last_playtime
+     *
+     * @param path
+     * @return
+     */
+    @Query("UPDATE " + TABLE.VIDEOFILE + " " +
+            "SET last_playtime=:time " +
+            "WHERE path=:path")
+    public int updateLastPlaytime(String path, long time);
+
+    @Query("SELECT poster FROM "+VIEW.MOVIE_DATAVIEW +" WHERE path=:path AND source=:source")
+    public String getPoster(String path,String source);
+
     @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
@@ -35,8 +49,15 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);
 
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE vid=:vid")
+    public VideoFile queryByVid(long vid);
+
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path in (:paths)")
     public List<VideoFile> queryByPaths(String... paths);
+
+
+    @Query("SELECT * FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" WHERE last_playtime!=0 ORDER BY last_playtime DESC")
+    public List<UnrecognizedFileDataView> queryHistoryMovieDataView();
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId and path not in (:paths) ")
     public void deleteByDeviceId(String deviceId, List<String> paths);
@@ -48,9 +69,9 @@ public interface VideoFileDao {
     public int deleteOutdated(long currentTime);
 
     @Query("SELECT * FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW +
-            " GROUP BY keyword")
-    public List<UnrecognizedFileDataView> queryUnrecognizedFiles();
+            " WHERE path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source)  GROUP BY keyword ")
+    public List<UnrecognizedFileDataView> queryUnrecognizedFiles(String source);
 
-    @Query("SELECT * FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW + " WHERE keyword=:keyword")
-    public List<UnrecognizedFileDataView> queryUnrecognizedFilesByKeyword(String keyword);
+    @Query("SELECT * FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW + " WHERE keyword=:keyword AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source)")
+    public List<UnrecognizedFileDataView> queryUnrecognizedFilesByKeyword(String keyword,String source);
 }

@@ -22,11 +22,13 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
 
     @Override
     public MovieWrapper toEntity() {
-        return data.toEntity();
+        if (data != null)
+            return data.toEntity();
+        return null;
     }
 
     private class Data implements ResponeEntity<MovieWrapper> {
-        private int movie_id;
+        private String movie_id;
         private String title;
         private String title_en;
         private String year;

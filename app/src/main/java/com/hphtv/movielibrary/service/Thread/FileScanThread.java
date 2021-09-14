@@ -2,7 +2,7 @@ package com.hphtv.movielibrary.service.Thread;
 
 import android.content.Context;
 
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
@@ -192,7 +192,7 @@ public class FileScanThread implements Callable<Boolean> {
         if (startIndex >= path.length())
             return null;
         String tailEx = path.substring(startIndex).toLowerCase();
-        if (Arrays.binarySearch(ConstData.VIDEO_SUFFIX, tailEx) >= 0) {
+        if (Arrays.binarySearch(Constants.VIDEO_SUFFIX, tailEx) >= 0) {
             String fileName = file.getName();
             VideoFile videoFile = new VideoFile();
             videoFile.deviceId = (device.id);
@@ -232,6 +232,7 @@ public class FileScanThread implements Callable<Boolean> {
                     videoFile.isScanned = tVideoFile.isScanned;
                     videoFile.keyword = tVideoFile.keyword;
                     videoFile.addTime = System.currentTimeMillis();
+                    videoFile.lastPlayTime=tVideoFile.lastPlayTime;
                     mVideoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();

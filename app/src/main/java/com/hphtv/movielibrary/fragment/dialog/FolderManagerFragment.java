@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.EditText;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.FolderItemAdapter;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutFolderBinding;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.viewmodel.fragment.FolderManagerFragmentViewModel;
@@ -87,7 +86,7 @@ public class FolderManagerFragment extends BaseDialogFragment<FolderManagerFragm
                     synchronized (this) {
                         if (!isPickerOpening) {
                             isPickerOpening = true;
-                            Intent picker_intent = new Intent(ConstData.ACTION_FILE_PICKER);
+                            Intent picker_intent = new Intent(Constants.ACTION_FILE_PICKER);
                             startActivityForResult(picker_intent);
                         }
                     }

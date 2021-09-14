@@ -9,6 +9,7 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -27,17 +28,19 @@ public class MovieSearchViewModel extends AndroidViewModel {
     private MovieDao mMovieDao;
 
     private List<MovieDataView> mMovieDataViewList;
+    private String mSource;
 
     public MovieSearchViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase database = MovieLibraryRoomDatabase.getDatabase(application);
         mMovieDao = database.getMovieDao();
+        mSource= ScraperSourceTools.getSource();
     }
 
     public void init() {
         Observable.just("")
                 .observeOn(Schedulers.io())
-                .subscribe(s -> mMovieDataViewList = mMovieDao.queryAllMovieDataView());
+                .subscribe(s -> mMovieDataViewList = mMovieDao.queryAllMovieDataView(mSource));
     }
 
     public void search(String keyword, Callback<MovieDataView> callback) {

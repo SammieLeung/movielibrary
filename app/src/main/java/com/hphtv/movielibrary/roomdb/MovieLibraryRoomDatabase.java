@@ -84,8 +84,7 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                     sInstance = Room.databaseBuilder(
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
-//                            .createFromAsset("database/moviedb_v2_version_1.db")
-//                            .addMigrations(MIGRATION_1_2,MIGRATION_2_3)
+                            .createFromAsset("database/movielibrary_db_v2_version_1.db")
                             .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -94,18 +93,5 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         return sInstance;
     }
 
-    static final Migration MIGRATION_1_2=new Migration(1,2) {
-        @Override
-        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE UNIQUE INDEX `index_scan_directory_path` ON `scan_directory` (`path`)");
-        }
-    };
-
-    static final Migration MIGRATION_2_3=new Migration(2,3) {
-        @Override
-        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE `videofile` ADD COLUMN `dir_path` TEXT");
-        }
-    };
 
 }

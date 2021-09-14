@@ -13,7 +13,7 @@ import com.hphtv.movielibrary.roomdb.TABLE;
  * author: Sam Leung
  * date:  2021/5/27
  */
-@Entity(tableName = TABLE.MOVIE_VIDEOFILE_CROSS_REF,primaryKeys = {"path","source"})
+@Entity(tableName = TABLE.MOVIE_VIDEOFILE_CROSS_REF,primaryKeys = {"path","source"},indices = {@Index("id")})
 public class MovieVideoFileCrossRef {
     @NonNull
     public String path;

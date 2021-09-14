@@ -12,9 +12,9 @@ import com.hphtv.movielibrary.roomdb.VIEW;
 
 @DatabaseView(
         value =
-        "SELECT M.id,M.title,M.pinyin,M.poster,M.ratings,M.year,MVCF__VF__SD.path,MVCF__VF__SD.dir_path,MVCF__VF__SD.device_id,genre_name,M.add_time,M.last_playtime,M.is_favorite " +
+        "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,MVCF__VF__SD.source,MVCF__VF__SD.path,MVCF__VF__SD.dir_path,MVCF__VF__SD.device_id,genre_name,M.add_time,M.last_playtime,M.is_favorite " +
                 "FROM " + TABLE.MOVIE + " AS M " +
-                "JOIN (SELECT MVCF.id,MVCF.path,VF__SD__DEV.dir_path,VF__SD__DEV.device_id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MVCF " +
+                "JOIN (SELECT MVCF.id,MVCF.path,MVCF.source,VF__SD__DEV.dir_path,VF__SD__DEV.device_id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MVCF " +
                 "JOIN (SELECT VF__SD.path,VF__SD.dir_path,DEV.id AS device_id FROM "+ TABLE.DEVICE +" AS DEV "+
                 "JOIN (SELECT VF.path,SD.path AS dir_path,SD.device_path FROM " + TABLE.VIDEOFILE + " AS VF " +
                 "JOIN " + TABLE.SCAN_DIRECTORY + " AS SD " +
@@ -30,6 +30,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
 )
 public class MovieDataView {
     public long id;
+    public String movie_id;
     public String title;
     public String pinyin;
     public String poster;
@@ -39,6 +40,7 @@ public class MovieDataView {
     public String device_id;
     public String dir_path;
     public String genre_name;
+    public String source;
     public long add_time;
     public long last_playtime;
     public boolean is_favorite;

@@ -11,10 +11,11 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
@@ -191,18 +192,42 @@ public class MovieScanService extends Service {
             boolean isMtimeFound = false;
             boolean isOmdbFound = false;
             if (!TextUtils.isEmpty(mtimeId)) {
-                MovieWrapper wrapper = MtimeApiService.getDetials(mtimeId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
-                saveMovieWrapper(wrapper, videoFile,ConstData.ScraperSource.MTIME);
-                isMtimeFound = true;
+                MovieDetailRespone respone = MtimeApiService.getDetials(mtimeId)
+                        .onErrorReturn(throwable -> {
+                            LogUtil.e("Mtime Detail "+throwable.getMessage());
+                            return null;
+                        })
+                        .subscribeOn(Schedulers.io()).blockingFirst();
+                if (respone != null) {
+                    MovieWrapper wrapper = respone.toEntity();
+                    if (wrapper != null) {
+                        saveMovieWrapper(wrapper, videoFile, Constants.ScraperSource.MTIME);
+                        isMtimeFound = true;
+                    }
+                }
             }
             if (!TextUtils.isEmpty(omdbId)) {
-                MovieWrapper wrapper = OmdbApiService.getDetials(mtimeId).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
-                saveMovieWrapper(wrapper, videoFile,ConstData.ScraperSource.OMDB);
-                isOmdbFound = true;
+                MovieDetailRespone respone = OmdbApiService.getDetials(omdbId)
+                        .onErrorReturn(throwable -> {
+                            throwable.printStackTrace();
+                            LogUtil.e("OMDB Detail "+throwable.getMessage());
+                            return null;
+                        })
+                        .subscribeOn(Schedulers.io()).blockingFirst();
+                if (respone != null) {
+                    MovieWrapper wrapper = respone.toEntity();
+                    if (wrapper != null) {
+                        saveMovieWrapper(wrapper, videoFile, Constants.ScraperSource.OMDB);
+                        isOmdbFound = true;
+                    }
+                }
             }
             videoFile.isScanned = 1;
             mVideoFileDao.update(videoFile);
             return isMtimeFound || isOmdbFound;
+        }).onErrorReturn(throwable -> {
+            LogUtil.e("combineLatest error-> "+ throwable.getMessage());
+            return false;
         }).subscribeOn(Schedulers.from(mMovieDetailExecutor))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new SimpleObserver<Boolean>() {
@@ -210,13 +235,16 @@ public class MovieScanService extends Service {
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                        synchronized (MovieScanService.this) {
-                            if (offset == total) {
-                                //扫描结束
-                                isScanning = false;
-                                Intent intent = new Intent();
-                                intent.setAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
-                                LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                        LogUtil.v("onComplete");
+                        if (offset == total) {
+                            synchronized (MovieScanService.this) {
+                                if (offset == total) {
+                                    //扫描结束
+                                    isScanning = false;
+                                    Intent intent = new Intent();
+                                    intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
+                                    LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                                }
                             }
                         }
                     }
@@ -224,6 +252,7 @@ public class MovieScanService extends Service {
                     @Override
                     public void onAction(Boolean aBoolean) {
                         offset++;
+                        LogUtil.v("onAction offset " + offset);
                     }
                 });
     }
@@ -256,33 +285,40 @@ public class MovieScanService extends Service {
                         }),
                 //获取最优匹配
                 (unionSearchRespone, unionSuggestRespone) -> {
-                    LogUtil.v(Thread.currentThread().getName(), "获取最优匹配 ...");
+                    LogUtil.v(Thread.currentThread().getName(), "MTIME 获取最优匹配 ...");
                     String name = movieSupplier.keyword;
+                    List<Movie> movies = new ArrayList<>();
                     if (unionSearchRespone != null) {
                         List<Movie> unionSearchMovies = unionSearchRespone.toEntity();
-                        List<Movie> suggestMovies = unionSuggestRespone.toEntity();
-                        List<Movie> movies = new ArrayList<>();
                         movies.addAll(unionSearchMovies);
-                        movies.addAll(suggestMovies);
-
-                        Movie mostSimilarMovie = null;
-                        float maxSimilarity = 0;
-                        for (Movie movie : movies) {
-                            float similarity = EditorDistance.checkLevenshtein(movie.title, name);
-                            float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
-                            float tmpSimilarity = Math.max(similarity, similarityEn);
-                            if (tmpSimilarity == 1) {
-                                mostSimilarMovie = movie;
-                                break;
-                            }
-                            if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
-                                mostSimilarMovie = movie;
-                                maxSimilarity = tmpSimilarity;
-                            }
-                        }
-                        if (mostSimilarMovie != null)
-                            return mostSimilarMovie.movieId;
                     }
+                    if (unionSuggestRespone != null) {
+                        List<Movie> suggestMovies = unionSuggestRespone.toEntity();
+                        movies.addAll(suggestMovies);
+                    }
+
+                    Movie mostSimilarMovie = null;
+                    float maxSimilarity = 0;
+                    for (Movie movie : movies) {
+                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
+                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
+                        float tmpSimilarity = Math.max(similarity, similarityEn);
+                        if (tmpSimilarity == 1) {
+                            mostSimilarMovie = movie;
+                            break;
+                        }
+                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
+                            mostSimilarMovie = movie;
+                            maxSimilarity = tmpSimilarity;
+                        }
+                    }
+                    if (mostSimilarMovie != null)
+                        return mostSimilarMovie.movieId;
+                    else
+                        return "";
+                })
+                .onErrorReturn(throwable -> {
+                    LogUtil.e("onErrorReturn MTIME-> " + throwable.getMessage());
                     return "";
                 });
     }
@@ -297,32 +333,36 @@ public class MovieScanService extends Service {
                     if (!TextUtils.isEmpty(name))
                         return OmdbApiService.unionSearch(name).observeOn(Schedulers.io());
                     return null;
-                }).map(movieSearchRespone -> {
-                    LogUtil.v(Thread.currentThread().getName(), "获取最优匹配 ...");
+                })
+                .map(movieSearchRespone -> {
+                    LogUtil.v(Thread.currentThread().getName(), "OMDB 获取最优匹配 ...");
                     String name = movieSupplier.keyword;
+                    List<Movie> movies = new ArrayList<>();
                     if (movieSearchRespone != null) {
                         List<Movie> unionSearchMovies = movieSearchRespone.toEntity();
-                        List<Movie> movies = new ArrayList<>();
                         movies.addAll(unionSearchMovies);
-
-                        Movie mostSimilarMovie = null;
-                        float maxSimilarity = 0;
-                        for (Movie movie : movies) {
-                            float similarity = EditorDistance.checkLevenshtein(movie.title, name);
-                            float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
-                            float tmpSimilarity = Math.max(similarity, similarityEn);
-                            if (tmpSimilarity == 1) {
-                                mostSimilarMovie = movie;
-                                break;
-                            }
-                            if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
-                                mostSimilarMovie = movie;
-                                maxSimilarity = tmpSimilarity;
-                            }
-                        }
-                        if (mostSimilarMovie != null)
-                            return mostSimilarMovie.movieId;
                     }
+                    Movie mostSimilarMovie = null;
+                    float maxSimilarity = 0;
+                    for (Movie movie : movies) {
+                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
+                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
+                        float tmpSimilarity = Math.max(similarity, similarityEn);
+                        if (tmpSimilarity == 1) {
+                            mostSimilarMovie = movie;
+                            break;
+                        }
+                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
+                            mostSimilarMovie = movie;
+                            maxSimilarity = tmpSimilarity;
+                        }
+                    }
+                    if (mostSimilarMovie != null)
+                        return mostSimilarMovie.movieId;
+                    else
+                        return "";
+                }).onErrorReturn(throwable -> {
+                    LogUtil.e("onErrorReturn OMDB-> " + throwable.getMessage());
                     return "";
                 });
     }

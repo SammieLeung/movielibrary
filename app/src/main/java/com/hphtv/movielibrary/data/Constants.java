@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by tchip on 18-3-1.
  */
 
-public class ConstData {
+public class Constants {
 
     public static final long GLIDE_CACHE_VERSION = System.currentTimeMillis() / 86400000;
     ;
@@ -60,7 +60,7 @@ public class ConstData {
     }
 
     public interface ScraperSource {
-        String MTIME = "MTime";
+        String MTIME = "MTIME";
         String OMDB = "OMDB";
     }
 

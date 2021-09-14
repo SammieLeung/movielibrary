@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.MovieTrailerAdapter;
 import com.hphtv.movielibrary.adapter.MovieTrailerAdapter.OnRecyclerViewItemClickListener;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
 import com.hphtv.movielibrary.fragment.dialog.MovieSearchFragment;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
@@ -33,6 +33,7 @@ import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.fragment.dialog.ConfirmDialogFragment;
 import com.hphtv.movielibrary.fragment.dialog.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
+import com.station.kit.util.LogUtil;
 import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -68,15 +69,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent != null) {
-            int currentMode = intent.getIntExtra(ConstData.IntentKey.KEY_MODE, -1);
+            int currentMode = intent.getIntExtra(Constants.IntentKey.KEY_MODE, -1);
             mViewModel.setCurrentMode(currentMode);
             switch (currentMode) {
-                case ConstData.MovieDetailMode.MODE_WRAPPER:
-                    long movieId = intent.getLongExtra(ConstData.IntentKey.KEY_MOVIE_ID, -1);
+                case Constants.MovieDetailMode.MODE_WRAPPER:
+                    long movieId = intent.getLongExtra(Constants.IntentKey.KEY_MOVIE_ID, -1);
                     prepareMovieWrapper(movieId);
                     break;
-                case ConstData.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
-                    String unrecognizedFileKeyword = intent.getStringExtra(ConstData.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD);
+                case Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
+                    String unrecognizedFileKeyword = intent.getStringExtra(Constants.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD);
                     prepareUnrecogizedFile(unrecognizedFileKeyword);
                     break;
             }
@@ -139,7 +140,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     protected void onResume() {
         Log.v(TAG, "onResume()被调用");
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
+        intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
         super.onResume();
     }
@@ -365,7 +366,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(ConstData.ACTION_FAVORITE_MOVIE_CHANGE)) {
+            if (intent.getAction().equals(Constants.ACTION_FAVORITE_MOVIE_CHANGE)) {
                 long id = intent.getLongExtra("id", -1);
 //                if (id == mCurrentWrapper.getId())
 //                    refreshFavroite();

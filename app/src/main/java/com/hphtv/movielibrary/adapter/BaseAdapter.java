@@ -91,7 +91,7 @@ public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAda
     public void onClick(View v) {
         if (mOnItemClickListener != null) {
             //注意这里使用getTag方法获取数据
-            mOnItemClickListener.onItemClick(v, v.getTag());
+            mOnItemClickListener.onItemClick(v, (T) v.getTag());
         }
     }
 
@@ -117,9 +117,9 @@ public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAda
     }
 
 
-    private OnRecyclerViewItemClickListener mOnItemClickListener = null;
+    private OnRecyclerViewItemClickListener<T> mOnItemClickListener = null;
 
-    public void setOnItemClickListener(OnRecyclerViewItemClickListener listener) {
+    public void setOnItemClickListener(OnRecyclerViewItemClickListener<T> listener) {
         this.mOnItemClickListener = listener;
     }
 

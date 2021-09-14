@@ -37,6 +37,9 @@ public class VideoFile implements Serializable {
     @ColumnInfo(name = "add_time")
     public long addTime;
 
+    @ColumnInfo(name = "last_playtime")
+    public long lastPlayTime;//上次播放时间
+
     @Override
     public String toString() {
         return "VideoFile{" +

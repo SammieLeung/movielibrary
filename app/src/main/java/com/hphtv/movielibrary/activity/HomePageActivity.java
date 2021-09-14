@@ -41,7 +41,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.LeftMenuListAdapter;
 import com.hphtv.movielibrary.adapter.QuickFragmentPageAdapter;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityHomepageBinding;
 import com.hphtv.movielibrary.databinding.MovieLibraryMovieFiltersLayoutBinding;
 import com.hphtv.movielibrary.fragment.FavoriteFragment;
@@ -183,13 +183,13 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     private void registerReceiver() {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ConstData.ACTION_FAVORITE_MOVIE_CHANGE);
-        intentFilter.addAction(ConstData.BroadCastMsg.DEVICE_UP);
-        intentFilter.addAction(ConstData.BroadCastMsg.DEVICE_DOWN);
-        intentFilter.addAction(ConstData.BroadCastMsg.RESCAN_DEVICE);
-        intentFilter.addAction(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH);
-        intentFilter.addAction(ConstData.BroadCastMsg.START_LOADING);
-        intentFilter.addAction(ConstData.BroadCastMsg.STOP_LOADING);
+        intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
+        intentFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
+        intentFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
+        intentFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
+        intentFilter.addAction(Constants.BroadCastMsg.START_LOADING);
+        intentFilter.addAction(Constants.BroadCastMsg.STOP_LOADING);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
     }
@@ -386,8 +386,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         TypedArray ta_1 = getResources().obtainTypedArray(R.array.menu_item_icon_group_1);
         for (int i = 0; i < itemGroup1.length; i++) {
             HashMap<String, Object> map = new HashMap<>();
-            map.put(ConstData.TEXT, itemGroup1[i]);
-            map.put(ConstData.ICON, ta_1.getResourceId(i, 0));
+            map.put(Constants.TEXT, itemGroup1[i]);
+            map.put(Constants.ICON, ta_1.getResourceId(i, 0));
             menuList.add(map);
         }
         return menuList;
@@ -638,28 +638,28 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             String action = intent.getAction();
             LogUtil.v(HomePageActivity.class.getSimpleName(), "mBroadcastReceiver action:" + action);
             switch (action) {
-                case ConstData.BroadCastMsg.DEVICE_DOWN:
+                case Constants.BroadCastMsg.DEVICE_DOWN:
                     mFilterBinding.categoryview.resetDevicePos();
                     postDelayMovieRefresh();
                     break;
-                case ConstData.BroadCastMsg.DEVICE_UP:
+                case Constants.BroadCastMsg.DEVICE_UP:
                     startLoading();
                     break;
-                case ConstData.BroadCastMsg.START_LOADING:
-                    int cur_start = intent.getIntExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, 0);
+                case Constants.BroadCastMsg.START_LOADING:
+                    int cur_start = intent.getIntExtra(Constants.IntentKey.KEY_CUR_FRAGMENT, 0);
                     if (mBinding.viewpager.getCurrentItem() == cur_start) {
                         LogUtil.v("response " + cur_start + " startLoading");
                         startLoading();
                     }
                     break;
-                case ConstData.BroadCastMsg.STOP_LOADING:
-                    int cur_stop = intent.getIntExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, 0);
+                case Constants.BroadCastMsg.STOP_LOADING:
+                    int cur_stop = intent.getIntExtra(Constants.IntentKey.KEY_CUR_FRAGMENT, 0);
                     if (mBinding.viewpager.getCurrentItem() == cur_stop) {
                         LogUtil.v("response " + cur_stop + " stopLoading");
                         stopLoading();
                     }
                     break;
-                case ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH:
+                case Constants.BroadCastMsg.MOVIE_SCRAP_FINISH:
                     postDelayMovieRefresh(0);
                     break;
             }

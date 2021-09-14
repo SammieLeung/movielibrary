@@ -5,13 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
-import com.bumptech.glide.signature.ObjectKey;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.databinding.MovieLibraryItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.util.GlideTools;

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class LeftMenuListAdapter extends BaseAdapter {
     }
 
     public int getIconResourceId(int position) {
-        return (int) rawDataList.get(position).get(ConstData.ICON);
+        return (int) rawDataList.get(position).get(Constants.ICON);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class LeftMenuListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.icon.setImageResource(getIconResourceId(position));
-        viewHolder.title.setText((String) getItem(position).get(ConstData.TEXT));
+        viewHolder.title.setText((String) getItem(position).get(Constants.TEXT));
 
         return convertView;
     }

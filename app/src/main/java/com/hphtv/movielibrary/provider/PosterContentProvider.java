@@ -10,11 +10,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
-import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.sqlite.dao.MovieWrapperDao;
-import com.hphtv.movielibrary.sqlite.dao.PosterProviderDao;
+import com.hphtv.movielibrary.data.Constants;
 
 /**
  * Created by tchip on 18-5-15.
@@ -35,7 +32,7 @@ public class PosterContentProvider extends ContentProvider {
     }
 
     private Cursor createPhotoCursor() {
-        String poster = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.LAST_POTSER, "");
+        String poster = SharePreferencesTools.getInstance(getContext()).readProperty(Constants.SharePreferenceKeys.LAST_POTSER, "");
         MatrixCursor matrixCursor = new MatrixCursor(COLUMN_NAME);
         matrixCursor.addRow(new String[]{poster});
         return matrixCursor;

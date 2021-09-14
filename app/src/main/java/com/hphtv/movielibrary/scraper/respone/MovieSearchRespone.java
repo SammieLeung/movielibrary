@@ -1,7 +1,9 @@
 package com.hphtv.movielibrary.scraper.respone;
 
 
-import com.hphtv.movielibrary.data.ConstData;
+import android.text.TextUtils;
+
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
@@ -19,9 +21,11 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
     @Override
     public List<Movie> toEntity() {
         List<Movie> movies = new ArrayList<>();
-        if (data.list != null)
+        if (data!=null&&data.list != null)
             for (Data.SearchMovie searchMovie : data.list) {
-                movies.add(searchMovie.toEntity());
+                Movie movie=searchMovie.toEntity();
+                movie.source= data.source.toUpperCase();
+                movies.add(movie);
             }
         return movies;
     }
@@ -51,7 +55,6 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
                 movie.tag = genre;
                 movie.tag2 = actors;
                 movie.type = type;
-                movie.source = ConstData.ScraperSource.MTIME;
                 movie.year = year;
                 movie.poster = poster;
                 return movie;

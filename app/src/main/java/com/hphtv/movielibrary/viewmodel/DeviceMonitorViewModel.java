@@ -10,7 +10,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
@@ -137,7 +137,7 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
                         if (videoFiles != null && videoFiles.size() > 0)
                             scanService.start(videoFiles);
                         else
-                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(ConstData.BroadCastMsg.MOVIE_SCRAP_FINISH));
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH));
                     }
                 });
     }
@@ -182,26 +182,26 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
                     + " deviceType:" + mDeviceType);
 
             Intent broadIntent = new Intent();
-            broadIntent.putExtra(ConstData.DeviceMountMsg.DEVICE_MOUNT_PATH, mMountPath);
-            broadIntent.putExtra(ConstData.DeviceMountMsg.MOUNT_TYPE, mDeviceType);
-            broadIntent.putExtra(ConstData.DeviceMountMsg.MOUNT_DEVICE_STATE, mMountState);
-            broadIntent.putExtra(ConstData.DeviceMountMsg.IS_FROM_NETWORK, false);//TODO hard code
+            broadIntent.putExtra(Constants.DeviceMountMsg.DEVICE_MOUNT_PATH, mMountPath);
+            broadIntent.putExtra(Constants.DeviceMountMsg.MOUNT_TYPE, mDeviceType);
+            broadIntent.putExtra(Constants.DeviceMountMsg.MOUNT_DEVICE_STATE, mMountState);
+            broadIntent.putExtra(Constants.DeviceMountMsg.IS_FROM_NETWORK, false);//TODO hard code
             //设备状态为mounted则将设备信息入库，并扫描设备文件。
             Device device_db = mDeviceDao.querybyMountPath(mMountPath);
             if (device_db != null) {
                 mDeviceDao.deleteDevices(device_db);//删除设备
             }
-            if (mMountState == ConstData.DeviceMountState.MOUNTED) {
+            if (mMountState == Constants.DeviceMountState.MOUNTED) {
                 Device device = buildDeviceFromPath(mMountPath, mNetworkPath, mDeviceType, mDeviceName);//生成一个基础设备
                 if (device == null)
                     return;
                 //设备入库
                 mDeviceDao.insertDevices(device);
                 //保存设备id和设备路径的关联信息
-                ConstData.devicePathIDs.put(mMountPath, device.id);//
+                Constants.devicePathIDs.put(mMountPath, device.id);//
 
-                broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_UP);
-                broadIntent.putExtra(ConstData.DeviceMountMsg.DEVICE_ID, device.id);
+                broadIntent.setAction(Constants.BroadCastMsg.DEVICE_UP);
+                broadIntent.putExtra(Constants.DeviceMountMsg.DEVICE_ID, device.id);
 
                 //启动文件扫描线程。
                 Future<Boolean> scan = executeOnFileScanThread(device);
@@ -215,8 +215,8 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
                     e.printStackTrace();
                 }
             } else {
-                ConstData.devicePathIDs.remove(mMountPath);
-                broadIntent.setAction(ConstData.BroadCastMsg.DEVICE_DOWN);
+                Constants.devicePathIDs.remove(mMountPath);
+                broadIntent.setAction(Constants.BroadCastMsg.DEVICE_DOWN);
                 LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(broadIntent);
             }
             LogUtil.v("mount " + mDeviceName + " finish");
@@ -239,17 +239,17 @@ public class DeviceMonitorViewModel extends AndroidViewModel {
             device.name = name;
 
             //获取设备具体类型
-            if (deviceType == ConstData.DeviceType.DEVICE_TYPE_LOCAL) {
+            if (deviceType == Constants.DeviceType.DEVICE_TYPE_LOCAL) {
                 if (StorageHelper.isMountUsb(getApplication(), mountPath)) {
-                    device.type = ConstData.DeviceType.DEVICE_TYPE_USB;
+                    device.type = Constants.DeviceType.DEVICE_TYPE_USB;
                 } else if (StorageHelper.isMountSdCard(getApplication(), mountPath)) {
-                    device.type = ConstData.DeviceType.DEVICE_TYPE_SDCARDS;
+                    device.type = Constants.DeviceType.DEVICE_TYPE_SDCARDS;
                 } else if (StorageHelper.isMountHardDisk(getApplication(), mountPath)) {
-                    device.type = ConstData.DeviceType.DEVICE_TYPE_HARD_DISK;
+                    device.type = Constants.DeviceType.DEVICE_TYPE_HARD_DISK;
                 } else if (StorageHelper.isMountPcie(getApplication(), mountPath)) {
-                    device.type = ConstData.DeviceType.DEVICE_TYPE_PCIE;
+                    device.type = Constants.DeviceType.DEVICE_TYPE_PCIE;
                 } else {
-                    device.type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
+                    device.type = Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
                 }
             } else {
                 device.type = deviceType;

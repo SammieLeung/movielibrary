@@ -23,7 +23,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.activity.AppBaseActivity;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +48,7 @@ public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends View
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            mPosition = bundle.getInt(ConstData.IntentKey.KEY_CUR_FRAGMENT, 0);
+            mPosition = bundle.getInt(Constants.IntentKey.KEY_CUR_FRAGMENT, 0);
         }
     }
 
@@ -120,8 +120,8 @@ public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends View
 
     protected void notifyStartLoading() {
         Intent intent = new Intent();
-        intent.setAction(ConstData.BroadCastMsg.START_LOADING);
-        intent.putExtra(ConstData.IntentKey.KEY_CUR_FRAGMENT, mPosition);
+        intent.setAction(Constants.BroadCastMsg.START_LOADING);
+        intent.putExtra(Constants.IntentKey.KEY_CUR_FRAGMENT, mPosition);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 

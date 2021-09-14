@@ -18,8 +18,8 @@ public interface MovieVideofileCrossRefDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long insertOrReplace(MovieVideoFileCrossRef movieVideoFileCrossRef);
 
-    @Query("SELECT * FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path")
-    public MovieVideoFileCrossRef queryByPath(String path);
+//    @Query("SELECT * FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path")
+//    public MovieVideoFileCrossRef queryByPath(String path);
 
     @Update
     public int update(MovieVideoFileCrossRef movieVideoFileCrossRef);

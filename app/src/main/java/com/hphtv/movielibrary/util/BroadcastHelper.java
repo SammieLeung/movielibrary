@@ -3,7 +3,6 @@ package com.hphtv.movielibrary.util;
 import android.content.Context;
 import android.content.Intent;
 
-import com.hphtv.movielibrary.sqlite.bean.scraperBean.Movie;
 
 /**
  * author: Sam Leung

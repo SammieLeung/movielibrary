@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
@@ -52,8 +52,8 @@ public class DeviceInitThread extends Thread {
         if (allCardPaths != null && allCardPaths.size() > 0) {
             for (String path : allCardPaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
-                int type = ConstData.DeviceType.DEVICE_TYPE_SDCARDS;
-                int state = ConstData.DeviceMountState.MOUNTED;
+                int type = Constants.DeviceType.DEVICE_TYPE_SDCARDS;
+                int state = Constants.DeviceMountState.MOUNTED;
                 mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
@@ -62,8 +62,8 @@ public class DeviceInitThread extends Thread {
         if (allUsbPaths != null && allUsbPaths.size() > 0) {
             for (String path : allUsbPaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
-                int type = ConstData.DeviceType.DEVICE_TYPE_USB;
-                int state = ConstData.DeviceMountState.MOUNTED;
+                int type = Constants.DeviceType.DEVICE_TYPE_USB;
+                int state = Constants.DeviceMountState.MOUNTED;
                 mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
@@ -72,8 +72,8 @@ public class DeviceInitThread extends Thread {
         if (allPciePaths != null && allPciePaths.size() > 0) {
             for (String path : allPciePaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
-                int type = ConstData.DeviceType.DEVICE_TYPE_PCIE;
-                int state = ConstData.DeviceMountState.MOUNTED;
+                int type = Constants.DeviceType.DEVICE_TYPE_PCIE;
+                int state = Constants.DeviceMountState.MOUNTED;
                 mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
@@ -82,8 +82,8 @@ public class DeviceInitThread extends Thread {
         if (allHardDiskPaths != null && allHardDiskPaths.size() > 0) {
             for (String path : allHardDiskPaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
-                int type = ConstData.DeviceType.DEVICE_TYPE_HARD_DISK;
-                int state = ConstData.DeviceMountState.MOUNTED;
+                int type = Constants.DeviceType.DEVICE_TYPE_HARD_DISK;
+                int state = Constants.DeviceMountState.MOUNTED;
                 mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, path, false, "", state);
             }
         }
@@ -91,8 +91,8 @@ public class DeviceInitThread extends Thread {
         if (!TextUtils.isEmpty(internelStorage)) {
             //扫描内置存储
             String deviceName = internelStorage.substring(internelStorage.lastIndexOf("/") + 1);//TODO 验证Android 11上的可行性
-            int type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
-            int state = ConstData.DeviceMountState.MOUNTED;
+            int type = Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
+            int state = Constants.DeviceMountState.MOUNTED;
             mDeviceMonitorViewModel.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
         }
 

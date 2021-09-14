@@ -8,9 +8,11 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.MovieSearchAdapter;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
+import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
@@ -39,7 +41,7 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
 
     public MovieSearchFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
-        mSource =ConstData.ScraperSource.MTIME;
+        mSource = ScraperSourceTools.getSource();
         mMovieLinkedList=new LinkedList<>();
     }
 
@@ -50,8 +52,11 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
         mMovieLinkedList.clear();
         mCurrentPage=1;
         switch (mSource) {
-            case ConstData.ScraperSource.MTIME:
+            case Constants.ScraperSource.MTIME:
                  notifyNewSearch(MtimeApiService.unionSearch(mCurrentKeyword, mCurrentPage, pageSize * 3), adapter);
+                break;
+            case Constants.ScraperSource.OMDB:
+                notifyNewSearch(OmdbApiService.unionSearch(mCurrentKeyword,mCurrentPage,pageSize*3),adapter);
                 break;
         }
         mCurrentPage=3;
@@ -61,8 +66,11 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
         if(TextUtils.isEmpty(mCurrentKeyword))
             return;
         switch (mSource) {
-            case ConstData.ScraperSource.MTIME:
+            case Constants.ScraperSource.MTIME:
                 notifyLoadingMore(MtimeApiService.unionSearch(mCurrentKeyword, mCurrentPage+1, pageSize ), adapter);
+                break;
+            case Constants.ScraperSource.OMDB:
+                notifyLoadingMore(OmdbApiService.unionSearch(mCurrentKeyword,mCurrentPage+1,pageSize),adapter);
                 break;
         }
 
@@ -89,14 +97,14 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                     @Override
                     public void onError(Throwable e) {
                         super.onError(e);
+                        String msg;
                         if(e instanceof UnknownHostException) {
-                            String msg=getApplication().getString(R.string.toast_UnknownHostException);
-                            ToastUtil.newInstance(getApplication()).toast(msg);
-                            adapter.cancelLoadingAndShowTips(msg);
+                            msg = getApplication().getString(R.string.toast_UnknownHostException);
                         }else{
-                            ToastUtil.newInstance(getApplication()).toast(e.getMessage());
-                            adapter.cancelLoading();
+                            msg = e.getMessage();
                         }
+                        ToastUtil.newInstance(getApplication()).toast(msg);
+                        adapter.cancelLoadingAndShowTips(msg);
 
                     }
                 });
@@ -109,15 +117,30 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                 .observeOn(Schedulers.io())
                 .map(responeEntity -> responeEntity.toEntity())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(movies -> {
-                    if(movies==null||movies.size()==0) {
-                        ToastUtil.newInstance(getApplication()).toast(getApplication().getString(R.string.toast_loadmore_end));
+                .subscribe(new SimpleObserver<List<Movie>>() {
+                    @Override
+                    public void onAction(List<Movie> movies) {
+                        if (movies == null || movies.size() == 0) {
+                            ToastUtil.newInstance(getApplication()).toast(getApplication().getString(R.string.toast_loadmore_end));
+                        } else {
+                            mCurrentPage++;
+                            adapter.addMovies(movies);
+                        }
+                        adapter.cancelLoading();
                     }
-                    else {
-                        mCurrentPage++;
-                        adapter.addMovies(movies);
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        String msg;
+                        if(e instanceof UnknownHostException) {
+                            msg = getApplication().getString(R.string.toast_UnknownHostException);
+                        }else{
+                            msg = e.getMessage();
+                        }
+                        ToastUtil.newInstance(getApplication()).toast(msg);
+                        adapter.cancelLoadingAndShowTips(msg);
                     }
-                    adapter.cancelLoading();
                 });
     }
 

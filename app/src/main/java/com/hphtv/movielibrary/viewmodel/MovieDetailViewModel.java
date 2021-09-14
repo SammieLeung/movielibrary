@@ -26,8 +26,9 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
 import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.SharePreferencesTools;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
@@ -77,10 +78,12 @@ public class MovieDetailViewModel extends AndroidViewModel {
     private int mCurrentMode;
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViewList;
 
+    private String mSource;
 
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSingleThreadPool = Executors.newSingleThreadExecutor();
+        mSource= ScraperSourceTools.getSource();
         initData();
     }
 
@@ -102,7 +105,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
-                    mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id);
+                    mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id,mSource);
                     return mMovieWrapper;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -119,7 +122,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         Observable.just(keyword)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(sKeyword -> {
-                    mUnrecognizedFileDataViewList = mVideoFileDao.queryUnrecognizedFilesByKeyword(sKeyword);
+                    mUnrecognizedFileDataViewList = mVideoFileDao.queryUnrecognizedFilesByKeyword(sKeyword,mSource);
                     return mUnrecognizedFileDataViewList;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -162,8 +165,8 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 //记录播放时间，作为播放记录
                 .doOnNext(filepath -> {
-                    mMovieDao.updateLastPlaytime(filepath, System.currentTimeMillis());
-                    SharePreferencesTools.getInstance(getApplication()).saveProperty(ConstData.SharePreferenceKeys.LAST_POTSER, wrapper.movie.poster);
+                    mVideoFileDao.updateLastPlaytime(filepath, System.currentTimeMillis());
+                    SharePreferencesTools.getInstance(getApplication()).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, wrapper.movie.poster);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<String>() {
@@ -198,10 +201,10 @@ public class MovieDetailViewModel extends AndroidViewModel {
                     @Override
                     public MovieWrapper apply(String _source) throws Throwable {
                         switch (_source) {
-                            case ConstData.ScraperSource.MTIME:
+                            case Constants.ScraperSource.MTIME:
                                 MovieWrapper mtimeWrapper = MtimeApiService.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                                 return mtimeWrapper;
-                            case ConstData.ScraperSource.OMDB:
+                            case Constants.ScraperSource.OMDB:
                                 MovieWrapper omdbWrapper = OmdbApiService.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                                 return omdbWrapper;
                         }
@@ -210,7 +213,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 })
                 .doOnNext(wrapper -> {
                     String[] paths;
-                    if (mCurrentMode == ConstData.MovieDetailMode.MODE_WRAPPER) {
+                    if (mCurrentMode == Constants.MovieDetailMode.MODE_WRAPPER) {
                         paths = new String[mMovieWrapper.videoFiles.size()];
                         for (int i = 0; i < paths.length; i++) {
                             paths[i] = mMovieWrapper.videoFiles.get(i).path;

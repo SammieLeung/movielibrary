@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,17 +24,18 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class FavoriteFragmentViewModel extends AndroidViewModel {
     private MovieDao mMovieDao;
-
+    private String mSource;
     public FavoriteFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
+        mSource= ScraperSourceTools.getSource();
         MovieLibraryRoomDatabase database = MovieLibraryRoomDatabase.getDatabase(application);
         mMovieDao = database.getMovieDao();
     }
 
-    public void prepareFavorite(HistoryFragmentViewModel.Callback callback) {
+    public void prepareFavorite(Callback callback) {
         Observable.just("")
                 .map(s -> {
-                    List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView();
+                    List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(mSource);
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())

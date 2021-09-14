@@ -8,11 +8,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
-import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.MovieAdapter;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.viewmodel.fragment.HomePageFragementViewModel;
@@ -35,7 +34,7 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
     public static HomePageFragment newInstance(int pos) {
 
         Bundle args = new Bundle();
-        args.putInt(ConstData.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
         HomePageFragment fragment = new HomePageFragment();
         fragment.setArguments(args);
         return fragment;
@@ -53,12 +52,12 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
         StaggeredGridLayoutManager mGridLayoutManager = new StaggeredGridLayoutManager( mColums, GridLayoutManager.VERTICAL);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mMovieAdapter = new MovieAdapter(getContext(), mMovieDataViewList);
-        mMovieAdapter.setOnItemClickListener((BaseAdapter.OnRecyclerViewItemClickListener<MovieDataView>) (view, data) -> {
+        mMovieAdapter.setOnItemClickListener((view, data) -> {
             Intent intent = new Intent(HomePageFragment.this.getContext(),
                     MovieDetailActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putLong(ConstData.IntentKey.KEY_MOVIE_ID, data.id);
-            bundle.putInt(ConstData.IntentKey.KEY_MODE, ConstData.MovieDetailMode.MODE_WRAPPER);
+            bundle.putLong(Constants.IntentKey.KEY_MOVIE_ID, data.id);
+            bundle.putInt(Constants.IntentKey.KEY_MODE, Constants.MovieDetailMode.MODE_WRAPPER);
             intent.putExtras(bundle);
             startActivityForResultFromParent(intent);
         });

@@ -11,7 +11,7 @@ import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.signature.ObjectKey;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 
 /**
  * author: Sam Leung
@@ -46,7 +46,7 @@ public class GlideTools {
                     .load(buildGlideUrl(path))
                     .thumbnail(0.3f)
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .signature(new ObjectKey(ConstData.GLIDE_CACHE_VERSION))
+                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
                     .placeholder(R.mipmap.ic_poster_default)
                     .error(R.mipmap.ic_poster_default);
         }

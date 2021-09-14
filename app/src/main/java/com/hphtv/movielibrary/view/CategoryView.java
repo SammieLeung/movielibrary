@@ -21,10 +21,10 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import androidx.annotation.NonNull;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.ConstData;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.util.FormatterTools;
 
@@ -112,11 +112,11 @@ public class CategoryView extends LinearLayout implements
     }
 
     private void prepareCheckPosition() {
-        String devicePath = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.DEVICE, "");
-        String year = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.YEAR, "");
-        String genre = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.GENRE, "");
-        String sort_type = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.SORTTYPE, getResources().getString(R.string.order_name));
-        boolean isDesc = SharePreferencesTools.getInstance(getContext()).readProperty(ConstData.SharePreferenceKeys.SORT_BY_DESC, false);
+        String devicePath = SharePreferencesTools.getInstance(getContext()).readProperty(Constants.SharePreferenceKeys.DEVICE, "");
+        String year = SharePreferencesTools.getInstance(getContext()).readProperty(Constants.SharePreferenceKeys.YEAR, "");
+        String genre = SharePreferencesTools.getInstance(getContext()).readProperty(Constants.SharePreferenceKeys.GENRE, "");
+        String sort_type = SharePreferencesTools.getInstance(getContext()).readProperty(Constants.SharePreferenceKeys.SORTTYPE, getResources().getString(R.string.order_name));
+        boolean isDesc = SharePreferencesTools.getInstance(getContext()).readProperty(Constants.SharePreferenceKeys.SORT_BY_DESC, false);
         int i = 0;
         for (Device device : mDevices) {
             if (devicePath.equalsIgnoreCase(device.path)) {
@@ -241,8 +241,8 @@ public class CategoryView extends LinearLayout implements
      * 更新排序方式--需要UI线程执行
      */
     private void updateOrder() {
-        SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.SORTTYPE, mSortFilters.get(mCurSortPos));
-        SharePreferencesTools.getInstance(getContext()).saveProperty(ConstData.SharePreferenceKeys.SORT_BY_DESC, isDesc);
+        SharePreferencesTools.getInstance(getContext()).saveProperty(Constants.SharePreferenceKeys.SORTTYPE, mSortFilters.get(mCurSortPos));
+        SharePreferencesTools.getInstance(getContext()).saveProperty(Constants.SharePreferenceKeys.SORT_BY_DESC, isDesc);
         mUIHandler.post(() -> {
             for (int i = 0; i < mSortRadioGroup.getChildCount(); i++) {
                 RadioButton radioButton = (RadioButton) mSortRadioGroup.getChildAt(i);

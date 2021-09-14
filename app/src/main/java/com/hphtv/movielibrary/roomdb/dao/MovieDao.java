@@ -10,6 +10,7 @@ import androidx.room.Transaction;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 
@@ -29,36 +30,30 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
     public Movie queryByMovieId(String movie_id);
 
-    /**
-     * 根据文件路径设置last_playtime
-     *
-     * @param path
-     * @return
-     */
-    @Query("UPDATE " + TABLE.MOVIE + " " +
-            "SET last_playtime=:time " +
-            "WHERE id = " +
-            "(SELECT id from " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " " +
-            "WHERE path=:path)")
-    public int updateLastPlaytime(String path, long time);
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
             "SET is_favorite=:isFavorite " +
             "WHERE id=:id")
     public int updateFavorite(boolean isFavorite, long id);
 
+    @Query("UPDATE " + TABLE.MOVIE + " " +
+            "SET is_favorite=:isFavorite " +
+            "WHERE movie_id=:movie_id")
+    public int updateFavoriteByMovieId(boolean isFavorite, String movie_id);
+
     @Query("SELECT is_favorite FROM "+TABLE.MOVIE +" WHERE id=:id")
     public boolean queryFavorite(long id);
-    /**
-     * 只查询当前以挂载的设备
-     *
-     * @return
-     */
-    @Transaction
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
-            "(SELECT VF.path from " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
-            "ON MOVIE__VF.path=VF__DEV.path)")
-    public List<MovieWrapper> queryAll();
+
+//    /**
+//     * 只查询当前以挂载的设备
+//     *
+//     * @return
+//     */
+//    @Transaction
+//    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
+//            "(SELECT VF.path from " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
+//            "ON MOVIE__VF.path=VF__DEV.path)")
+//    public List<MovieWrapper> queryAll();
 
     /**
      * 按电影id查询电影wrapper
@@ -68,9 +63,9 @@ public interface MovieDao {
      */
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
-            "(SELECT VF.path from " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
-            "ON MOVIE__VF.path=VF__DEV.path) and id=:id")
-    public MovieWrapper queryMovieWrapperById(long id);
+            "(SELECT VF.path FROM " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_id=DEV.id) AS VF__DEV " +
+            "ON MOVIE__VF.path=VF__DEV.path AND MOVIE__VF.source=:source) and id=:id")
+    public MovieWrapper queryMovieWrapperById(long id,String source);
 
 
     /**
@@ -92,7 +87,8 @@ public interface MovieDao {
      * @return
      */
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
-            + " WHERE (:device_id IS NULL OR device_id=:device_id)" +
+            + " WHERE source=:source" +
+            " AND (:device_id IS NULL OR device_id=:device_id)" +
             " AND (:year IS NULL OR year=:year)" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name)" +
             " GROUP BY id " +
@@ -108,16 +104,14 @@ public interface MovieDao {
             "CASE WHEN :order =4 THEN last_playtime END ASC," +
             "CASE WHEN :order =5 THEN is_favorite END ASC"
     )
-    public List<MovieDataView> queryMovieDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, @Nullable boolean isDesc);
+    public List<MovieDataView> queryMovieDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, String source,@Nullable boolean isDesc);
     
-    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " GROUP BY id ")
-    public List<MovieDataView> queryAllMovieDataView();
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
+    public List<MovieDataView> queryAllMovieDataView(String source);
 
-    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW+" WHERE last_playtime!=0 GROUP BY id ORDER BY last_playtime DESC")
-    public List<MovieDataView> queryHistoryMovieDataView();
 
-    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW+" WHERE is_favorite=1 GROUP BY id ORDER BY pinyin ASC")
-    public List<MovieDataView> queryFavoriteMovieDataView();
+    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW+" WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
+    public List<MovieDataView> queryFavoriteMovieDataView(String source);
     /**
      * 查询年份
      *

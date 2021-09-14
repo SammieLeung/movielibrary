@@ -19,7 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.station.kit.util.LogUtil;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.viewmodel.DeviceMonitorViewModel;
 
 import java.io.File;
@@ -95,9 +95,9 @@ public class DeviceMonitorService extends Service {
                 public void onStateChanged(@NonNull StorageVolume volume) {
                     super.onStateChanged(volume);
                     String state_txt = volume.getState();
-                    int state = state_txt.equals(ConstData.DeviceMountState.MOUNTED_TEXT) ? ConstData.DeviceMountState.MOUNTED : ConstData.DeviceMountState.UNMOUNTED;
-                    if (state == ConstData.DeviceMountState.MOUNTED) {
-                        mDeviceMonitorViewModel.executeOnMountThread(volume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, volume.getDirectory().getPath(), false, "", state);
+                    int state = state_txt.equals(Constants.DeviceMountState.MOUNTED_TEXT) ? Constants.DeviceMountState.MOUNTED : Constants.DeviceMountState.UNMOUNTED;
+                    if (state == Constants.DeviceMountState.MOUNTED) {
+                        mDeviceMonitorViewModel.executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, volume.getDirectory().getPath(), false, "", state);
                     } else {
                         //拔出U盘的时候volume.getDirectory()返回的是null，所以被迫使用反射获取mPath的值
                         try {
@@ -106,7 +106,7 @@ public class DeviceMonitorService extends Service {
                             field_mPath.setAccessible(true);
                             File fpath = (File) field_mPath.get(volume);
                             String path = fpath.toString();
-                            mDeviceMonitorViewModel.executeOnMountThread(volume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
+                            mDeviceMonitorViewModel.executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
                         } catch (NoSuchFieldException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
@@ -125,9 +125,9 @@ public class DeviceMonitorService extends Service {
             registerReceiver(mDeviceMountReceiver, newFilter);
         }
         IntentFilter localFilter = new IntentFilter();
-        localFilter.addAction(ConstData.BroadCastMsg.DEVICE_UP);
-        localFilter.addAction(ConstData.BroadCastMsg.DEVICE_DOWN);
-        localFilter.addAction(ConstData.BroadCastMsg.RESCAN_DEVICE);
+        localFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
+        localFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
+        localFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
     }
 
@@ -158,14 +158,14 @@ public class DeviceMonitorService extends Service {
                 case Intent.ACTION_MEDIA_UNMOUNTED:
                     StorageVolume storageVolume = intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
                     String state_txt = storageVolume.getState();
-                    int state = state_txt.equals(ConstData.DeviceMountState.MOUNTED_TEXT) ? ConstData.DeviceMountState.MOUNTED : ConstData.DeviceMountState.UNMOUNTED;
+                    int state = state_txt.equals(Constants.DeviceMountState.MOUNTED_TEXT) ? Constants.DeviceMountState.MOUNTED : Constants.DeviceMountState.UNMOUNTED;
                     //Android 11以上
                     try {
                         Class clazz = storageVolume.getClass();
                         Method meth = clazz.getDeclaredMethod("getPath");
                         meth.setAccessible(true);
                         String path = (String) meth.invoke(storageVolume);
-                        mDeviceMonitorViewModel.executeOnMountThread(storageVolume.getUuid(), ConstData.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
+                        mDeviceMonitorViewModel.executeOnMountThread(storageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
@@ -177,14 +177,14 @@ public class DeviceMonitorService extends Service {
                     }
                     break;
                 //本地广播
-                case ConstData.BroadCastMsg.DEVICE_UP:
-                    String mountPath = intent.getStringExtra(ConstData.DeviceMountMsg.DEVICE_MOUNT_PATH);
+                case Constants.BroadCastMsg.DEVICE_UP:
+                    String mountPath = intent.getStringExtra(Constants.DeviceMountMsg.DEVICE_MOUNT_PATH);
                     LogUtil.v("currentPath=" + mountPath);
                     mDeviceMonitorViewModel.startScanWithNotScannedFiles(mMovieScanService, mountPath);
                     break;
-                case ConstData.BroadCastMsg.DEVICE_DOWN:
+                case Constants.BroadCastMsg.DEVICE_DOWN:
                     break;
-                case ConstData.BroadCastMsg.RESCAN_DEVICE:
+                case Constants.BroadCastMsg.RESCAN_DEVICE:
                   mDeviceMonitorViewModel.reScanDevices();
                     break;
             }

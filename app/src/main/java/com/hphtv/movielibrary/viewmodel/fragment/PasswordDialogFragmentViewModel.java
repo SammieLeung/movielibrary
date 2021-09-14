@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.SharePreferencesTools;
 
@@ -28,7 +28,7 @@ public class PasswordDialogFragmentViewModel extends AndroidViewModel {
     public static final int PASSWORD_ERROR=4;    //0b0100 password error
     public static final int PASSWORD_INCONSISTENT=8;    //0b1000 password Inconsistent
     private String mPassword = "";
-    private String mSharePreferenceSavePasswordKey=ConstData.SharePreferenceKeys.PASSWORD;
+    private String mSharePreferenceSavePasswordKey= Constants.SharePreferenceKeys.PASSWORD;
 
     public PasswordDialogFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);

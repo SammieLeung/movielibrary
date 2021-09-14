@@ -3,20 +3,7 @@ package com.hphtv.movielibrary.util;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-
-import androidx.core.content.FileProvider;
-
-import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.station.kit.util.UriParseUtil;
-import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.sqlite.bean.VideoFile;
-
-import java.io.File;
 
 /**
  * @author lxp

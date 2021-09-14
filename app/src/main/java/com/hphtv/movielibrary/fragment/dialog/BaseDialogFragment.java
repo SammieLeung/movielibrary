@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,12 +19,8 @@ import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.activity.AppBaseActivity;
-import com.hphtv.movielibrary.data.ConstData;
-import com.hphtv.movielibrary.fragment.BaseFragment;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -7,7 +7,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.activity.HomePageActivity;
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutSettingBinding;
 import com.hphtv.movielibrary.fragment.dialog.FolderManagerFragment;
 import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
@@ -25,7 +25,7 @@ public class FileManagerFragment extends BaseFragment<FileManagerFragmentViewMod
 
     public static FileManagerFragment newInstance(int pos) {
         Bundle args = new Bundle();
-        args.putInt(ConstData.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
         FileManagerFragment fragment = new FileManagerFragment();
         fragment.setArguments(args);
         return fragment;
@@ -39,7 +39,7 @@ public class FileManagerFragment extends BaseFragment<FileManagerFragmentViewMod
                 boolean needRefresh = result.getBoolean("refresh");
                 if (needRefresh) {
                     Intent intent = new Intent();
-                    intent.setAction(ConstData.BroadCastMsg.RESCAN_DEVICE);
+                    intent.setAction(Constants.BroadCastMsg.RESCAN_DEVICE);
                     LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
                     ((HomepageViewModel) getAppBaseActivity().getViewModel()).getCurrentFragmentPos().postValue(HomePageActivity.HOME_PAGE_FRAGMENT);
                 }

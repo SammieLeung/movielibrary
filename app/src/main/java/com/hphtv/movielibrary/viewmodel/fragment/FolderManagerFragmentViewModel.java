@@ -7,27 +7,22 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.hphtv.movielibrary.data.ConstData;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -44,7 +39,7 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
         MovieLibraryRoomDatabase roomDatabase = MovieLibraryRoomDatabase.getDatabase(application);
         mScanDirectoryDao = roomDatabase.getScanDirectoryDao();
         mDeviceDao = roomDatabase.getDeviceDao();
-        String password= SharePreferencesTools.getInstance(application).readProperty(ConstData.SharePreferenceKeys.PASSWORD,"");
+        String password= SharePreferencesTools.getInstance(application).readProperty(Constants.SharePreferenceKeys.PASSWORD,"");
         passwordhasBeenSet = TextUtils.isEmpty(password) ? false : true;
     }
 
