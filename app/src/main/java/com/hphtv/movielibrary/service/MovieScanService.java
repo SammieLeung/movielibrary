@@ -194,7 +194,7 @@ public class MovieScanService extends Service {
             if (!TextUtils.isEmpty(mtimeId)) {
                 MovieDetailRespone respone = MtimeApiService.getDetials(mtimeId)
                         .onErrorReturn(throwable -> {
-                            LogUtil.e("Mtime Detail "+throwable.getMessage());
+                            LogUtil.e("Mtime Detail " + throwable.getMessage());
                             return null;
                         })
                         .subscribeOn(Schedulers.io()).blockingFirst();
@@ -210,7 +210,7 @@ public class MovieScanService extends Service {
                 MovieDetailRespone respone = OmdbApiService.getDetials(omdbId)
                         .onErrorReturn(throwable -> {
                             throwable.printStackTrace();
-                            LogUtil.e("OMDB Detail "+throwable.getMessage());
+                            LogUtil.e("OMDB Detail " + throwable.getMessage());
                             return null;
                         })
                         .subscribeOn(Schedulers.io()).blockingFirst();
@@ -226,7 +226,8 @@ public class MovieScanService extends Service {
             mVideoFileDao.update(videoFile);
             return isMtimeFound || isOmdbFound;
         }).onErrorReturn(throwable -> {
-            LogUtil.e("combineLatest error-> "+ throwable.getMessage());
+            LogUtil.e("combineLatest error-> ");
+            throwable.printStackTrace();
             return false;
         }).subscribeOn(Schedulers.from(mMovieDetailExecutor))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -361,7 +362,8 @@ public class MovieScanService extends Service {
                         return mostSimilarMovie.movieId;
                     else
                         return "";
-                }).onErrorReturn(throwable -> {
+                })
+                .onErrorReturn(throwable -> {
                     LogUtil.e("onErrorReturn OMDB-> " + throwable.getMessage());
                     return "";
                 });

@@ -36,7 +36,7 @@ public class GlideTools {
     }
 
     public static RequestBuilder<Drawable> GlideWrapper(Context context,String path){
-        if(TextUtils.isEmpty(path))
+        if(TextUtils.isEmpty(path)||!path.startsWith("http"))
             return Glide.with(context)
                     .load(R.mipmap.ic_poster_default)
                     .placeholder(R.mipmap.ic_poster_default)
@@ -45,8 +45,8 @@ public class GlideTools {
             return Glide.with(context)
                     .load(buildGlideUrl(path))
                     .thumbnail(0.3f)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
+//                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+//                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
                     .placeholder(R.mipmap.ic_poster_default)
                     .error(R.mipmap.ic_poster_default);
         }

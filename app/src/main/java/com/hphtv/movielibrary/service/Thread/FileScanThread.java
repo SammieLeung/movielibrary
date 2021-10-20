@@ -53,30 +53,14 @@ public class FileScanThread implements Callable<Boolean> {
     public FileScanThread(Context context, Device device) {
         this.mDevice = device;
         this.mPath = mDevice.path;
-//        this.mScanDirectories.add(new ScanDirectory(mPath, mDevice.id));
         this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
         this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
         this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Boolean call() {
         mScanDirectories.addAll(mScanDirectoryDao.queryScanDirByDevicePath(mDevice.path));
-//        if (mScanDirectories.size() == 0 && mPath.equals(StorageHelper.getFlashStoragePath(MovieApplication.getInstance()))) {
-//            ScanDirectory scanDirectory = new ScanDirectory(new File(mPath, "/Station/Download").toString(), mDevice.id);
-//            ScanDirectory scanDirectory2 = new ScanDirectory(new File(mPath, "/Download").toString(), mDevice.id);
-//            ScanDirectory scanDirectory3 = new ScanDirectory(new File(mPath, "/Movies").toString(), mDevice.id);
-//
-//            scanDirectory.isUserAdd=false;
-//            scanDirectory2.isUserAdd=false;
-//            scanDirectory3.isUserAdd=false;
-//
-//            mScanDirectoryDao.insertScanDirectories(scanDirectory,scanDirectory2,scanDirectory3);
-//
-//            mScanDirectories.add(scanDirectory);
-//            mScanDirectories.add(scanDirectory2);
-//            mScanDirectories.add(scanDirectory3);
-//        }
         int videoCount = 0;
         while (!mScanDirectories.isEmpty()) {
             boolean nomediaFlag = false;
@@ -96,40 +80,12 @@ public class FileScanThread implements Callable<Boolean> {
             //获取待扫描设备队列的一个设备。
             ScanDirectory scanDirectory=mScanDirectories.remove();
             File dirFile = new File(scanDirectory.path);
-//            Log.i(TAG, "scanDirectory->dirFile:" + dirFile);
             //初始化当前文件夹下的媒体文件数量
 
             if (dirFile != null && dirFile.exists()) {
                 File[] subFiles = dirFile.listFiles();//获取子文件
                 if (subFiles == null || subFiles.length == 0)
                     continue;
-//                for (File subFile : subFiles) {
-//                    if (subFile.exists() && subFile.isFile() && isNomedia(subFile)) {
-//                        nomediaFlag = true;
-//                        break;
-//                    }
-//                }
-//
-//                if(nomediaFlag){
-//                    if(!isContainsSubfolder)
-//                    {
-//                        for (File subFile : subFiles) {
-//                            if (!subFile.exists())//判断子文件是否存在
-//                                continue;
-//                            //文件夹加入待扫描队列
-//                            if (subFile.isDirectory()) {
-//                                if (mIsOverMaxDirs) {//当前扫描目录队列超过1000个则先缓存
-//                                    mTmpScanDirectories.add(new ScanDirectory(subFile.getPath(), mDevice.id));
-//                                    if (mTmpScanDirectories.size() >= MAX_DIRS / 2) {//暂存1000个
-//                                        mScanDirectoryDao.insertScanDirectories(mTmpScanDirectories.toArray(new ScanDirectory[0]));
-//                                    }
-//                                } else {
-//                                    mScanDirectories.add(new ScanDirectory(subFile.getPath(), mDevice.id));
-//                                }
-//                            }
-//                        }
-//                    }
-//                }else{
                 for (File subFile : subFiles) {
                     if (!subFile.exists())//判断子文件是否存在
                         continue;
@@ -159,7 +115,6 @@ public class FileScanThread implements Callable<Boolean> {
                 }
                 mDevice.fileCount = (videoCount);
                 mDeviceDao.updateDevice(mDevice);
-//                }
 
             }
         }

@@ -83,7 +83,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSingleThreadPool = Executors.newSingleThreadExecutor();
-        mSource= ScraperSourceTools.getSource();
+        mSource = ScraperSourceTools.getSource();
         initData();
     }
 
@@ -105,7 +105,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
-                    mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id,mSource);
+                    mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id, mSource);
                     return mMovieWrapper;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -122,7 +122,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         Observable.just(keyword)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(sKeyword -> {
-                    mUnrecognizedFileDataViewList = mVideoFileDao.queryUnrecognizedFilesByKeyword(sKeyword,mSource);
+                    mUnrecognizedFileDataViewList = mVideoFileDao.queryUnrecognizedFilesByKeyword(sKeyword, mSource);
                     return mUnrecognizedFileDataViewList;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -211,7 +211,16 @@ public class MovieDetailViewModel extends AndroidViewModel {
                         return null;
                     }
                 })
+                .onErrorReturn(new Function<Throwable, MovieWrapper>() {
+                    @Override
+                    public MovieWrapper apply(Throwable throwable) throws Throwable {
+                        throwable.printStackTrace();
+                        return new MovieWrapper();
+                    }
+                })
                 .doOnNext(wrapper -> {
+                    if (wrapper.movie == null)
+                        return;
                     String[] paths;
                     if (mCurrentMode == Constants.MovieDetailMode.MODE_WRAPPER) {
                         paths = new String[mMovieWrapper.videoFiles.size()];
@@ -226,7 +235,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
                     }
                     List<VideoFile> videoFiles = mVideoFileDao.queryByPaths(paths);
                     wrapper.videoFiles = videoFiles;
-                    saveMovieWrapper(wrapper, videoFiles,source);
+                    saveMovieWrapper(wrapper, videoFiles, source);
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<MovieWrapper>() {
@@ -244,7 +253,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
      *
      * @param movieWrapper
      */
-    private void saveMovieWrapper(MovieWrapper movieWrapper, List<VideoFile> videoFileList,String source) {
+    private void saveMovieWrapper(MovieWrapper movieWrapper, List<VideoFile> videoFileList, String source) {
         //获取各个实体类
         Movie movie = movieWrapper.movie;
         List<Genre> genreList = movieWrapper.genres;

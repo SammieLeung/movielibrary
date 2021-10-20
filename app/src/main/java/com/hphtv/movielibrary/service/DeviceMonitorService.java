@@ -54,7 +54,6 @@ public class DeviceMonitorService extends Service {
         mDeviceMonitorViewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication()).create(DeviceMonitorViewModel.class);
         bindRegisterReceivers();
         bindServices();
-
     }
 
     @Nullable
@@ -139,7 +138,6 @@ public class DeviceMonitorService extends Service {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mDeviceMountReceiver);
         }
     }
-
 
     public DeviceMonitorViewModel getDeviceMonitorViewModel() {
         return mDeviceMonitorViewModel;
