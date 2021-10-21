@@ -24,7 +24,7 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
         if (data!=null&&data.list != null)
             for (Data.SearchMovie searchMovie : data.list) {
                 Movie movie=searchMovie.toEntity();
-                movie.source= TextUtils.isEmpty(data.api)?null:data.api.toUpperCase();
+                movie.source= TextUtils.isEmpty(data.source)?null:data.source.toUpperCase();
                 movies.add(movie);
             }
         return movies;
@@ -33,7 +33,7 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
     private class Data {
         private List<SearchMovie> list;
         private int total;
-        private String api;
+        private String source;
 
         private class SearchMovie implements ResponeEntity<Movie> {
             private String movie_id;

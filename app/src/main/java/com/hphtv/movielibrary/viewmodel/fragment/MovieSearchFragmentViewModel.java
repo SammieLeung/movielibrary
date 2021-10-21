@@ -45,7 +45,6 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
         super(application);
         mSource = ScraperSourceTools.getSource();
         mMovieLinkedList = new LinkedList<>();
-        LogUtil.e(this.toString());
     }
 
     public void refresh(String keyword, MovieSearchAdapter adapter) {
@@ -69,9 +68,7 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                 .doOnSubscribe(entity -> adapter.loading())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .map(responeEntity -> {
-                    return responeEntity.toEntity();
-                })
+                .map(responeEntity -> responeEntity.toEntity())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<Movie>>() {
                     @Override
