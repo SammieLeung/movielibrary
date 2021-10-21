@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.scraper.omdb.request;
+package com.hphtv.movielibrary.scraper.api.tmdb.request;
 
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
@@ -13,7 +13,7 @@ import retrofit2.http.POST;
  * author: Sam Leung
  * date:  2021/9/8
  */
-public interface OmdbApiRequest {
+public interface TmdbApiRequest {
     @POST("movie/movie/search")
     Observable<MovieSearchRespone> createSearch(@Body PostSearchRequetBody body);
 

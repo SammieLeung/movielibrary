@@ -16,14 +16,14 @@ import java.io.Serializable;
  * author: Sam Leung
  * date:  21-5-14
  */
-@Entity(tableName = TABLE.MOVIE,indices = {@Index(value = {"movie_id","source"},unique = true)})
-public class Movie  implements Serializable {
+@Entity(tableName = TABLE.MOVIE, indices = {@Index(value = {"movie_id", "source"}, unique = true)})
+public class Movie implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public long id;
     @ColumnInfo(name = "movie_id")
     public String movieId;//电影id
     public String title;//电影名称
-    @ColumnInfo(name="title_other")
+    @ColumnInfo(name = "title_other")
     public String otherTitle;//电影别名
     public String plot;//剧情
     public String ratings;//评分

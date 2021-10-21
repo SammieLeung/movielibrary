@@ -1,9 +1,13 @@
 package com.hphtv.movielibrary.util.retrofit;
 
-import com.hphtv.movielibrary.scraper.mtime.MtimeURL;
-import com.hphtv.movielibrary.scraper.mtime.request.MtimeApiRequest;
-import com.hphtv.movielibrary.scraper.omdb.OmdbURL;
-import com.hphtv.movielibrary.scraper.omdb.request.OmdbApiRequest;
+import com.hphtv.movielibrary.scraper.api.mtime.MtimeURL;
+import com.hphtv.movielibrary.scraper.api.mtime.request.MtimeApiRequest;
+import com.hphtv.movielibrary.scraper.api.omdb.OmdbURL;
+import com.hphtv.movielibrary.scraper.api.omdb.request.OmdbApiRequest;
+import com.hphtv.movielibrary.scraper.api.tmdb.TmdbURL;
+import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
+
+import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -24,9 +28,18 @@ public class RetrofiTools {
         return MTimeRetrofitBuilder().create(MtimeApiRequest.class);
     }
 
-    public static OmdbApiRequest createOmdbApiRequest(){
+    public static OmdbApiRequest createOmdbApiRequest() {
         return OmdbRetrofitBuilder().create(OmdbApiRequest.class);
     }
+
+    public static TmdbApiRequest createTmdbApiRequest() {
+            return TmdbRetrofitBuilder().create(TmdbApiRequest.class);
+    }
+
+    public static TmdbApiRequest createTmdbApiRequest_EN(){
+        return TmdbRetrofitBuilder_EN().create(TmdbApiRequest.class);
+    }
+
 
     private static Retrofit MTimeRetrofitBuilder() {
         return new Retrofit.Builder()
@@ -40,6 +53,24 @@ public class RetrofiTools {
     private static Retrofit OmdbRetrofitBuilder() {
         return new Retrofit.Builder()
                 .baseUrl(OmdbURL.BASE_URL)// 设置网络请求的Url地址
+                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(getOkHttpClient())
+                .build();
+    }
+
+    private static Retrofit TmdbRetrofitBuilder() {
+        return new Retrofit.Builder()
+                .baseUrl(TmdbURL.BASE_URL_CN)
+                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(getOkHttpClient())
+                .build();
+    }
+
+    private static Retrofit TmdbRetrofitBuilder_EN() {
+        return new Retrofit.Builder()
+                .baseUrl(TmdbURL.BASE_URL_EN)
                 .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(getOkHttpClient())

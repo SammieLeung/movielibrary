@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.scraper.omdb;
+package com.hphtv.movielibrary.scraper.api.omdb;
 
 /**
  * Created by tchip on 18-11-9.

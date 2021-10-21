@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.scraper.mtime.request;
+package com.hphtv.movielibrary.scraper.api.mtime.request;
 
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;

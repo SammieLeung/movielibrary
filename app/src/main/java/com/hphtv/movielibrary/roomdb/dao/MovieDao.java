@@ -27,8 +27,8 @@ public interface MovieDao {
     public long insertOrIgnoreMovie(Movie movie);
 
 
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
-    public Movie queryByMovieId(String movie_id);
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source")
+    public Movie queryByMovieId(String movie_id,String source);
 
 
     @Query("UPDATE " + TABLE.MOVIE + " " +

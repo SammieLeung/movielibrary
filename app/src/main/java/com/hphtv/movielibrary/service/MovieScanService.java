@@ -10,9 +10,11 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.api.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
@@ -40,12 +42,14 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
+import com.hphtv.movielibrary.scraper.api.mtime.MtimeApiService;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -82,6 +86,7 @@ public class MovieScanService extends Service {
     private TrailerDao mTrailerDao;
     private StagePhotoDao mStagePhotoDao;
     private boolean isScanning;
+
     private int total;
     private int offset;
 
@@ -184,54 +189,51 @@ public class MovieScanService extends Service {
 
     private void startSearch(VideoFile videoFile) {
         MovieSupplier movieSupplier = new MovieSupplier(videoFile);
-        Observable<String> mtimeObservalbe = getMtimeSearchResult(movieSupplier);
-        Observable<String> omdbObservalbe = getOmdbSearchResult(movieSupplier);
 
+        getTmdbSearchResult(movieSupplier)
+                .map(movie_id -> {
+                    if (!TextUtils.isEmpty(movie_id)) {
+                        MovieDetailRespone respone = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB)
+                                .onErrorReturn(throwable -> {
+                                    LogUtil.e("TMDB Detail " + throwable.getMessage());
+                                    return null;
+                                })
+                                .subscribeOn(Schedulers.io()).blockingFirst();
+                        if (respone != null) {
+                            MovieWrapper wrapper = respone.toEntity();
+                            if (wrapper != null) {
+                                saveMovieWrapper(wrapper, videoFile, Constants.Scraper.TMDB);
+                            }
+                        }
 
-        Observable.combineLatest(mtimeObservalbe, omdbObservalbe, (BiFunction<String, String, Boolean>) (mtimeId, omdbId) -> {
-            boolean isMtimeFound = false;
-            boolean isOmdbFound = false;
-            if (!TextUtils.isEmpty(mtimeId)) {
-                MovieDetailRespone respone = MtimeApiService.getDetials(mtimeId)
-                        .onErrorReturn(throwable -> {
-                            LogUtil.e("Mtime Detail " + throwable.getMessage());
-                            return null;
-                        })
-                        .subscribeOn(Schedulers.io()).blockingFirst();
-                if (respone != null) {
-                    MovieWrapper wrapper = respone.toEntity();
-                    if (wrapper != null) {
-                        saveMovieWrapper(wrapper, videoFile, Constants.ScraperSource.MTIME);
-                        isMtimeFound = true;
                     }
-                }
-            }
-            if (!TextUtils.isEmpty(omdbId)) {
-                MovieDetailRespone respone = OmdbApiService.getDetials(omdbId)
-                        .onErrorReturn(throwable -> {
-                            throwable.printStackTrace();
-                            LogUtil.e("OMDB Detail " + throwable.getMessage());
-                            return null;
-                        })
-                        .subscribeOn(Schedulers.io()).blockingFirst();
-                if (respone != null) {
-                    MovieWrapper wrapper = respone.toEntity();
-                    if (wrapper != null) {
-                        saveMovieWrapper(wrapper, videoFile, Constants.ScraperSource.OMDB);
-                        isOmdbFound = true;
+                    return movie_id;
+                })
+                .map(movie_id -> {
+                    if (!TextUtils.isEmpty(movie_id)) {
+                        MovieDetailRespone respone_en = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB_EN)
+                                .onErrorReturn(throwable -> {
+                                    LogUtil.e("TMDB_EN Detail " + throwable.getMessage());
+                                    return null;
+                                })
+                                .subscribeOn(Schedulers.io()).blockingFirst();
+                        if (respone_en != null) {
+                            MovieWrapper wrapper = respone_en.toEntity();
+                            if (wrapper != null) {
+                                saveMovieWrapper(wrapper, videoFile, Constants.Scraper.TMDB_EN);
+                            }
+                        }
                     }
-                }
-            }
-            videoFile.isScanned = 1;
-            mVideoFileDao.update(videoFile);
-            return isMtimeFound || isOmdbFound;
-        }).onErrorReturn(throwable -> {
-            LogUtil.e("combineLatest error-> ");
-            throwable.printStackTrace();
-            return false;
-        }).subscribeOn(Schedulers.from(mMovieDetailExecutor))
+                    return movie_id;
+                })
+                .onErrorReturn(throwable -> {
+                    LogUtil.e("TMDB throw");
+                    throwable.printStackTrace();
+                    return "";
+                })
+                .subscribeOn(Schedulers.from(mMovieDetailExecutor))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SimpleObserver<Boolean>() {
+                .subscribeWith(new SimpleObserver<String>() {
 
                     @Override
                     public void onComplete() {
@@ -251,11 +253,12 @@ public class MovieScanService extends Service {
                     }
 
                     @Override
-                    public void onAction(Boolean aBoolean) {
+                    public void onAction(String movie_id) {
                         offset++;
                         LogUtil.v("onAction offset " + offset);
                     }
                 });
+
     }
 
     private Observable<String> getMtimeSearchResult(MovieSupplier movieSupplier) {
@@ -369,6 +372,56 @@ public class MovieScanService extends Service {
                 });
     }
 
+    private Observable<String> getTmdbSearchResult(MovieSupplier movieSupplier) {
+
+        return Observable.defer(movieSupplier)
+                .subscribeOn(Schedulers.from(mSearchMovieExecutor))
+                .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
+                    LogUtil.v(Thread.currentThread().getName(), "1 ...");
+
+                    String name = movieNameInfo.getName();
+                    String api = Constants.Scraper.TMDB_EN;
+                    if (StringUtils.isGB2312(name)) {
+                        api = Constants.Scraper.TMDB;
+                    }
+                    if (!TextUtils.isEmpty(name))
+                        return TmdbApiService.unionSearch(name, api).observeOn(Schedulers.io());
+                    return null;
+                })
+                .map(movieSearchRespone -> {
+                    LogUtil.v(Thread.currentThread().getName(), "TMDB 获取最优匹配 ...");
+                    String name = movieSupplier.keyword;
+                    List<Movie> movies = new ArrayList<>();
+                    if (movieSearchRespone != null) {
+                        List<Movie> unionSearchMovies = movieSearchRespone.toEntity();
+                        movies.addAll(unionSearchMovies);
+                    }
+                    Movie mostSimilarMovie = null;
+                    float maxSimilarity = 0;
+                    for (Movie movie : movies) {
+                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
+                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
+                        float tmpSimilarity = Math.max(similarity, similarityEn);
+                        if (tmpSimilarity == 1) {
+                            mostSimilarMovie = movie;
+                            break;
+                        }
+                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
+                            mostSimilarMovie = movie;
+                            maxSimilarity = tmpSimilarity;
+                        }
+                    }
+                    if (mostSimilarMovie != null)
+                        return mostSimilarMovie.movieId;
+                    else
+                        return "";
+                })
+                .onErrorReturn(throwable -> {
+                    LogUtil.e("onErrorReturn OMDB-> " + throwable.getMessage());
+                    return "";
+                });
+    }
+
     /**
      * 保存MovieWrapper实体
      *
@@ -377,6 +430,8 @@ public class MovieScanService extends Service {
     private void saveMovieWrapper(MovieWrapper movieWrapper, VideoFile videoFile, String source) {
         //获取各个实体类
         Movie movie = movieWrapper.movie;
+        if (movie == null)
+            return;
         List<Genre> genreList = movieWrapper.genres;
         List<Director> directorList = movieWrapper.directors;
         List<Actor> actorList = movieWrapper.actors;
@@ -385,7 +440,8 @@ public class MovieScanService extends Service {
         //插入电影到数据库
         movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
-        mMovieDao.insertOrIgnoreMovie(movie);
+        long id = mMovieDao.insertOrIgnoreMovie(movie);
+        LogUtil.v(movie.title + " " + movie.source + " insertrelut:" + id);
         mGenreDao.insertGenres(genreList);
         mActorDao.insertActors(actorList);
         mDirectorDao.insertDirectors(directorList);
@@ -396,7 +452,7 @@ public class MovieScanService extends Service {
         }
 
         //查询影片ID
-        long movie_id = mMovieDao.queryByMovieId(movie.movieId).id;
+        long movie_id = mMovieDao.queryByMovieId(movie.movieId, source).id;
         long[] genre_ids = mGenreDao.queryByName(querySelectionGenreNames);
 
         movieWrapper.movie.id = movie_id;

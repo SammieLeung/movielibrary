@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.scraper.mtime;
+package com.hphtv.movielibrary.scraper.api.mtime;
 
 /**
  * Created by tchip on 18-11-9.

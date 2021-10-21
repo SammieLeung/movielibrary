@@ -10,8 +10,9 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.MovieSearchAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
-import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.api.mtime.MtimeApiService;
+import com.hphtv.movielibrary.scraper.api.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -42,7 +43,7 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
     public MovieSearchFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSource = ScraperSourceTools.getSource();
-        mMovieLinkedList=new LinkedList<>();
+        mMovieLinkedList = new LinkedList<>();
     }
 
     public void refresh(String keyword, MovieSearchAdapter adapter) {
@@ -50,30 +51,15 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
             return;
         mCurrentKeyword = keyword.trim();
         mMovieLinkedList.clear();
-        mCurrentPage=1;
-        switch (mSource) {
-            case Constants.ScraperSource.MTIME:
-                 notifyNewSearch(MtimeApiService.unionSearch(mCurrentKeyword, mCurrentPage, pageSize * 3), adapter);
-                break;
-            case Constants.ScraperSource.OMDB:
-                notifyNewSearch(OmdbApiService.unionSearch(mCurrentKeyword,mCurrentPage,pageSize*3),adapter);
-                break;
-        }
-        mCurrentPage=3;
+        mCurrentPage = 1;
+        notifyNewSearch(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage, pageSize * 3, mSource), adapter);
+//        mCurrentPage = 3;
     }
 
     public void loading(MovieSearchAdapter adapter) {
-        if(TextUtils.isEmpty(mCurrentKeyword))
+        if (TextUtils.isEmpty(mCurrentKeyword))
             return;
-        switch (mSource) {
-            case Constants.ScraperSource.MTIME:
-                notifyLoadingMore(MtimeApiService.unionSearch(mCurrentKeyword, mCurrentPage+1, pageSize ), adapter);
-                break;
-            case Constants.ScraperSource.OMDB:
-                notifyLoadingMore(OmdbApiService.unionSearch(mCurrentKeyword,mCurrentPage+1,pageSize),adapter);
-                break;
-        }
-
+        notifyLoadingMore(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage + 1, pageSize, mSource), adapter);
     }
 
     private void notifyNewSearch(Observable<? extends ResponeEntity<List<Movie>>> observable, MovieSearchAdapter adapter) {
@@ -98,9 +84,9 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                     public void onError(Throwable e) {
                         super.onError(e);
                         String msg;
-                        if(e instanceof UnknownHostException) {
+                        if (e instanceof UnknownHostException) {
                             msg = getApplication().getString(R.string.toast_UnknownHostException);
-                        }else{
+                        } else {
                             msg = e.getMessage();
                         }
                         ToastUtil.newInstance(getApplication()).toast(msg);
@@ -110,7 +96,7 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                 });
     }
 
-    private void notifyLoadingMore(Observable<? extends ResponeEntity<List<Movie>>> observable, MovieSearchAdapter adapter){
+    private void notifyLoadingMore(Observable<? extends ResponeEntity<List<Movie>>> observable, MovieSearchAdapter adapter) {
         observable
                 .doOnSubscribe(entity -> adapter.loading())
                 .subscribeOn(AndroidSchedulers.mainThread())
@@ -133,9 +119,9 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                     public void onError(Throwable e) {
                         super.onError(e);
                         String msg;
-                        if(e instanceof UnknownHostException) {
+                        if (e instanceof UnknownHostException) {
                             msg = getApplication().getString(R.string.toast_UnknownHostException);
-                        }else{
+                        } else {
                             msg = e.getMessage();
                         }
                         ToastUtil.newInstance(getApplication()).toast(msg);

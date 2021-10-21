@@ -53,15 +53,12 @@ public class Constants {
     /**
      * 搜刮器
      */
-    public interface Scraper {
-        int UNKNOW = -1;
-        int MTIME = 2;
-        int OMDB = 3;
-    }
 
-    public interface ScraperSource {
+    public interface Scraper {
         String MTIME = "MTIME";
         String OMDB = "OMDB";
+        String TMDB = "TMDB";
+        String TMDB_EN="TMDB_EN";
     }
 
     public interface DirectoryState {

@@ -39,7 +39,7 @@ public class MovieLibraryProvider extends ContentProvider {
 
     public static final int MOVIE_DATAVIEW_LIST = 11;
 
-    private int api_version;
+    private String api;
 
     @Override
     public boolean onCreate() {
@@ -66,7 +66,7 @@ public class MovieLibraryProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         int code = matcher.match(uri);
-        api_version = Constants.Scraper.MTIME;
+        api = Constants.Scraper.TMDB;
         Cursor cursor = null;
         switch (code) {
             case ALL_MOVIE_WRAPPER:

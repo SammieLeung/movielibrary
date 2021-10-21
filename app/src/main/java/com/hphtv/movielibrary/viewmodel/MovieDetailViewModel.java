@@ -23,8 +23,9 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
-import com.hphtv.movielibrary.scraper.mtime.MtimeApiService;
-import com.hphtv.movielibrary.scraper.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.api.mtime.MtimeApiService;
+import com.hphtv.movielibrary.scraper.api.omdb.OmdbApiService;
+import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.SharePreferencesTools;
@@ -200,23 +201,13 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .map(new Function<String, MovieWrapper>() {
                     @Override
                     public MovieWrapper apply(String _source) throws Throwable {
-                        switch (_source) {
-                            case Constants.ScraperSource.MTIME:
-                                MovieWrapper mtimeWrapper = MtimeApiService.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
-                                return mtimeWrapper;
-                            case Constants.ScraperSource.OMDB:
-                                MovieWrapper omdbWrapper = OmdbApiService.getDetials(movie_id).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
-                                return omdbWrapper;
-                        }
-                        return null;
+                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                        return wrapper;
                     }
                 })
-                .onErrorReturn(new Function<Throwable, MovieWrapper>() {
-                    @Override
-                    public MovieWrapper apply(Throwable throwable) throws Throwable {
-                        throwable.printStackTrace();
-                        return new MovieWrapper();
-                    }
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return new MovieWrapper();
                 })
                 .doOnNext(wrapper -> {
                     if (wrapper.movie == null)
@@ -275,7 +266,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         }
 
         //查询影片ID
-        long movie_id = mMovieDao.queryByMovieId(movie.movieId).id;
+        long movie_id = mMovieDao.queryByMovieId(movie.movieId, source).id;
         long[] genre_ids = mGenreDao.queryByName(querySelectionGenreNames);
 
         movieWrapper.movie.id = movie_id;
