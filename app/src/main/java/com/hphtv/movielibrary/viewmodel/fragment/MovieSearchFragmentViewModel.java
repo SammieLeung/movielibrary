@@ -16,6 +16,7 @@ import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.LogUtil;
 import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,7 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
         super(application);
         mSource = ScraperSourceTools.getSource();
         mMovieLinkedList = new LinkedList<>();
+        LogUtil.e(this.toString());
     }
 
     public void refresh(String keyword, MovieSearchAdapter adapter) {
@@ -67,7 +69,9 @@ public class MovieSearchFragmentViewModel extends AndroidViewModel {
                 .doOnSubscribe(entity -> adapter.loading())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .map(responeEntity -> responeEntity.toEntity())
+                .map(responeEntity -> {
+                    return responeEntity.toEntity();
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<Movie>>() {
                     @Override

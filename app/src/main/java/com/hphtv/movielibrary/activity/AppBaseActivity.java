@@ -74,7 +74,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
                 //如果没有指定泛型参数，则默认使用BaseViewModel
                 modelClass = AndroidViewModel.class;
             }
-            mViewModel = (VM)   new ViewModelProvider.AndroidViewModelFactory(getApplication()).create(modelClass);
+            mViewModel = (VM)   new ViewModelProvider(this).get(modelClass);
 
         }
     }

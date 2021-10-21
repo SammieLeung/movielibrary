@@ -39,7 +39,7 @@ public class MovieSearchFragment extends DialogFragment {
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider.AndroidViewModelFactory(getActivity().getApplication()).create(MovieSearchFragmentViewModel.class);
+        mViewModel = new ViewModelProvider(getActivity()).get(MovieSearchFragmentViewModel.class);
         String keyword = getArguments().getString("keyword");
         mViewModel.setCurrentKeyword(keyword);
     }
