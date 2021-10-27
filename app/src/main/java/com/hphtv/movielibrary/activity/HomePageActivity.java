@@ -504,7 +504,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         String year = mFilterBinding.categoryview.getYear();
         boolean isDesc = mFilterBinding.categoryview.isDesc();
 
-        LogUtil.v("2 sotType "+sorttype+" isDesc "+isDesc);
+        LogUtil.v("2 sotType " + sorttype + " isDesc " + isDesc);
 
         mHomePageFragment.notifyUpdate(device, year, genre, sorttype, isDesc);
         mUnrecognizedFileFragement.notifyUpdate();
@@ -595,7 +595,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         @Override
         public void onConditionChange(Device device, String year, String genre, int sortType, boolean isDesc) {
             if (mHomePageFragment != null) {
-                LogUtil.v(" sotType "+sortType+" isDesc "+isDesc);
+                LogUtil.v(" sotType " + sortType + " isDesc " + isDesc);
 
                 startLoading();
                 updateDeviceText();
@@ -661,6 +661,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                     break;
                 case Constants.BroadCastMsg.MOVIE_SCRAP_FINISH:
                     postDelayMovieRefresh(0);
+                    break;
+                case Constants.ACTION_FAVORITE_MOVIE_CHANGE:
+                    mFavoriteFragment.notifyUpdate();
                     break;
             }
         }

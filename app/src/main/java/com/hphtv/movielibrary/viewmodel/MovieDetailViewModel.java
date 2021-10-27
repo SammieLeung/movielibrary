@@ -181,21 +181,24 @@ public class MovieDetailViewModel extends AndroidViewModel {
     public void removeMovieWrapper(Callback2 callback) {
         Observable.just("")
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .doOnNext(s -> {
-                    long movieId = mMovieWrapper.movie.id;
-                    mMovieVideofileCrossRefDao.deleteById(movieId);
+                .map(s -> {
+                    long id = mMovieWrapper.movie.id;
+                    String movie_id=mMovieWrapper.movie.movieId;
+                    mMovieVideofileCrossRefDao.deleteById(id);
+                    mMovieDao.updateFavorite(false,id);//电影的收藏状态在删除时要设置为false
+                    return movie_id;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<String>() {
                     @Override
-                    public void onAction(String s) {
+                    public void onAction(String movie_id) {
                         if (callback != null)
-                            callback.runOnUIThread();
+                            callback.runOnUIThread(movie_id);
                     }
                 });
     }
 
-    public void selectMovie(String source, String movie_id, MovieWrapperCallback movieWrapperCallback) {
+    public void selectMovie(String source, String movie_id,boolean is_favorite, MovieWrapperCallback movieWrapperCallback) {
 
         Observable.just(source)
                 .map(new Function<String, MovieWrapper>() {
@@ -212,6 +215,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .doOnNext(wrapper -> {
                     if (wrapper.movie == null)
                         return;
+                    wrapper.movie.isFavorite=is_favorite;
                     String[] paths;
                     if (mCurrentMode == Constants.MovieDetailMode.MODE_WRAPPER) {
                         paths = new String[mMovieWrapper.videoFiles.size()];

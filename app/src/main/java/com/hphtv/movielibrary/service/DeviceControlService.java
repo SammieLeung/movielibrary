@@ -9,8 +9,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -25,9 +23,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class DeviceControlService extends Service {
-    public static final int CMD_PLAY_VIDEO = 0;
-    public static final int CMD_SET_FAVORITE = 1;
-    public static final int CMD_CHECK_MOVIEDB = 2;
+    public static final int CMD_NOTIFY_REFRESH_DB = 2;
 
     public static final String TAG = DeviceControlService.class.getSimpleName();
     private MyHandler mMyHandler = new MyHandler();
@@ -52,37 +48,10 @@ public class DeviceControlService extends Service {
         public void handleMessage(Message msgFromClient) {
             Message msgToClient = Message.obtain(msgFromClient);
             switch (msgFromClient.what) {
-                case CMD_PLAY_VIDEO:
-                    LogUtil.v(TAG, "CMD_PLAY_VIDEO");
-                    msgToClient.what = CMD_PLAY_VIDEO;
-                    try {
-                        playVideo(msgFromClient.arg1);
-                        msgFromClient.replyTo.send(msgToClient);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case CMD_SET_FAVORITE:
-                    LogUtil.v(TAG, "CMD_SET_FAVORITE");
-                    msgToClient.what = CMD_SET_FAVORITE;
-                    try {
-                        Bundle bundle = msgFromClient.getData();
-                        int isFavorite = bundle.getInt("favorite");
-                        String movie_id=bundle.getString("movie_id");
-                        setFavorite(movie_id, isFavorite==1?true:false);
-                        msgToClient.arg1 = msgFromClient.arg1;
-                        bundle.putBoolean("res", true);
-                        msgToClient.setData(bundle);
-                        msgFromClient.replyTo.send(msgToClient);
-                    } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    break;
-                case CMD_CHECK_MOVIEDB:
+                case CMD_NOTIFY_REFRESH_DB:
                     boolean isMovieDbUpdate = SharePreferencesTools.getInstance(DeviceControlService.this).readProperty(Constants.SharePreferenceKeys.MOVIE_DB_UPDATE, false);
                     if (isMovieDbUpdate) {
-                        msgToClient.what = CMD_CHECK_MOVIEDB;
+                        msgToClient.what = CMD_NOTIFY_REFRESH_DB;
                         try {
                             msgFromClient.replyTo.send(msgToClient);
                         } catch (RemoteException e) {
@@ -109,13 +78,4 @@ public class DeviceControlService extends Service {
                     }
                 });
     }
-
-    private void sendRefreshFavoriteBroadcast(long id) {
-        LogUtil.v(TAG, "sendRefreshFavoriteBroadcast " + id);
-        Intent intent = new Intent();
-        intent.setAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
-        intent.putExtra("id", id);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
 }

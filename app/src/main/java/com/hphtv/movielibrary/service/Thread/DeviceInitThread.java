@@ -38,7 +38,7 @@ public class DeviceInitThread extends Thread {
     @Override
     public void run() {
         super.run();
-        //清除数据库设备
+        //清除数据库设备,
         mDeviceDao.deleteAll();
         LogUtil.v(TAG, "=============>挂载设备:");
 

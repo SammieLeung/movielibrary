@@ -28,19 +28,6 @@ public class Constants {
      */
     public static final String DEVICE = "device";
     public static final String DIRECTORY = "directory";
-    /**
-     * 设备是否被选择
-     */
-    public static final String DEVICE_CHECK_STATUS = "device_check_status";
-
-    public static final String DEVICE_IS_ENCRYPTED = "device_is_encrypted";
-
-    public static final String DEVICE_MATCHED_VIDEO = "device_match_video";
-    public static final String DEVICE_VIDEO_COUNT = "device_video_count";
-
-    public static final int DEFAULT_UPDATE_TIME_7DAY = 3600 * 7 * 1000 * 24;
-    public static final int DEFAULT_UPDATE_TIME_3DAY = 3600 * 3 * 1000 * 24;
-    public static final int DEFAULT_UPDATE_TEST = 2000;
 
     /**
      * 电影搜索 模式
@@ -220,6 +207,7 @@ public class Constants {
     public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
 
     public interface BroadCastMsg {
+        String FILE_SCANNING="file_scannig";
         /**
          * 设备挂载/卸载广播
          */

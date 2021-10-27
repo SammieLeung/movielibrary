@@ -76,7 +76,20 @@ public interface MovieDao {
      */
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE source=:source and movie_id=:movie_id")
-    public MovieWrapper queryMovieWrapperByMovieId(String source, String movie_id);
+    public MovieWrapper queryMovieWrapperByMovieId(String movie_id,String source);
+
+    /**
+     * @return
+     */
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source" +
+            " GROUP BY id " +
+            " ORDER BY " +
+            " pinyin ASC " +
+            " LIMIT :limit " +
+            " OFFSET :offset "
+    )
+    public List<MovieDataView> queryMovieDataView( String source,int offset,int limit);
 
     /**
      * @param device_id  设备id
@@ -105,13 +118,16 @@ public interface MovieDao {
             "CASE WHEN :order =5 THEN is_favorite END ASC"
     )
     public List<MovieDataView> queryMovieDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, String source,@Nullable boolean isDesc);
-    
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);
 
 
     @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW+" WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
     public List<MovieDataView> queryFavoriteMovieDataView(String source);
+
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE source=:source GROUP BY id)")
+    public int queryTotalMovieCount(String source);
     /**
      * 查询年份
      *

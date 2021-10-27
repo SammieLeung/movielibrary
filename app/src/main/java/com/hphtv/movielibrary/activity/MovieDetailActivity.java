@@ -28,6 +28,7 @@ import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.fragment.dialog.ConfirmDialogFragment;
@@ -51,6 +52,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private ItemViewMode mItemViewMode;
     private LinearLayoutManager mLayoutManager;
     private MovieTrailerAdapter mMovieTrailerAdapter;
+    private MovieWrapper mCurWrapper;
 
     @Override
     protected int getContentViewId() {
@@ -74,23 +76,29 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             switch (currentMode) {
                 case Constants.MovieDetailMode.MODE_WRAPPER:
                     long movieId = intent.getLongExtra(Constants.IntentKey.KEY_MOVIE_ID, -1);
-                    prepareMovieWrapper(movieId);
+                    prepareMovieWrapper(movieId);//1.加载电影数据
                     break;
                 case Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
                     String unrecognizedFileKeyword = intent.getStringExtra(Constants.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD);
-                    prepareUnrecogizedFile(unrecognizedFileKeyword);
+                    prepareUnrecogizedFile(unrecognizedFileKeyword);//2.组合未识别文件数据
                     break;
             }
         }
     }
 
+    /**
+     * 加载电影数据
+     *
+     * @param movieId
+     */
     private void prepareMovieWrapper(long movieId) {
         mBinding.btnFavorite.setVisibility(View.VISIBLE);
         mBinding.btnTrailer.setVisibility(View.VISIBLE);
         mBinding.btnRemove.setVisibility(View.VISIBLE);
         mViewModel.loadMovieWrapper(movieId, wrapper -> {
             if (wrapper != null) {
-                mBinding.setWrapper(wrapper);
+                mCurWrapper = wrapper;
+                mBinding.setWrapper(mCurWrapper);
                 String stagePhoto = "";
                 if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
                     Random random = new Random();
@@ -105,6 +113,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         });
     }
 
+    /**
+     * 组合未识别文件数据
+     *
+     * @param keyword
+     */
     private void prepareUnrecogizedFile(String keyword) {
         mBinding.btnFavorite.setVisibility(View.GONE);
         mBinding.btnTrailer.setVisibility(View.GONE);
@@ -138,17 +151,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     @Override
     protected void onResume() {
-        Log.v(TAG, "onResume()被调用");
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
         super.onResume();
+        this.onNewIntent(getIntent());
     }
 
 
     @Override
     protected void onPause() {
-        Log.v(TAG, "onPause()被调用");
         stopLoading();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
@@ -156,7 +168,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     @Override
     protected void onDestroy() {
-        Log.v(TAG, "onDestroy()被调用");
         super.onDestroy();
     }
 
@@ -218,7 +229,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         MovieSearchFragment movieSearchFragment = MovieSearchFragment.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((source, movie_id) -> {
             startLoading();
-            mViewModel.selectMovie(source, movie_id, movieWrapper -> {
+            boolean is_favoirte=false;//默认收藏状态为false
+            if (mCurWrapper != null && mCurWrapper.movie != null) {
+                String last_movie_id = mCurWrapper.movie.movieId;
+                is_favoirte = mCurWrapper.movie.isFavorite;//获取当前收藏状态
+                BroadcastHelper.sendBroadcastMovieUpdateSync(this, last_movie_id, movie_id, is_favoirte?1:0);//向手机助手发送电影更改的广播
+            }else{
+                BroadcastHelper.sendBroadcastMovieAddSync(this, movie_id);//向手机助手发送添加电影的广播
+            }
+            //选择新电影逻辑
+            mViewModel.selectMovie(source, movie_id,is_favoirte, movieWrapper -> {
                 prepareMovieWrapper(movieWrapper.movie.id);
                 setActivityResult();
                 stopLoading();
@@ -234,6 +254,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private void removeMovie() {
         startLoading();
         mViewModel.removeMovieWrapper(args -> {
+            if (args != null && args.length > 0) {
+                String movie_id = (String) args[0];
+                BroadcastHelper.sendBroadcastMovieRemoveSync(this, movie_id);//向手机助手发送电影移除的广播
+            }
             setActivityResult();
             stopLoading();
             finish();
@@ -246,9 +270,12 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void toggleFavroite() {
         mViewModel.setFavorite(mBinding.getWrapper(), args -> {
-            if (args[0] != null) {
+            if (args[0] != null && mCurWrapper != null && mCurWrapper.movie != null) {
                 boolean isFavorite = (boolean) args[0];
-                mBinding.getWrapper().movie.isFavorite = isFavorite;
+                String movie_id = mCurWrapper.movie.movieId;
+                int is_favorite = isFavorite == true ? 1 : 0;
+                BroadcastHelper.sendBroadcastMovieUpdateSync(this, movie_id,movie_id, is_favorite);//向手机助手发送电影更改的广播
+                mCurWrapper.movie.isFavorite = isFavorite;
                 mBinding.btnFavorite.setFavoriteState(isFavorite);
                 setActivityResult();
             }
@@ -259,11 +286,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 显示电影预告片
      */
     private void showMovieTrailer() {
-        if(mMovieTrailerAdapter.getRealItemCount()>0) {
+        if (mMovieTrailerAdapter.getRealItemCount() > 0) {
             mBinding.viewTrailer.setVisibility(View.VISIBLE);
             if (mBinding.rvTrailer.getChildAt(0) != null)
                 mBinding.rvTrailer.getChildAt(0).requestFocus();
-        }else{
+        } else {
             ToastUtil.newInstance(this).toast(getResources().getString(R.string.toastmsg_no_trailer_found));
         }
     }
@@ -315,11 +342,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 if (isMovieTrailerShowing()) {
                     return true;
                 }
-
             }
         }
-
-
         return super.dispatchKeyEvent(event);
     }
 
@@ -348,6 +372,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         setActivityResult();
     }
 
+    /**
+     * 返回时刷新主页
+     */
     private void setActivityResult() {
         setResult(1);
     }
@@ -359,7 +386,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         else {
             finish();
         }
-
     }
 
 
@@ -367,9 +393,13 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Constants.ACTION_FAVORITE_MOVIE_CHANGE)) {
-                long id = intent.getLongExtra("id", -1);
-//                if (id == mCurrentWrapper.getId())
-//                    refreshFavroite();
+                String movie_id = intent.getStringExtra("movie_id");
+                String curMovieId = mCurWrapper != null ? mCurWrapper.movie.movieId : "";
+                if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
+                    boolean is_favorite = intent.getBooleanExtra("is_favorite", false);
+                    mBinding.btnFavorite.setFavoriteState(is_favorite);
+                    setActivityResult();
+                }
             }
         }
     };
