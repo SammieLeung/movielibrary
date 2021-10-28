@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.decoration;
+package com.hphtv.movielibrary.effect;
 
 import android.content.Context;
 import android.graphics.Rect;

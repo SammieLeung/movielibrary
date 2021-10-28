@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.MovieTrailerAdapter;
 import com.hphtv.movielibrary.adapter.MovieTrailerAdapter.OnRecyclerViewItemClickListener;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
+import com.hphtv.movielibrary.effect.GlideBlurTransformation;
 import com.hphtv.movielibrary.fragment.dialog.MovieSearchFragment;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -105,8 +107,12 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     int index = random.nextInt(wrapper.stagePhotos.size());
                     stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
                 }
-                GlideTools.GlideWrapper(this, wrapper.movie.poster).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
-                GlideTools.GlideWrapper(this, stagePhoto).error(R.mipmap.ic_poster_default).into(mBinding.ivStage);
+                GlideTools.GlideWrapper(this, wrapper.movie.poster).error(R.mipmap.ic_poster_default)
+                        .into(mBinding.ivCover);
+                GlideTools.GlideWrapper(this, stagePhoto)
+                        .apply(RequestOptions.bitmapTransform(new GlideBlurTransformation(MovieDetailActivity.this, 25, 3)))
+                        .error(R.mipmap.ic_poster_default)
+                        .into(mBinding.ivStage);
                 mBinding.btnFavorite.setFavoriteState(wrapper.movie.isFavorite);
                 mMovieTrailerAdapter.addItems(wrapper.trailers);
             }
@@ -229,16 +235,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         MovieSearchFragment movieSearchFragment = MovieSearchFragment.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((source, movie_id) -> {
             startLoading();
-            boolean is_favoirte=false;//默认收藏状态为false
+            boolean is_favoirte = false;//默认收藏状态为false
             if (mCurWrapper != null && mCurWrapper.movie != null) {
                 String last_movie_id = mCurWrapper.movie.movieId;
                 is_favoirte = mCurWrapper.movie.isFavorite;//获取当前收藏状态
-                BroadcastHelper.sendBroadcastMovieUpdateSync(this, last_movie_id, movie_id, is_favoirte?1:0);//向手机助手发送电影更改的广播
-            }else{
+                BroadcastHelper.sendBroadcastMovieUpdateSync(this, last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
+            } else {
                 BroadcastHelper.sendBroadcastMovieAddSync(this, movie_id);//向手机助手发送添加电影的广播
             }
             //选择新电影逻辑
-            mViewModel.selectMovie(source, movie_id,is_favoirte, movieWrapper -> {
+            mViewModel.selectMovie(source, movie_id, is_favoirte, movieWrapper -> {
                 prepareMovieWrapper(movieWrapper.movie.id);
                 setActivityResult();
                 stopLoading();
@@ -274,7 +280,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 boolean isFavorite = (boolean) args[0];
                 String movie_id = mCurWrapper.movie.movieId;
                 int is_favorite = isFavorite == true ? 1 : 0;
-                BroadcastHelper.sendBroadcastMovieUpdateSync(this, movie_id,movie_id, is_favorite);//向手机助手发送电影更改的广播
+                BroadcastHelper.sendBroadcastMovieUpdateSync(this, movie_id, movie_id, is_favorite);//向手机助手发送电影更改的广播
                 mCurWrapper.movie.isFavorite = isFavorite;
                 mBinding.btnFavorite.setFavoriteState(isFavorite);
                 setActivityResult();

@@ -44,7 +44,7 @@ public class GlideTools {
         else {
             return Glide.with(context)
                     .load(buildGlideUrl(path))
-                    .thumbnail(0.3f)
+//                    .thumbnail(0.3f)
 //                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
 //                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
                     .placeholder(R.mipmap.ic_poster_default)
