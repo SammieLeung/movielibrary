@@ -55,7 +55,7 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
                 movie.tag = genre;
                 movie.tag2 = actors;
                 movie.type = type;
-                movie.year = year;
+                movie.releaseDate = year;
                 movie.poster = poster;
                 return movie;
             }

@@ -141,6 +141,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             private String name;
             private String name_en;
             private String img;
+            private String type;
         }
 
         private class Video {
