@@ -118,10 +118,6 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         unbindService(mServiceConnection);
     }
 
-    @Override
-    protected int getContentViewId() {
-        return R.layout.activity_homepage;
-    }
 
     @Override
     protected void processLogic() {
@@ -176,9 +172,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     private void bindService() {
-        Intent intent2 = new Intent();
-        intent2.setClass(this, DeviceMonitorService.class);
-        bindService(intent2, mServiceConnection, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent();
+        intent.setClass(this, DeviceMonitorService.class);
+        bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private void registerReceiver() {
@@ -498,20 +494,21 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     }
 
     public void notifyAllFragmentsUpdate() {
-        int sorttype = mFilterBinding.categoryview.getSortTypePos();
-        Device device = mFilterBinding.categoryview.getDevice();
-        String genre = mFilterBinding.categoryview.getGenre();
-        String year = mFilterBinding.categoryview.getYear();
-        boolean isDesc = mFilterBinding.categoryview.isDesc();
-
-        LogUtil.v("2 sotType " + sorttype + " isDesc " + isDesc);
-
-        mHomePageFragment.notifyUpdate(device, year, genre, sorttype, isDesc);
+        notifyHomePage();
         mUnrecognizedFileFragement.notifyUpdate();
         mHistoryFragment.notifyUpdate();
         mFavoriteFragment.notifyUpdate();
     }
 
+    public void notifyHomePage(){
+        int sorttype = mFilterBinding.categoryview.getSortTypePos();
+        Device device = mFilterBinding.categoryview.getDevice();
+        String genre = mFilterBinding.categoryview.getGenre();
+        String year = mFilterBinding.categoryview.getYear();
+        boolean isDesc = mFilterBinding.categoryview.isDesc();
+        LogUtil.v("2 sotType " + sorttype + " isDesc " + isDesc);
+        mHomePageFragment.notifyUpdate(device, year, genre, sorttype, isDesc);
+    }
 
     public MovieScanService getMovieSearchService() {
         return mScanService;
@@ -599,7 +596,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
                 startLoading();
                 updateDeviceText();
-                notifyAllFragmentsUpdate();
+                notifyHomePage();
             }
 
 //            mViewModel.prepareMovies(device, year, genre,sortType,isDesc, args -> {

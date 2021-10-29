@@ -57,11 +57,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private MovieWrapper mCurWrapper;
 
     @Override
-    protected int getContentViewId() {
-        return R.layout.layout_detail;
-    }
-
-    @Override
     protected void processLogic() {
         // 初始化
         initView();

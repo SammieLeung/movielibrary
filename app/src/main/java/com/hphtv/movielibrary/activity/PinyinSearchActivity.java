@@ -34,11 +34,6 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     private MovieAdapter mMovieAdapter;
 
     @Override
-    protected int getContentViewId() {
-        return R.layout.layout_movie_search;
-    }
-
-    @Override
     protected void processLogic() {
         prepearT9();
         initView();

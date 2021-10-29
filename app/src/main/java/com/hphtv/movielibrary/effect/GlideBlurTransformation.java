@@ -13,8 +13,6 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool;
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.hphtv.movielibrary.util.GaussianBlurUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +20,6 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 
 import jp.wasabeef.glide.transformations.internal.FastBlur;
-import jp.wasabeef.glide.transformations.internal.RSBlur;
 
 
 /**

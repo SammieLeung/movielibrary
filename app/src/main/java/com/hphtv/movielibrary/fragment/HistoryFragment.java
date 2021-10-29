@@ -43,11 +43,14 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
 
     @Override
     protected void onViewCreated() {
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), mColums, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mUnrecognizedFileDataViewList);
         mHistoryListAdapter.setOnItemClickListener((view, data) -> {
-            mViewModel.playingVideo(data.path,data.filename);
+            mViewModel.playingVideo(data.path, data.filename, dataViewList -> {
+                updateMovie(dataViewList);
+                notifyStopLoading();
+            });
         });
         mBinding.rvMovies.setAdapter(mHistoryListAdapter);
     }

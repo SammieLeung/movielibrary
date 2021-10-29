@@ -54,7 +54,7 @@ public class HistoryFragmentViewModel extends AndroidViewModel {
                 });
     }
 
-    public void playingVideo(String path, String name) {
+    public void playingVideo(String path, String name,Callback callback) {
         Observable.just(path)
                 .subscribeOn(Schedulers.io())
                 //记录播放时间，作为播放记录
@@ -68,6 +68,7 @@ public class HistoryFragmentViewModel extends AndroidViewModel {
                     @Override
                     public void onAction(String path) {
                         VideoPlayTools.play(getApplication(), path, name);
+                        prepareHistory(callback);
                     }
                 });
     }
