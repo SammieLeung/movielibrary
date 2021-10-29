@@ -11,6 +11,7 @@ import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -104,7 +105,7 @@ public class HomepageViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .doOnNext(s -> {
                     mConditionDevices = mDeviceDao.qureyAll();
-                    mConditionGenres = mGenreDao.queryAllGenres();
+                    mConditionGenres = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource());
                     mConditionYears = mMovieDao.qureyYearsGroup();
                 })
                 .observeOn(AndroidSchedulers.mainThread())

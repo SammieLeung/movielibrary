@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 
@@ -26,4 +27,7 @@ public interface GenreDao {
 
     @Query("SELECT genre_id FROM "+TABLE.GENRE +" WHERE name in (:names)")
     public long[] queryByName(List<String> names);
+
+    @Query("SELECT genre_name FROM "+ VIEW.MOVIE_DATAVIEW +" WHERE source=:source GROUP BY genre_name;")
+    public List<String> queryGenresBySource(String source);
 }

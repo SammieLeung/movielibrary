@@ -133,6 +133,6 @@ public interface MovieDao {
      *
      * @return
      */
-    @Query("SELECT year FROM " + TABLE.MOVIE + " GROUP BY year ORDER BY year DESC")
+    @Query("SELECT year FROM " + VIEW.MOVIE_DATAVIEW + " GROUP BY year ORDER BY year DESC")
     public List<String> qureyYearsGroup();
 }
