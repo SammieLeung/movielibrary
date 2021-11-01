@@ -1,0 +1,705 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "d9d89d7984f99518f0e86b859d4acab0",
+    "entities": [
+      {
+        "tableName": "actor",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`actor_id` INTEGER NOT NULL, `name` TEXT, `name_en` TEXT, `img` TEXT, PRIMARY KEY(`actor_id`))",
+        "fields": [
+          {
+            "fieldPath": "actorId",
+            "columnName": "actor_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nameEn",
+            "columnName": "name_en",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "img",
+            "columnName": "img",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "actor_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "device",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `type` INTEGER NOT NULL, `path` TEXT, `connect_state` INTEGER NOT NULL, `file_count` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "connectState",
+            "columnName": "connect_state",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileCount",
+            "columnName": "file_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_device_path",
+            "unique": true,
+            "columnNames": [
+              "path"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_device_path` ON `${TABLE_NAME}` (`path`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "director",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`director_id` INTEGER NOT NULL, `name` TEXT, `name_en` TEXT, `img` TEXT, PRIMARY KEY(`director_id`))",
+        "fields": [
+          {
+            "fieldPath": "director_id",
+            "columnName": "director_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nameEn",
+            "columnName": "name_en",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "img",
+            "columnName": "img",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "director_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "genre",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`genre_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "genreId",
+            "columnName": "genre_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "genre_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_genre_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_genre_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "movie",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` TEXT, `title` TEXT, `title_other` TEXT, `plot` TEXT, `ratings` TEXT, `source` TEXT, `type` TEXT, `season` TEXT, `episode_count` INTEGER NOT NULL, `poster` TEXT, `country` TEXT, `release_date` TEXT, `release_area` TEXT, `year` TEXT, `duration` TEXT, `language` TEXT, `pinyin` TEXT, `add_time` INTEGER NOT NULL, `update_time` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "movieId",
+            "columnName": "movie_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "otherTitle",
+            "columnName": "title_other",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "plot",
+            "columnName": "plot",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ratings",
+            "columnName": "ratings",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "season",
+            "columnName": "season",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "episodeCount",
+            "columnName": "episode_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "poster",
+            "columnName": "poster",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "releaseDate",
+            "columnName": "release_date",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "releaseArea",
+            "columnName": "release_area",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "year",
+            "columnName": "year",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "pinyin",
+            "columnName": "pinyin",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addTime",
+            "columnName": "add_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updateTime",
+            "columnName": "update_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "is_favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPlayTime",
+            "columnName": "last_playtime",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_movie_movie_id_source",
+            "unique": true,
+            "columnNames": [
+              "movie_id",
+              "source"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_movie_movie_id_source` ON `${TABLE_NAME}` (`movie_id`, `source`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "movie_actor_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `actor_id` INTEGER NOT NULL, PRIMARY KEY(`id`, `actor_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actorId",
+            "columnName": "actor_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id",
+            "actor_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_movie_actor_cross_ref_actor_id",
+            "unique": false,
+            "columnNames": [
+              "actor_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_actor_cross_ref_actor_id` ON `${TABLE_NAME}` (`actor_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "movie_director_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `director_id` INTEGER NOT NULL, PRIMARY KEY(`id`, `director_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "directorId",
+            "columnName": "director_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id",
+            "director_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_movie_director_cross_ref_director_id",
+            "unique": false,
+            "columnNames": [
+              "director_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_director_cross_ref_director_id` ON `${TABLE_NAME}` (`director_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "movie_genre_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `genre_id` INTEGER NOT NULL, PRIMARY KEY(`id`, `genre_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "genreId",
+            "columnName": "genre_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id",
+            "genre_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_movie_genre_cross_ref_genre_id",
+            "unique": false,
+            "columnNames": [
+              "genre_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_genre_cross_ref_genre_id` ON `${TABLE_NAME}` (`genre_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "movie_videofile_cross_ref",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`path` TEXT NOT NULL, `source` TEXT NOT NULL, `id` INTEGER NOT NULL, PRIMARY KEY(`path`, `source`))",
+        "fields": [
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "path",
+            "source"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_movie_videofile_cross_ref_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_videofile_cross_ref_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "scan_directory",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`scan_dir_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT, `device_path` TEXT, `is_user_add` INTEGER NOT NULL, `is_hidden` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "scanDirId",
+            "columnName": "scan_dir_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "devicePath",
+            "columnName": "device_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isUserAdd",
+            "columnName": "is_user_add",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isHidden",
+            "columnName": "is_hidden",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "scan_dir_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_scan_directory_path",
+            "unique": true,
+            "columnNames": [
+              "path"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_scan_directory_path` ON `${TABLE_NAME}` (`path`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "videofile",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT NOT NULL, `device_id` TEXT, `dir_path` TEXT, `filename` TEXT, `is_scanned` INTEGER NOT NULL, `keyword` TEXT, `add_time` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "vid",
+            "columnName": "vid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "device_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "dirPath",
+            "columnName": "dir_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "filename",
+            "columnName": "filename",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isScanned",
+            "columnName": "is_scanned",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "keyword",
+            "columnName": "keyword",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addTime",
+            "columnName": "add_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastPlayTime",
+            "columnName": "last_playtime",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "vid"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_videofile_path",
+            "unique": true,
+            "columnNames": [
+              "path"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_videofile_path` ON `${TABLE_NAME}` (`path`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "trailer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`trailer_id` INTEGER NOT NULL, `url` TEXT, `title` TEXT, `img` TEXT, `movie_id` INTEGER NOT NULL, PRIMARY KEY(`trailer_id`))",
+        "fields": [
+          {
+            "fieldPath": "trailerId",
+            "columnName": "trailer_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "img",
+            "columnName": "img",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "movieId",
+            "columnName": "movie_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "trailer_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "stagephoto",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`stage_id` INTEGER NOT NULL, `movie_id` INTEGER NOT NULL, `imgUrl` TEXT, PRIMARY KEY(`stage_id`))",
+        "fields": [
+          {
+            "fieldPath": "stageId",
+            "columnName": "stage_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "movieId",
+            "columnName": "movie_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imgUrl",
+            "columnName": "imgUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "stage_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [
+      {
+        "viewName": "movie_dataview",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,MVCF__VF__SD.source,MVCF__VF__SD.path,MVCF__VF__SD.dir_path,MVCF__VF__SD.device_id,genre_name,M.add_time,M.last_playtime,M.is_favorite FROM movie AS M JOIN (SELECT MVCF.id,MVCF.path,MVCF.source,VF__SD__DEV.dir_path,VF__SD__DEV.device_id FROM movie_videofile_cross_ref AS MVCF JOIN (SELECT VF__SD.path,VF__SD.dir_path,DEV.id AS device_id FROM device AS DEV JOIN (SELECT VF.path,SD.path AS dir_path,SD.device_path FROM videofile AS VF JOIN scan_directory AS SD ON VF.dir_path=SD.path) AS VF__SD ON VF__SD.device_path=DEV.path) AS VF__SD__DEV ON MVCF.path=VF__SD__DEV.path) AS MVCF__VF__SD ON MVCF__VF__SD.id = M.id LEFT OUTER  JOIN (SELECT MGCF.id,G.name AS genre_name FROM genre AS G JOIN movie_genre_cross_ref AS MGCF ON MGCF.genre_id = G.genre_id) AS MGCF__G ON MGCF__G.id = M.id"
+      },
+      {
+        "viewName": "unrecognizedfile_dataview",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT VF.vid,VF.filename,VF.keyword,VF.path,VF.last_playtime,SD__DEV.dir_path,SD__DEV.device_id,SD__DEV.device_path FROM videofile AS VF JOIN (SELECT SD.path AS dir_path,DEV.id AS device_id,DEV.path AS device_path FROM device AS DEV JOIN scan_directory AS SD ON SD.device_path=DEV.path) AS SD__DEV ON VF.dir_path=SD__DEV.dir_path"
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd9d89d7984f99518f0e86b859d4acab0')"
+    ]
+  }
+}
