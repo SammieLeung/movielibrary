@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,7 +35,6 @@ import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.fragment.dialog.ConfirmDialogFragment;
 import com.hphtv.movielibrary.fragment.dialog.CustomRadioDialogFragment;
 import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
-import com.station.kit.util.LogUtil;
 import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -68,15 +66,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent != null) {
-            int currentMode = intent.getIntExtra(Constants.IntentKey.KEY_MODE, -1);
+            int currentMode = intent.getIntExtra(Constants.Extras.MODE, -1);
             mViewModel.setCurrentMode(currentMode);
             switch (currentMode) {
                 case Constants.MovieDetailMode.MODE_WRAPPER:
-                    long movieId = intent.getLongExtra(Constants.IntentKey.KEY_MOVIE_ID, -1);
+                    long movieId = intent.getLongExtra(Constants.Extras.MOVIE_ID, -1);
                     prepareMovieWrapper(movieId);//1.加载电影数据
                     break;
                 case Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
-                    String unrecognizedFileKeyword = intent.getStringExtra(Constants.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD);
+                    String unrecognizedFileKeyword = intent.getStringExtra(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD);
                     prepareUnrecogizedFile(unrecognizedFileKeyword);//2.组合未识别文件数据
                     break;
             }

@@ -7,7 +7,6 @@ import android.view.View;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
-import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.MovieAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
@@ -27,7 +26,7 @@ public class FavoriteFragment extends BaseFragment<FavoriteFragmentViewModel, FL
 
     public static FavoriteFragment newInstance(int pos) {
         Bundle args = new Bundle();
-        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.Extras.CURRENT_FRAGMENT, pos);
         FavoriteFragment fragment = new FavoriteFragment();
         fragment.setArguments(args);
         return fragment;
@@ -42,8 +41,8 @@ public class FavoriteFragment extends BaseFragment<FavoriteFragmentViewModel, FL
             Intent intent = new Intent(getContext(),
                     MovieDetailActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putLong(Constants.IntentKey.KEY_MOVIE_ID, data.id);
-            bundle.putInt(Constants.IntentKey.KEY_MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+            bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
+            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
             intent.putExtras(bundle);
             startActivityForResultFromParent(intent);
         });

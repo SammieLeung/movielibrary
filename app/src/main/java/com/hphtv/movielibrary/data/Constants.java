@@ -10,7 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Constants {
 
     public static final long GLIDE_CACHE_VERSION = System.currentTimeMillis() / 86400000;
-    ;
+
+    public static final String PACKAGE_FILE_PICKER = "com.firefly.filepicker";
+    public static final String ACTION_FILE_PICKER = "com.firefly.FILE_PICKER";
+    public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
     /**
      * 设备路径与id映射
      */
@@ -30,14 +33,6 @@ public class Constants {
     public static final String DIRECTORY = "directory";
 
     /**
-     * 电影搜索 模式
-     */
-    public interface SearchMode {
-        int MODE_LIST = 0;// 搜索电影
-        int MODE_INFO = 1;// 获取电影信息
-    }
-
-    /**
      * 搜刮器
      */
 
@@ -48,37 +43,8 @@ public class Constants {
         String TMDB_EN="TMDB_EN";
     }
 
-    public interface DirectoryState {
-        /*设备已被扫描*/
-        int SCANNED = 0;
-        /*设备正在扫描*/
-        int SCANNING = 1;
-        /*未扫描*/
-        int UNSCAN = 2;
-    }
-
-    public interface VideoFile {
-        int IS_MATCHED = 1;
-        int UN_MATCHED = 0;
-    }
-
-    /**
-     * 设备连接状态
-     */
-    public interface DeviceConnectState {
-        int CONNECTED = 0;
-        int DISCONNECTED = 1;
-    }
 
     public interface DeviceType {
-        /*本地设备*/
-        String STR_LOCAL = "local";
-        /*dlna设备*/
-        String STR_DLNA = "dlna";
-        /*设备*/
-        String STR_SAMBA = "samba";
-
-
         int DEVICE_TYPE_LOCAL = -1;
         /**
          * 内部存储
@@ -105,11 +71,6 @@ public class Constants {
         int DEVICE_TYPE_SMB = 7;
     }
 
-    public interface EncryptState {
-        public static final int UNENCRYPTED = 0;
-        public static final int ENCRYPTED = 1;
-    }
-
     public interface FileType {
         /*全部文件*/
         int OTHER = 0; // 全部文件
@@ -134,13 +95,6 @@ public class Constants {
         Arrays.sort(VIDEO_SUFFIX);
     }
 
-    //4.------------for filepicker---------------
-    public static final String PACKAGE_FILE_PICKER = "com.firefly.filepicker";
-    public static final String ACTION_FILE_PICKER = "com.firefly.FILE_PICKER";
-
-    /*--------------uri prefix for get connected devices------------*/
-    public static final String PREFIX_URI_CONNECTED_DEVICES = "content://com.firefly.filepicker/devices/";//content://com.firefly.filepicker/devices[/<deviceType>]
-
 
     //5.---------------for MovieDetailActivity----------------------
     public interface MovieDetailMode {
@@ -159,23 +113,23 @@ public class Constants {
     }
 
 
-    //7.---------------for MovieSearcherHelper -----------
-    public interface IntentKey {
-        //        String IS_GET_MOVIE_LISTS = "MODE_LIST";
-        String KEY_MODE = "mode";
-        String KEY_MOVIE_ID = "movie_id";
-        String KEY_UNRECOGNIZE_FILE_KEYWORD = "keyword";
+    public interface Extras {
+        //详情页
+        String MODE = "mode";
+        String MOVIE_ID = "movie_id";
+        String UNRECOGNIZE_FILE_KEYWORD = "keyword";
 
-        String KEY_CUR_FRAGMENT = "current_fragment";
+        String CURRENT_FRAGMENT = "current_fragment";
+        //设备信息
+        String DEVICE_NAME = "device_name";
+        String DEVICE_STATE = "device_state";
+        String DEVICE_MOUNT_PATH = "device_mount_path";
+        String DEVICE_NETWORKPATH = "device_networkpath";
+        String MOUNT_TYPE = "device_type";
+        String IS_FROM_NETWORK = "is_from_network";
+        String DEVICE_ID = "device_id";
 
     }
-
-
-    public interface DeviceModel {
-        String TRV9 = "trv9";
-        String ROC_RK3399_PC = "ROC_RK3399_PC";
-    }
-
 
     /**
      * 设备挂在状态
@@ -188,23 +142,7 @@ public class Constants {
         int UNMOUNTED = 0;
     }
 
-    /**
-     * 设备信息
-     */
 
-    public interface DeviceMountMsg {
-        String DEVICE_NAME = "device_name";
-        String MOUNT_DEVICE_STATE = "device_state";
-        String DEVICE_MOUNT_PATH = "device_mount_path";
-        String DEVICE_NETWORKPATH = "device_networkpath";
-        String MOUNT_TYPE = "device_type";
-        String IS_FROM_NETWORK = "is_from_network";
-
-        String DEVICE_ID = "device_id";
-    }
-
-    /*---------------------本地广播-----------------------------*/
-    public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
 
     public interface BroadCastMsg {
         String FILE_SCANNING="file_scannig";
@@ -213,14 +151,16 @@ public class Constants {
          */
         String DEVICE_UP = "action_mounted";
         String DEVICE_DOWN = "action_unmounted";
-        String FILE_SCAN = "file_scan";
+        String POSTER_PAIRING = "poster_pairing";
 
         /**
          * 重新扫描设备
          */
         String RESCAN_DEVICE = "com.rockchips.mediacenter.rescan_device";
 
+        String MOVIE_SCRAP_START= "action.movie.scrap.start";
         String MOVIE_SCRAP_FINISH = "action.movie.scrap.finish";
+        String MATCHED_MOVIE="action.movie.matched";
         String FOLDER_REFRESH = "action.movie.folder.refresh";
         String START_LOADING = "action.home.startloading";
         String STOP_LOADING = "action.home.stoploading";

@@ -25,7 +25,7 @@ public class FileManagerFragment extends BaseFragment<FileManagerFragmentViewMod
 
     public static FileManagerFragment newInstance(int pos) {
         Bundle args = new Bundle();
-        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.Extras.CURRENT_FRAGMENT, pos);
         FileManagerFragment fragment = new FileManagerFragment();
         fragment.setArguments(args);
         return fragment;

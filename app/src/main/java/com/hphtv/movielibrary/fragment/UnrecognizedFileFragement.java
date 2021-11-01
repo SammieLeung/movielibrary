@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
-import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.UnrecognizedFileListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
@@ -30,7 +29,7 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
 
     public static UnrecognizedFileFragement newInstance(int pos) {
         Bundle args = new Bundle();
-        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.Extras.CURRENT_FRAGMENT, pos);
         UnrecognizedFileFragement fragment = new UnrecognizedFileFragement();
         fragment.setArguments(args);
         return fragment;
@@ -53,8 +52,8 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
             Intent intent = new Intent(getContext(),
                     MovieDetailActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putString(Constants.IntentKey.KEY_UNRECOGNIZE_FILE_KEYWORD, data.keyword);
-            bundle.putInt(Constants.IntentKey.KEY_MODE, Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE);
+            bundle.putString(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD, data.keyword);
+            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE);
             intent.putExtras(bundle);
             startActivityForResultFromParent(intent);
         });

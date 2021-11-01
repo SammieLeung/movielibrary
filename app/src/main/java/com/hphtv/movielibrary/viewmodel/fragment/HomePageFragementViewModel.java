@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.viewmodel.fragment;
 
 import android.app.Application;
+import android.telecom.Call;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,9 @@ import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Scheduler;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -91,6 +95,20 @@ public class HomePageFragementViewModel extends AndroidViewModel {
                     public void onAction(List<MovieDataView> movieDataViews) {
                         callback.runOnUIThread(movieDataViews);
                     }
+                });
+    }
+
+    public void getMovieDataView(String movie_id, Callback callback){
+        Observable.just(movie_id)
+                .map(mid -> {
+                    MovieDataView movieDataView=mMovieDao.queryMovieDataViewByMovieId(mid,ScraperSourceTools.getSource());
+                    return movieDataView;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(view -> {
+                    if(callback!=null)
+                        callback.runOnUIThread(view);
                 });
     }
 

@@ -15,17 +15,37 @@ import android.os.storage.StorageVolume;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
+import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
+import com.hphtv.movielibrary.service.Thread.DeviceMountThread;
+import com.hphtv.movielibrary.service.Thread.FileScanThread;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.viewmodel.DeviceMonitorViewModel;
+
+import org.eclipse.jetty.util.ConcurrentHashSet;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * @author lxp
@@ -34,26 +54,57 @@ import java.lang.reflect.Method;
 public class DeviceMonitorService extends Service {
     public static final String TAG = DeviceMonitorService.class.getSimpleName();
     private MonitorBinder mBinder;
-    private DeviceMonitorViewModel mDeviceMonitorViewModel;
     private StorageManager mStorageManager;
     private MovieScanService mMovieScanService;
+    private ConcurrentHashSet<String> mPosterPairingDevice=new ConcurrentHashSet<>();
+    /**
+     * 单线程池服务，设备挂载，卸载线程
+     */
+    private ExecutorService mDeviceMountExecutor;
+    /**
+     * 单线程池服务，设备初始化检测服务
+     */
+    private ExecutorService mDeviceInitExecutor;
+    private ExecutorService mFileScanExecutor;
+    private ExecutorService mSingleThreadPool;
+
+    private DeviceDao mDeviceDao;
+    private VideoFileDao mVideoFileDao;
+    private ScanDirectoryDao mScanDirectoryDao;
+    private int mScanFlag = 0;
+
+
     /**
      * 处理Android 11设备挂载/卸载回调
      */
     Object mStorageVolumeCallback;
 
     /**
-     * 1.监听设备挂载广播
-     * 2.初始化线程池
-     * 3.扫描全盘
+     * 初始化工作
      */
     @Override
     public void onCreate() {
         LogUtil.v(TAG, "OnCreate");
         super.onCreate();
-        mDeviceMonitorViewModel = new ViewModelProvider.AndroidViewModelFactory(getApplication()).create(DeviceMonitorViewModel.class);
+        initThreadPools();
+        initDb();
+    }
+
+    /**
+     * 绑定扫描服务
+     * 绑定监听器
+     *
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        LogUtil.v(TAG, "onStartCommand flags:" + flags + " startId:" + startId);
         bindRegisterReceivers();
         bindServices();
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Nullable
@@ -65,6 +116,10 @@ public class DeviceMonitorService extends Service {
         return mBinder;
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
 
     @Override
     public void onDestroy() {
@@ -72,6 +127,24 @@ public class DeviceMonitorService extends Service {
         super.onDestroy();
         unRegisterReceivers();
         unbindServices();
+    }
+
+    /**
+     * 初始化数据库类
+     */
+    private void initDb() {
+        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
+        mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
+        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
+        mScanDirectoryDao = movieLibraryRoomDatabase.getScanDirectoryDao();
+    }
+
+    //初始化线程池
+    private void initThreadPools() {
+        mDeviceMountExecutor = Executors.newSingleThreadExecutor();
+        mFileScanExecutor = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        mDeviceInitExecutor = Executors.newSingleThreadExecutor();
+        mSingleThreadPool = Executors.newSingleThreadExecutor();
     }
 
     private void bindServices() {
@@ -96,7 +169,7 @@ public class DeviceMonitorService extends Service {
                     String state_txt = volume.getState();
                     int state = state_txt.equals(Constants.DeviceMountState.MOUNTED_TEXT) ? Constants.DeviceMountState.MOUNTED : Constants.DeviceMountState.UNMOUNTED;
                     if (state == Constants.DeviceMountState.MOUNTED) {
-                        mDeviceMonitorViewModel.executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, volume.getDirectory().getPath(), false, "", state);
+                        executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, volume.getDirectory().getPath(), false, "", state);
                     } else {
                         //拔出U盘的时候volume.getDirectory()返回的是null，所以被迫使用反射获取mPath的值
                         try {
@@ -105,7 +178,7 @@ public class DeviceMonitorService extends Service {
                             field_mPath.setAccessible(true);
                             File fpath = (File) field_mPath.get(volume);
                             String path = fpath.toString();
-                            mDeviceMonitorViewModel.executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
+                            executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
                         } catch (NoSuchFieldException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
@@ -127,6 +200,7 @@ public class DeviceMonitorService extends Service {
         localFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
         localFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
         localFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+        localFilter.addAction(Constants.BroadCastMsg.POSTER_PAIRING);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
     }
 
@@ -139,9 +213,6 @@ public class DeviceMonitorService extends Service {
         }
     }
 
-    public DeviceMonitorViewModel getDeviceMonitorViewModel() {
-        return mDeviceMonitorViewModel;
-    }
 
     /**
      * 接受设备挂载广播
@@ -163,7 +234,7 @@ public class DeviceMonitorService extends Service {
                         Method meth = clazz.getDeclaredMethod("getPath");
                         meth.setAccessible(true);
                         String path = (String) meth.invoke(storageVolume);
-                        mDeviceMonitorViewModel.executeOnMountThread(storageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
+                        executeOnMountThread(storageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
@@ -176,14 +247,18 @@ public class DeviceMonitorService extends Service {
                     break;
                 //本地广播
                 case Constants.BroadCastMsg.DEVICE_UP:
-                    String mountPath = intent.getStringExtra(Constants.DeviceMountMsg.DEVICE_MOUNT_PATH);
+                    String mountPath = intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
                     LogUtil.v("currentPath=" + mountPath);
-                    mDeviceMonitorViewModel.startScanWithNotScannedFiles(mMovieScanService, mountPath);
+                    executeOnFileScanThread(mountPath);
                     break;
                 case Constants.BroadCastMsg.DEVICE_DOWN:
                     break;
                 case Constants.BroadCastMsg.RESCAN_DEVICE:
-                  mDeviceMonitorViewModel.reScanDevices();
+                    reScanDevices();
+                    break;
+                case Constants.BroadCastMsg.POSTER_PAIRING:
+                    String path=intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
+                    startScanWithNotScannedFiles(path);
                     break;
             }
         }
@@ -193,7 +268,7 @@ public class DeviceMonitorService extends Service {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mMovieScanService = ((MovieScanService.ScanBinder) service).getService();
-            mDeviceMonitorViewModel.scanDevices();
+            scanDevices();
         }
 
         @Override
@@ -202,10 +277,87 @@ public class DeviceMonitorService extends Service {
         }
     };
 
+
+    /**
+     * 扫描本地所有挂载设备并扫描文件
+     */
+    public void scanDevices() {
+        if (mScanFlag == 0) {
+            synchronized (DeviceMonitorService.this) {
+                if (mScanFlag == 0) {
+                    mScanFlag = 1;
+                    mDeviceInitExecutor.execute(new DeviceInitThread(this));
+                }
+            }
+        }
+    }
+
+    public void reScanDevices() {
+        mScanFlag = 0;
+        scanDevices();
+    }
+
+    /**
+     * 设备挂载处理线程
+     *
+     * @param deviceName
+     * @param deviceType
+     * @param localPath
+     * @param isFromNetwork
+     * @param networkPath
+     * @param mountState
+     */
+    public void executeOnMountThread(String deviceName, int deviceType, String localPath, boolean isFromNetwork, String networkPath, int mountState) {
+        mDeviceMountExecutor.execute(new DeviceMountThread(this, deviceName, deviceType, localPath, isFromNetwork, networkPath, mountState));
+    }
+
+    public void executeOnFileScanThread(Device device) {
+        mFileScanExecutor.execute(new FileScanThread(this, device));
+    }
+
+
+    public void executeOnFileScanThread(String device_path) {
+        mFileScanExecutor.execute(new FileScanThread(this, device_path));
+    }
+
+    public void startScanWithNotScannedFiles(String mountPath) {
+        Observable.just(mountPath)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .observeOn(Schedulers.from(mSingleThreadPool))
+                .map(mount_path -> {
+                    mPosterPairingDevice.add(mount_path);
+                    Device device = mDeviceDao.querybyMountPath(mount_path);
+                    if (device != null) {
+                        List<VideoFile> videoFiles = getNotScannedFiles(device);
+                        return videoFiles;
+                    }
+                    return new ArrayList<VideoFile>();
+                })
+                .subscribe(new SimpleObserver<List<VideoFile>>() {
+                    @Override
+                    public void onAction(List<VideoFile> videoFiles) {
+                        if (videoFiles != null && videoFiles.size() > 0) {
+                            if (mMovieScanService != null)
+                                mMovieScanService.addToPairingQueue(videoFiles);
+                        } else {    //TODO mPosterPairingDevice处理
+                            mPosterPairingDevice.remove(mountPath);
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH));
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 获取所以未扫描的文件
+     */
+    private List<VideoFile> getNotScannedFiles(Device device) {
+        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedByIds(device.id);
+        return mountedDeviceFiles;
+    }
+
     public class MonitorBinder extends Binder {
         public DeviceMonitorService getService() {
             return DeviceMonitorService.this;
         }
     }
-
 }

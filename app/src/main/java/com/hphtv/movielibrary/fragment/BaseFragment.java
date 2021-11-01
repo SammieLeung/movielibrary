@@ -48,7 +48,7 @@ public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends View
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
         if (bundle != null) {
-            mPosition = bundle.getInt(Constants.IntentKey.KEY_CUR_FRAGMENT, 0);
+            mPosition = bundle.getInt(Constants.Extras.CURRENT_FRAGMENT, 0);
         }
     }
 
@@ -121,7 +121,7 @@ public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends View
     protected void notifyStartLoading() {
         Intent intent = new Intent();
         intent.setAction(Constants.BroadCastMsg.START_LOADING);
-        intent.putExtra(Constants.IntentKey.KEY_CUR_FRAGMENT, mPosition);
+        intent.putExtra(Constants.Extras.CURRENT_FRAGMENT, mPosition);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 

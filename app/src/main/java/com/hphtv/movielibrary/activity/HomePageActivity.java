@@ -183,7 +183,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         intentFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
         intentFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
         intentFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_START);
         intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
+        intentFilter.addAction(Constants.BroadCastMsg.MATCHED_MOVIE);
         intentFilter.addAction(Constants.BroadCastMsg.START_LOADING);
         intentFilter.addAction(Constants.BroadCastMsg.STOP_LOADING);
 
@@ -640,20 +642,27 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                     postDelayMovieRefresh();
                     break;
                 case Constants.BroadCastMsg.DEVICE_UP:
+                case Constants.BroadCastMsg.MOVIE_SCRAP_START:
                     startLoading();
                     break;
                 case Constants.BroadCastMsg.START_LOADING:
-                    int cur_start = intent.getIntExtra(Constants.IntentKey.KEY_CUR_FRAGMENT, 0);
+                    int cur_start = intent.getIntExtra(Constants.Extras.CURRENT_FRAGMENT, 0);
                     if (mBinding.viewpager.getCurrentItem() == cur_start) {
                         LogUtil.v("response " + cur_start + " startLoading");
                         startLoading();
                     }
                     break;
                 case Constants.BroadCastMsg.STOP_LOADING:
-                    int cur_stop = intent.getIntExtra(Constants.IntentKey.KEY_CUR_FRAGMENT, 0);
+                    int cur_stop = intent.getIntExtra(Constants.Extras.CURRENT_FRAGMENT, 0);
                     if (mBinding.viewpager.getCurrentItem() == cur_stop) {
                         LogUtil.v("response " + cur_stop + " stopLoading");
                         stopLoading();
+                    }
+                    break;
+                case Constants.BroadCastMsg.MATCHED_MOVIE:
+                    String mid=intent.getStringExtra(Constants.Extras.MOVIE_ID);
+                    if(!TextUtils.isEmpty(mid)){
+                        mHomePageFragment.addMovie(mid);
                     }
                     break;
                 case Constants.BroadCastMsg.MOVIE_SCRAP_FINISH:

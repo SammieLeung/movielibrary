@@ -5,6 +5,8 @@ import androidx.room.DatabaseView;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 
+import java.util.Objects;
+
 /**
  * author: Sam Leung
  * date:  2021/6/8
@@ -44,4 +46,18 @@ public class MovieDataView {
     public long add_time;
     public long last_playtime;
     public boolean is_favorite;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MovieDataView that = (MovieDataView) o;
+        return movie_id.equals(that.movie_id) &&
+                source.equals(that.source);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(movie_id, source);
+    }
 }

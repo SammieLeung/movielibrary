@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
 import com.hphtv.movielibrary.activity.MovieDetailActivity;
-import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.MovieAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Device;
@@ -34,10 +33,15 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
     public static HomePageFragment newInstance(int pos) {
 
         Bundle args = new Bundle();
-        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.Extras.CURRENT_FRAGMENT, pos);
         HomePageFragment fragment = new HomePageFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -56,8 +60,8 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
             Intent intent = new Intent(HomePageFragment.this.getContext(),
                     MovieDetailActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putLong(Constants.IntentKey.KEY_MOVIE_ID, data.id);
-            bundle.putInt(Constants.IntentKey.KEY_MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+            bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
+            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
             intent.putExtras(bundle);
             startActivityForResultFromParent(intent);
         });
@@ -68,12 +72,22 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
     public void notifyUpdate(Device device, String year, String genre, int sortType, boolean isDesc) {
         mViewModel.prepareMovies(device, year, genre, sortType, isDesc, args -> {
             List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
-            updateMovie(movieDataViews);
+            refresh(movieDataViews);
             notifyStopLoading();
         });
     }
 
-    private void updateMovie(List<MovieDataView> movieDataViews) {
+    public void addMovie(String movie_id){
+        mViewModel.getMovieDataView(movie_id, args -> {
+            if(args!=null&&args.length>0){
+                mBinding.tipsEmpty.setVisibility(View.GONE);
+                MovieDataView movieDataView= (MovieDataView) args[0];
+                mMovieAdapter.put(movieDataView);
+            }
+        });
+    }
+
+    private void refresh(List<MovieDataView> movieDataViews) {
         if (movieDataViews.size() > 0) {
             mBinding.tipsEmpty.setVisibility(View.GONE);
         } else {
@@ -81,5 +95,9 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
         }
         mMovieAdapter.addAll(movieDataViews);
     }
+
+
+
+
 
 }

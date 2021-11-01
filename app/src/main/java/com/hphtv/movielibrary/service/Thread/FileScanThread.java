@@ -1,6 +1,10 @@
 package com.hphtv.movielibrary.service.Thread;
 
 import android.content.Context;
+import android.content.Intent;
+import android.text.TextUtils;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
@@ -10,14 +14,12 @@ import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.station.kit.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 
 /**
@@ -25,9 +27,10 @@ import java.util.concurrent.Callable;
  * @date 18-12-17
  * 扫描文件设备线程
  */
-public class FileScanThread implements Callable<Boolean> {
+public class FileScanThread extends Thread {
     public static final String TAG = FileScanThread.class.getSimpleName();
-    private boolean isContainsSubfolder = true;
+
+    private Context mContext;
     private String mPath;
     private Device mDevice;
     /**
@@ -50,18 +53,33 @@ public class FileScanThread implements Callable<Boolean> {
 
     private boolean mIsOverMaxDirs = false;
 
+    private FileScanThread(Context context) {
+        this.mContext = context;
+        this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(mContext).getDeviceDao();
+        this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(mContext).getScanDirectoryDao();
+        this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(mContext).getVideoFileDao();
+    }
+
     public FileScanThread(Context context, Device device) {
+        this(context);
         this.mDevice = device;
         this.mPath = mDevice.path;
-        this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
-        this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
-        this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+
+    }
+
+    public FileScanThread(Context context, String path) {
+        this(context);
+        mPath = path;
     }
 
     @Override
-    public Boolean call() {
-        mScanDirectories.addAll(mScanDirectoryDao.queryScanDirByDevicePath(mDevice.path));
+    public void run() {
+
+        if (mDevice == null && !TextUtils.isEmpty(mPath))
+            mDevice = mDeviceDao.querybyMountPath(mPath);
+        mScanDirectories.addAll(mScanDirectoryDao.queryScanDirByDevicePath(mPath));
         int videoCount = 0;
+
         while (!mScanDirectories.isEmpty()) {
             boolean nomediaFlag = false;
             //文件信息超过100则先保存到数据库
@@ -78,7 +96,7 @@ public class FileScanThread implements Callable<Boolean> {
                 loadScanDirectoriesFromDB();
             }
             //获取待扫描设备队列的一个设备。
-            ScanDirectory scanDirectory=mScanDirectories.remove();
+            ScanDirectory scanDirectory = mScanDirectories.remove();
             File dirFile = new File(scanDirectory.path);
             //初始化当前文件夹下的媒体文件数量
 
@@ -92,20 +110,20 @@ public class FileScanThread implements Callable<Boolean> {
                     //文件夹加入待扫描队列
                     if (subFile.isDirectory()) {
                         if (mIsOverMaxDirs) {//当前扫描目录队列超过1000个则先缓存
-                            ScanDirectory tmpScanDirectory=new ScanDirectory(subFile.getPath(), mDevice.path);
-                            tmpScanDirectory.parentPath=scanDirectory.parentPath;
+                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), mDevice.path);
+                            tmpScanDirectory.parentPath = scanDirectory.parentPath;
                             mTmpScanDirectories.add(tmpScanDirectory);
                             if (mTmpScanDirectories.size() >= MAX_DIRS / 2) {//暂存1000个
                                 mScanDirectoryDao.insertScanDirectories(mTmpScanDirectories.toArray(new ScanDirectory[0]));
                             }
                         } else {
-                            ScanDirectory tmpScanDirectory=new ScanDirectory(subFile.getPath(), mDevice.path);
-                            tmpScanDirectory.parentPath=scanDirectory.parentPath;
+                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), mDevice.path);
+                            tmpScanDirectory.parentPath = scanDirectory.parentPath;
                             mScanDirectories.add(tmpScanDirectory);
                         }
                     } else {
                         //获取文件信息，传入文件信息暂存列表
-                        VideoFile videoFile = buildVideoInfoFromFile(subFile, mDevice,scanDirectory);
+                        VideoFile videoFile = buildVideoInfoFromFile(subFile, mDevice, scanDirectory);
                         if (videoFile != null) {
                             ++videoCount;
                             mVideoFiles.add(videoFile);
@@ -120,9 +138,11 @@ public class FileScanThread implements Callable<Boolean> {
         }
         //队列结束保存文件信息入库
         saveVideoFileInfotoDB();
-        LogUtil.v("fileScanThread " + mDevice.name);
-        return true;
-    }
+        Intent intent = new Intent();
+        intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
+        intent.putExtra(Constants.Extras.DEVICE_MOUNT_PATH,mPath);
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+}
 
 
     private boolean isNomedia(File file) {
@@ -138,7 +158,7 @@ public class FileScanThread implements Callable<Boolean> {
      * @param device
      * @return
      */
-    private VideoFile buildVideoInfoFromFile(File file, Device device,ScanDirectory scanDirectory) {
+    private VideoFile buildVideoInfoFromFile(File file, Device device, ScanDirectory scanDirectory) {
         String path = file.getPath();
         int dotIndex = path.lastIndexOf(".");
         if (dotIndex < 0)
@@ -153,7 +173,7 @@ public class FileScanThread implements Callable<Boolean> {
             videoFile.deviceId = (device.id);
             videoFile.filename = (fileName);
             videoFile.path = (file.getPath());
-            videoFile.dirPath=scanDirectory.parentPath;
+            videoFile.dirPath = scanDirectory.parentPath;
             return videoFile;
         }
         return null;
@@ -187,13 +207,13 @@ public class FileScanThread implements Callable<Boolean> {
                     videoFile.isScanned = tVideoFile.isScanned;
                     videoFile.keyword = tVideoFile.keyword;
                     videoFile.addTime = System.currentTimeMillis();
-                    videoFile.lastPlayTime=tVideoFile.lastPlayTime;
+                    videoFile.lastPlayTime = tVideoFile.lastPlayTime;
                     mVideoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();
-                    mVideoFileDao.insertOrIgnore(videoFile);
+                    long id = mVideoFileDao.insertOrIgnore(videoFile);
+                    videoFile.vid = id;
                 }
-
             }
             mVideoFiles.clear();
         }

@@ -5,16 +5,15 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.text.TextUtils;
+import android.util.SparseArray;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.hphtv.movielibrary.scraper.api.omdb.OmdbApiService;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
-import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
@@ -42,15 +41,16 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.scraper.api.mtime.MtimeApiService;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -58,7 +58,10 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.functions.Supplier;
@@ -69,6 +72,9 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2021/5/26
  */
 public class MovieScanService extends Service {
+    public static final String TAG = MovieScanService.class.getSimpleName();
+    public static final int KEY_MOVIE_ID = 0;
+    public static final int KEY_VIDEOFILE = 1;
     private ScanBinder mScanBinder;
 
     private ExecutorService mSearchMovieExecutor;
@@ -86,9 +92,10 @@ public class MovieScanService extends Service {
     private TrailerDao mTrailerDao;
     private StagePhotoDao mStagePhotoDao;
     private boolean isScanning;
-
     private int total;
     private int offset;
+
+    private ConcurrentLinkedQueue<VideoFile> mQueue;
 
     @Override
     public void onCreate() {
@@ -104,6 +111,7 @@ public class MovieScanService extends Service {
     }
 
     private void init() {
+        mQueue = new ConcurrentLinkedQueue<>();
     }
 
     /**
@@ -143,36 +151,16 @@ public class MovieScanService extends Service {
         }
     }
 
-    public boolean start(VideoFile... videoFiles) {
-        synchronized (this) {
-            if (!isScanning) {
-                total = videoFiles.length;
-                offset = 0;
-            } else {
-                total += videoFiles.length;
-            }
-            isScanning = true;
-            for (VideoFile videoFile : videoFiles) {
-                startSearch(videoFile);
-            }
-            return true;
-        }
-    }
-
-    public boolean start(List<VideoFile> videoFileList) {
-        synchronized (this) {
-            if (!isScanning) {
-                total = videoFileList.size();
-                offset = 0;
-            } else {
-                total += videoFileList.size();
-            }
-            isScanning = true;
-            for (VideoFile videoFile : videoFileList) {
-                startSearch(videoFile);
-            }
-            return true;
-        }
+    /**
+     * 将videofile加入匹配队列
+     *
+     * @param videoFileList
+     * @return
+     */
+    public void addToPairingQueue(List<VideoFile> videoFileList) {
+        mQueue.addAll(videoFileList);
+        if (!isScanning)
+            startSearch();
     }
 
     /**
@@ -187,15 +175,17 @@ public class MovieScanService extends Service {
         return FileScanUtil.simpleParse(raw);
     }
 
-    private void startSearch(VideoFile videoFile) {
-        MovieSupplier movieSupplier = new MovieSupplier(videoFile);
-
-        getTmdbSearchResult(movieSupplier)
-                .map(movie_id -> {
-                    if (!TextUtils.isEmpty(movie_id)) {
+    private void startSearch() {
+        startTmdbSearch()
+                .map(sparseArray -> {
+                    String movie_id = null;
+                    if (sparseArray.get(KEY_MOVIE_ID) != null) {
+                        movie_id = (String) sparseArray.get(KEY_MOVIE_ID);
+                        VideoFile videoFile = (VideoFile) sparseArray.get(KEY_VIDEOFILE);
+                        LogUtil.w(TAG, "获取" + movie_id + "详情");
                         MovieDetailRespone respone = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB)
                                 .onErrorReturn(throwable -> {
-                                    LogUtil.e("TMDB Detail " + throwable.getMessage());
+                                    LogUtil.w(TAG, "TMDB Detail " + throwable.getMessage());
                                     return null;
                                 })
                                 .subscribeOn(Schedulers.io()).blockingFirst();
@@ -205,15 +195,9 @@ public class MovieScanService extends Service {
                                 saveMovieWrapper(wrapper, videoFile, Constants.Scraper.TMDB);
                             }
                         }
-
-                    }
-                    return movie_id;
-                })
-                .map(movie_id -> {
-                    if (!TextUtils.isEmpty(movie_id)) {
                         MovieDetailRespone respone_en = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB_EN)
                                 .onErrorReturn(throwable -> {
-                                    LogUtil.e("TMDB_EN Detail " + throwable.getMessage());
+                                    LogUtil.w(TAG, "TMDB_EN Detail " + throwable.getMessage());
                                     return null;
                                 })
                                 .subscribeOn(Schedulers.io()).blockingFirst();
@@ -223,202 +207,221 @@ public class MovieScanService extends Service {
                                 saveMovieWrapper(wrapper, videoFile, Constants.Scraper.TMDB_EN);
                             }
                         }
+
                     }
                     return movie_id;
                 })
                 .onErrorReturn(throwable -> {
-                    LogUtil.e("TMDB throw");
+                    LogUtil.e(TAG, "TMDB throw");
                     throwable.printStackTrace();
                     return "";
                 })
                 .subscribeOn(Schedulers.from(mMovieDetailExecutor))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new SimpleObserver<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        Intent intent = new Intent();
+                        intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_START);
+                        LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                    }
 
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                        LogUtil.v("onComplete");
-                        if (offset == total) {
-                            synchronized (MovieScanService.this) {
-                                if (offset == total) {
-                                    //扫描结束
-                                    isScanning = false;
-                                    Intent intent = new Intent();
-                                    intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
-                                    LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
-                                }
-                            }
-                        }
+                        LogUtil.v(TAG, "onComplete");
+                        //扫描结束
+                        isScanning = false;
+                        Intent intent = new Intent();
+                        intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
+                        LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                        offset=0;
                     }
 
                     @Override
                     public void onAction(String movie_id) {
                         offset++;
-                        LogUtil.v("onAction offset " + offset);
+                        Intent intent = new Intent();
+                        intent.setAction(Constants.BroadCastMsg.MATCHED_MOVIE);
+                        intent.putExtra(Constants.Extras.MOVIE_ID, movie_id);
+                        LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                        LogUtil.w(TAG, "onAction offset " + offset);
                     }
-                });
-
-    }
-
-    private Observable<String> getMtimeSearchResult(MovieSupplier movieSupplier) {
-        return Observable.zip(
-                //unionSearch请求
-                Observable
-                        .defer(movieSupplier)
-                        .subscribeOn(Schedulers.from(mSearchMovieExecutor))
-                        .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
-                            LogUtil.v(Thread.currentThread().getName(), "1 ...");
-
-                            String name = movieNameInfo.getName();
-                            if (!TextUtils.isEmpty(name))
-                                return MtimeApiService.unionSearch(name).observeOn(Schedulers.io());
-                            return null;
-                        }),
-                //suggest movie 请求
-                Observable
-                        .defer(movieSupplier)
-                        .subscribeOn(Schedulers.from(mSearchMovieExecutor))
-                        .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
-                            LogUtil.v(Thread.currentThread().getName(), "2 ...");
-
-                            String name = movieNameInfo.getName();
-                            if (!TextUtils.isEmpty(name))
-                                return MtimeApiService.suggestMovies(name).observeOn(Schedulers.io());
-                            return null;
-                        }),
-                //获取最优匹配
-                (unionSearchRespone, unionSuggestRespone) -> {
-                    LogUtil.v(Thread.currentThread().getName(), "MTIME 获取最优匹配 ...");
-                    String name = movieSupplier.keyword;
-                    List<Movie> movies = new ArrayList<>();
-                    if (unionSearchRespone != null) {
-                        List<Movie> unionSearchMovies = unionSearchRespone.toEntity();
-                        movies.addAll(unionSearchMovies);
-                    }
-                    if (unionSuggestRespone != null) {
-                        List<Movie> suggestMovies = unionSuggestRespone.toEntity();
-                        movies.addAll(suggestMovies);
-                    }
-
-                    Movie mostSimilarMovie = null;
-                    float maxSimilarity = 0;
-                    for (Movie movie : movies) {
-                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
-                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
-                        float tmpSimilarity = Math.max(similarity, similarityEn);
-                        if (tmpSimilarity == 1) {
-                            mostSimilarMovie = movie;
-                            break;
-                        }
-                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
-                            mostSimilarMovie = movie;
-                            maxSimilarity = tmpSimilarity;
-                        }
-                    }
-                    if (mostSimilarMovie != null)
-                        return mostSimilarMovie.movieId;
-                    else
-                        return "";
-                })
-                .onErrorReturn(throwable -> {
-                    LogUtil.e("onErrorReturn MTIME-> " + throwable.getMessage());
-                    return "";
                 });
     }
 
-    private Observable<String> getOmdbSearchResult(MovieSupplier movieSupplier) {
-        return Observable.defer(movieSupplier)
-                .subscribeOn(Schedulers.from(mSearchMovieExecutor))
-                .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
+//    private Observable<String> getMtimeSearchResult(MovieSupplier movieSupplier) {
+//        return Observable.zip(
+//                //unionSearch请求
+//                Observable
+//                        .defer(movieSupplier)
+//                        .subscribeOn(Schedulers.from(mSearchMovieExecutor))
+//                        .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
+//                            LogUtil.v(Thread.currentThread().getName(), "1 ...");
+//
+//                            String name = movieNameInfo.getName();
+//                            if (!TextUtils.isEmpty(name))
+//                                return MtimeApiService.unionSearch(name).observeOn(Schedulers.io());
+//                            return null;
+//                        }),
+//                //suggest movie 请求
+//                Observable
+//                        .defer(movieSupplier)
+//                        .subscribeOn(Schedulers.from(mSearchMovieExecutor))
+//                        .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
+//                            LogUtil.v(Thread.currentThread().getName(), "2 ...");
+//
+//                            String name = movieNameInfo.getName();
+//                            if (!TextUtils.isEmpty(name))
+//                                return MtimeApiService.suggestMovies(name).observeOn(Schedulers.io());
+//                            return null;
+//                        }),
+//                //获取最优匹配
+//                (unionSearchRespone, unionSuggestRespone) -> {
+//                    LogUtil.v(Thread.currentThread().getName(), "MTIME 获取最优匹配 ...");
+//                    String name = movieSupplier.keyword;
+//                    List<Movie> movies = new ArrayList<>();
+//                    if (unionSearchRespone != null) {
+//                        List<Movie> unionSearchMovies = unionSearchRespone.toEntity();
+//                        movies.addAll(unionSearchMovies);
+//                    }
+//                    if (unionSuggestRespone != null) {
+//                        List<Movie> suggestMovies = unionSuggestRespone.toEntity();
+//                        movies.addAll(suggestMovies);
+//                    }
+//
+//                    Movie mostSimilarMovie = null;
+//                    float maxSimilarity = 0;
+//                    for (Movie movie : movies) {
+//                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
+//                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
+//                        float tmpSimilarity = Math.max(similarity, similarityEn);
+//                        if (tmpSimilarity == 1) {
+//                            mostSimilarMovie = movie;
+//                            break;
+//                        }
+//                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
+//                            mostSimilarMovie = movie;
+//                            maxSimilarity = tmpSimilarity;
+//                        }
+//                    }
+//                    if (mostSimilarMovie != null)
+//                        return mostSimilarMovie.movieId;
+//                    else
+//                        return "";
+//                })
+//                .onErrorReturn(throwable -> {
+//                    LogUtil.e("onErrorReturn MTIME-> " + throwable.getMessage());
+//                    return "";
+//                });
+//    }
+//
+//    private Observable<String> getOmdbSearchResult(MovieSupplier movieSupplier) {
+//        return Observable.defer(movieSupplier)
+//                .subscribeOn(Schedulers.from(mSearchMovieExecutor))
+//                .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
+//                    LogUtil.v(Thread.currentThread().getName(), "1 ...");
+//
+//                    String name = movieNameInfo.getName();
+//                    if (!TextUtils.isEmpty(name))
+//                        return OmdbApiService.unionSearch(name).observeOn(Schedulers.io());
+//                    return null;
+//                })
+//                .map(movieSearchRespone -> {
+//                    LogUtil.v(Thread.currentThread().getName(), "OMDB 获取最优匹配 ...");
+//                    String name = movieSupplier.keyword;
+//                    List<Movie> movies = new ArrayList<>();
+//                    if (movieSearchRespone != null) {
+//                        List<Movie> unionSearchMovies = movieSearchRespone.toEntity();
+//                        movies.addAll(unionSearchMovies);
+//                    }
+//                    Movie mostSimilarMovie = null;
+//                    float maxSimilarity = 0;
+//                    for (Movie movie : movies) {
+//                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
+//                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
+//                        float tmpSimilarity = Math.max(similarity, similarityEn);
+//                        if (tmpSimilarity == 1) {
+//                            mostSimilarMovie = movie;
+//                            break;
+//                        }
+//                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
+//                            mostSimilarMovie = movie;
+//                            maxSimilarity = tmpSimilarity;
+//                        }
+//                    }
+//                    if (mostSimilarMovie != null)
+//                        return mostSimilarMovie.movieId;
+//                    else
+//                        return "";
+//                })
+//                .onErrorReturn(throwable -> {
+//                    LogUtil.e("onErrorReturn OMDB-> " + throwable.getMessage());
+//                    return "";
+//                });
+//    }
+
+    private Observable<SparseArray<Object>> startTmdbSearch() {
+        return Observable.create((ObservableOnSubscribe<VideoFile>) emitter -> {
+            isScanning = true;
+            while (mQueue.size() > 0) {
+                VideoFile videoFile = mQueue.poll();
+                if (videoFile != null)
+                    emitter.onNext(videoFile);
+            }
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.from(mSearchMovieExecutor))
+                .flatMap((Function<VideoFile, ObservableSource<SparseArray<Object>>>) videoFile -> {
                     LogUtil.v(Thread.currentThread().getName(), "1 ...");
-
-                    String name = movieNameInfo.getName();
-                    if (!TextUtils.isEmpty(name))
-                        return OmdbApiService.unionSearch(name).observeOn(Schedulers.io());
-                    return null;
-                })
-                .map(movieSearchRespone -> {
-                    LogUtil.v(Thread.currentThread().getName(), "OMDB 获取最优匹配 ...");
-                    String name = movieSupplier.keyword;
-                    List<Movie> movies = new ArrayList<>();
-                    if (movieSearchRespone != null) {
-                        List<Movie> unionSearchMovies = movieSearchRespone.toEntity();
-                        movies.addAll(unionSearchMovies);
-                    }
-                    Movie mostSimilarMovie = null;
-                    float maxSimilarity = 0;
-                    for (Movie movie : movies) {
-                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
-                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
-                        float tmpSimilarity = Math.max(similarity, similarityEn);
-                        if (tmpSimilarity == 1) {
-                            mostSimilarMovie = movie;
-                            break;
-                        }
-                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
-                            mostSimilarMovie = movie;
-                            maxSimilarity = tmpSimilarity;
-                        }
-                    }
-                    if (mostSimilarMovie != null)
-                        return mostSimilarMovie.movieId;
-                    else
-                        return "";
-                })
-                .onErrorReturn(throwable -> {
-                    LogUtil.e("onErrorReturn OMDB-> " + throwable.getMessage());
-                    return "";
-                });
-    }
-
-    private Observable<String> getTmdbSearchResult(MovieSupplier movieSupplier) {
-
-        return Observable.defer(movieSupplier)
-                .subscribeOn(Schedulers.from(mSearchMovieExecutor))
-                .flatMap((Function<MovieNameInfo, ObservableSource<MovieSearchRespone>>) movieNameInfo -> {
-                    LogUtil.v(Thread.currentThread().getName(), "1 ...");
-
-                    String name = movieNameInfo.getName();
+                    MovieNameInfo movieNameInfo = createMovieNameInfo(videoFile);
+                    String keyword = movieNameInfo.getName();
+                    videoFile.keyword = keyword;
+                    mVideoFileDao.update(videoFile);
                     String api = Constants.Scraper.TMDB_EN;
-                    if (StringUtils.isGB2312(name)) {
+                    if (StringUtils.isGB2312(keyword)) {
                         api = Constants.Scraper.TMDB;
                     }
-                    if (!TextUtils.isEmpty(name))
-                        return TmdbApiService.unionSearch(name, api).observeOn(Schedulers.io());
+                    if (!TextUtils.isEmpty(keyword)) {
+                        String finalApi = api;
+                        return Observable.combineLatest(TmdbApiService.unionSearch(keyword, api).observeOn(Schedulers.io()),
+                                Observable.just(keyword),
+                                (movieSearchRespone, _keyword) -> {
+                                    LogUtil.v(Thread.currentThread().getName(), "从" + finalApi + "结果列表获取最优匹配 ...");
+                                    List<Movie> movies = new ArrayList<>();
+                                    if (movieSearchRespone != null) {
+                                        List<Movie> unionSearchMovies = movieSearchRespone.toEntity();
+                                        movies.addAll(unionSearchMovies);
+                                    }
+                                    Movie mostSimilarMovie = null;
+                                    float maxSimilarity = 0;
+                                    for (Movie movie : movies) {
+                                        float similarity = EditorDistance.checkLevenshtein(movie.title, _keyword);
+                                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, _keyword);
+                                        float tmpSimilarity = Math.max(similarity, similarityEn);
+                                        if (tmpSimilarity == 1) {
+                                            mostSimilarMovie = movie;
+                                            break;
+                                        }
+                                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
+                                            mostSimilarMovie = movie;
+                                            maxSimilarity = tmpSimilarity;
+                                        }
+                                    }
+
+                                    SparseArray<Object> sparseArray = new SparseArray<>(2);
+                                    if (mostSimilarMovie != null) {
+                                        sparseArray.append(KEY_MOVIE_ID, mostSimilarMovie.movieId);
+                                        sparseArray.append(KEY_VIDEOFILE, videoFile);
+                                    }
+                                    return sparseArray;
+                                });
+                    }
                     return null;
                 })
-                .map(movieSearchRespone -> {
-                    LogUtil.v(Thread.currentThread().getName(), "TMDB 获取最优匹配 ...");
-                    String name = movieSupplier.keyword;
-                    List<Movie> movies = new ArrayList<>();
-                    if (movieSearchRespone != null) {
-                        List<Movie> unionSearchMovies = movieSearchRespone.toEntity();
-                        movies.addAll(unionSearchMovies);
-                    }
-                    Movie mostSimilarMovie = null;
-                    float maxSimilarity = 0;
-                    for (Movie movie : movies) {
-                        float similarity = EditorDistance.checkLevenshtein(movie.title, name);
-                        float similarityEn = EditorDistance.checkLevenshtein(movie.otherTitle, name);
-                        float tmpSimilarity = Math.max(similarity, similarityEn);
-                        if (tmpSimilarity == 1) {
-                            mostSimilarMovie = movie;
-                            break;
-                        }
-                        if (tmpSimilarity > maxSimilarity || mostSimilarMovie == null) {
-                            mostSimilarMovie = movie;
-                            maxSimilarity = tmpSimilarity;
-                        }
-                    }
-                    if (mostSimilarMovie != null)
-                        return mostSimilarMovie.movieId;
-                    else
-                        return "";
-                })
                 .onErrorReturn(throwable -> {
-                    LogUtil.e("onErrorReturn OMDB-> " + throwable.getMessage());
-                    return "";
+                    LogUtil.e(TAG, "onErrorReturn OMDB-> Keyword is Empty!");
+                    return new SparseArray<>(2);
                 });
     }
 
@@ -441,7 +444,7 @@ public class MovieScanService extends Service {
         movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
         long id = mMovieDao.insertOrIgnoreMovie(movie);
-        LogUtil.v(movie.title + " " + movie.source + " insertrelut:" + id);
+        LogUtil.v(TAG, movie.title + " " + movie.source + " insertrelut:" + id);
         mGenreDao.insertGenres(genreList);
         mActorDao.insertActors(actorList);
         mDirectorDao.insertDirectors(directorList);
@@ -505,27 +508,11 @@ public class MovieScanService extends Service {
         movieVideoFileCrossRef.source = source;
         mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
 
-        LogUtil.v("saveMovieWrapper==>: " + videoFile.filename + " isScanned ");
+        videoFile.isScanned = 1;
+        mVideoFileDao.update(videoFile);
 
-    }
+        LogUtil.v(TAG, "saveMovieWrapper==>: " + videoFile.filename + " isScanned ");
 
-    public class MovieSupplier implements Supplier<Observable<MovieNameInfo>> {
-        VideoFile mVideoFile;
-        public String keyword;
-
-        public MovieSupplier(VideoFile videoFile) {
-            mVideoFile = videoFile;
-        }
-
-        @Override
-        public Observable<MovieNameInfo> get() throws Throwable {
-            MovieNameInfo movieNameInfo = createMovieNameInfo(mVideoFile);
-            keyword = movieNameInfo.getName();
-            mVideoFile.keyword = keyword;
-            mVideoFileDao.update(mVideoFile);
-            LogUtil.v(Thread.currentThread().getName(), "MovieSupplier " + keyword);
-            return Observable.just(movieNameInfo);
-        }
     }
 
 }

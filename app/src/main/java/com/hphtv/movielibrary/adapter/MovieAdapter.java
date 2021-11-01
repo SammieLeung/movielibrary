@@ -44,4 +44,6 @@ public class MovieAdapter extends BaseAdapter<MovieLibraryItemBinding, BaseAdapt
             binding.tvTitle.setText(title);
         }
     }
+
+
 }

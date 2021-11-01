@@ -95,9 +95,17 @@ public abstract class BaseAdapter<VDB extends ViewDataBinding,VH extends BaseAda
         mList.addAll(data);
         notifyDataSetChanged();
     }
+
     public void removeAll(){
         mList.clear();
         notifyDataSetChanged();
+    }
+
+    public void put(T item){
+        if(!mList.contains(item)) {
+            mList.add(item);
+            notifyItemInserted(mList.size() - 1);
+        }
     }
 
     /**

@@ -91,6 +91,10 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryMovieDataView( String source,int offset,int limit);
 
+    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source AND movie_id=:movie_id " +
+            "GROUP BY id")
+    public MovieDataView queryMovieDataViewByMovieId(String movie_id,String source);
     /**
      * @param device_id  设备id
      * @param year       年份

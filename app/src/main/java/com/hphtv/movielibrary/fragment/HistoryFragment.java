@@ -1,22 +1,15 @@
 package com.hphtv.movielibrary.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.hphtv.movielibrary.activity.MovieDetailActivity;
-import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
-import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.viewmodel.MovieDetailViewModel;
 import com.hphtv.movielibrary.viewmodel.fragment.HistoryFragmentViewModel;
-import com.station.kit.util.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +28,7 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
 
     public static HistoryFragment newInstance(int pos) {
         Bundle args = new Bundle();
-        args.putInt(Constants.IntentKey.KEY_CUR_FRAGMENT, pos);
+        args.putInt(Constants.Extras.CURRENT_FRAGMENT, pos);
         HistoryFragment fragment = new HistoryFragment();
         fragment.setArguments(args);
         return fragment;
