@@ -43,8 +43,8 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_id in (:device_ids) AND is_scanned=0")
-    public List<VideoFile> queryAllNotScanedByIds(String... device_ids);
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_path in (:device_paths) AND is_scanned=0")
+    public List<VideoFile> queryAllNotScanedVideoFiles(String... device_paths);
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);
@@ -55,12 +55,14 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path in (:paths)")
     public List<VideoFile> queryByPaths(String... paths);
 
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path not in (:paths) and device_path=:device_path")
+    public List<VideoFile> queryInvalidByPaths(List<String> paths,String device_path);
 
     @Query("SELECT * FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" WHERE last_playtime!=0 ORDER BY last_playtime DESC")
     public List<UnrecognizedFileDataView> queryHistoryMovieDataView();
 
-    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_id=:deviceId and path not in (:paths) ")
-    public void deleteByDeviceId(String deviceId, List<String> paths);
+    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
+    public void deleteByDevice(String devicePath, List<String> paths);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE)
     public void deleteAll();

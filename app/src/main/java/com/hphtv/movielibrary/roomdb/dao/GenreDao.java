@@ -9,6 +9,7 @@ import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
+import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 
 import java.util.List;
 
@@ -30,4 +31,11 @@ public interface GenreDao {
 
     @Query("SELECT genre_name FROM "+ VIEW.MOVIE_DATAVIEW +" WHERE source=:source GROUP BY genre_name;")
     public List<String> queryGenresBySource(String source);
+
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public long insertGenreTag(GenreTag genreTag);
+
+    @Query("SELECT name FROM "+TABLE.GENRE_TAG +" WHERE source=:source")
+    public List<String> queryGenreTagBySource(String source);
 }

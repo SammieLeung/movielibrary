@@ -26,6 +26,7 @@ import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
+import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
@@ -47,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Database(entities = {Actor.class, Device.class, Director.class, Genre.class, Movie.class, MovieActorCrossRef.class,
         MovieDirectorCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
-        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class}, views = {MovieDataView.class, UnrecognizedFileDataView.class}, version = 1)
+        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, GenreTag.class}, views = {MovieDataView.class, UnrecognizedFileDataView.class}, version = 1)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO
@@ -84,7 +85,7 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                     sInstance = Room.databaseBuilder(
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
-                            .createFromAsset("database/movielibrary_db_v2_version_1.db")
+//                            .createFromAsset("database/movielibrary_db_v2_version_1.db")
                             .fallbackToDestructiveMigration()
                             .build();
                 }

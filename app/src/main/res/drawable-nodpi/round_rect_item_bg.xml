@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="@dimen/round_rect_radius"/>
+            <stroke android:color="@color/c1c9bbe" android:width="2dp"></stroke>
+        </shape>
+    </item>
+    <item android:state_hovered="true">
+        <shape>
+            <corners android:radius="@dimen/round_rect_radius"/>
+            <stroke android:color="@color/c1c9bbe" android:width="2dp"></stroke>
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <corners android:radius="@dimen/round_rect_radius"/>
+            <stroke android:color="@color/white" android:width="2dp"></stroke>
+        </shape>
+    </item>
+</selector>

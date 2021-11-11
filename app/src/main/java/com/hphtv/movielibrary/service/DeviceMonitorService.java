@@ -45,6 +45,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -333,6 +334,13 @@ public class DeviceMonitorService extends Service {
                     }
                     return new ArrayList<VideoFile>();
                 })
+                .onErrorReturn(new Function<Throwable, List<VideoFile>>() {
+                    @Override
+                    public List<VideoFile> apply(Throwable throwable) throws Throwable {
+                        throwable.printStackTrace();
+                        return new ArrayList<VideoFile>();
+                    }
+                })
                 .subscribe(new SimpleObserver<List<VideoFile>>() {
                     @Override
                     public void onAction(List<VideoFile> videoFiles) {
@@ -351,7 +359,7 @@ public class DeviceMonitorService extends Service {
      * 获取所以未扫描的文件
      */
     private List<VideoFile> getNotScannedFiles(Device device) {
-        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedByIds(device.id);
+        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedVideoFiles(device.path);
         return mountedDeviceFiles;
     }
 

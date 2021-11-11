@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
@@ -39,11 +40,19 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mUnrecognizedFileDataViewList);
-        mHistoryListAdapter.setOnItemClickListener((view, data) -> {
-            mViewModel.playingVideo(data.path, data.filename, dataViewList -> {
-                updateMovie(dataViewList);
-                notifyStopLoading();
-            });
+        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
+            @Override
+            public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
+                mViewModel.playingVideo(data.path, data.filename, dataViewList -> {
+                    updateMovie(dataViewList);
+                    notifyStopLoading();
+                });
+            }
+
+            @Override
+            public void onItemFocus(View view, boolean hasFocus) {
+
+            }
         });
         mBinding.rvMovies.setAdapter(mHistoryListAdapter);
     }

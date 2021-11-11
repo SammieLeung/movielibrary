@@ -52,4 +52,12 @@
         <item>@string/api_mtime</item>
     </string-array>
 
+    <string-array name="category_title_array">
+        <item>@string/category_all</item>
+        <item>@string/category_movie</item>
+        <item>@string/category_tv</item>
+        <item>@string/category_unmatched</item>
+        <item>@string/category_favorite</item>
+    </string-array>
+
 </resources>

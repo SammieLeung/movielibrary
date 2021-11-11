@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_list_title">最近播放</string>
+    <string name="history_list_empty">暂无观看记录</string>
+    <string name="category_list_title">分类浏览</string>
+    <string name="recently_added_list_title">最近添加</string>
+
+    <!--分类浏览-->
+    <string name="category_all">全部</string>
+    <string name="category_movie">电影</string>
+    <string name="category_tv">电视剧</string>
+    <string name="category_unmatched">未匹配</string>
+    <string name="category_favorite">收藏</string>
+</resources>

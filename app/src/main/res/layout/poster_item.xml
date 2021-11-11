@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="title"
+            type="String" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+         android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:duplicateParentState="true"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <com.lqm.roundview.RoundImageView
+                app:border_width="4dp"
+                android:duplicateParentState="true"
+                android:layout_marginLeft="@dimen/poster_item_1_margin"
+                android:background="@drawable/round_rect_item_bg"
+                android:layout_marginRight="@dimen/poster_item_1_margin"
+                app:border_color="@android:color/transparent"
+                app:corner_radius="@dimen/poster_item_1_radius"
+                android:id="@+id/rv_poster"
+                android:layout_width="@dimen/poster_item_1_w"
+                android:layout_height="@dimen/poster_item_1_h"/>
+            <TextView
+                android:id="@+id/tv_title"
+                android:text="@{title}"
+                android:gravity="center"
+                android:layout_width="@dimen/poster_item_1_w"
+                android:layout_height="@dimen/poster_item_1_tv_h"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

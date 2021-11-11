@@ -96,7 +96,8 @@ public class DeviceInitThread extends Thread {
             mDeviceMonitorService.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
         }
 
+//        //TODO 清理数据库 (需要
         int ret = mVideoFileDao.deleteOutdated(System.currentTimeMillis());
-        LogUtil.v(TAG, "delete outdated videofile " + ret);
+//        LogUtil.v(TAG, "delete outdated videofile " + ret);
     }
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d9d89d7984f99518f0e86b859d4acab0",
+    "identityHash": "0935df6bf8c3623660b0b35c7bc75fe9",
     "entities": [
       {
         "tableName": "actor",
@@ -176,7 +176,7 @@
       },
       {
         "tableName": "movie",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` TEXT, `title` TEXT, `title_other` TEXT, `plot` TEXT, `ratings` TEXT, `source` TEXT, `type` TEXT, `season` TEXT, `episode_count` INTEGER NOT NULL, `poster` TEXT, `country` TEXT, `release_date` TEXT, `release_area` TEXT, `year` TEXT, `duration` TEXT, `language` TEXT, `pinyin` TEXT, `add_time` INTEGER NOT NULL, `update_time` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` TEXT, `title` TEXT, `title_other` TEXT, `plot` TEXT, `ratings` TEXT, `source` TEXT, `type` TEXT, `season_count` INTEGER NOT NULL, `episode_count` INTEGER NOT NULL, `poster` TEXT, `region` TEXT, `release_date` TEXT, `release_area` TEXT, `year` TEXT, `duration` TEXT, `language` TEXT, `pinyin` TEXT, `add_time` INTEGER NOT NULL, `update_time` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL, `certification` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -227,10 +227,10 @@
             "notNull": false
           },
           {
-            "fieldPath": "season",
-            "columnName": "season",
-            "affinity": "TEXT",
-            "notNull": false
+            "fieldPath": "seasonCount",
+            "columnName": "season_count",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "episodeCount",
@@ -245,8 +245,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "country",
-            "columnName": "country",
+            "fieldPath": "region",
+            "columnName": "region",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -309,6 +309,12 @@
             "columnName": "last_playtime",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "certification",
+            "columnName": "certification",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -535,7 +541,7 @@
       },
       {
         "tableName": "videofile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT NOT NULL, `device_id` TEXT, `dir_path` TEXT, `filename` TEXT, `is_scanned` INTEGER NOT NULL, `keyword` TEXT, `add_time` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT NOT NULL, `device_path` TEXT, `dir_path` TEXT, `filename` TEXT, `is_scanned` INTEGER NOT NULL DEFAULT 0, `keyword` TEXT, `add_time` INTEGER NOT NULL DEFAULT 0, `last_playtime` INTEGER NOT NULL DEFAULT 0, `season` INTEGER NOT NULL DEFAULT -1, `episode` INTEGER NOT NULL DEFAULT -1)",
         "fields": [
           {
             "fieldPath": "vid",
@@ -550,8 +556,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "deviceId",
-            "columnName": "device_id",
+            "fieldPath": "devicePath",
+            "columnName": "device_path",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -571,7 +577,8 @@
             "fieldPath": "isScanned",
             "columnName": "is_scanned",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "keyword",
@@ -583,13 +590,29 @@
             "fieldPath": "addTime",
             "columnName": "add_time",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "0"
           },
           {
             "fieldPath": "lastPlayTime",
             "columnName": "last_playtime",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "season",
+            "columnName": "season",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "-1"
+          },
+          {
+            "fieldPath": "episode",
+            "columnName": "episode",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "-1"
           }
         ],
         "primaryKey": {
@@ -685,6 +708,33 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "genre_tag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `source` TEXT NOT NULL, PRIMARY KEY(`name`, `source`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name",
+            "source"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [
@@ -699,7 +749,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd9d89d7984f99518f0e86b859d4acab0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0935df6bf8c3623660b0b35c7bc75fe9')"
     ]
   }
 }

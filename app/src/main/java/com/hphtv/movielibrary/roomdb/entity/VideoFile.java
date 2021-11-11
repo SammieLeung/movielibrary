@@ -24,28 +24,32 @@ public class VideoFile implements Serializable {
     public long vid;
     @NonNull
     public String path;
-    @ColumnInfo(name = "device_id")
-    public String deviceId;
+    @ColumnInfo(name = "device_path")
+    public String devicePath;
     @ColumnInfo(name = "dir_path")
     public String dirPath;
     public String filename;
-    @ColumnInfo(name = "is_scanned")
+    @ColumnInfo(name = "is_scanned",defaultValue = "0")
     public int isScanned;
 
     public String keyword;
 
-    @ColumnInfo(name = "add_time")
-    public long addTime;
+    @ColumnInfo(name = "add_time",defaultValue = "0")
+    public long addTime;//文件添加时间
 
-    @ColumnInfo(name = "last_playtime")
+    @ColumnInfo(name = "last_playtime",defaultValue = "0")
     public long lastPlayTime;//上次播放时间
+    @ColumnInfo(defaultValue = "-1")
+    public int season;
+    @ColumnInfo(defaultValue = "-1")
+    public int episode;
 
     @Override
     public String toString() {
         return "VideoFile{" +
                 "vid=" + vid +
                 ", path='" + path + '\'' +
-                ", deviceId='" + deviceId + '\'' +
+                ", devicePath='" + devicePath + '\'' +
                 ", dirPath='" + dirPath + '\'' +
                 ", filename='" + filename + '\'' +
                 ", isScanned=" + isScanned +

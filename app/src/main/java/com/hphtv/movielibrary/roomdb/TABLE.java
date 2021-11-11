@@ -1,5 +1,7 @@
 package com.hphtv.movielibrary.roomdb;
 
+import kotlin.text.UStringsKt;
+
 /**
  * author: Sam Leung
  * date:  2021/5/20
@@ -20,4 +22,5 @@ public interface TABLE {
 
     String SCAN_DIRECTORY = "scan_directory";
     String VIDEOFILE = "videofile";
+    String GENRE_TAG="genre_tag";
 }

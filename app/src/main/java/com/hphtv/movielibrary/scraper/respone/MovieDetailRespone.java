@@ -59,12 +59,12 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movie.poster = poster;
             movie.releaseDate = released;
             movie.releaseArea = country;
-            movie.country = country;
+            movie.region = country;
             movie.duration = duration;
             movie.plot = plot;
             movie.year = year;
             movie.language = language;
-            movie.type = type;
+            movie.type = "movie";//todo 换回type
             movie.source = api;
 
             List<Genre> genreList = new ArrayList<>();

@@ -84,4 +84,12 @@
         <item name="android:textSize">@dimen/folder_dialog_item_textsize</item>
         <item name="android:textColor">@color/white</item>
     </style>
+
+    <style name="rount_image_view_style">
+        <item name="shapeAppearance">@style/RoundedStyle</item>
+    </style>
+    <style name="RoundedStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">30dp</item>
+    </style>
 </resources>

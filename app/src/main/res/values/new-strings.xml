@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="history_list_title">Recently Played</string>
+    <string name="history_list_empty">No watch history</string>
+    <string name="category_list_title">Category Browse</string>
+    <string name="recently_added_list_title">Recently Added</string>
+
+    <!--分类浏览-->
+    <string name="category_all">All</string>
+    <string name="category_movie">Movie</string>
+    <string name="category_tv">TV Series</string>
+    <string name="category_unmatched">Unmatched</string>
+    <string name="category_favorite">Favorite</string>
+
+</resources>

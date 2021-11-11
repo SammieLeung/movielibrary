@@ -420,7 +420,8 @@ public class MovieScanService extends Service {
                     return null;
                 })
                 .onErrorReturn(throwable -> {
-                    LogUtil.e(TAG, "onErrorReturn OMDB-> Keyword is Empty!");
+                    LogUtil.e(TAG, "onErrorReturn TMDB");
+                    throwable.printStackTrace();
                     return new SparseArray<>(2);
                 });
     }

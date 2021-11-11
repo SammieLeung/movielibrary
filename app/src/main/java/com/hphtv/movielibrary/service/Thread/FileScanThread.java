@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.service.Thread;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -14,6 +15,7 @@ import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.station.kit.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -138,11 +140,12 @@ public class FileScanThread extends Thread {
         }
         //队列结束保存文件信息入库
         saveVideoFileInfotoDB();
+        clearRedundantVideoFiles();
         Intent intent = new Intent();
         intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
-        intent.putExtra(Constants.Extras.DEVICE_MOUNT_PATH,mPath);
+        intent.putExtra(Constants.Extras.DEVICE_MOUNT_PATH, mPath);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-}
+    }
 
 
     private boolean isNomedia(File file) {
@@ -170,7 +173,7 @@ public class FileScanThread extends Thread {
         if (Arrays.binarySearch(Constants.VIDEO_SUFFIX, tailEx) >= 0) {
             String fileName = file.getName();
             VideoFile videoFile = new VideoFile();
-            videoFile.deviceId = (device.id);
+            videoFile.devicePath = (device.path);
             videoFile.filename = (fileName);
             videoFile.path = (file.getPath());
             videoFile.dirPath = scanDirectory.parentPath;
@@ -219,4 +222,10 @@ public class FileScanThread extends Thread {
         }
     }
 
+    private void clearRedundantVideoFiles() {
+        List<VideoFile> videoFiles = mVideoFileDao.queryInvalidByPaths(mTmpVideoFilePaths, mDevice.path);
+        for (VideoFile videoFile : videoFiles) {
+            LogUtil.e(TAG, "lost file:" + videoFile.filename);
+        }
+    }
 }

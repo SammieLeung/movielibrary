@@ -10,7 +10,10 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.Until;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import org.intellij.lang.annotations.Language;
+
 import java.io.Serializable;
+import java.util.Locale;
 
 /**
  * author: Sam Leung
@@ -28,12 +31,13 @@ public class Movie implements Serializable {
     public String plot;//剧情
     public String ratings;//评分
     public String source;//来源
-    public String type;//电影？电视剧？综艺？
-    public String season;//季数
+    public String type;//电影？电视剧  movie/tv
+    @ColumnInfo(name = "season_count")
+    public int seasonCount;//季数
     @ColumnInfo(name = "episode_count")
     public int episodeCount;//集数
     public String poster;//海报
-    public String country;//制片国家
+    public String region;//制片国家/地区
     @ColumnInfo(name = "release_date")
     public String releaseDate;//上映时间
     @ColumnInfo(name = "release_area")
@@ -50,6 +54,9 @@ public class Movie implements Serializable {
     public boolean isFavorite;//收藏
     @ColumnInfo(name = "last_playtime")
     public long lastPlayTime;//上次播放时间
+
+    public String certification;//分级 R-限制级 G-全年龄 C-儿童 PG-辅导
+
 
     @Ignore
     public String tag;
