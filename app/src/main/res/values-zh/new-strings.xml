@@ -11,4 +11,7 @@
     <string name="category_tv">电视剧</string>
     <string name="category_unmatched">未匹配</string>
     <string name="category_favorite">收藏</string>
+
+    <string name="genre_edit_dialog_title">分类管理</string>
+
 </resources>

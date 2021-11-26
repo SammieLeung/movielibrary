@@ -28,7 +28,7 @@ public interface MovieDao {
 
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source")
-    public Movie queryByMovieId(String movie_id,String source);
+    public Movie queryByMovieId(String movie_id, String source);
 
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
@@ -41,7 +41,12 @@ public interface MovieDao {
             "WHERE movie_id=:movie_id")
     public int updateFavoriteByMovieId(boolean isFavorite, String movie_id);
 
-    @Query("SELECT is_favorite FROM "+TABLE.MOVIE +" WHERE id=:id")
+    @Query("UPDATE " + TABLE.MOVIE +
+            " SET last_playtime=:last_playtime" +
+            " WHERE movie_id=:movie_id")
+    public int updateLastPlaytime(String movie_id, long last_playtime);
+
+    @Query("SELECT is_favorite FROM " + TABLE.MOVIE + " WHERE id=:id")
     public boolean queryFavorite(long id);
 
 //    /**
@@ -65,7 +70,7 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
             "(SELECT VF.path FROM " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_path=DEV.path) AS VF__DEV " +
             "ON MOVIE__VF.path=VF__DEV.path AND MOVIE__VF.source=:source) and id=:id")
-    public MovieWrapper queryMovieWrapperById(long id,String source);
+    public MovieWrapper queryMovieWrapperById(long id, String source);
 
 
     /**
@@ -76,10 +81,11 @@ public interface MovieDao {
      */
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE source=:source and movie_id=:movie_id")
-    public MovieWrapper queryMovieWrapperByMovieId(String movie_id,String source);
+    public MovieWrapper queryMovieWrapperByMovieId(String movie_id, String source);
 
     /**
      * 按照来源分页查找
+     *
      * @param source
      * @param offset
      * @param limit
@@ -93,18 +99,20 @@ public interface MovieDao {
             " LIMIT :limit " +
             " OFFSET :offset "
     )
-    public List<MovieDataView> queryMovieDataView( String source,int offset,int limit);
+    public List<MovieDataView> queryMovieDataView(String source, int offset, int limit);
 
     /**
      * 按照电影id和来源
+     *
      * @param movie_id
      * @param source
      * @return
      */
-    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source AND movie_id=:movie_id " +
             "GROUP BY id")
-    public MovieDataView queryMovieDataViewByMovieId(String movie_id,String source);
+    public MovieDataView queryMovieDataViewByMovieId(String movie_id, String source);
+
     /**
      * @param device_id  设备id
      * @param year       年份
@@ -131,25 +139,26 @@ public interface MovieDao {
             "CASE WHEN :order =4 THEN last_playtime END ASC," +
             "CASE WHEN :order =5 THEN is_favorite END ASC"
     )
-    public List<MovieDataView> queryMovieDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, String source,@Nullable boolean isDesc);
+    public List<MovieDataView> queryMovieDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, String source, @Nullable boolean isDesc);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
             " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
             " GROUP BY id " +
             " ORDER BY add_time DESC "
-          )
+    )
     public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);
 
 
-    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW+" WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
     public List<MovieDataView> queryFavoriteMovieDataView(String source);
 
-    @Query("SELECT COUNT(*) FROM (SELECT * FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE source=:source GROUP BY id)")
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);
+
     /**
      * 查询年份
      *

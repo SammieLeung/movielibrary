@@ -44,6 +44,7 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -166,7 +167,9 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 //记录播放时间，作为播放记录
                 .doOnNext(filepath -> {
-                    mVideoFileDao.updateLastPlaytime(filepath, System.currentTimeMillis());
+                    long currentTime=System.currentTimeMillis();
+                    mVideoFileDao.updateLastPlaytime(filepath, currentTime);
+                    mMovieDao.updateLastPlaytime(wrapper.movie.movieId,currentTime);
                     SharePreferencesTools.getInstance(getApplication()).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, wrapper.movie.poster);
                 })
                 .observeOn(AndroidSchedulers.mainThread())

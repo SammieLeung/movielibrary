@@ -10,15 +10,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.fragment.dialog.LoadingDialogFragment;
 import com.station.kit.util.LogUtil;
-import com.station.kit.view.activity.BaseInflateActivity;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import com.station.kit.view.mvvm.activity.BaseInflateActivity;
 
 /**
  * @author lxp

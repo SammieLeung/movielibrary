@@ -36,7 +36,7 @@ public class GlideTools {
     }
 
     public static RequestBuilder<Drawable> GlideWrapper(Context context,String path){
-        if(TextUtils.isEmpty(path)||!path.startsWith("http"))
+        if(TextUtils.isEmpty(path)||!(path.startsWith("http")||path.startsWith("/")))
             return Glide.with(context)
                     .load(R.mipmap.ic_poster_default)
                     .placeholder(R.mipmap.ic_poster_default)

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+     <import type="com.hphtv.movielibrary.fragment.newdialoag.entity.GenreTagItem"/>
+        <variable
+            name="tag"
+            type="com.hphtv.movielibrary.fragment.newdialoag.entity.GenreTagItem" />
+    </data>
+
+    <CheckedTextView
+        android:id="@+id/checkbox"
+        android:text="@{tag.name}"
+        android:checked="@{tag.checked}"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="@dimen/genre_item_h"
+        android:checkMark="@drawable/ic_checkbox_btn"
+        />
+
+</layout>

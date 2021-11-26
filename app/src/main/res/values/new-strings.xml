@@ -12,4 +12,6 @@
     <string name="category_unmatched">Unmatched</string>
     <string name="category_favorite">Favorite</string>
 
+    <string name="genre_edit_dialog_title">Category</string>
+
 </resources>

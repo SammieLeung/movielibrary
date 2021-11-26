@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+
 import androidx.annotation.NonNull;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -29,6 +31,7 @@ import com.station.kit.util.StorageHelper;
 
 import org.fourthline.cling.model.action.ActionInvocation;
 import org.fourthline.cling.model.message.UpnpResponse;
+import org.fourthline.cling.model.meta.Action;
 import org.fourthline.cling.model.meta.Device;
 import org.fourthline.cling.model.meta.Service;
 import org.fourthline.cling.model.types.UDAServiceType;
@@ -677,7 +680,9 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             if (service == null) {
                 continue;
             }
-
+            Action action = service.getAction("Browse");
+            if (action == null)
+                continue;
             Node node = new Node(device.getIdentity().getUdn().getIdentifierString(),
                     device.getDetails().getFriendlyName(),
                     Node.DLNA_DEVICE,

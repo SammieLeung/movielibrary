@@ -75,11 +75,15 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
         Observable.just(uri)
                 .subscribeOn(Schedulers.io())
                 .map(uri1 -> {
-//                        String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
-
+                    String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
                     String base64Id = uri1.getPathSegments().get(1);//dir id
                     String path = Base64Helper.decode(base64Id);
-
+                    switch (deviceTypeStr){
+                        case "local":
+                            break;
+                        case "dlna":
+                            break;
+                    }
 //                        int type;
 //                        if (deviceTypeStr.equals(ConstData.DeviceType.STR_LOCAL)) {
 //                            if (StorageHelper.isMountUsb(getApplication(), path)) {
