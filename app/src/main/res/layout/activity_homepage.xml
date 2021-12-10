@@ -123,7 +123,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/view_sortbox"
+                android:id="@+id/btn_view_sortbox"
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
                 android:layout_alignParentRight="true"
@@ -154,6 +154,11 @@
 
 
         </RelativeLayout>
+        <View
+            android:id="@+id/container_sortbox"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"/>
 
     </RelativeLayout>
 </layout>

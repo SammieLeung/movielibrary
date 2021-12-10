@@ -496,7 +496,7 @@ public class BrowsePathFragment extends Fragment
                 SmbFile smbFile = (SmbFile) node.getItem();
 
                 try {
-                    if (smbFile.getType() == SmbFile.TYPE_SHARE
+                    if (SmbFileHelper.getType(smbFile) == SmbFile.TYPE_SHARE
                             && !mPresenter.isAlreadyAuth(node)) {
                         showAuthDialog(node, true);
                     } else {

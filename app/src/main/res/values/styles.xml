@@ -17,18 +17,7 @@
         <item name="android:minHeight">24dp</item>
     </style>
 
-    <style name="my_pb" parent="@android:style/Widget.ProgressBar.Horizontal">
-        <item name="android:progressDrawable">@drawable/progress_green</item>
-        <item name="android:minHeight">10dip</item>
-        <item name="android:maxHeight">10dip</item>
-    </style>
 
-    <style name="my_seekbar" parent="@android:style/Widget.SeekBar">
-        <item name="android:indeterminateOnly">false</item>
-        <item name="android:progressDrawable">@drawable/lxp_seekbar_track</item>
-        <item name="android:thumb">@drawable/lxp_seekbar_thumb</item>
-        <item name="android:focusable">true</item>
-    </style>
 
 
     <style name="DialogStyle" parent="@android:style/Theme.Dialog">

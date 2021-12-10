@@ -71,6 +71,14 @@ public class Constants {
         int DEVICE_TYPE_SMB = 7;
     }
 
+    public enum FolderPermission{
+        MOVIE,//电影
+        TV_SERIES,//电视节目
+        VARIETY_SHOW,//综艺节目
+        ANIMATE,//动画
+        OTHER,//其他
+    }
+
     public interface FileType {
         /*全部文件*/
         int OTHER = 0; // 全部文件

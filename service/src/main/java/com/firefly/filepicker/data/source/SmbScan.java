@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URLConnection;
 
 import jcifs.CIFSContext;
+import jcifs.context.SingletonContext;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -48,7 +49,7 @@ public class SmbScan extends AbstractScanFiles {
         }
 
         try {
-            SmbFile smbFile = new SmbFile(mNode.getId());
+            SmbFile smbFile = new SmbFile(mNode.getId(), SingletonContext.getInstance().withAnonymousCredentials());
 
             if (smbFile.getURL().getUserInfo() == null) {
                 CIFSContext cifsContext =
@@ -114,7 +115,7 @@ public class SmbScan extends AbstractScanFiles {
                             null,
                             contentType,
                             String.valueOf(smbFile.getLastModified()),
-                            file.getContentLength(),
+                            file.length(),
                             FileItem.SMB);
 
                     addResultItem(item);

@@ -59,6 +59,7 @@ public abstract class BaseDialogFragment<VM extends AndroidViewModel,VDB extends
 
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
@@ -98,7 +99,7 @@ public abstract class BaseDialogFragment<VM extends AndroidViewModel,VDB extends
             getAppBaseActivity().startActivityForResult(intent);
     }
 
-    private void createAndroidViewModel() {
+    protected void createAndroidViewModel() {
         if (mViewModel == null) {
             Class modelClass;
             Type type = getClass().getGenericSuperclass();

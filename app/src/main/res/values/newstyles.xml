@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="filter_box_title_text_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="filter_box_recyclerview_style">
+        <item name="android:background">@drawable/filter_box_main_bg</item>
+        <item name="android:layout_marginRight">@dimen/filter_box_common_margin</item>
+    </style>
+</resources>

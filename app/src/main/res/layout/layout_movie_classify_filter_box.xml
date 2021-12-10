@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/filter_box_title_box_h"
+            android:layout_margin="@dimen/filter_box_common_margin"
+            android:background="@drawable/filter_box_main_bg"
+            android:minHeight="@dimen/filter_box_title_box_h">
+
+            <TextView
+                style="@style/filter_box_title_text_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/lb_sort_device" />
+
+            <TextView
+                style="@style/filter_box_title_text_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/lb_sort_year" />
+
+            <TextView
+                style="@style/filter_box_title_text_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/lb_sort_type" />
+
+            <TextView
+                style="@style/filter_box_title_text_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/lb_sort_order" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/filter_box_main_h"
+            android:layout_marginLeft="@dimen/filter_box_common_margin"
+            android:layout_marginRight="@dimen/filter_box_common_margin"
+            android:minHeight="@dimen/filter_box_main_h">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/view_sortby_device"
+                style="@style/filter_box_recyclerview_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/view_sortby_year"
+                style="@style/filter_box_recyclerview_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/view_sortby_genres"
+                style="@style/filter_box_recyclerview_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/view_order"
+                style="@style/filter_box_recyclerview_style"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="0dp"
+                android:layout_weight="1" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <data>
+
+    </data>
+</layout>

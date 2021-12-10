@@ -17,6 +17,7 @@ import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
+import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.firefly.filepicker.DLNAService;
 import com.firefly.filepicker.R;
 
@@ -79,6 +80,12 @@ public class BrowsePathActivity extends AppCompatActivity {
     }
 
     private void init() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                JcifsUtils.getInstance(BrowsePathActivity.this);
+            }
+        }).start();
         Intent intent = new Intent(this, DLNAService.class);
         startService(intent);
 

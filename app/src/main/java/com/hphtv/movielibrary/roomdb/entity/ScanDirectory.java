@@ -6,7 +6,10 @@ import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
+
+import java.util.Objects;
 
 
 /**
@@ -26,6 +29,9 @@ public class ScanDirectory {
     public boolean  isUserAdd;
     @ColumnInfo(name="is_hidden")
     public boolean isHidden;
+    @ColumnInfo(name = "friendly_name")
+    public String friendlyName;
+    public Constants.FolderPermission permissions;
 
     @Ignore
     public String parentPath;
@@ -36,6 +42,20 @@ public class ScanDirectory {
         this.isUserAdd=false;
         this.isHidden=false;
         this.parentPath=path;
+        this.permissions = Constants.FolderPermission.MOVIE;
+        this.friendlyName=path.substring(path.lastIndexOf("/")+1);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScanDirectory that = (ScanDirectory) o;
+        return Objects.equals(path, that.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
+    }
 }

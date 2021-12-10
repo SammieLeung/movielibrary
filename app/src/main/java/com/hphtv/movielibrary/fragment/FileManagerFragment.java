@@ -9,7 +9,7 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.activity.HomePageActivity;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutSettingBinding;
-import com.hphtv.movielibrary.fragment.dialog.FolderManagerFragment;
+import com.hphtv.movielibrary.fragment.dialog.foldermanager.FolderManagerFragment;
 import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
 import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
 import com.hphtv.movielibrary.viewmodel.fragment.FileManagerFragmentViewModel;

@@ -18,6 +18,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -49,6 +50,7 @@ import com.hphtv.movielibrary.fragment.FileManagerFragment;
 import com.hphtv.movielibrary.fragment.HistoryFragment;
 import com.hphtv.movielibrary.fragment.HomePageFragment;
 import com.hphtv.movielibrary.fragment.UnrecognizedFileFragement;
+import com.hphtv.movielibrary.fragment.dialog.homepage.FilterBoxDialogFragment;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService;
@@ -108,6 +110,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         LogUtil.v(TAG, "onResume()");
         registerReceiver();//注册广播
         bindService();//绑定服务
+        Log.d(TAG, "onResume: "+mViewModel.toString());
     }
 
     @Override
@@ -209,7 +212,14 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      */
     private void initButtons() {
         //弹出筛选窗口
-        mBinding.viewSortbox.setOnClickListener(v -> mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0));
+//        mBinding.btnViewSortbox.setOnClickListener(v -> mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0));
+        mBinding.btnViewSortbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FilterBoxDialogFragment filterBoxDialogFragment=FilterBoxDialogFragment.newInstance();
+                filterBoxDialogFragment.show(getSupportFragmentManager(),"");
+            }
+        });
         //本地搜索按钮
         mBinding.btnSearch.setOnClickListener(v -> {
             Intent intent = new Intent(this, PinyinSearchActivity.class);
@@ -359,9 +369,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             public void onPageSelected(int position) {
                 mBinding.leftmenuListview.setSelection(position);
                 if (position != HOME_PAGE_FRAGMENT) {
-                    mBinding.viewSortbox.setVisibility(View.GONE);
+                    mBinding.btnViewSortbox.setVisibility(View.GONE);
                 } else {
-                    mBinding.viewSortbox.setVisibility(View.VISIBLE);
+                    mBinding.btnViewSortbox.setVisibility(View.VISIBLE);
                 }
                 LogUtil.v("onPageSelected " + position);
             }

@@ -25,6 +25,7 @@
     <string name="sortby">%1$s|%2$s %3$s</string>
     <string name="lb_title" translatable="false">MediaStation</string>
     <string name="lb_sort_device">Device</string>
+    <string name="lb_sort_region">Region</string>
     <string name="lb_sort_directory">Directory</string>
     <string name="lb_sort_year">Year</string>
     <string name="lb_sort_type">Genres</string>
@@ -72,10 +73,11 @@
     <string name="message_success">->Success!</string>
     <string name="message_faild">->Faild!</string>
     <string name="order_name">Title</string>
-    <string name="order_type">Genre</string>
+    <string name="order_genre">Genre</string>
     <string name="order_year">Year</string>
     <string name="order_score">Score</string>
-    <string name="order_addtime">Add time</string>
+    <string name="order_addtime">Add Time</string>
+    <string name="order_recently_played">Recently Played</string>
 
     <string name="toastmsg_no_trailer_found">No trailer found!</string>
 
@@ -212,5 +214,7 @@
     <string name="folder_item_delete">Delete</string>
     <string name="folder_item_add_to_hidden">Add to private</string>
     <string name="folder_item_move_out">Move out</string>
+    <string name="folder_item_rescan">Rescan</string>
+
 
 </resources>

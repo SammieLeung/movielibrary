@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.fragment.dialog;
+package com.hphtv.movielibrary.fragment.dialog.foldermanager;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -14,7 +14,10 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.FolderItemAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutFolderBinding;
+import com.hphtv.movielibrary.fragment.dialog.BaseDialogFragment;
+import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.viewmodel.fragment.FolderManagerFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,11 +34,47 @@ import static com.hphtv.movielibrary.fragment.FileManagerFragment.REQUEST_FOLDER
  */
 public class FolderManagerFragment extends BaseDialogFragment<FolderManagerFragmentViewModel, FLayoutFolderBinding> {
     private FolderItemAdapter mFolderItemAdapter;
-    private FolderItemAdapter mHiddenFolderItemApdapter;
-    private List<ScanDirectory> mScanDirectoryList = new ArrayList<>();
+//    private FolderItemAdapter mHiddenFolderItemApdapter;
     private List<ScanDirectory> mHiddenScanDirectoryList = new ArrayList<>();
     private boolean isPickerOpening = false;
     private boolean isNeedRefresh=false;
+
+    private FolderItemAdapter.OnClickListener mFolderItemClickListener =new FolderItemAdapter.OnClickListener() {
+        @Override
+        public void onClick(ScanDirectory scanDirectory) {
+
+        }
+
+        @Override
+        public void delete(String path) {
+            mViewModel.deleteDirecotryByPath(path, mCallback);
+            isNeedRefresh=true;
+        }
+
+        @Override
+        public void move(String path) {
+            mViewModel.moveToHidden(path, mCallback);
+            isNeedRefresh=true;
+        }
+
+        @Override
+        public void rescan(String path) {
+
+        }
+
+        @Override
+        public void addClick() {
+            if (!isPickerOpening) {
+                synchronized (this) {
+                    if (!isPickerOpening) {
+                        isPickerOpening = true;
+                        Intent picker_intent = new Intent(Constants.ACTION_FILE_PICKER);
+                        startActivityForResult(picker_intent);
+                    }
+                }
+            }
+        }
+    };
 
     public static FolderManagerFragment newInstance() {
 
@@ -61,65 +100,40 @@ public class FolderManagerFragment extends BaseDialogFragment<FolderManagerFragm
         hiddenLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mBinding.rvAddedFolders.setLayoutManager(linearLayoutManager);
         mBinding.rvHiddenFolder.setLayoutManager(hiddenLinearLayoutManager);
-        mFolderItemAdapter = new FolderItemAdapter(getContext(), mScanDirectoryList);
-        mFolderItemAdapter.setOnClickListener(new FolderItemAdapter.OnClickListener() {
-            @Override
-            public void onClick(ScanDirectory scanDirectory) {
-
-            }
-
-            @Override
-            public void delete(String path) {
-                mViewModel.deleteDirecotryByPath(path, mCallback);
-                isNeedRefresh=true;
-            }
-
-            @Override
-            public void move(String path) {
-                mViewModel.moveToHidden(path, mCallback);
-                isNeedRefresh=true;
-            }
-
-            @Override
-            public void addClick() {
-                if (!isPickerOpening) {
-                    synchronized (this) {
-                        if (!isPickerOpening) {
-                            isPickerOpening = true;
-                            Intent picker_intent = new Intent(Constants.ACTION_FILE_PICKER);
-                            startActivityForResult(picker_intent);
-                        }
-                    }
-                }
-            }
-        });
-        mHiddenFolderItemApdapter = new FolderItemAdapter(getContext(), mHiddenScanDirectoryList);
-        mHiddenFolderItemApdapter.setTypeFolder(FolderItemAdapter.TYPE_HIDDEN_FOLDER);
-        mHiddenFolderItemApdapter.setOnClickListener(new FolderItemAdapter.OnClickListener() {
-            @Override
-            public void addClick() {
-
-            }
-
-            @Override
-            public void onClick(ScanDirectory scanDirectory) {
-
-            }
-
-            @Override
-            public void delete(String path) {
-                mViewModel.deleteDirecotryByPath(path, mCallback);
-                isNeedRefresh=true;
-            }
-
-            @Override
-            public void move(String path) {
-                mViewModel.moveToPublic(path, mCallback);
-                isNeedRefresh=true;
-            }
-        });
+        mFolderItemAdapter = new FolderItemAdapter(getContext());
+        mFolderItemAdapter.setOnClickListener(mFolderItemClickListener);
+//        mHiddenFolderItemApdapter = new FolderItemAdapter(getContext(), mHiddenScanDirectoryList);
+//        mHiddenFolderItemApdapter.setTypeFolder(FolderItemAdapter.TYPE_HIDDEN_FOLDER);
+//        mHiddenFolderItemApdapter.setOnClickListener(new FolderItemAdapter.OnClickListener() {
+//            @Override
+//            public void addClick() {
+//
+//            }
+//
+//            @Override
+//            public void onClick(ScanDirectory scanDirectory) {
+//
+//            }
+//
+//            @Override
+//            public void delete(String path) {
+//                mViewModel.deleteDirecotryByPath(path, mCallback);
+//                isNeedRefresh=true;
+//            }
+//
+//            @Override
+//            public void move(String path) {
+//                mViewModel.moveToPublic(path, mCallback);
+//                isNeedRefresh=true;
+//            }
+//
+//            @Override
+//            public void rescan(String path) {
+//
+//            }
+//        });
         mBinding.rvAddedFolders.setAdapter(mFolderItemAdapter);
-        mBinding.rvHiddenFolder.setAdapter(mHiddenFolderItemApdapter);
+//        mBinding.rvHiddenFolder.setAdapter(mHiddenFolderItemApdapter);
     }
 
 
@@ -192,12 +206,29 @@ public class FolderManagerFragment extends BaseDialogFragment<FolderManagerFragm
     private FolderManagerFragmentViewModel.Callback mCallback = new FolderManagerFragmentViewModel.Callback() {
         @Override
         public void refreshScanDirectoryList(List<ScanDirectory> scanDirectoryList) {
-            mFolderItemAdapter.addAll(scanDirectoryList);
+            mFolderItemAdapter.addAllScanDirecotry(scanDirectoryList);
         }
 
         @Override
         public void refreshHiddenScanDirectoryList(List<ScanDirectory> scanDirectoryList) {
-            mHiddenFolderItemApdapter.addAll(scanDirectoryList);
+//            mHiddenFolderItemApdapter.addAll(scanDirectoryList);
         }
+
+        @Override
+        public void refreshShortcutList(List<Shortcut> shortcutList) {
+            mFolderItemAdapter.addAllShortcuts(shortcutList);
+        }
+
+        @Override
+        public void addShortcut(Shortcut shortcut) {
+            mFolderItemAdapter.add(shortcut);
+        }
+
+        @Override
+        public void addScanDirectory(ScanDirectory scanDirectory) {
+            mFolderItemAdapter.add(scanDirectory);
+
+        }
+
     };
 }

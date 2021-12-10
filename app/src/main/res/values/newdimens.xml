@@ -32,5 +32,16 @@
 
     <dimen name="textsize_medium">24sp</dimen>
     <dimen name="textsize_small">18sp</dimen>
+    <!--   分类浏览-->  <!--   分类浏览-->  <!--   分类浏览-->  <!--   分类浏览-->  <!--   分类浏览-->  <!--   分类浏览-->
+    <dimen name="filter_box_title_box_h">67dp</dimen>
+    <dimen name="filter_box_main_h">410dp</dimen>
+
+    <dimen name="filter_box_common_margin">21dp</dimen>
+
+    <dimen name="filter_box_item_height">67dp</dimen>
+    <dimen name="filter_box_item_margin_lr">21dp</dimen>
+    <dimen name="filter_box_item_margin_tb">11dp</dimen>
+    <dimen name="filter_box_item_textsize">24sp</dimen>
+    <dimen name="filter_box_headitem_height">34dp</dimen>
 
 </resources>

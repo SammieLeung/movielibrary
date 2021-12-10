@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,6 +18,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.archos.filecorelibrary.filecorelibrary.jcifs.NovaSmbFile;
+import com.archos.filecorelibrary.filecorelibrary.samba.SambaDiscovery;
+import com.archos.filecorelibrary.filecorelibrary.samba.Share;
+import com.archos.filecorelibrary.filecorelibrary.samba.Workgroup;
 import com.firefly.filepicker.R;
 import com.firefly.filepicker.commom.listener.DeviceRegistryListener;
 import com.firefly.filepicker.data.Constants;
@@ -27,6 +32,7 @@ import com.firefly.filepicker.utils.Base64Helper;
 import com.firefly.filepicker.utils.MediaDirHelper;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.firefly.filepicker.utils.SmbFileHelper;
+import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
 
 import org.fourthline.cling.model.action.ActionInvocation;
@@ -41,7 +47,6 @@ import org.fourthline.cling.support.model.DIDLContent;
 import org.fourthline.cling.support.model.SortCriterion;
 import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
-import org.seamless.util.logging.LoggingUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,6 +54,7 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jcifs.CIFSContext;
@@ -56,6 +62,9 @@ import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
+import jcifs.smb.SmbFileFilter;
+
+import static com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils.getSmbFile;
 
 /**
  * Created by rany on 18-1-12.
@@ -86,6 +95,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     private SparseArray<Node> mCancelTasks = new SparseArray<>();
 
     private Map<String, CIFSContext> mSmbAuthMap;
+
+    private SambaDiscovery mSambaDiscovery;
 
     private BroadcastReceiver mDeviceChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -130,11 +141,139 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         }
     };
 
+    private SmbFileFilter mFileFilter = f -> {
+        final String filename=f.getName();
+        try {
+            if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
+                return keepFile(filename);
+            }
+            else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
+                return keepDirectory(filename);
+            }
+            else {
+                Log.d(TAG, "SmbFileFilter: neither file nor directory: "+filename);
+                return false;
+            }
+        } catch (SmbException e) {
+            Log.d(TAG, "accept: SmbException "+e.getNtStatus());
+            e.printStackTrace();
+        }
+        return false;
+    };
+
+
+    private boolean mKeepHiddenFiles=true;
+    protected boolean keepFile(String filename) {
+        // don't keep a hidden file
+        if (filename.startsWith(".")&&!mKeepHiddenFiles) {
+            return false;
+        }
+        // keep file if filter list contains its extension
+//        String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase(Locale.US);
+//        boolean extensionFiltered = mExtensionFilter != null && mExtensionFilter.length > 0;
+//        if (extensionFiltered) {
+//            for (String filt : mExtensionFilter) {
+//                if (extension != null && extension.equalsIgnoreCase(filt) && !filt.isEmpty()) {
+//                    return true;
+//                }
+//            }
+//        }
+//        // keep file if filter list contains start of its mime type
+//        String mimeType = MimeUtils.guessMimeTypeFromExtension(extension);
+//        boolean mimeTypeFiltered = mMimeTypeFilter != null && mMimeTypeFilter.length > 0;
+//        if (mimeTypeFiltered) {
+//            for (String filt : mMimeTypeFilter) {
+//                if (mimeType != null && mimeType.startsWith(filt) && !filt.isEmpty()) {
+//                    return true;
+//                }
+//            }
+//        }
+//        if (mimeTypeFiltered || extensionFiltered) {
+//            return false;
+//        } else {
+//            return true;
+//        }
+        return true;
+    }
+
+    protected boolean keepDirectory(String filename) {
+        // don't keep a hidden directory
+        if (filename.startsWith(".")) {
+            return false;
+        }
+        // don't keep a weird directory
+        if (filename.equalsIgnoreCase("IPC$/") || filename.equalsIgnoreCase("print$/")) {
+            return false;
+        }
+        return true;
+    }
+
+    private class SambaDiscoveryListener implements SambaDiscovery.Listener {
+        private Node mCurrentNode;
+
+        public void setCurrentNode(Node node) {
+            mCurrentNode = node;
+        }
+
+        @Override
+        public void onDiscoveryStart() {
+            Log.v(TAG, "onDiscoveryStart");
+        }
+
+        @Override
+        public void onDiscoveryEnd() {
+            Log.v(TAG, "onDiscoveryEnd");
+
+        }
+
+        @Override
+        public void onDiscoveryUpdate(List<Workgroup> workgroups) {
+            Log.v(TAG, "onDiscoveryUpdate " + workgroups.size());
+            for (Workgroup w : workgroups) {
+                for (Share share : w.getShares()) {
+                    Log.v(TAG,
+                            "displayName:" + share.getDisplayName()
+                                    + " workgroup:" + share.getWorkgroup()
+                                    + " toUri:" + share.toUri().toString()
+                                    + " address:" + Uri.parse(share.getAddress()).getHost());
+
+                    new Thread(() -> {
+                        try {
+                            NovaSmbFile novaSmbFile = getSmbFile(share.toUri());
+//                            SmbFile[] smbFiles = novaSmbFile.getSmbFile().listFiles();
+                            getNodeFromSmbFiles(novaSmbFile.getSmbFile(), mCurrentNode, Node.SAMBA_DEVICE,share.getDisplayName());
+                            updateTreeView(mCurrentNode);
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                            mView.fallBackParent(mCurrentNode);
+                        } catch (SmbException e) {
+                            e.printStackTrace();
+                            showError(mCurrentNode, mContext.getString(R.string.samba_access_error));
+                            mView.fallBackParent(mCurrentNode);
+                        }
+                    }).start();
+                }
+            }
+
+        }
+
+        @Override
+        public void onDiscoveryFatalError() {
+            Log.v(TAG, "onDiscoveryFatalError");
+
+        }
+    }
+
+    private SambaDiscoveryListener mSambaDiscoveryListener = new SambaDiscoveryListener();
+
     public BrowsePathPresenter(BrowsePathContract.View view, Context context) {
         mView = view;
         mContext = context;
 
         mView.setPresenter(this);
+        mSambaDiscovery = new SambaDiscovery(mContext);
+        mSambaDiscovery.setMinimumUpdatePeriodInMs(100);
+        mSambaDiscovery.addListener(mSambaDiscoveryListener);
     }
 
     @Override
@@ -370,7 +509,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             case Node.DLNA:
                 Device device = (Device) node.getItem();
                 if (!identity.endsWith(":0")) {
-                    identity = device.getIdentity().getUdn().getIdentifierString() + ":" + identity;
+                    identity = device.getIdentity().getUdn().getIdentifierString() + ":" + identity+":"+device.getDetails().getFriendlyName();
                     identity += ":" + node.getTitle();
                 } else {
                     identity += ":" + device.getDetails().getFriendlyName();
@@ -809,28 +948,16 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         if (SmbFileHelper.getType(smbFile) != SmbFile.TYPE_WORKGROUP) {
                             type = Node.SAMBA;
                         }
-                    }
-
-                    SmbFile[] files = smbFile.listFiles();
-
-                    for (SmbFile f : files) {
-                        int fileType = SmbFileHelper.getType(f);
-                        if ((mSelectType == SELECT_DIR && SmbFileHelper.isFile(f))
-                                || fileType == SmbFile.TYPE_NAMED_PIPE
-                                || fileType == SmbFile.TYPE_COMM
-                                || fileType == SmbFile.TYPE_PRINTER) {
-                            continue;
+                        SmbFile[] files = smbFile.listFiles(mFileFilter);
+                        for (SmbFile f : files) {
+                           getNodeFromSmbFiles(f,node,type,null);
                         }
-
-                        Node child = new Node(
-                                f.getCanonicalPath(),
-                                f.getName().replace('/', '\0'),
-                                type,
-                                f);
-
-                        node.addChild(child);
+                        updateTreeView(node);
+                    } else {
+                        mSambaDiscoveryListener.setCurrentNode(node);
+                        mSambaDiscovery.start();
                     }
-                    updateTreeView(node);
+
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                     mView.fallBackParent(node);
@@ -919,4 +1046,31 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
         return true;
     }
+
+    private void getNodeFromSmbFiles(SmbFile f, Node node, int type,String displayName) throws SmbException {
+        if ((mSelectType == SELECT_DIR && SmbFileHelper.isFile(f))) {
+            return;
+        }
+        Log.d(TAG, "getNodeFromSmbFiles: 1 "+f.getCanonicalPath());
+        Log.d(TAG, "getNodeFromSmbFiles: "+f.getPath());
+        Log.d(TAG, "getNodeFromSmbFiles: "+f.getCanonicalUncPath());
+        Log.d(TAG, "getNodeFromSmbFiles: "+f.getShare());
+
+
+
+        Node child = new Node(
+                f.getCanonicalPath(),
+                displayName!=null?displayName:f.getName().replace('/', '\0'),
+                type,
+                f);
+        if(node.hasChild()){
+           List<Node> nodes=node.getChildren();
+          if(nodes.contains(child)){
+              return;
+          }
+        }
+        node.addChild(child);
+    }
+
+
 }

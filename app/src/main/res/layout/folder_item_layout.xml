@@ -4,7 +4,7 @@
     <data>
         <import type="android.view.View"/>
         <variable
-            name="folder"
+            name="uri"
             type="String" />
         <variable
             name="option"
@@ -32,7 +32,7 @@
             android:marqueeRepeatLimit="marquee_forever"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@id/btn_delete"
-            android:text="@{folder}"
+            android:text="@{uri}"
             android:layout_width="match_parent"
             android:layout_height="@dimen/folder_dialog_folderitem_h">
 
@@ -42,12 +42,22 @@
             android:id="@+id/btn_delete"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_toStartOf="@id/btn_move"
+            android:layout_toStartOf="@id/btn_rescan"
             android:ellipsize="end"
             android:singleLine="true"
             android:text="@string/folder_item_delete" />
 
         <Button
+            android:id="@+id/btn_rescan"
+            android:layout_width="0dp"
+            android:layout_alignParentEnd="true"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="@string/folder_item_rescan" />
+
+        <Button
+            android:visibility="gone"
             android:text="@{btn_move_text}"
             android:layout_alignParentEnd="true"
             android:id="@+id/btn_move"

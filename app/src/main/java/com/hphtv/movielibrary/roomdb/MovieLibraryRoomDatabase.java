@@ -19,6 +19,7 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
+import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao;
 import com.hphtv.movielibrary.roomdb.dao.TrailerDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
@@ -28,6 +29,7 @@ import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
@@ -48,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Database(entities = {Actor.class, Device.class, Director.class, Genre.class, Movie.class, MovieActorCrossRef.class,
         MovieDirectorCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
-        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, GenreTag.class}, views = {MovieDataView.class, UnrecognizedFileDataView.class}, version = 1)
+        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, GenreTag.class,Shortcut.class}, views = {MovieDataView.class, UnrecognizedFileDataView.class}, version = 1)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO
@@ -77,6 +79,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     public abstract TrailerDao getTrailerDao();
 
     public abstract StagePhotoDao getStagePhotoDao();
+
+    public abstract ShortcutDao getShortcutDao();
 
     public static MovieLibraryRoomDatabase getDatabase(final Context context) {
         if (sInstance == null) {

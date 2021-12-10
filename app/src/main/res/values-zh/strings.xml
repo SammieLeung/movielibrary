@@ -26,6 +26,7 @@
     <string name="ratingsCounts">( %1$s人评价 )</string>
     <string name="sortby">%1$s|%2$s %3$s</string>
     <string name="lb_sort_device">设备</string>
+    <string name="lb_sort_region">地区</string>
     <string name="lb_sort_directory">目录</string>
     <string name="lb_sort_year">年份</string>
     <string name="lb_sort_type">类型</string>
@@ -73,10 +74,11 @@
     <string name="message_success">->获取成功！</string>
     <string name="message_faild">->获取失败！</string>
     <string name="order_name">名称</string>
-    <string name="order_type">类型</string>
+    <string name="order_genre">类型</string>
     <string name="order_year">年份</string>
     <string name="order_score">评分</string>
     <string name="order_addtime">添加时间</string>
+    <string name="order_recently_played">最近播放</string>
 
     <string name="toastmsg_no_trailer_found">找不到预告片</string>
 
@@ -204,4 +206,9 @@
     <string name="folder_item_delete">删除</string>
     <string name="folder_item_add_to_hidden">添加到私密</string>
     <string name="folder_item_move_out">移出私密</string>
+    <string name="folder_item_rescan">重新扫描</string>
+    
+
+
+
 </resources>

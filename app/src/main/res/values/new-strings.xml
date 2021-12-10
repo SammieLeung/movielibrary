@@ -14,4 +14,7 @@
 
     <string name="genre_edit_dialog_title">Category</string>
 
+    <string name="filter_box_local_device">LOCAL</string>
+    <string name="filter_box_dlna_device">DLNA</string>
+    <string name="filter_box_smb_device">SMB</string>
 </resources>

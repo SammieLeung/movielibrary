@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/filter_box_item_height">
+
+
+        <androidx.appcompat.widget.AppCompatCheckedTextView
+            android:id="@+id/cbtv_title"
+            android:textSize="@dimen/filter_box_item_textsize"
+            android:layout_marginLeft="@dimen/filter_box_item_margin_lr"
+            android:layout_marginRight="@dimen/filter_box_item_margin_lr"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/filter_box_item_margin_lr"
+            android:duplicateParentState="true"
+            android:checkMark="@{isDesc?@drawable/desc_order:@drawable/asc_order}"
+            android:layout_width="match_parent"
+            android:checked="@{checkPos==pos}"
+            android:text="@{name}"
+            android:layout_height="@dimen/filter_box_item_height"
+            android:layout_alignParentStart="true"
+      />
+    </RelativeLayout>
+
+    <data>
+        <variable
+            name="name"
+            type="String" />
+        <variable
+            name="checkPos"
+            type="androidx.databinding.ObservableInt" />
+        <variable
+            name="pos"
+            type="int" />
+        <variable
+            name="isDesc"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+</layout>

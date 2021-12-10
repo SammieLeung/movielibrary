@@ -33,12 +33,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/6/1
  */
-public class NewepageViewModel extends AndroidViewModel {
+public class NewpageViewModel extends AndroidViewModel {
     private GenreDao mGenreDao;
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
 
-    public NewepageViewModel(@NonNull @NotNull Application application) {
+    public NewpageViewModel(@NonNull @NotNull Application application) {
         super(application);
 
         initDao();

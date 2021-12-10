@@ -17,10 +17,16 @@ android {
         }
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs',excludes: ['jcifs-ng.jar'])
     implementation support["appcompat"]
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation support["design"]
@@ -37,8 +43,11 @@ dependencies {
         exclude module: 'stax-api'
         exclude module: 'xpp3'
     }
-//    implementation "org.codelibs:jcifs:2.1.19"
+    api "org.codelibs:jcifs:2.1.27"
+//    implementation 'org.bouncycastle:bcprov-jdk15to18:1.66'
+//    implementation group: 'eu.agno3.jcifs',name:'jcifs-ng',version:'2.1.7'
 
-    implementation group: 'eu.agno3.jcifs',name:'jcifs-ng',version:'2.1.7'
+    //preference
+    implementation 'androidx.preference:preference:1.1.1'
 
 }

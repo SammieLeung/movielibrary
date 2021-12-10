@@ -14,6 +14,7 @@ public interface TABLE {
     String MOVIE = "movie";
     String TRAILER="trailer";
     String STAGEPHOTO ="stagephoto";
+    String SHORTCUT="shortcut";
 
     String MOVIE_ACTOR_CROSS_REF = "movie_actor_cross_ref";
     String MOVIE_DIRECTOR_CROSS_REF = "movie_director_cross_ref";

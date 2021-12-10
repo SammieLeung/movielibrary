@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0935df6bf8c3623660b0b35c7bc75fe9",
+    "identityHash": "f72f7c45a1dde78c7af7b3d5aeb17d12",
     "entities": [
       {
         "tableName": "actor",
@@ -488,7 +488,7 @@
       },
       {
         "tableName": "scan_directory",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`scan_dir_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT, `device_path` TEXT, `is_user_add` INTEGER NOT NULL, `is_hidden` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`scan_dir_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT, `device_path` TEXT, `is_user_add` INTEGER NOT NULL, `is_hidden` INTEGER NOT NULL, `friendly_name` TEXT, `permissions` TEXT)",
         "fields": [
           {
             "fieldPath": "scanDirId",
@@ -519,6 +519,18 @@
             "columnName": "is_hidden",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "friendlyName",
+            "columnName": "friendly_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "permissions",
+            "columnName": "permissions",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -735,6 +747,71 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "shortcut",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `uri` TEXT, `type` INTEGER NOT NULL, `file_count` INTEGER NOT NULL, `poster_count` INTEGER NOT NULL, `permissions` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileCount",
+            "columnName": "file_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "posterCount",
+            "columnName": "poster_count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "permissions",
+            "columnName": "permissions",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_shortcut_uri",
+            "unique": true,
+            "columnNames": [
+              "uri"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_shortcut_uri` ON `${TABLE_NAME}` (`uri`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [
@@ -749,7 +826,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0935df6bf8c3623660b0b35c7bc75fe9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f72f7c45a1dde78c7af7b3d5aeb17d12')"
     ]
   }
 }

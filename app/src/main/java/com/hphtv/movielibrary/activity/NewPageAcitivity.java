@@ -10,11 +10,10 @@ import com.hphtv.movielibrary.adapter.CircleItemAdapter;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.RecentlyAddListAdapter;
-import com.hphtv.movielibrary.adapter.RoundRectItemAdapter;
 import com.hphtv.movielibrary.databinding.ActivityNewpageBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.viewmodel.NewepageViewModel;
+import com.hphtv.movielibrary.viewmodel.NewpageViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +23,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class NewPageAcitivity extends AppBaseActivity<NewepageViewModel, ActivityNewpageBinding> {
+public class NewPageAcitivity extends AppBaseActivity<NewpageViewModel, ActivityNewpageBinding> {
     private HistoryListAdapter mHistoryListAdapter;
     private CircleItemAdapter mCircleItemAdapter;
     private GenreTagAdapter mGenreTagAdapter;
