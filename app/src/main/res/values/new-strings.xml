@@ -17,4 +17,7 @@
     <string name="filter_box_local_device">LOCAL</string>
     <string name="filter_box_dlna_device">DLNA</string>
     <string name="filter_box_smb_device">SMB</string>
+
+    <!--    文件夹管理-->
+    <string name="pm_item_add_shortcut">Add Shortcut</string>
 </resources>

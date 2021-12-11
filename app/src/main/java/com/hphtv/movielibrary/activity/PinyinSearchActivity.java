@@ -32,7 +32,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     private MovieAdapter mMovieAdapter;
 
     @Override
-    protected void processLogic() {
+    protected void onCreate() {
         prepearT9();
         initView();
         mViewModel.init();

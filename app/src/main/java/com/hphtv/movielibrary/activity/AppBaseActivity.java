@@ -29,7 +29,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        processLogic();
+        onCreate();
         init();
         ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
         mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
@@ -41,7 +41,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     /**
      * 处理onCreate()
      */
-    protected abstract void processLogic();
+    protected abstract void onCreate();
 
     protected void onActivityResultCallback(ActivityResult result) {
 

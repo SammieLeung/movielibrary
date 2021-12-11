@@ -123,7 +123,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
 
     @Override
-    protected void processLogic() {
+    protected void onCreate() {
         LogUtil.v(TAG, "processLogic==>OnCreate");
         mTagAll = getResources().getString(R.string.tx_all);
         mTitleArr = new String[]{getResources().getString(R.string.lb_title), getResources().getString(R.string.lb_sort_directory), getResources().getString(R.string.lb_setting)};

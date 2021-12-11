@@ -55,7 +55,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private MovieWrapper mCurWrapper;
 
     @Override
-    protected void processLogic() {
+    protected void onCreate() {
         // 初始化
         initView();
         this.onNewIntent(getIntent());

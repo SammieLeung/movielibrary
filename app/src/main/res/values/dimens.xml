@@ -44,9 +44,6 @@
     <dimen name="dialog_fragment_search_result_img_w">119dp</dimen>
     <dimen name="dialog_fragment_search_result_img_h">157dp</dimen>
     
-    <dimen name="folder_dialog_title_label_w">190dp</dimen>
-    <dimen name="folder_dialog_title_label_h">48dp</dimen>
-    <dimen name="folder_dialog_textsize">32sp</dimen>
     <dimen name="folder_dialog_item_textsize">20sp</dimen>
 
     <dimen name="folder_dialog_img_w">48dp</dimen>
@@ -58,8 +55,6 @@
     <dimen name="folder_dialog_folderitem_hide_margin">-192dp</dimen>
     <dimen name="folder_dialog_folderitem_show_margin">0dp</dimen>
 
-    <dimen name="folder_dialog_folderitem_button_w">160dp</dimen>
-    <dimen name="folder_dialog_folderitem_button_h">48dp</dimen>
 
     <dimen name="folder_dialog_padding">15dp</dimen>
     <dimen name="folder_dialog_padding_x2">30dp</dimen>

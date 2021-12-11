@@ -1,15 +1,17 @@
 package com.hphtv.movielibrary.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.activity.HomePageActivity;
+import com.hphtv.movielibrary.activity.PosterManagerActivity;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutSettingBinding;
-import com.hphtv.movielibrary.fragment.dialog.foldermanager.FolderManagerFragment;
 import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
 import com.hphtv.movielibrary.viewmodel.HomepageViewModel;
 import com.hphtv.movielibrary.viewmodel.fragment.FileManagerFragmentViewModel;
@@ -34,17 +36,8 @@ public class FileManagerFragment extends BaseFragment<FileManagerFragmentViewMod
     @Override
     protected void onViewCreated() {
         mBinding.viewFolderManager.setOnClickListener(v -> {
-            FolderManagerFragment fragment = FolderManagerFragment.newInstance();
-            getChildFragmentManager().setFragmentResultListener(REQUEST_FOLDER_DIALOG, this, (requestKey, result) -> {
-                boolean needRefresh = result.getBoolean("refresh");
-                if (needRefresh) {
-                    Intent intent = new Intent();
-                    intent.setAction(Constants.BroadCastMsg.RESCAN_DEVICE);
-                    LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
-                    ((HomepageViewModel) getAppBaseActivity().getViewModel()).getCurrentFragmentPos().postValue(HomePageActivity.HOME_PAGE_FRAGMENT);
-                }
-            });
-            fragment.show(getChildFragmentManager(), "");
+            Intent intent = new Intent(getContext(), PosterManagerActivity.class);
+            startActivityForResult(intent);
         });
         mBinding.viewChangePassword.setOnClickListener(v -> {
             PasswordDialogFragment passwordDialogFragment = PasswordDialogFragment.newInstance().newChangePassword();
@@ -58,4 +51,14 @@ public class FileManagerFragment extends BaseFragment<FileManagerFragmentViewMod
         return R.layout.f_layout_setting;
     }
 
+    @Override
+    protected void onActivityResultCallback(ActivityResult result) {
+        super.onActivityResultCallback(result);
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent intent = new Intent();
+            intent.setAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+            LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+            ((HomepageViewModel) getAppBaseActivity().getViewModel()).getCurrentFragmentPos().postValue(HomePageActivity.HOME_PAGE_FRAGMENT);
+        }
+    }
 }

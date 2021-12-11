@@ -33,7 +33,7 @@ public class NewPageAcitivity extends AppBaseActivity<NewpageViewModel, Activity
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
 
     @Override
-    protected void processLogic() {
+    protected void onCreate() {
         initViews();
     }
 

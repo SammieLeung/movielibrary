@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.fragment.dialog.foldermanager;
+package com.hphtv.movielibrary.activity.bean;
 
 import androidx.annotation.NonNull;
 
