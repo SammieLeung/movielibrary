@@ -1,16 +1,15 @@
 package com.hphtv.movielibrary.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.net.Uri;
 
 import androidx.activity.result.ActivityResult;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hphtv.movielibrary.adapter.FolderItemAdapter;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutFolderBinding;
 import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
+import com.hphtv.movielibrary.listener.PosterManagerEventHandler;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.viewmodel.fragment.FolderManagerFragmentViewModel;
@@ -25,45 +24,44 @@ import java.util.List;
 public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragmentViewModel, FLayoutFolderBinding> {
     private FolderItemAdapter mFolderItemAdapter;
     private List<ScanDirectory> mHiddenScanDirectoryList = new ArrayList<>();
-    private boolean isPickerOpening = false;
 
-    private FolderItemAdapter.OnClickListener mFolderItemClickListener = new FolderItemAdapter.OnClickListener() {
-        @Override
-        public void onClick(ScanDirectory scanDirectory) {
-
-        }
-
-        @Override
-        public void delete(String path) {
-            mViewModel.deleteDirecotryByPath(path, mCallback);
-           setResult(Activity.RESULT_OK);
-        }
-
-        @Override
-        public void move(String path) {
-            mViewModel.moveToHidden(path, mCallback);
-            setResult(Activity.RESULT_OK);
-
-        }
-
-        @Override
-        public void rescan(String path) {
-
-        }
-
-        @Override
-        public void addClick() {
-            if (!isPickerOpening) {
-                synchronized (this) {
-                    if (!isPickerOpening) {
-                        isPickerOpening = true;
-                        Intent picker_intent = new Intent(Constants.ACTION_FILE_PICKER);
-                        startActivityForResult(picker_intent);
-                    }
-                }
-            }
-        }
-    };
+//    private FolderItemAdapter.OnClickListener mFolderItemClickListener = new FolderItemAdapter.OnClickListener() {
+//        @Override
+//        public void onClick(ScanDirectory scanDirectory) {
+//
+//        }
+//
+//        @Override
+//        public void delete(String path) {
+//            mViewModel.deleteDirecotryByPath(path, mCallback);
+//           setResult(Activity.RESULT_OK);
+//        }
+//
+//        @Override
+//        public void move(String path) {
+//            mViewModel.moveToHidden(path, mCallback);
+//            setResult(Activity.RESULT_OK);
+//
+//        }
+//
+//        @Override
+//        public void rescan(String path) {
+//
+//        }
+//
+//        @Override
+//        public void addClick() {
+////            if (!isPickerOpening) {
+////                synchronized (this) {
+////                    if (!isPickerOpening) {
+////                        isPickerOpening = true;
+////                        Intent picker_intent = new Intent(Constants.ACTION_FILE_PICKER);
+////                        startActivityForResult(picker_intent);
+////                    }
+////                }
+////            }
+//        }
+//    };
 
 
     @Override
@@ -79,14 +77,14 @@ public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragment
         hiddenLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mBinding.rvAddedFolders.setLayoutManager(linearLayoutManager);
         mFolderItemAdapter = new FolderItemAdapter(this);
-        mFolderItemAdapter.setOnClickListener(mFolderItemClickListener);
+//        mFolderItemAdapter.setOnClickListener(mFolderItemClickListener);
         mBinding.rvAddedFolders.setAdapter(mFolderItemAdapter);
     }
 
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
-        isPickerOpening = false;
+        PosterManagerEventHandler.isPickerOpening = false;
 
         if (result.getResultCode() == RESULT_OK) {
             final Uri uri = result.getData().getData();

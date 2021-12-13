@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.activity.AppBaseActivity;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FolderAddItemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
@@ -72,6 +74,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         if (viewType == TYPE_HEAD) {
             FolderAddItemLayoutBinding binding = FolderAddItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             CommonViewHolder<FolderAddItemLayoutBinding> vh = new CommonViewHolder<>(binding);
+            binding.setActivity((AppBaseActivity) mContext);
             return vh;
         } else {
             FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
@@ -79,10 +82,6 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             return vh;
         }
     }
-
-
-
-
 
 
     @Override
@@ -182,23 +181,5 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     }
 
 
-    private OnClickListener mOnClickListener;
-
-
-    public interface OnClickListener {
-        void addClick();
-
-        void onClick(ScanDirectory scanDirectory);
-
-        void delete(String path);
-
-        void move(String path);
-
-        void rescan(String path);
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        mOnClickListener = listener;
-    }
 
 }

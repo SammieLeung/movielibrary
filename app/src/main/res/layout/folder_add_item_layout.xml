@@ -2,9 +2,14 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+        <import type="com.hphtv.movielibrary.listener.PosterManagerEventHandler"/>
+        <variable
+            name="activity"
+            type="com.hphtv.movielibrary.activity.AppBaseActivity" />
     </data>
 
     <RelativeLayout
+        android:onClick="@{()->PosterManagerEventHandler.openShortcutPicker(activity)}"
         android:layout_width="match_parent"
         android:background="@drawable/blue_stroke_select_bg_2"
         android:layout_height="@dimen/pm_item_height">
@@ -22,7 +27,6 @@
                 android:layout_centerVertical="true"
                 android:src="@mipmap/add_device" />
             <TextView
-
                 android:layout_marginLeft="@dimen/pm_container_padding"
                 android:text="@string/pm_item_add_shortcut"
                 android:textSize="@dimen/pm_item_textsize"
