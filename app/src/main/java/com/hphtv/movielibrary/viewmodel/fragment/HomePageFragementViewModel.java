@@ -98,17 +98,20 @@ public class HomePageFragementViewModel extends AndroidViewModel {
                 });
     }
 
-    public void getMovieDataView(String movie_id, Callback callback){
+    public void getMovieDataView(String movie_id, Callback callback) {
         Observable.just(movie_id)
                 .map(mid -> {
-                    MovieDataView movieDataView=mMovieDao.queryMovieDataViewByMovieId(mid,ScraperSourceTools.getSource());
+                    MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(mid, ScraperSourceTools.getSource());
                     return movieDataView;
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(view -> {
-                    if(callback!=null)
-                        callback.runOnUIThread(view);
+                .subscribe(new SimpleObserver<MovieDataView>() {
+                    @Override
+                    public void onAction(MovieDataView view) {
+                        if (callback != null)
+                            callback.runOnUIThread(view);
+                    }
                 });
     }
 

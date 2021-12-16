@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 
@@ -25,14 +24,14 @@ public interface ScanDirectoryDao {
     @Delete
     public void deleteScanDirectories(List<ScanDirectory> scanDirectories);
 
-    @Query("DELETE FROM " + TABLE.SCAN_DIRECTORY + " WHERE path=:path")
-    public void deleteScanDirectory(String path);
+//    @Query("DELETE FROM " + TABLE.SCAN_DIRECTORY + " WHERE path=:path")
+//    public void deleteScanDirectory(String path);
 
-    @Query("DELETE FROM " + TABLE.SCAN_DIRECTORY + " WHERE is_user_add=0")
-    public void delectTmpScanDirectories();
-
-    @Query("UPDATE " + TABLE.SCAN_DIRECTORY + " SET is_hidden=:isHidden WHERE path=:path")
-    public void updateScanDirectoryHiddenState(String path,boolean isHidden);
+//    @Query("DELETE FROM " + TABLE.SCAN_DIRECTORY + " WHERE is_user_add=0")
+//    public void delectTmpScanDirectories();
+//
+//    @Query("UPDATE " + TABLE.SCAN_DIRECTORY + " SET is_hidden=:isHidden WHERE path=:path")
+//    public void updateScanDirectoryHiddenState(String path,boolean isHidden);
 
     @Update
     public void updateScanDirectory(ScanDirectory scanDirectory);
@@ -40,16 +39,16 @@ public interface ScanDirectoryDao {
     @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE path=:path")
     public ScanDirectory queryScanDirectoryByPath(String path);
 
-    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE device_path=:devicePath AND is_user_add=0 LIMIT 0,:limit")
-    public List<ScanDirectory> queryTmpScanDirectories(String devicePath, int limit);
+    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " LIMIT 0,:limit")
+    public List<ScanDirectory> queryTmpScanDirectories(int limit);
 
-    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE device_path=:devicePath AND is_user_add=1")
-    public List<ScanDirectory> queryScanDirByDevicePath(String devicePath);
-
-    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE is_user_add=1 AND is_hidden=0")
-    public List<ScanDirectory> queryAllNotHiddenScanDirectories();
-
-    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE is_user_add=1 AND is_hidden=1")
-    public List<ScanDirectory> queryAllHiddenScanDirectories();
+//    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE device_path=:devicePath ")
+//    public List<ScanDirectory> queryScanDirByDevicePath(String devicePath);
+//
+//    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE is_user_add=1 AND is_hidden=0")
+//    public List<ScanDirectory> queryAllNotHiddenScanDirectories();
+//
+//    @Query("SELECT * FROM " + TABLE.SCAN_DIRECTORY + " WHERE is_user_add=1 AND is_hidden=1")
+//    public List<ScanDirectory> queryAllHiddenScanDirectories();
 
 }

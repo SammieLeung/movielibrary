@@ -96,6 +96,7 @@ public class MovieScanService extends Service {
     private int offset;
 
     private ConcurrentLinkedQueue<VideoFile> mQueue;
+    private ConcurrentLinkedQueue<VideoFile> mScannedQueue;
 
     @Override
     public void onCreate() {
@@ -112,6 +113,7 @@ public class MovieScanService extends Service {
 
     private void init() {
         mQueue = new ConcurrentLinkedQueue<>();
+        mScannedQueue = new ConcurrentLinkedQueue<>();
     }
 
     /**
@@ -158,7 +160,11 @@ public class MovieScanService extends Service {
      * @return
      */
     public void addToPairingQueue(List<VideoFile> videoFileList) {
-        mQueue.addAll(videoFileList);
+        for (VideoFile videoFile : videoFileList) {
+            if (!mQueue.contains(videoFile)) {
+                mQueue.add(videoFile);
+            }
+        }
         if (!isScanning)
             startSearch();
     }
@@ -218,7 +224,7 @@ public class MovieScanService extends Service {
                 })
                 .subscribeOn(Schedulers.from(mMovieDetailExecutor))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new SimpleObserver<String>() {
+                .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                         super.onSubscribe(d);
@@ -236,7 +242,8 @@ public class MovieScanService extends Service {
                         Intent intent = new Intent();
                         intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
                         LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
-                        offset=0;
+                        offset = 0;
+                        mScannedQueue.clear();
                     }
 
                     @Override
@@ -367,8 +374,10 @@ public class MovieScanService extends Service {
             isScanning = true;
             while (mQueue.size() > 0) {
                 VideoFile videoFile = mQueue.poll();
-                if (videoFile != null)
+                if (videoFile != null && !mScannedQueue.contains(videoFile)) {
+                    mScannedQueue.add(videoFile);
                     emitter.onNext(videoFile);
+                }
             }
             emitter.onComplete();
         }).subscribeOn(Schedulers.from(mSearchMovieExecutor))

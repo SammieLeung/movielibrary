@@ -2,12 +2,9 @@ package com.hphtv.movielibrary.roomdb;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.migration.Migration;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -29,19 +26,17 @@ import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
+import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
-import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
-import com.hphtv.movielibrary.roomdb.entity.Trailer;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * author: Sam Leung

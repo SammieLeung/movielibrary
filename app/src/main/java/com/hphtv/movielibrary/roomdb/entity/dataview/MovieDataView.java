@@ -14,20 +14,20 @@ import java.util.Objects;
 
 @DatabaseView(
         value =
-        "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,MVCF__VF__SD.source,MVCF__VF__SD.path,MVCF__VF__SD.dir_path,MVCF__VF__SD.device_id,genre_name,M.add_time,M.last_playtime,M.is_favorite " +
-                "FROM " + TABLE.MOVIE + " AS M " +
-                "JOIN (SELECT MVCF.id,MVCF.path,MVCF.source,VF__SD__DEV.dir_path,VF__SD__DEV.device_id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MVCF " +
-                "JOIN (SELECT VF__SD.path,VF__SD.dir_path,DEV.id AS device_id FROM "+ TABLE.DEVICE +" AS DEV "+
-                "JOIN (SELECT VF.path,SD.path AS dir_path,SD.device_path FROM " + TABLE.VIDEOFILE + " AS VF " +
-                "JOIN " + TABLE.SCAN_DIRECTORY + " AS SD " +
-                "ON VF.dir_path=SD.path) AS VF__SD " +
-                "ON VF__SD.device_path=DEV.path) AS VF__SD__DEV "+
-                "ON MVCF.path=VF__SD__DEV.path) AS MVCF__VF__SD " +
-                "ON MVCF__VF__SD.id = M.id " +
-                "LEFT OUTER  JOIN (SELECT MGCF.id,G.name AS genre_name FROM " + TABLE.GENRE + " AS G " +
-                "JOIN " + TABLE.MOVIE_GENRE_CROSS_REF + " AS MGCF " +
-                "ON MGCF.genre_id = G.genre_id) AS MGCF__G " +
-                "ON MGCF__G.id = M.id ",
+                "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,VF.path AS file_uri,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite " +
+                        "FROM " + TABLE.VIDEOFILE + " AS VF " +
+                        "JOIN " + TABLE.SHORTCUT + " AS ST  " +
+                        "ON VF.dir_path=ST.uri " +
+                        "JOIN " + TABLE.DEVICE + " AS DEV " +
+                        "ON DEV.path=ST.device_path OR ST.device_type > 5 " +
+                        "JOIN " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MVCF " +
+                        "ON MVCF.path=VF.path " +
+                        "JOIN " + TABLE.MOVIE + " AS M " +
+                        "ON MVCF.id=M.id " +
+                        "JOIN " + TABLE.MOVIE_GENRE_CROSS_REF + " AS MGCF  " +
+                        "ON M.id=MGCF.id " +
+                        "LEFT OUTER JOIN " + TABLE.GENRE + " AS G " +
+                        "ON MGCF.genre_id = G.genre_id",
         viewName = VIEW.MOVIE_DATAVIEW
 )
 public class MovieDataView {
@@ -38,11 +38,13 @@ public class MovieDataView {
     public String poster;
     public String ratings;
     public String year;
-    public String path;
-    public String device_id;
-    public String dir_path;
-    public String genre_name;
     public String source;
+    public String file_uri;
+    public String dir_uri;
+    public String device_uri;
+    public String dir_name;
+    public String dir_fname;
+    public String genre_name;
     public long add_time;
     public long last_playtime;
     public boolean is_favorite;

@@ -25,13 +25,6 @@ public class ScanDirectory {
     public String path;
     @ColumnInfo(name = "device_path")
     public String devicePath;
-    @ColumnInfo(name = "is_user_add")
-    public boolean  isUserAdd;
-    @ColumnInfo(name="is_hidden")
-    public boolean isHidden;
-    @ColumnInfo(name = "friendly_name")
-    public String friendlyName;
-    public Constants.FolderPermission permissions;
 
     @Ignore
     public String parentPath;
@@ -39,11 +32,7 @@ public class ScanDirectory {
     public ScanDirectory(String path, String devicePath) {
         this.path = path;
         this.devicePath = devicePath;
-        this.isUserAdd=false;
-        this.isHidden=false;
         this.parentPath=path;
-        this.permissions = Constants.FolderPermission.MOVIE;
-        this.friendlyName=path.substring(path.lastIndexOf("/")+1);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.fragment.dialog.homepage;
 
 import android.app.Application;
-import android.telecom.Call;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
@@ -11,12 +10,10 @@ import androidx.lifecycle.AndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
-import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -28,8 +25,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -42,7 +37,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private GenreDao mGenreDao;
     private MovieDao mMovieDao;
 
-    private List<ScanDirectory> mScanDirectoryList;
+    private List<Shortcut> mLocalShortcutList;
     private List<Shortcut> mDLNAShortcutList;
     private List<Shortcut> mSMBShortcutList;
     private List<Object> mDeviceDataList;
@@ -65,15 +60,15 @@ public class FilterBoxViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mScanDirectoryList = mScanDirectoryDao.queryAllNotHiddenScanDirectories();
-                    mDLNAShortcutList = mShortcutDao.queryAllShortcutsByType(Constants.DeviceType.DEVICE_TYPE_DLNA);
-                    mSMBShortcutList = mShortcutDao.queryAllShortcutsByType(Constants.DeviceType.DEVICE_TYPE_SMB);
+                    mLocalShortcutList = mShortcutDao.queryAllLocalShortcuts();
+                    mDLNAShortcutList = mShortcutDao.queryAllShortcutsByDevcietype(Constants.DeviceType.DEVICE_TYPE_DLNA);
+                    mSMBShortcutList = mShortcutDao.queryAllShortcutsByDevcietype(Constants.DeviceType.DEVICE_TYPE_SMB);
                     if(mDeviceDataList==null)
                         mDeviceDataList=new ArrayList<>();
                     mDeviceDataList.clear();
-                    if (mScanDirectoryList != null && mScanDirectoryList.size() > 0) {
+                    if (mLocalShortcutList != null && mLocalShortcutList.size() > 0) {
                         mDeviceDataList.add(getApplication().getString(R.string.filter_box_local_device));
-                        mDeviceDataList.addAll(mScanDirectoryList);
+                        mDeviceDataList.addAll(mLocalShortcutList);
                     }
                     if (mDLNAShortcutList != null && mDLNAShortcutList.size() > 0) {
                         mDeviceDataList.add(getApplication().getString(R.string.filter_box_dlna_device));

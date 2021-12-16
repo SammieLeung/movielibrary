@@ -12,6 +12,7 @@ import androidx.room.PrimaryKey;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * author: Sam Leung
@@ -40,9 +41,22 @@ public class VideoFile implements Serializable {
     @ColumnInfo(name = "last_playtime",defaultValue = "0")
     public long lastPlayTime;//上次播放时间
     @ColumnInfo(defaultValue = "-1")
-    public int season;
+    public int season=-1;
     @ColumnInfo(defaultValue = "-1")
-    public int episode;
+    public int episode=-1;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VideoFile videoFile = (VideoFile) o;
+        return path.equals(videoFile.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
+    }
 
     @Override
     public String toString() {

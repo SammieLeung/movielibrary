@@ -2,8 +2,6 @@ package com.hphtv.movielibrary.service.Thread;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -11,11 +9,12 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
+import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.station.kit.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,13 +32,12 @@ public class FileScanThread extends Thread {
     public static final String TAG = FileScanThread.class.getSimpleName();
 
     private Context mContext;
-    private String mPath;
-    private Device mDevice;
     /**
      * 数据库dao类
      */
     private DeviceDao mDeviceDao;
     private ScanDirectoryDao mScanDirectoryDao;
+    private ShortcutDao mShortcutDao;
     private VideoFileDao mVideoFileDao;
     /**
      * 扫描的目录队列
@@ -55,32 +53,18 @@ public class FileScanThread extends Thread {
 
     private boolean mIsOverMaxDirs = false;
 
-    private FileScanThread(Context context) {
+    public FileScanThread(Context context) {
         this.mContext = context;
         this.mDeviceDao = MovieLibraryRoomDatabase.getDatabase(mContext).getDeviceDao();
         this.mScanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(mContext).getScanDirectoryDao();
         this.mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(mContext).getVideoFileDao();
-    }
-
-    public FileScanThread(Context context, Device device) {
-        this(context);
-        this.mDevice = device;
-        this.mPath = mDevice.path;
-
-    }
-
-    public FileScanThread(Context context, String path) {
-        this(context);
-        mPath = path;
+        this.mShortcutDao = MovieLibraryRoomDatabase.getDatabase(mContext).getShortcutDao();
     }
 
     @Override
     public void run() {
 
-        if (mDevice == null && !TextUtils.isEmpty(mPath))
-            mDevice = mDeviceDao.querybyMountPath(mPath);
-        mScanDirectories.addAll(mScanDirectoryDao.queryScanDirByDevicePath(mPath));
-        int videoCount = 0;
+        mScanDirectories.addAll(queryLocalDirs());
 
         while (!mScanDirectories.isEmpty()) {
             boolean nomediaFlag = false;
@@ -112,29 +96,26 @@ public class FileScanThread extends Thread {
                     //文件夹加入待扫描队列
                     if (subFile.isDirectory()) {
                         if (mIsOverMaxDirs) {//当前扫描目录队列超过1000个则先缓存
-                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), mDevice.path);
+                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), scanDirectory.devicePath);
                             tmpScanDirectory.parentPath = scanDirectory.parentPath;
                             mTmpScanDirectories.add(tmpScanDirectory);
                             if (mTmpScanDirectories.size() >= MAX_DIRS / 2) {//暂存1000个
                                 mScanDirectoryDao.insertScanDirectories(mTmpScanDirectories.toArray(new ScanDirectory[0]));
                             }
                         } else {
-                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), mDevice.path);
+                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), scanDirectory.devicePath);
                             tmpScanDirectory.parentPath = scanDirectory.parentPath;
                             mScanDirectories.add(tmpScanDirectory);
                         }
                     } else {
                         //获取文件信息，传入文件信息暂存列表
-                        VideoFile videoFile = buildVideoInfoFromFile(subFile, mDevice, scanDirectory);
+                        VideoFile videoFile = buildVideoInfoFromFile(subFile, scanDirectory);
                         if (videoFile != null) {
-                            ++videoCount;
                             mVideoFiles.add(videoFile);
                             mTmpVideoFilePaths.add(videoFile.path);
                         }
                     }
                 }
-                mDevice.fileCount = (videoCount);
-                mDeviceDao.updateDevice(mDevice);
 
             }
         }
@@ -143,7 +124,6 @@ public class FileScanThread extends Thread {
         clearRedundantVideoFiles();
         Intent intent = new Intent();
         intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
-        intent.putExtra(Constants.Extras.DEVICE_MOUNT_PATH, mPath);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
@@ -158,10 +138,9 @@ public class FileScanThread extends Thread {
      * 生成VdieoFile实体类
      *
      * @param file
-     * @param device
      * @return
      */
-    private VideoFile buildVideoInfoFromFile(File file, Device device, ScanDirectory scanDirectory) {
+    private VideoFile buildVideoInfoFromFile(File file, ScanDirectory scanDirectory) {
         String path = file.getPath();
         int dotIndex = path.lastIndexOf(".");
         if (dotIndex < 0)
@@ -173,9 +152,9 @@ public class FileScanThread extends Thread {
         if (Arrays.binarySearch(Constants.VIDEO_SUFFIX, tailEx) >= 0) {
             String fileName = file.getName();
             VideoFile videoFile = new VideoFile();
-            videoFile.devicePath = (device.path);
             videoFile.filename = (fileName);
             videoFile.path = (file.getPath());
+            videoFile.devicePath=scanDirectory.devicePath;
             videoFile.dirPath = scanDirectory.parentPath;
             return videoFile;
         }
@@ -187,7 +166,7 @@ public class FileScanThread extends Thread {
      * 从数据库将数据读入扫描目录队列
      */
     private void loadScanDirectoriesFromDB() {
-        List<ScanDirectory> dbScanDirectories = mScanDirectoryDao.queryTmpScanDirectories(mDevice.path, MAX_DIRS - mScanDirectories.size());
+        List<ScanDirectory> dbScanDirectories = mScanDirectoryDao.queryTmpScanDirectories(MAX_DIRS - mScanDirectories.size());
         if (dbScanDirectories != null && dbScanDirectories.size() > 0) {
             for (ScanDirectory itemDirectory : dbScanDirectories) {
                 mScanDirectories.add(itemDirectory);
@@ -223,9 +202,22 @@ public class FileScanThread extends Thread {
     }
 
     private void clearRedundantVideoFiles() {
-        List<VideoFile> videoFiles = mVideoFileDao.queryInvalidByPaths(mTmpVideoFilePaths, mDevice.path);
-        for (VideoFile videoFile : videoFiles) {
-            LogUtil.e(TAG, "lost file:" + videoFile.filename);
+//        List<VideoFile> videoFiles = mVideoFileDao.queryInvalidByPaths(mTmpVideoFilePaths, mDevice.path);
+//        for (VideoFile videoFile : videoFiles) {
+//            LogUtil.e(TAG, "lost file:" + videoFile.filename);
+//        }
+    }
+
+    private List<ScanDirectory> queryLocalDirs() {
+        List<Shortcut> shortcutList = mShortcutDao.queryAllLocalShortcuts();
+        List<ScanDirectory> scanDirectoryList = new ArrayList<>();
+        for (Shortcut shortcut : shortcutList) {
+            Device device=mDeviceDao.querybyMountPath(shortcut.devicePath);
+            if(device!=null) {
+                ScanDirectory scanDirectory = new ScanDirectory(shortcut.uri, shortcut.devicePath);
+                scanDirectoryList.add(scanDirectory);
+            }
         }
+        return scanDirectoryList;
     }
 }

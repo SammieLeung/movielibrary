@@ -10,11 +10,9 @@ import com.hphtv.movielibrary.adapter.FolderItemAdapter;
 import com.hphtv.movielibrary.databinding.FLayoutFolderBinding;
 import com.hphtv.movielibrary.fragment.dialog.PasswordDialogFragment;
 import com.hphtv.movielibrary.listener.PosterManagerEventHandler;
-import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.viewmodel.fragment.FolderManagerFragmentViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +21,6 @@ import java.util.List;
  */
 public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragmentViewModel, FLayoutFolderBinding> {
     private FolderItemAdapter mFolderItemAdapter;
-    private List<ScanDirectory> mHiddenScanDirectoryList = new ArrayList<>();
 
 //    private FolderItemAdapter.OnClickListener mFolderItemClickListener = new FolderItemAdapter.OnClickListener() {
 //        @Override
@@ -88,7 +85,7 @@ public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragment
 
         if (result.getResultCode() == RESULT_OK) {
             final Uri uri = result.getData().getData();
-            mViewModel.addScanDirectoryByUri(uri, mCallback);
+            mViewModel.addShortcut(uri, mCallback);
             setResult(Activity.RESULT_OK);
         }
     }
@@ -121,20 +118,10 @@ public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragment
     }
 
     public void notifyUpdate() {
-        mViewModel.loadScanDirectory(mCallback);
-        mViewModel.loadHiddenScanDirectory(mCallback);
+        mViewModel.loadShortcuts(mCallback);
     }
 
     private FolderManagerFragmentViewModel.Callback mCallback = new FolderManagerFragmentViewModel.Callback() {
-        @Override
-        public void refreshScanDirectoryList(List<ScanDirectory> scanDirectoryList) {
-            mFolderItemAdapter.addAllScanDirecotry(scanDirectoryList);
-        }
-
-        @Override
-        public void refreshHiddenScanDirectoryList(List<ScanDirectory> scanDirectoryList) {
-//            mHiddenFolderItemApdapter.addAll(scanDirectoryList);
-        }
 
         @Override
         public void refreshShortcutList(List<Shortcut> shortcutList) {
@@ -145,11 +132,5 @@ public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragment
         public void addShortcut(Shortcut shortcut) {
             mFolderItemAdapter.add(shortcut);
         }
-
-        @Override
-        public void addScanDirectory(ScanDirectory scanDirectory) {
-            mFolderItemAdapter.add(scanDirectory);
-        }
-
     };
 }

@@ -1,5 +1,7 @@
 package com.hphtv.movielibrary.data;
 
+import com.hphtv.movielibrary.roomdb.entity.Device;
+
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,7 +19,7 @@ public class Constants {
     /**
      * 设备路径与id映射
      */
-    public static final ConcurrentHashMap<String, Object> devicePathIDs = new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, String> connectDeviceIds = new ConcurrentHashMap<>();
 
     //--------------HashMap keys------------
     //1.for LeftMenuListAdapter and HomePageActivity
@@ -71,13 +73,20 @@ public class Constants {
         int DEVICE_TYPE_SMB = 7;
     }
 
-    public enum FolderPermission{
+    public enum FolderType {
         MOVIE,//电影
         TV_SERIES,//电视节目
         VARIETY_SHOW,//综艺节目
         ANIMATE,//动画
         OTHER,//其他
     }
+
+    public enum AccessPermission{
+        NORMAL,
+        CHILDREN,
+        ADULT
+    }
+
 
     public interface FileType {
         /*全部文件*/

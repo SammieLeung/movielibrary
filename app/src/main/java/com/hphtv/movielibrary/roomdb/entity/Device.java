@@ -30,7 +30,5 @@ public class Device {
     public String path;
     @ColumnInfo(name = "connect_state")
     public int connectState;
-    @ColumnInfo(name = "file_count")
-    public int fileCount;
 
 }

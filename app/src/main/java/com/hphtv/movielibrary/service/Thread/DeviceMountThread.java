@@ -67,13 +67,13 @@ public class DeviceMountThread extends Thread {
             //设备入库
             mDeviceDao.insertDevices(device);
             //保存设备id和设备路径的关联信息
-            Constants.devicePathIDs.put(mMountPath, device.id);//
+            Constants.connectDeviceIds.put(mMountPath, device.id);//
 
             broadIntent.setAction(Constants.BroadCastMsg.DEVICE_UP);
             broadIntent.putExtra(Constants.Extras.DEVICE_ID, device.id);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(broadIntent);
         } else {
-            Constants.devicePathIDs.remove(mMountPath);
+            Constants.connectDeviceIds.remove(mMountPath);
             broadIntent.setAction(Constants.BroadCastMsg.DEVICE_DOWN);
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(broadIntent);
         }

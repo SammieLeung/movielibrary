@@ -13,7 +13,6 @@ import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
-import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.Base64Helper;
@@ -23,11 +22,9 @@ import com.station.kit.util.SharePreferencesTools;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import jcifs.context.SingletonContext;
 import jcifs.smb.SmbFile;
@@ -53,21 +50,7 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
         passwordhasBeenSet = TextUtils.isEmpty(password) ? false : true;
     }
 
-    public void loadScanDirectory(Callback callback) {
-        Observable.just("")
-                .subscribeOn(Schedulers.io())
-                .map(s -> {
-                    List<ScanDirectory> scanDirectoryList = mScanDirectoryDao.queryAllNotHiddenScanDirectories();
-                    return scanDirectoryList;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<ScanDirectory>>() {
-                    @Override
-                    public void onAction(List<ScanDirectory> scanDirectoryList) {
-                        if (callback != null)
-                            callback.refreshScanDirectoryList(scanDirectoryList);
-                    }
-                });
+    public void loadShortcuts(Callback callback) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
@@ -84,21 +67,21 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
                 });
     }
 
-    public void loadHiddenScanDirectory(Callback callback) {
-        Observable.just("")
-                .subscribeOn(Schedulers.io())
-                .map(s -> {
-                    List<ScanDirectory> scanDirectoryList = mScanDirectoryDao.queryAllHiddenScanDirectories();
-                    return scanDirectoryList;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(scanDirectoryList -> {
-                    if (callback != null)
-                        callback.refreshHiddenScanDirectoryList(scanDirectoryList);
-                });
-    }
+//    public void loadHiddenScanDirectory(Callback callback) {
+//        Observable.just("")
+//                .subscribeOn(Schedulers.io())
+//                .map(s -> {
+//                    List<ScanDirectory> scanDirectoryList = mScanDirectoryDao.queryAllHiddenScanDirectories();
+//                    return scanDirectoryList;
+//                })
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(scanDirectoryList -> {
+//                    if (callback != null)
+//                        callback.refreshHiddenScanDirectoryList(scanDirectoryList);
+//                });
+//    }
 
-    public void addScanDirectoryByUri(Uri uri, Callback callback) {
+    public void addShortcut(Uri uri, Callback callback) {
         Observable.just(uri)
                 .subscribeOn(Schedulers.io())
                 .map(uri1 -> {
@@ -111,134 +94,90 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
                         case "dlna":
                             break;
                     }
-//                        int type;
-//                        if (deviceTypeStr.equals(ConstData.DeviceType.STR_LOCAL)) {
-//                            if (StorageHelper.isMountUsb(getApplication(), path)) {
-//                                type = ConstData.DeviceType.DEVICE_TYPE_USB;
-//                            } else if (StorageHelper.isMountSdCard(getApplication(), path)) {
-//                                type = ConstData.DeviceType.DEVICE_TYPE_SDCARDS;
-//                            } else if (StorageHelper.isMountHardDisk(getApplication(), path)) {
-//                                type = ConstData.DeviceType.DEVICE_TYPE_HARD_DISK;
-//                            } else if (StorageHelper.isMountPcie(getApplication(), path)) {
-//                                type = ConstData.DeviceType.DEVICE_TYPE_PCIE;
-//                            } else {
-//                                type = ConstData.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
-//                            }
-//                        } else if (deviceTypeStr.equals(ConstData.DeviceType.STR_DLNA)) {
-//                            type=ConstData.DeviceType.DEVICE_TYPE_DLNA;
-//                        } else if (deviceTypeStr.equals(ConstData.DeviceType.STR_SAMBA)) {
-//                            type=ConstData.DeviceType.DEVICE_TYPE_SMB;
-//                        }
-                    ConcurrentHashMap map = new ConcurrentHashMap();
                     if (deviceTypeStr.equals("local")) {
                         for (Device device : mDeviceDao.qureyAll()) {
                             if (path.contains(device.path)) {
                                 LogUtil.v("id " + device.id + " localpath:" + device.path);
-                                ScanDirectory scanDirectory = mScanDirectoryDao.queryScanDirectoryByPath(path);
-                                if (scanDirectory != null) {
-                                    scanDirectory.isUserAdd = true;
-                                    scanDirectory.isHidden = false;
-                                    mScanDirectoryDao.updateScanDirectory(scanDirectory);
-                                } else {
-                                    scanDirectory = new ScanDirectory(path, device.path);
-                                    scanDirectory.isUserAdd = true;
-                                    mScanDirectoryDao.insertScanDirectories(scanDirectory);
+                                Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
+                                if (shortcut == null) {
+                                    shortcut = new Shortcut(path, device.type, null, null);
+                                    shortcut.devicePath=device.path;
+                                    mShortcutDao.insertShortcut(shortcut);
                                 }
-                                map.put(deviceTypeStr, scanDirectory);
+                                return shortcut;
                             }
                         }
-
                     } else if (deviceTypeStr.equals("dlna") || deviceTypeStr.equals("samba")) {
                         Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                         if (shortcut == null) {
-                            if(deviceTypeStr.equals("samba")) {
+                            if (deviceTypeStr.equals("samba")) {
                                 SmbFile smbFile = new SmbFile(path, SingletonContext.getInstance().withAnonymousCredentials());
-                                shortcut = new Shortcut();
-                                shortcut.name = smbFile.getShare();
-                                shortcut.uri = path;
-                                shortcut.type=Constants.DeviceType.DEVICE_TYPE_SMB;
+                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, smbFile.getShare(), null);
                                 mShortcutDao.insertShortcut(shortcut);
-                            }else {
-                                shortcut=new Shortcut();
-                                shortcut.name="";
-                                shortcut.uri=path;
-                                shortcut.type=Constants.DeviceType.DEVICE_TYPE_DLNA;
+                            } else {
+                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_DLNA, null, null);
                                 mShortcutDao.insertShortcut(shortcut);
                             }
                         }
-                        map.put(deviceTypeStr, shortcut);
+                        return shortcut;
                     }
-                    return map;
+                    return new Shortcut("", 0, null, null);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(map -> {
-                    if(map.keys().hasMoreElements()) {
-                        String deviceType = (String) map.keys().nextElement();
-                        if (callback != null) {
-                            if (deviceType.equals("local")) {
-                                callback.addScanDirectory((ScanDirectory) map.get(deviceType));
-                            } else if (deviceType.equals("dlna") || deviceType.equals("samba")) {
-                                callback.addShortcut((Shortcut) map.get(deviceType));
-                            }
-                        }
-                    }
+                .subscribe(shortcut -> {
+                    if (callback != null)
+                        callback.addShortcut(shortcut);
                 });
 
     }
 
-    public void deleteDirecotryByPath(String path, Callback callback) {
-        Observable.just(path)
+    public void removeShortcut(Shortcut shortcut, Callback callback) {
+        Observable.just(shortcut)
                 .subscribeOn(Schedulers.io())
-                .doOnNext(_path -> {
-                    mScanDirectoryDao.deleteScanDirectory(_path);
+                .doOnNext(_shortcut -> {
+                    mShortcutDao.delete(_shortcut);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(_path1 -> {
-                    loadHiddenScanDirectory(callback);
-                    loadScanDirectory(callback);
+                .subscribe(result -> {
+                    loadShortcuts(callback);
                 });
     }
 
-    public void moveToHidden(String path, Callback callback) {
-        Observable.just(path)
-                .subscribeOn(Schedulers.io())
-                .doOnNext(_path -> {
-                    mScanDirectoryDao.updateScanDirectoryHiddenState(_path, true);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> {
-                    loadScanDirectory(callback);
-                    loadHiddenScanDirectory(callback);
-                });
+//    public void moveToHidden(String path, Callback callback) {
+//        Observable.just(path)
+//                .subscribeOn(Schedulers.io())
+//                .doOnNext(_path -> {
+//                    mScanDirectoryDao.updateScanDirectoryHiddenState(_path, true);
+//                })
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(s -> {
+//                    loadShortcuts(callback);
+//                    loadHiddenScanDirectory(callback);
+//                });
+//
+//    }
+//
+//    public void moveToPublic(String path, Callback callback) {
+//        Observable.just(path)
+//                .subscribeOn(Schedulers.io())
+//                .doOnNext(_path -> {
+//                    mScanDirectoryDao.updateScanDirectoryHiddenState(_path, false);
+//                })
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(s -> {
+//                    loadShortcuts(callback);
+//                    loadHiddenScanDirectory(callback);
+//                });
+//    }
 
-    }
-
-    public void moveToPublic(String path, Callback callback) {
-        Observable.just(path)
-                .subscribeOn(Schedulers.io())
-                .doOnNext(_path -> {
-                    mScanDirectoryDao.updateScanDirectoryHiddenState(_path, false);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> {
-                    loadScanDirectory(callback);
-                    loadHiddenScanDirectory(callback);
-                });
-    }
-
-    public boolean isPasswordHasBeenSet() {
-        return passwordhasBeenSet;
-    }
+//    public boolean isPasswordHasBeenSet() {
+//        return passwordhasBeenSet;
+//    }
 
     public interface Callback {
-        void refreshScanDirectoryList(List<ScanDirectory> scanDirectoryList);
-
-        void refreshHiddenScanDirectoryList(List<ScanDirectory> scanDirectoryList);
-
         void refreshShortcutList(List<Shortcut> shortcutList);
 
         void addShortcut(Shortcut shortcut);
 
-        void addScanDirectory(ScanDirectory scanDirectory);
     }
 }

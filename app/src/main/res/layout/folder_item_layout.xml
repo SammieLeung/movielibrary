@@ -23,6 +23,7 @@
         android:layout_height="@dimen/pm_item_height"
         android:paddingLeft="@dimen/pm_container_padding"
         android:paddingRight="@dimen/pm_container_padding"
+        android:layout_marginBottom="@dimen/pm_container_padding"
         android:background="@drawable/blue_stroke_select_bg_2"
         >
 
@@ -49,7 +50,6 @@
             </TextView>
             <TextView
                 android:textSize="@dimen/pm_item_textsize"
-
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit="marquee_forever"

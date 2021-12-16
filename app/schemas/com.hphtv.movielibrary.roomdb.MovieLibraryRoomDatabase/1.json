@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f72f7c45a1dde78c7af7b3d5aeb17d12",
+    "identityHash": "82958945f7bf95c7f1293d4b279a7ace",
     "entities": [
       {
         "tableName": "actor",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "device",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `type` INTEGER NOT NULL, `path` TEXT, `connect_state` INTEGER NOT NULL, `file_count` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT, `type` INTEGER NOT NULL, `path` TEXT, `connect_state` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -73,12 +73,6 @@
           {
             "fieldPath": "connectState",
             "columnName": "connect_state",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fileCount",
-            "columnName": "file_count",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -488,7 +482,7 @@
       },
       {
         "tableName": "scan_directory",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`scan_dir_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT, `device_path` TEXT, `is_user_add` INTEGER NOT NULL, `is_hidden` INTEGER NOT NULL, `friendly_name` TEXT, `permissions` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`scan_dir_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT, `device_path` TEXT)",
         "fields": [
           {
             "fieldPath": "scanDirId",
@@ -505,30 +499,6 @@
           {
             "fieldPath": "devicePath",
             "columnName": "device_path",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "isUserAdd",
-            "columnName": "is_user_add",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isHidden",
-            "columnName": "is_hidden",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "friendlyName",
-            "columnName": "friendly_name",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "permissions",
-            "columnName": "permissions",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -750,11 +720,11 @@
       },
       {
         "tableName": "shortcut",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `uri` TEXT, `type` INTEGER NOT NULL, `file_count` INTEGER NOT NULL, `poster_count` INTEGER NOT NULL, `permissions` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shortcut_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `device_path` TEXT, `friendly_name` TEXT, `uri` TEXT, `device_type` INTEGER NOT NULL, `file_count` INTEGER NOT NULL, `poster_count` INTEGER NOT NULL, `folder_type` TEXT, `access` TEXT)",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "shortcutId",
+            "columnName": "shortcut_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -765,14 +735,26 @@
             "notNull": false
           },
           {
+            "fieldPath": "devicePath",
+            "columnName": "device_path",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "firendlyName",
+            "columnName": "friendly_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "uri",
             "columnName": "uri",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "type",
-            "columnName": "type",
+            "fieldPath": "devcieType",
+            "columnName": "device_type",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -789,15 +771,21 @@
             "notNull": true
           },
           {
-            "fieldPath": "permissions",
-            "columnName": "permissions",
+            "fieldPath": "folderType",
+            "columnName": "folder_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "access",
+            "columnName": "access",
             "affinity": "TEXT",
             "notNull": false
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "id"
+            "shortcut_id"
           ],
           "autoGenerate": true
         },
@@ -826,7 +814,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f72f7c45a1dde78c7af7b3d5aeb17d12')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '82958945f7bf95c7f1293d4b279a7ace')"
     ]
   }
 }

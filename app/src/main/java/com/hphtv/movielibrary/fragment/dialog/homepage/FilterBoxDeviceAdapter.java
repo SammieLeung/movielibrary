@@ -5,14 +5,12 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.FilterBoxHeaditemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FilterBoxItemLayoutBinding;
-import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,10 +63,7 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
             holder.mViewDataBinding.setPos(position);
         } else if (viewType == VIEWTYPE_DEVICE) {
             Object o = mDataList.get(realPos);
-            if (o instanceof ScanDirectory) {
-                ScanDirectory scanDirectory = (ScanDirectory) o;
-                holder.mViewDataBinding.setName(scanDirectory.friendlyName);
-            } else if (o instanceof Shortcut) {
+           if (o instanceof Shortcut) {
                 Shortcut shortcut = (Shortcut) o;
                 holder.mViewDataBinding.setName(shortcut.name);
             }

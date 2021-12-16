@@ -37,14 +37,14 @@ public interface VideoFileDao {
             "WHERE path=:path")
     public int updateLastPlaytime(String path, long time);
 
-    @Query("SELECT poster FROM "+VIEW.MOVIE_DATAVIEW +" WHERE path=:path AND source=:source")
+    @Query("SELECT poster FROM "+VIEW.MOVIE_DATAVIEW +" WHERE file_uri=:path AND source=:source")
     public String getPoster(String path,String source);
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_path in (:device_paths) AND is_scanned=0")
-    public List<VideoFile> queryAllNotScanedVideoFiles(String... device_paths);
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_path <=5 AND is_scanned=0")
+    public List<VideoFile> queryAllNotScanedVideoFiles();
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);

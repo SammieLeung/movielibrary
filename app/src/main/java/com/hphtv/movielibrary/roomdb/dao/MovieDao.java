@@ -114,7 +114,7 @@ public interface MovieDao {
     public MovieDataView queryMovieDataViewByMovieId(String movie_id, String source);
 
     /**
-     * @param device_id  设备id
+     * @param device_uri  设备id
      * @param year       年份
      * @param genre_name 类型
      * @param order      排序方式
@@ -123,7 +123,7 @@ public interface MovieDao {
      */
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source" +
-            " AND (:device_id IS NULL OR device_id=:device_id)" +
+            " AND (:device_uri IS NULL OR device_uri=:device_uri)" +
             " AND (:year IS NULL OR year=:year)" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name)" +
             " GROUP BY id " +
@@ -139,7 +139,7 @@ public interface MovieDao {
             "CASE WHEN :order =4 THEN last_playtime END ASC," +
             "CASE WHEN :order =5 THEN is_favorite END ASC"
     )
-    public List<MovieDataView> queryMovieDataView(@Nullable String device_id, @Nullable String year, @Nullable String genre_name, int order, String source, @Nullable boolean isDesc);
+    public List<MovieDataView> queryMovieDataView(@Nullable String device_uri, @Nullable String year, @Nullable String genre_name, int order, String source, @Nullable boolean isDesc);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +

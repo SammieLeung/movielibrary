@@ -10,19 +10,24 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  * date:  2021/6/22
  */
 @DatabaseView(value =
-        "SELECT VF.vid,VF.filename,VF.keyword,VF.path,VF.last_playtime,SD__DEV.dir_path,SD__DEV.device_id,SD__DEV.device_path FROM " + TABLE.VIDEOFILE + " AS VF " +
-                "JOIN (SELECT SD.path AS dir_path,DEV.id AS device_id,DEV.path AS device_path FROM " + TABLE.DEVICE + " AS DEV " +
-                "JOIN " + TABLE.SCAN_DIRECTORY + " AS SD " +
-                "ON SD.device_path=DEV.path) AS SD__DEV " +
-                "ON VF.dir_path=SD__DEV.dir_path ",
+        "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.uri AS dir_uri,DEV.path AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode " +
+                "FROM "+TABLE.VIDEOFILE+" AS VF " +
+                "JOIN "+TABLE.SHORTCUT+" AS ST " +
+                "ON VF.dir_path=ST.uri " +
+                "JOIN "+TABLE.DEVICE+" AS DEV " +
+                "ON DEV.path=ST.device_path OR ST.device_path > 5",
         viewName = VIEW.UNRECOGNIZEDFILE_DATAVIEW)
 public class UnrecognizedFileDataView {
     public long vid;
-    public String keyword;
     public String filename;
-    public String last_playtime;
+    public String keyword;
     public String path;
-    public String dir_path;
-    public String device_id;
-    public String device_path;
+    public String dir_uri;
+    public String device_uri;
+    public long last_playtime;
+    public long add_time;
+    public int episode;
+    public int season;
+
+
 }

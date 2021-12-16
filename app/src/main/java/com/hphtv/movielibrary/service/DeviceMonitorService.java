@@ -57,7 +57,7 @@ public class DeviceMonitorService extends Service {
     private MonitorBinder mBinder;
     private StorageManager mStorageManager;
     private MovieScanService mMovieScanService;
-    private ConcurrentHashSet<String> mPosterPairingDevice=new ConcurrentHashSet<>();
+    private ConcurrentHashSet<String> mPosterPairingDevice = new ConcurrentHashSet<>();
     /**
      * 单线程池服务，设备挂载，卸载线程
      */
@@ -248,9 +248,9 @@ public class DeviceMonitorService extends Service {
                     break;
                 //本地广播
                 case Constants.BroadCastMsg.DEVICE_UP:
-                    String mountPath = intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
-                    LogUtil.v("currentPath=" + mountPath);
-                    executeOnFileScanThread(mountPath);
+//                    String mountPath = intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
+//                    LogUtil.v("currentPath=" + mountPath);
+                    executeOnFileScanThread();
                     break;
                 case Constants.BroadCastMsg.DEVICE_DOWN:
                     break;
@@ -258,8 +258,7 @@ public class DeviceMonitorService extends Service {
                     reScanDevices();
                     break;
                 case Constants.BroadCastMsg.POSTER_PAIRING:
-                    String path=intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
-                    startScanWithNotScannedFiles(path);
+                    startScanWithNotScannedFiles();
                     break;
             }
         }
@@ -312,34 +311,21 @@ public class DeviceMonitorService extends Service {
         mDeviceMountExecutor.execute(new DeviceMountThread(this, deviceName, deviceType, localPath, isFromNetwork, networkPath, mountState));
     }
 
-    public void executeOnFileScanThread(Device device) {
-        mFileScanExecutor.execute(new FileScanThread(this, device));
+    public void executeOnFileScanThread() {
+        mFileScanExecutor.execute(new FileScanThread(this));
     }
 
-
-    public void executeOnFileScanThread(String device_path) {
-        mFileScanExecutor.execute(new FileScanThread(this, device_path));
-    }
-
-    public void startScanWithNotScannedFiles(String mountPath) {
-        Observable.just(mountPath)
+    public void startScanWithNotScannedFiles() {
+        Observable.just("")
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(Schedulers.from(mSingleThreadPool))
-                .map(mount_path -> {
-                    mPosterPairingDevice.add(mount_path);
-                    Device device = mDeviceDao.querybyMountPath(mount_path);
-                    if (device != null) {
-                        List<VideoFile> videoFiles = getNotScannedFiles(device);
-                        return videoFiles;
-                    }
-                    return new ArrayList<VideoFile>();
+                .map(arg -> {
+                    List<VideoFile> videoFiles = getNotScannedFiles();
+                    return videoFiles;
                 })
-                .onErrorReturn(new Function<Throwable, List<VideoFile>>() {
-                    @Override
-                    public List<VideoFile> apply(Throwable throwable) throws Throwable {
-                        throwable.printStackTrace();
-                        return new ArrayList<VideoFile>();
-                    }
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return new ArrayList<VideoFile>();
                 })
                 .subscribe(new SimpleObserver<List<VideoFile>>() {
                     @Override
@@ -348,7 +334,6 @@ public class DeviceMonitorService extends Service {
                             if (mMovieScanService != null)
                                 mMovieScanService.addToPairingQueue(videoFiles);
                         } else {    //TODO mPosterPairingDevice处理
-                            mPosterPairingDevice.remove(mountPath);
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH));
                         }
                     }
@@ -358,8 +343,8 @@ public class DeviceMonitorService extends Service {
     /**
      * 获取所以未扫描的文件
      */
-    private List<VideoFile> getNotScannedFiles(Device device) {
-        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedVideoFiles(device.path);
+    private List<VideoFile> getNotScannedFiles() {
+        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedVideoFiles();
         return mountedDeviceFiles;
     }
 

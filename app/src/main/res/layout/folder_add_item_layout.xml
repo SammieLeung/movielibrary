@@ -11,6 +11,7 @@
     <RelativeLayout
         android:onClick="@{()->PosterManagerEventHandler.openShortcutPicker(activity)}"
         android:layout_width="match_parent"
+        android:layout_marginBottom="@dimen/pm_container_padding"
         android:background="@drawable/blue_stroke_select_bg_2"
         android:layout_height="@dimen/pm_item_height">
 
