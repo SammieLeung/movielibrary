@@ -1,10 +1,13 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.activity.AppBaseActivity;
@@ -12,6 +15,7 @@ import com.hphtv.movielibrary.activity.bean.FolderItem;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FolderAddItemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
+import com.hphtv.movielibrary.listener.PosterManagerEventHandler;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +35,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     private List<FolderItem> mFolderItemList = new ArrayList<>();
     private List<CommonViewHolder> mViewHolderList = new ArrayList<>();
     private Context mContext;
-
+    private PosterManagerEventHandler mEventHandler;
 
     Comparator mComparator = (Comparator<FolderItem>) (o1, o2) -> {
 
@@ -49,6 +53,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
     public FolderItemAdapter(Context context) {
         mContext = context;
+        mEventHandler=new PosterManagerEventHandler((AppBaseActivity) mContext);
     }
 
     @NonNull
@@ -58,16 +63,30 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         if (viewType == TYPE_HEAD) {
             FolderAddItemLayoutBinding binding = FolderAddItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             CommonViewHolder<FolderAddItemLayoutBinding> vh = new CommonViewHolder<>(binding);
-            binding.setActivity((AppBaseActivity) mContext);
+            binding.setPosterHandler(mEventHandler);
             return vh;
         } else {
             FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
+            binding.getRoot().setOnClickListener(mOnClickListener);
             return vh;
         }
     }
 
+    private View.OnClickListener mOnClickListener=new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            FolderItem folderItem= (FolderItem) v.getTag();
+            Shortcut shortcut=folderItem.item;
+            if(shortcut.devcieType>5) {
+                Intent intent = new Intent();
+                intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
+                intent.putExtra(Constants.Extras.NETWORK_DIR_URI,shortcut.queryUri);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }
 
+        }
+    };
     @Override
     public int getItemViewType(int position) {
         if (position == 0)
@@ -80,9 +99,8 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         if (getItemViewType(position) == TYPE_FOLDER) {
             FolderItem folderItem = mFolderItemList.get(position - 1);
             CommonViewHolder<FolderItemLayoutBinding> vh = holder;
-            vh.mDataBinding.setName(folderItem.title);
-            vh.mDataBinding.setUri(folderItem.uri);
-            vh.itemView.setTag(folderItem);
+            vh.mDataBinding.setItem(folderItem);
+            vh.mDataBinding.getRoot().setTag(folderItem);
         }
     }
 
@@ -124,7 +142,15 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         folderItem.uri = shortcut.uri;
         folderItem.item = shortcut;
         folderItem.type = shortcut.devcieType;
+        folderItem.file_count=shortcut.fileCount;
+        folderItem.poster_count=shortcut.posterCount;
+
         return folderItem;
+    }
+
+    public void pickerClose(){
+        if(mEventHandler!=null)
+            mEventHandler.pickerClose();
     }
 
 }

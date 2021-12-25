@@ -143,6 +143,7 @@ public class Constants {
         String DEVICE_MOUNT_PATH = "device_mount_path";
         String DEVICE_NETWORKPATH = "device_networkpath";
         String MOUNT_TYPE = "device_type";
+        String NETWORK_DIR_URI="network_dir_uri";
         String IS_FROM_NETWORK = "is_from_network";
         String DEVICE_ID = "device_id";
 
@@ -168,7 +169,8 @@ public class Constants {
          */
         String DEVICE_UP = "action_mounted";
         String DEVICE_DOWN = "action_unmounted";
-        String POSTER_PAIRING = "poster_pairing";
+        String POSTER_PAIRING = "action.poster_pairing";
+        String POSTER_PAIRING_FOR_NETWORK_URI ="action.network_uri.poster_pairing";
 
         /**
          * 重新扫描设备

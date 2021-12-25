@@ -4,12 +4,12 @@
     <data>
         <import type="com.hphtv.movielibrary.listener.PosterManagerEventHandler"/>
         <variable
-            name="activity"
-            type="com.hphtv.movielibrary.activity.AppBaseActivity" />
+            name="posterHandler"
+            type="PosterManagerEventHandler" />
     </data>
 
     <RelativeLayout
-        android:onClick="@{()->PosterManagerEventHandler.openShortcutPicker(activity)}"
+        android:onClick="@{()->posterHandler.openShortcutPicker()}"
         android:layout_width="match_parent"
         android:layout_marginBottom="@dimen/pm_container_padding"
         android:background="@drawable/blue_stroke_select_bg_2"

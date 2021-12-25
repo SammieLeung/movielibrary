@@ -28,21 +28,26 @@ public class Shortcut {
     @ColumnInfo(name = "friendly_name")
     public String firendlyName;
     public String uri;
-    @ColumnInfo(name="device_type")
+    @ColumnInfo(name = "device_type")
     public int devcieType;//smb
     @ColumnInfo(name = "file_count")
-    public int fileCount;
+    public int fileCount = 0;
     @ColumnInfo(name = "poster_count")
-    public int posterCount;
+    public int posterCount = 0;
     @ColumnInfo(name = "folder_type")
     public Constants.FolderType folderType;
     public Constants.AccessPermission access;
+    @ColumnInfo(name = "query_uri")
+    public String queryUri;
+    @ColumnInfo(name = "is_scanned")
+    public int isScanned = 0;
 
-    public Shortcut(String uri, int devcieType,String name,String firendlyName) {
+    public Shortcut(String uri, int devcieType, String name, String firendlyName, String queryUri) {
         this.folderType = Constants.FolderType.MOVIE;
         this.access = Constants.AccessPermission.NORMAL;
         this.uri = uri;
         this.devcieType = devcieType;
+        this.queryUri = queryUri;
         String tmp;
         switch (devcieType) {
             case Constants.DeviceType.DEVICE_TYPE_LOCAL:
@@ -53,12 +58,12 @@ public class Shortcut {
             case Constants.DeviceType.DEVICE_TYPE_HARD_DISK:
             case Constants.DeviceType.DEVICE_TYPE_SMB:
                 tmp = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
-                this.name = TextUtils.isEmpty(name)?tmp.substring(tmp.lastIndexOf("/") + 1):name;
-                this.firendlyName = TextUtils.isEmpty(firendlyName)? this.name:firendlyName;
+                this.name = TextUtils.isEmpty(name) ? tmp.substring(tmp.lastIndexOf("/") + 1) : name;
+                this.firendlyName = TextUtils.isEmpty(firendlyName) ? this.name : firendlyName;
                 break;
             case Constants.DeviceType.DEVICE_TYPE_DLNA:
-                this.name =  TextUtils.isEmpty(name)?uri.substring(uri.lastIndexOf(":") + 1):name;
-                this.firendlyName = TextUtils.isEmpty(firendlyName)? this.name:firendlyName;
+                this.name = TextUtils.isEmpty(name) ? uri.substring(uri.lastIndexOf(":") + 1) : name;
+                this.firendlyName = TextUtils.isEmpty(firendlyName) ? this.name : firendlyName;
                 break;
         }
     }

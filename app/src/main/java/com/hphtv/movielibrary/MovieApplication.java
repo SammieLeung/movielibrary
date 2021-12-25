@@ -3,9 +3,15 @@ package com.hphtv.movielibrary;
 import android.app.Application;
 import android.content.Intent;
 
+import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
+import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.umeng.analytics.MobclickAgent;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MovieApplication extends Application {
     public static final boolean DEBUG = true;
@@ -17,6 +23,7 @@ public class MovieApplication extends Application {
         super.onCreate();
         sMovieApplication =this;
         init();
+        initSambaAuthHelper();
     }
 
     private void init(){
@@ -24,8 +31,21 @@ public class MovieApplication extends Application {
         MobclickAgent.setScenarioType(sMovieApplication, MobclickAgent.EScenarioType.E_UM_NORMAL);
         Intent service=new Intent(sMovieApplication, DeviceMonitorService.class);
         startService(service);
+
     }
 
+
+    private void initSambaAuthHelper(){
+        Observable.just("")
+                .observeOn(Schedulers.newThread())
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                        JcifsUtils.getInstance(MovieApplication.this);
+                        SambaAuthHelper.getInstance().init(MovieApplication.this);
+                    }
+                });
+    }
     @Override
     public void onTerminate() {
         super.onTerminate();

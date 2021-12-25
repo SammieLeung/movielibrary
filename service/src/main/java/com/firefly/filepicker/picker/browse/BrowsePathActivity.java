@@ -96,7 +96,8 @@ public class BrowsePathActivity extends AppCompatActivity {
         mFragment = new BrowsePathFragment();
         mFragment.setTitle(fragmentTitle);
 
-        getFragmentManager().beginTransaction()
+
+        getSupportFragmentManager().beginTransaction()
                 .add(R.id.fragment, mFragment)
                 .commit();
         mPresenter = new BrowsePathPresenter(mFragment, this);

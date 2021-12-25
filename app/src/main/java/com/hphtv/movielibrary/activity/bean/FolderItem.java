@@ -2,6 +2,8 @@ package com.hphtv.movielibrary.activity.bean;
 
 import androidx.annotation.NonNull;
 
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+
 import java.util.Objects;
 
 /**
@@ -12,8 +14,11 @@ public class FolderItem {
     public String title;
     public String uri;
     @NonNull
-    public Object item;
+    public Shortcut item;
     public int type;
+    public int poster_count;
+    public int file_count;
+    public int state;
 
     @Override
     public boolean equals(Object o) {

@@ -3,22 +3,12 @@
 
     <data>
         <import type="android.view.View"/>
-        <variable
-            name="uri"
-            type="String" />
-        <variable
-            name="name"
-            type="String" />
-        <variable
-            name="status_1"
-            type="String" />
-        <variable
-            name="status_2"
-            type="String" />
+        <import type="com.hphtv.movielibrary.activity.bean.FolderItem"/>
+        <variable name="item"
+            type="FolderItem"/>
     </data>
 
     <RelativeLayout
-        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="@dimen/pm_item_height"
         android:paddingLeft="@dimen/pm_container_padding"
@@ -40,7 +30,7 @@
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:id="@+id/tv_shorcut_name"
-                android:text="@{name}"
+                android:text="@{item.title}"
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:layout_width="match_parent"
@@ -54,7 +44,7 @@
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:id="@+id/tv_shorcut_uri"
-                android:text="@{uri}"
+                android:text="@{item.uri}"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
@@ -68,14 +58,14 @@
             android:orientation="horizontal">
             <TextView
                 android:textSize="@dimen/pm_item_textsize"
-                android:text="@{status_1}"
+                android:text="@{String.valueOf(item.poster_count)}"
                 android:gravity="center"
                 android:id="@+id/tv_shorcut_status_1"
                 android:layout_marginRight="@dimen/pm_container_padding"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"/>
             <TextView
-                android:text="@{status_2}"
+                android:text="@{String.valueOf(item.file_count)}"
                 android:textSize="@dimen/pm_item_textsize"
                 android:gravity="center"
                 android:layout_toRightOf="@id/tv_shorcut_status_1"

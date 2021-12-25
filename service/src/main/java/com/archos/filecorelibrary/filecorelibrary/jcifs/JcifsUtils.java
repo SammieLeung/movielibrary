@@ -21,6 +21,8 @@ import android.net.Uri;
 import androidx.preference.PreferenceManager;
 
 import com.archos.filecorelibrary.filecorelibrary.samba.NetworkCredentialsDatabase;
+import com.firefly.filepicker.roomdb.Credential;
+import com.firefly.filepicker.utils.SambaAuthHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +225,7 @@ public class JcifsUtils {
     }
 
     private static CIFSContext getCifsContext(Uri uri, Boolean isSmbV2) {
-        NetworkCredentialsDatabase.Credential cred = NetworkCredentialsDatabase.getInstance().getCredential(uri.toString());
+        Credential cred = SambaAuthHelper.getInstance().getCredential(uri.toString());
         CIFSContext context = null;
         if (cred != null) {
             log.debug("getCifsContext using credentials for " + uri);

@@ -48,7 +48,7 @@ public class FilesRepository implements IFileSource {
             case Node.INTERNAL_DEVICE:
 
             case Node.SAMBA:
-            case SAMBA_DEVICE:
+            case Node.SAMBA_DEVICE:
                 svf = new SmbScan(mContext);
                 break;
             case Node.ROOT:

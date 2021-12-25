@@ -1,16 +1,25 @@
 package com.firefly.filepicker.data.source;
 
 import android.content.Context;
+import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.LongDef;
+
+import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.firefly.filepicker.data.bean.FileItem;
+import com.firefly.filepicker.roomdb.Credential;
 import com.firefly.filepicker.utils.SambaAuthHelper;
+import com.station.kit.util.LogUtil;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLConnection;
 
 import jcifs.CIFSContext;
 import jcifs.context.SingletonContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -49,13 +58,33 @@ public class SmbScan extends AbstractScanFiles {
         }
 
         try {
-            SmbFile smbFile = new SmbFile(mNode.getId(), SingletonContext.getInstance().withAnonymousCredentials());
-
-            if (smbFile.getURL().getUserInfo() == null) {
-                CIFSContext cifsContext =
-                        SambaAuthHelper.read(mContext, SambaAuthHelper.getSmbAuthKey(smbFile));
-                smbFile = new SmbFile(smbFile.getURL(), cifsContext);
+//            SmbFile smbFile = new SmbFile(mNode.getId(), SingletonContext.getInstance().withAnonymousCredentials());
+//            Log.d(TAG, "scan:userInfo: " + smbFile.getURL().getUserInfo());
+//            if (smbFile.getURL().getUserInfo() == null) {
+//                CIFSContext cifsContext =
+//                        SambaAuthHelper.read(mContext, SambaAuthHelper.getSmbAuthKey(smbFile));
+            CIFSContext cifsContext=null;
+            Credential credential = SambaAuthHelper.getInstance().getCredential(mNode.getId());
+            if(credential==null){
+                    Uri tmpUri=Uri.parse(mNode.getId());
+                    String userInfo=tmpUri.getUserInfo();
+                    if(!TextUtils.isEmpty(userInfo)){
+                        String[] splitStrs=userInfo.split(":");
+                        if(splitStrs.length>1){
+                            cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(splitStrs[0],splitStrs[1]));
+                        }
+                    }
+            }else{
+                cifsContext=SambaAuthHelper.getInstance().getCIFSContext(mNode.getId());
             }
+//            if (TextUtils.isEmpty(credential.getUsername()) && TextUtils.isEmpty(credential.getPassword())) {
+//                cifsContext=JcifsUtils.getBaseContext(true).withAnonymousCredentials();
+//            } else {
+//                cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(mNode.getId(), credential.getUsername(), credential.getPassword()));
+//            }
+
+            SmbFile smbFile = new SmbFile(mNode.getId(), cifsContext);
+//            }
 
             scan(smbFile, DEPTH);
             finish();
@@ -89,6 +118,7 @@ public class SmbScan extends AbstractScanFiles {
         try {
             smbFiles = smbFile.listFiles();
         } catch (SmbException e) {
+            e.printStackTrace();
             Log.d(TAG, "Can't scan the path: " + smbFile.getName());
             return;
         }
@@ -97,29 +127,37 @@ public class SmbScan extends AbstractScanFiles {
             if (isCancel) {
                 return;
             } else if (file.isDirectory()) {
-                if (depth > 0) {
+//                if (depth > 0) {//TODO 需要增加搜索深度限制
                     scan(file, depth - 1);
-                }
+//                }
             } else {
                 FileItem item = null;
-                String contentType = file.getContentType() != null ?
-                        file.getContentType()
-                        : URLConnection.guessContentTypeFromName(file.getName());
+                try {
+                    String contentType = file.getContentType() != null ?
+                            file.getContentType()
+                            : URLConnection.guessContentTypeFromName(file.getName());
+                    Log.d(TAG, "scan: contentType "+contentType+" name:"+file.getName());
 
-                if (mContentTypePre == null
-                        || (contentType != null && contentType.startsWith(mContentTypePre))) {
-                    item = new FileItem(
-                            mType,
-                            file.getName(),
-                            file.getCanonicalPath(),
-                            null,
-                            contentType,
-                            String.valueOf(smbFile.getLastModified()),
-                            file.length(),
-                            FileItem.SMB);
+                    if (mContentTypePre == null
+                            || (contentType != null && contentType.startsWith(mContentTypePre))) {
+                        item = new FileItem(
+                                mType,
+                                file.getName(),
+                                file.getCanonicalPath(),
+                                null,
+                                contentType,
+                                String.valueOf(smbFile.getLastModified()),
+                                file.length(),
+                                FileItem.SMB);
 
-                    addResultItem(item);
+                        addResultItem(item);
+                    }
+                }catch (Exception e){
+                    Log.e(TAG,"error:name "+file.getPath());
+
                 }
+
+
             }
         }
     }

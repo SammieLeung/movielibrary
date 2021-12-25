@@ -100,14 +100,12 @@ public class PickerContentProvider extends ContentProvider {
 
     @Override
     public String getType(@NonNull Uri uri) {
-        // TODO: Implement this to handle requests for the MIME type of the data
         // at the given URI.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
-        // TODO: Implement this to handle requests to insert a new row.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -205,7 +203,7 @@ public class PickerContentProvider extends ContentProvider {
             return null;
         }
         Log.d(TAG, Arrays.toString(ids));
-        Device device = Constants.deviceHashMap.get(ids[0]);
+        Device device = Constants.deviceHashMap.get(ids[0]);//TODO  需要解决DLNA设备持久化问题
 
         return new Node(ids[1], "", Node.DLNA, device);
     }
@@ -401,7 +399,6 @@ public class PickerContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        // TODO: Implement this to handle requests to update one or more rows.
         throw new UnsupportedOperationException("Not support");
     }
 

@@ -1,15 +1,16 @@
 package com.firefly.filepicker.picker.browse;
 
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.firefly.filepicker.R;
 import com.firefly.filepicker.commom.widgets.FPDialog;
 import com.firefly.filepicker.data.bean.FileItem;
@@ -33,6 +35,8 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jcifs.CIFSContext;
+import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
 
@@ -105,7 +109,11 @@ public class BrowsePathFragment extends Fragment
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.deinit();
+        try {
+            mPresenter.deinit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -196,23 +204,22 @@ public class BrowsePathFragment extends Fragment
             if (!TextUtils.isEmpty(data.getString("url"))) {
                 urlView.setText(data.getString("url"));
             }
+        }else{
+            checkBox.setChecked(false);
+            usernameView.setEnabled(true);
+            passwordView.setEnabled(true);
+            usernameView.requestFocus();
         }
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    usernameView.setFocusable(false);
                     usernameView.setEnabled(false);
-                    passwordView.setFocusable(false);
                     passwordView.setEnabled(false);
                 } else {
-                    usernameView.setFocusable(true);
                     usernameView.setEnabled(true);
-                    usernameView.setFocusableInTouchMode(true);
-                    passwordView.setFocusable(true);
                     passwordView.setEnabled(true);
-                    passwordView.setFocusableInTouchMode(true);
                     usernameView.requestFocus();
                 }
             }
@@ -250,7 +257,8 @@ public class BrowsePathFragment extends Fragment
                 if (isAddNew) {
                     SmbFile smbFile;
                     try {
-                        smbFile = new SmbFile(url);
+                        CIFSContext cifsContext=JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(username,password));
+                        smbFile = new SmbFile(url,cifsContext);
                     } catch (MalformedURLException e) {
                         Toast.makeText(getActivity(), R.string.url_is_invalid, Toast.LENGTH_LONG).show();
                         e.printStackTrace();
@@ -383,6 +391,7 @@ public class BrowsePathFragment extends Fragment
 
     @Override
     public void onClick(Node node) {
+        Log.w(TAG, "onClick: Node "+node.getTitle()+" id:"+node.getId() );
         if (PARENT_NODE_ID.equals(node.getId())) {
             if (mCurrentNode.getParent() != null) {
                 mCurrentNode = mCurrentNode.getParent();
@@ -504,6 +513,7 @@ public class BrowsePathFragment extends Fragment
                     }
                 } catch (SmbException e) {
                     e.printStackTrace();
+                    showAuthDialog(node, true);
                 }
             }
         } else if (node.getType() != Node.SAMBA_CATEGORY

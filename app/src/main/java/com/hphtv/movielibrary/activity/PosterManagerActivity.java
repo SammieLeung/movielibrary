@@ -81,8 +81,7 @@ public class PosterManagerActivity extends AppBaseActivity<FolderManagerFragment
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
-        PosterManagerEventHandler.isPickerOpening = false;
-
+        mFolderItemAdapter.pickerClose();
         if (result.getResultCode() == RESULT_OK) {
             final Uri uri = result.getData().getData();
             mViewModel.addShortcut(uri, mCallback);

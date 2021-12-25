@@ -3,10 +3,13 @@ package com.hphtv.movielibrary.viewmodel.fragment;
 import android.app.Application;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
+import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -19,6 +22,7 @@ import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
 
+import org.apache.http.conn.SchemePortResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -26,8 +30,10 @@ import java.util.List;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import jcifs.CIFSContext;
 import jcifs.context.SingletonContext;
 import jcifs.smb.SmbFile;
+import retrofit2.http.Url;
 
 /**
  * author: Sam Leung
@@ -84,9 +90,9 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
     public void addShortcut(Uri uri, Callback callback) {
         Observable.just(uri)
                 .subscribeOn(Schedulers.io())
-                .map(uri1 -> {
+                .map(queryUri -> {
                     String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
-                    String base64Id = uri1.getPathSegments().get(1);//dir id
+                    String base64Id = queryUri.getPathSegments().get(1);//dir id
                     String path = Base64Helper.decode(base64Id);
                     switch (deviceTypeStr) {
                         case "local":
@@ -100,7 +106,7 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
                                 LogUtil.v("id " + device.id + " localpath:" + device.path);
                                 Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                                 if (shortcut == null) {
-                                    shortcut = new Shortcut(path, device.type, null, null);
+                                    shortcut = new Shortcut(path, device.type, null, null,null);
                                     shortcut.devicePath=device.path;
                                     mShortcutDao.insertShortcut(shortcut);
                                 }
@@ -108,20 +114,34 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
                             }
                         }
                     } else if (deviceTypeStr.equals("dlna") || deviceTypeStr.equals("samba")) {
+
                         Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                         if (shortcut == null) {
                             if (deviceTypeStr.equals("samba")) {
-                                SmbFile smbFile = new SmbFile(path, SingletonContext.getInstance().withAnonymousCredentials());
-                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, smbFile.getShare(), null);
+                                Uri sambaUri= Uri.parse(path);
+                                Log.d(TAG, "addShortcut: getUserInfo:"+sambaUri.getUserInfo());
+                                String userInfo=sambaUri.getUserInfo();
+                                String name="";
+                                String password="";
+                                String domain="";
+                                if(!TextUtils.isEmpty(userInfo)){
+                                    String[] strs=userInfo.split(":");
+                                    name=strs[0];
+                                    password=strs[1];
+                                }
+//                                CIFSContext context=SambaAuthHelper.getInstance().getCIFSContext(path);
+                                path=path.replaceFirst("smb://.*@","smb://");
+//                                SmbFile smbFile = new SmbFile(path, context);
+                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, null, null,queryUri.toString());
                                 mShortcutDao.insertShortcut(shortcut);
                             } else {
-                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_DLNA, null, null);
+                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_DLNA, null, null,queryUri.toString());
                                 mShortcutDao.insertShortcut(shortcut);
                             }
                         }
                         return shortcut;
                     }
-                    return new Shortcut("", 0, null, null);
+                    return new Shortcut("", 0, null, null,"");
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(shortcut -> {

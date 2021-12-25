@@ -7,11 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,7 +24,6 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
-import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.DeviceMountThread;
@@ -45,7 +47,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -202,6 +203,7 @@ public class DeviceMonitorService extends Service {
         localFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
         localFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
         localFilter.addAction(Constants.BroadCastMsg.POSTER_PAIRING);
+        localFilter.addAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
     }
 
@@ -259,6 +261,10 @@ public class DeviceMonitorService extends Service {
                     break;
                 case Constants.BroadCastMsg.POSTER_PAIRING:
                     startScanWithNotScannedFiles();
+                    break;
+                case Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI:
+                    String query_uri=intent.getStringExtra(Constants.Extras.NETWORK_DIR_URI);
+                    startScanNetworkFiles(query_uri);
                     break;
             }
         }
@@ -340,6 +346,34 @@ public class DeviceMonitorService extends Service {
                 });
     }
 
+
+    public void startScanNetworkFiles(String query_dir){
+        Observable.just(query_dir)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .observeOn(Schedulers.from(mSingleThreadPool))
+                .map(uri->{
+                    Cursor cursor=getContentResolver().query(Uri.parse(uri),null,null,null,null);
+                    if(cursor!=null){
+                        while (cursor.moveToNext()){
+                            Log.w(TAG, "startScanNetworkFiles:document_id "+  cursor.getString(cursor.getColumnIndex("document_id")) );
+                            Log.w(TAG, "startScanNetworkFiles:mime_type "+  cursor.getString(cursor.getColumnIndex("mime_type")) );
+                            Log.w(TAG, "startScanNetworkFiles:_display_name "+  cursor.getString(cursor.getColumnIndex("_display_name")) );
+                            Log.w(TAG, "startScanNetworkFiles:last_modified "+  cursor.getString(cursor.getColumnIndex("last_modified")) );
+                            Log.w(TAG, "startScanNetworkFiles:_size "+  cursor.getString(cursor.getColumnIndex("_size")) );
+                            Log.w(TAG, "startScanNetworkFiles:path "+  cursor.getString(cursor.getColumnIndex("path")) );
+                            Log.w(TAG, "startScanNetworkFiles:file_source "+  cursor.getString(cursor.getColumnIndex("file_source")) );
+                        }
+
+                    }
+                    return 1;
+                })
+                .subscribe(new SimpleObserver<Integer>() {
+                    @Override
+                    public void onAction(Integer integer) {
+
+                    }
+                });
+    }
     /**
      * 获取所以未扫描的文件
      */

@@ -12,17 +12,28 @@ import com.hphtv.movielibrary.data.Constants;
  * date:  2021/12/10
  */
 public class PosterManagerEventHandler {
-    public static boolean isPickerOpening=false;
-    public static void openShortcutPicker(AppBaseActivity activity){
+    public AppBaseActivity mAppBaseActivity;
+    public boolean isPickerOpening = false;
+
+    public PosterManagerEventHandler(AppBaseActivity appBaseActivity) {
+        mAppBaseActivity = appBaseActivity;
+    }
+
+    public void openShortcutPicker() {
         if (!isPickerOpening) {
             synchronized (PosterManagerEventHandler.class) {
                 if (!isPickerOpening) {
                     isPickerOpening = true;
                     Intent picker_intent = new Intent(Constants.ACTION_FILE_PICKER);
-                    activity.startActivityForResult(picker_intent);
+                    mAppBaseActivity.startActivityForResult(picker_intent);
                 }
             }
         }
     }
+
+    public void pickerClose(){
+        isPickerOpening=false;
+    }
+
 
 }

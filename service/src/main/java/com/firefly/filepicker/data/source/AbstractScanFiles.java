@@ -89,7 +89,7 @@ public abstract class AbstractScanFiles implements IScanFiles {
     protected void error(@AbstractScanFiles.Status int status, String msg) {
         if (mListener != null) {
             mListener.error(status, msg);
-            mListener.finish();
+//            mListener.finish();   //TODO 放过部分错误。
         }
     }
 

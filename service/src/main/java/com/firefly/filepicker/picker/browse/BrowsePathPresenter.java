@@ -18,6 +18,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.archos.filecorelibrary.filecorelibrary.jcifs.NovaSmbFile;
 import com.archos.filecorelibrary.filecorelibrary.samba.SambaDiscovery;
 import com.archos.filecorelibrary.filecorelibrary.samba.Share;
@@ -28,11 +29,11 @@ import com.firefly.filepicker.data.Constants;
 import com.firefly.filepicker.data.bean.FileItem;
 import com.firefly.filepicker.data.bean.Node;
 import com.firefly.filepicker.data.bean.xml.SaveItem;
+import com.firefly.filepicker.roomdb.Credential;
 import com.firefly.filepicker.utils.Base64Helper;
 import com.firefly.filepicker.utils.MediaDirHelper;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.firefly.filepicker.utils.SmbFileHelper;
-import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
 
 import org.fourthline.cling.model.action.ActionInvocation;
@@ -54,11 +55,8 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import jcifs.CIFSContext;
-import jcifs.context.SingletonContext;
 import jcifs.smb.NtlmPasswordAuthenticator;
 import jcifs.smb.SmbException;
 import jcifs.smb.SmbFile;
@@ -94,7 +92,6 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     private SparseArray<Node> mCancelTasks = new SparseArray<>();
 
-    private Map<String, CIFSContext> mSmbAuthMap;
 
     private SambaDiscovery mSambaDiscovery;
 
@@ -142,30 +139,29 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     };
 
     private SmbFileFilter mFileFilter = f -> {
-        final String filename=f.getName();
+        final String filename = f.getName();
         try {
             if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
                 return keepFile(filename);
-            }
-            else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
+            } else if (f.isDirectory()) { // IMPORTANT: call the _noquery version to avoid network access
                 return keepDirectory(filename);
-            }
-            else {
-                Log.d(TAG, "SmbFileFilter: neither file nor directory: "+filename);
+            } else {
+                Log.d(TAG, "SmbFileFilter: neither file nor directory: " + filename);
                 return false;
             }
         } catch (SmbException e) {
-            Log.d(TAG, "accept: SmbException "+e.getNtStatus());
+            Log.d(TAG, "accept: SmbException " + e.getNtStatus());
             e.printStackTrace();
         }
         return false;
     };
 
 
-    private boolean mKeepHiddenFiles=true;
+    private boolean mKeepHiddenFiles = true;
+
     protected boolean keepFile(String filename) {
         // don't keep a hidden file
-        if (filename.startsWith(".")&&!mKeepHiddenFiles) {
+        if (filename.startsWith(".") && !mKeepHiddenFiles) {
             return false;
         }
         // keep file if filter list contains its extension
@@ -239,9 +235,9 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
                     new Thread(() -> {
                         try {
-                            NovaSmbFile novaSmbFile = getSmbFile(share.toUri());
+                            NovaSmbFile novaSmbFile = getSmbFile(share.toUri());//TODO getIpFromShareName；
 //                            SmbFile[] smbFiles = novaSmbFile.getSmbFile().listFiles();
-                            getNodeFromSmbFiles(novaSmbFile.getSmbFile(), mCurrentNode, Node.SAMBA_DEVICE,share.getDisplayName());
+                            getNodeFromSmbFiles(novaSmbFile.getSmbFile(), mCurrentNode, Node.SAMBA_DEVICE, share.getDisplayName());
                             updateTreeView(mCurrentNode);
                         } catch (MalformedURLException e) {
                             e.printStackTrace();
@@ -316,14 +312,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         mContext.registerReceiver(mDeviceChangedReceiver, deviceChangedFilter);
         mContext.registerReceiver(mDeviceChangedReceiver, deviceChangedFilter1);
 
-        mSmbAuthMap = SambaAuthHelper.readAll(mContext);
+        SambaAuthHelper.getInstance().init(mContext);
     }
 
     @Override
     public void deinit() {
         mContext.unregisterReceiver(mDeviceChangedReceiver);
-
-        SambaAuthHelper.save(mContext, mSmbAuthMap);
         mHandler.removeCallbacksAndMessages(null);
     }
 
@@ -509,7 +503,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
             case Node.DLNA:
                 Device device = (Device) node.getItem();
                 if (!identity.endsWith(":0")) {
-                    identity = device.getIdentity().getUdn().getIdentifierString() + ":" + identity+":"+device.getDetails().getFriendlyName();
+                    identity = device.getIdentity().getUdn().getIdentifierString() + ":" + identity + ":" + device.getDetails().getFriendlyName();
                     identity += ":" + node.getTitle();
                 } else {
                     identity += ":" + device.getDetails().getFriendlyName();
@@ -568,8 +562,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @Override
     public boolean isAlreadyAuth(Node node) {
         SmbFile smbFile = (SmbFile) node.getItem();
-
-        return mSmbAuthMap.containsKey(SambaAuthHelper.getSmbAuthKey(smbFile));
+        return SambaAuthHelper.getInstance().getCredential(smbFile.getCanonicalPath()) != null;
     }
 
     private String createSmbId(@NonNull SmbFile smbFile) {
@@ -580,20 +573,20 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     private String createSmbBasicAuthUrl(SmbFile smbFile) {
         StringBuilder builder = new StringBuilder(DEFAULT_ADDRESS);
-        CIFSContext cifsContext =
-                mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
-
+//        CIFSContext cifsContext =
+//                mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
+        Credential credential = SambaAuthHelper.getInstance().getCredential(smbFile.getCanonicalPath());
+//        SambaAuthHelper.getInstance().saveCredential(credential);//TODO 是否需要保存？
         MediaDirHelper.addAndSave(mContext, new SaveItem(SaveItem.TYPE_SMB, smbFile.getCanonicalPath()));
-        if (cifsContext == null || cifsContext.getCredentials().isAnonymous()) {
+        if (credential == null || (TextUtils.isEmpty(credential.getUsername()) && TextUtils.isEmpty(credential.getPassword()))) {
             return smbFile.getCanonicalPath();
-        }
-
-        if (!TextUtils.isEmpty(((NtlmPasswordAuthenticator) cifsContext.getCredentials()).getName())) {
-            builder.append(((NtlmPasswordAuthenticator) cifsContext.getCredentials()).getName().replace('\\', ';'));
+        } else {
+            builder.append(credential.getUsername().replace('\\', ';'));
             builder.append(':');
-            builder.append(((NtlmPasswordAuthenticator) cifsContext.getCredentials()).getPassword());
+            builder.append(credential.getPassword());
             builder.append('@');
         }
+
 
         return smbFile.getCanonicalPath().replaceFirst(DEFAULT_ADDRESS, builder.toString());
     }
@@ -604,7 +597,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         boolean checkOnly = data.getBoolean("checkOnly");
 
         if (isAnonymous) {
-            cifsContext = SingletonContext.getInstance().withAnonymousCredentials();
+            cifsContext = JcifsUtils.getBaseContext(true).withAnonymousCredentials();
+//            cifsContext = SingletonContext.getInstance().withAnonymousCredentials();
         } else {
             String username = data.getString("username");
             String password = data.getString("password");
@@ -615,8 +609,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                 domain = username.substring(0, i);
                 username = username.substring(i + 1);
             }
-
-            cifsContext = SingletonContext.getInstance().withCredentials(new NtlmPasswordAuthenticator(domain, username, password));
+            cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(domain, username, password));
+//            cifsContext = SingletonContext.getInstance().withCredentials(new NtlmPasswordAuthenticator(domain, username, password));
         }
 
         SmbFile smbFile = null;
@@ -685,11 +679,13 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         case SmbException.NT_STATUS_ACCESS_DENIED:
                             if (cifsContext.getCredentials().isAnonymous()) {
                                 try {
-                                    node.setItem(new SmbFile(smbFile.getURL(), SambaAuthHelper.GUEST));
+                                    CIFSContext guest = JcifsUtils.getBaseContext(true).withGuestCrendentials();
+                                    node.setItem(new SmbFile(smbFile.getURL(), guest));
                                 } catch (MalformedURLException ex) {
                                     ex.printStackTrace();
                                 }
-                                smbAuth(node, SambaAuthHelper.GUEST, data);
+                                CIFSContext guest = JcifsUtils.getBaseContext(true).withGuestCrendentials();
+                                smbAuth(node, guest, data);
                             } else {
                                 showError(node, mContext.getString(R.string.login_failed_try_again));
                                 showAuthDialog(node, data);
@@ -705,7 +701,11 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                     showAuthDialog(node, data);
                     return;
                 }
-                mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), cifsContext);
+//                NtlmPasswordAuthenticator auth = (NtlmPasswordAuthenticator) cifsContext.getCredentials();
+//                Credential credential = new Credential(auth.getUsername(), auth.getPassword(), node.getId(), auth.getUserDomain());
+//                SambaAuthHelper.getInstance().saveCredential(credential);
+                SambaAuthHelper.getInstance().saveCIFSContext((SmbFile) node.getItem(), cifsContext);
+//                mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), cifsContext);
                 if (mSelectType == SELECT_DIR) {
                     showSetPrivateDialog(node);
                 } else {
@@ -896,30 +896,32 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     private void sambaPath(Node node) {
         SmbFile smbFile = null;
         node.setChildren(null);
-
-        switch (node.getType()) {
-            case Node.SAMBA_DEVICE:
-                sambaGetPath(node, SingletonContext.getInstance().withAnonymousCredentials());
-                break;
-            default:
-                CIFSContext cifsContext = null;
-                if (node.getItem() instanceof SmbFile) {
-                    smbFile = (SmbFile) node.getItem();
-                    cifsContext = mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
-
-                    try {
-                        if (cifsContext == null
-                                && SmbFileHelper.getType(smbFile) == SmbFile.TYPE_SHARE) {
-                            showAuthDialog(node, false);
-                            return;
-                        }
-                    } catch (SmbException e) {
-                        e.printStackTrace();
-                    }
-                }
-                sambaGetPath(node, cifsContext);
-                break;
-        }
+        CIFSContext cifsContext = SambaAuthHelper.getInstance().  getCIFSContext(node.getId());
+        sambaGetPath(node,cifsContext);
+//        switch (node.getType()) {
+//            case Node.SAMBA_DEVICE:
+//                sambaGetPath(node, cifsContext);
+//                break;
+//            default:
+//                if (node.getItem() instanceof SmbFile) {
+////                    Credential credential=SambaAuthHelper.getInstance().getCredential(node.getId());
+////                    cifsContext = mSmbAuthMap.get(SambaAuthHelper.getSmbAuthKey(smbFile));
+////                    cifsContext =JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(credential.getDomain(),credential.getUsername(),credential.getPassword()));
+//
+//                    try {
+//                        smbFile = (SmbFile) node.getItem();
+//                        if (cifsContext == null
+//                                && SmbFileHelper.getType(smbFile) == SmbFile.TYPE_SHARE) {
+//                            showAuthDialog(node, false);
+//                            return;
+//                        }
+//                    } catch (SmbException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                sambaGetPath(node, cifsContext);
+//                break;
+//        }
     }
 
     private void sambaGetPath(final Node node, final CIFSContext cifsContext) {
@@ -936,21 +938,22 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
                 try {
                     int type = Node.SAMBA_DEVICE;
-
-                    if (cifsContext != null) {
+                    if (smbFile == null)
                         smbFile = new SmbFile(url, cifsContext);
-                        mSmbAuthMap.put(SambaAuthHelper.getSmbAuthKey(smbFile), cifsContext);
-                    } else {
-                        smbFile = new SmbFile(url, SingletonContext.getInstance().withAnonymousCredentials());
-                    }
-
                     if (node.getType() != Node.SAMBA_CATEGORY) {
                         if (SmbFileHelper.getType(smbFile) != SmbFile.TYPE_WORKGROUP) {
                             type = Node.SAMBA;
                         }
                         SmbFile[] files = smbFile.listFiles(mFileFilter);
+                        Log.d(TAG, "run: " + smbFile.getURL() + " " + smbFile.getShare() + " " + smbFile.getServer());
+                        SambaAuthHelper.getInstance().addTempCIFSContext((SmbFile) node.getItem(), cifsContext);//暂不保存
                         for (SmbFile f : files) {
-                           getNodeFromSmbFiles(f,node,type,null);
+                            try {
+                                f.exists();
+                                getNodeFromSmbFiles(f, node, type, null);
+                            } catch (Exception e) {
+                                continue;
+                            }
                         }
                         updateTreeView(node);
                     } else {
@@ -975,10 +978,12 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         case SmbException.NT_STATUS_ACCESS_DENIED:
                             if (cifsContext == null || cifsContext.getCredentials().isAnonymous()) {
                                 // 尝试使用GUEST帐号
-                                sambaGetPath(node, SambaAuthHelper.GUEST);
+                                CIFSContext guest = JcifsUtils.getBaseContext(true).withGuestCrendentials();
+                                sambaGetPath(node, guest);
                             } else {
                                 showError(node, mContext.getString(R.string.login_failed_try_again));
-                                mSmbAuthMap.remove(SambaAuthHelper.getSmbAuthKey(smbFile));
+//                                mSmbAuthMap.remove(SambaAuthHelper.getSmbAuthKey(smbFile));
+                                SambaAuthHelper.getInstance().deleteCIFSContext(smbFile);
                                 showAuthDialog(node, false);
                             }
                             break;
@@ -987,6 +992,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                             mView.fallBackParent(node);
                             break;
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
@@ -1047,27 +1054,26 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         return true;
     }
 
-    private void getNodeFromSmbFiles(SmbFile f, Node node, int type,String displayName) throws SmbException {
+    private void getNodeFromSmbFiles(SmbFile f, Node node, int type, String displayName) throws SmbException {
         if ((mSelectType == SELECT_DIR && SmbFileHelper.isFile(f))) {
             return;
         }
-        Log.d(TAG, "getNodeFromSmbFiles: 1 "+f.getCanonicalPath());
-        Log.d(TAG, "getNodeFromSmbFiles: "+f.getPath());
-        Log.d(TAG, "getNodeFromSmbFiles: "+f.getCanonicalUncPath());
-        Log.d(TAG, "getNodeFromSmbFiles: "+f.getShare());
-
+        Log.d(TAG, "getNodeFromSmbFiles: 1 " + f.getCanonicalPath());
+        Log.d(TAG, "getNodeFromSmbFiles: " + f.getPath());
+        Log.d(TAG, "getNodeFromSmbFiles: " + f.getCanonicalUncPath());
+        Log.d(TAG, "getNodeFromSmbFiles: " + f.getShare());
 
 
         Node child = new Node(
                 f.getCanonicalPath(),
-                displayName!=null?displayName:f.getName().replace('/', '\0'),
+                displayName != null ? displayName : f.getName().replace('/', '\0'),
                 type,
                 f);
-        if(node.hasChild()){
-           List<Node> nodes=node.getChildren();
-          if(nodes.contains(child)){
-              return;
-          }
+        if (node.hasChild()) {
+            List<Node> nodes = node.getChildren();
+            if (nodes.contains(child)) {
+                return;
+            }
         }
         node.addChild(child);
     }
