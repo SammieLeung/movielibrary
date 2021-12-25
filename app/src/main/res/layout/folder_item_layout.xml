@@ -44,7 +44,7 @@
                 android:ellipsize="marquee"
                 android:marqueeRepeatLimit="marquee_forever"
                 android:id="@+id/tv_shorcut_uri"
-                android:text="@{item.uri}"
+                android:text="@{item.sub_title}"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>

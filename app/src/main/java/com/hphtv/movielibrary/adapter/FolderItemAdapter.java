@@ -53,7 +53,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
     public FolderItemAdapter(Context context) {
         mContext = context;
-        mEventHandler=new PosterManagerEventHandler((AppBaseActivity) mContext);
+        mEventHandler = new PosterManagerEventHandler((AppBaseActivity) mContext);
     }
 
     @NonNull
@@ -73,20 +73,21 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         }
     }
 
-    private View.OnClickListener mOnClickListener=new View.OnClickListener() {
+    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            FolderItem folderItem= (FolderItem) v.getTag();
-            Shortcut shortcut=folderItem.item;
-            if(shortcut.devcieType>5) {
+            FolderItem folderItem = (FolderItem) v.getTag();
+            Shortcut shortcut = folderItem.item;
+            if (shortcut.devcieType > 5) {
                 Intent intent = new Intent();
                 intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
-                intent.putExtra(Constants.Extras.NETWORK_DIR_URI,shortcut.queryUri);
+                intent.putExtra(Constants.Extras.NETWORK_DIR_URI, shortcut.queryUri);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
 
         }
     };
+
     @Override
     public int getItemViewType(int position) {
         if (position == 0)
@@ -139,17 +140,33 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     public FolderItem getFolderItem(Shortcut shortcut) {
         FolderItem folderItem = new FolderItem();
         folderItem.title = shortcut.firendlyName;
-        folderItem.uri = shortcut.uri;
         folderItem.item = shortcut;
         folderItem.type = shortcut.devcieType;
-        folderItem.file_count=shortcut.fileCount;
-        folderItem.poster_count=shortcut.posterCount;
+        folderItem.file_count = shortcut.fileCount;
+        folderItem.poster_count = shortcut.posterCount;
+        switch (folderItem.type) {
+            case Constants.DeviceType.DEVICE_TYPE_SMB:
+                String smbUri = shortcut.uri;
+                smbUri = smbUri.replaceFirst("smb://.*@", "smb://");
+                folderItem.sub_title = smbUri;
+                break;
+            case Constants.DeviceType.DEVICE_TYPE_DLNA:
+                String dlnaUri = shortcut.uri;
+                String[] splits=dlnaUri.split(":");
+                if(splits.length>=3){
+                    dlnaUri=splits[2];
+                }
+                folderItem.sub_title =dlnaUri;
+                break;
+            default:
+                folderItem.sub_title = shortcut.uri;
 
+        }
         return folderItem;
     }
 
-    public void pickerClose(){
-        if(mEventHandler!=null)
+    public void pickerClose() {
+        if (mEventHandler != null)
             mEventHandler.pickerClose();
     }
 

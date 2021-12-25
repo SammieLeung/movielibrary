@@ -992,8 +992,6 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                             mView.fallBackParent(node);
                             break;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
         }).start();

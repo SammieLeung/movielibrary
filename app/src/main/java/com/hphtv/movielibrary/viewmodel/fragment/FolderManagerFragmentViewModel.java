@@ -118,20 +118,6 @@ public class FolderManagerFragmentViewModel extends AndroidViewModel {
                         Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                         if (shortcut == null) {
                             if (deviceTypeStr.equals("samba")) {
-                                Uri sambaUri= Uri.parse(path);
-                                Log.d(TAG, "addShortcut: getUserInfo:"+sambaUri.getUserInfo());
-                                String userInfo=sambaUri.getUserInfo();
-                                String name="";
-                                String password="";
-                                String domain="";
-                                if(!TextUtils.isEmpty(userInfo)){
-                                    String[] strs=userInfo.split(":");
-                                    name=strs[0];
-                                    password=strs[1];
-                                }
-//                                CIFSContext context=SambaAuthHelper.getInstance().getCIFSContext(path);
-                                path=path.replaceFirst("smb://.*@","smb://");
-//                                SmbFile smbFile = new SmbFile(path, context);
                                 shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, null, null,queryUri.toString());
                                 mShortcutDao.insertShortcut(shortcut);
                             } else {

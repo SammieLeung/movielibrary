@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class FolderItem {
     public String title;
-    public String uri;
+    public String sub_title;
     @NonNull
     public Shortcut item;
     public int type;
