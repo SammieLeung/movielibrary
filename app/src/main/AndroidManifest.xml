@@ -28,12 +28,12 @@
         android:theme="@style/MyTheme">
 
         <activity
-            android:name=".activity.MovieDetailActivity"
+            android:name=".ui.detail.MovieDetailActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateUnchanged"></activity>
         <activity
-            android:name=".activity.HomePageActivity"
+            android:name=".ui.homepage.HomePageActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
@@ -41,13 +41,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.NewPageAcitivity">
+        <activity android:name=".ui.homepage.NewPageAcitivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.PosterManagerActivity"></activity>
+        <activity android:name=".ui.shortcutmanager.ShortcutManagerActivity"></activity>
 
 
         <service android:name=".service.MovieScanService"></service>
@@ -69,7 +69,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".activity.PinyinSearchActivity"></activity>
+        <activity android:name=".ui.moviesearch.PinyinSearchActivity"></activity>
 
         <meta-data
             android:name="UMENG_APPKEY"

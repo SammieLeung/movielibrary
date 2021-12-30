@@ -143,7 +143,8 @@ public class Constants {
         String DEVICE_MOUNT_PATH = "device_mount_path";
         String DEVICE_NETWORKPATH = "device_networkpath";
         String MOUNT_TYPE = "device_type";
-        String NETWORK_DIR_URI="network_dir_uri";
+        String QUERY_URI ="query_uri";
+        String NETWORK_DIR_PATH="network_dir_path";
         String IS_FROM_NETWORK = "is_from_network";
         String DEVICE_ID = "device_id";
 

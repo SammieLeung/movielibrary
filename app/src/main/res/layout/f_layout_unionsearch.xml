@@ -45,11 +45,11 @@
         </RelativeLayout>
 
 
-        <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
+        <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
             android:id="@+id/recyclerview_search_result"
             android:layout_width="711dp"
             android:layout_height="match_parent"
-            android:layout_below="@id/et_box_name"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
+            android:layout_below="@id/et_box_name"></com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll>
 
     </LinearLayout>
 

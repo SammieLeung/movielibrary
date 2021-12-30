@@ -19,5 +19,21 @@
     <string name="filter_box_smb_device">SMB</string>
 
     <!--    文件夹管理-->
-    <string name="pm_item_add_shortcut">Add Shortcut</string>
+    <string name="shortcut_item_add_shortcut">Add Shortcut</string>
+    <string name="shortcut_scan_dialog_item_shortcut_type">Movie Type</string>
+    <string name="shortcut_scan_dialog_item_shortcut_access">Permission</string>
+    <string name="shortcut_scan_dialog_item_shortcut_name">Name</string>
+    <string name="shortcut_scan_dialog_confirm">Scan</string>
+    <!--   文件夹管理->影片分类-->
+    <string name="shortcut_type_auto">Auto</string>
+    <string name="shortcut_type_movie">Movie</string>
+    <string name="shortcut_type_tv">TV Series</string>
+    <string name="shortcut_type_child">Cartoon</string>
+    <string name="shortcut_type_variety_show">Variety Show</string>
+    <string name="shortcut_type_animate">Animate</string>
+    <!--    文件管理->影片分级-->
+    <string name="shortcut_access_adult_only">Adult Only</string>
+    <string name="shortcut_access_all_ages">All Ages</string>
+    <!--    文件管理->索引默认名称-->
+    <string name="shortcut_name_default">Default</string>
 </resources>

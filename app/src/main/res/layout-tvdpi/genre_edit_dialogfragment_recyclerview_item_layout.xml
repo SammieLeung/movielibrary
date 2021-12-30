@@ -2,10 +2,10 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-     <import type="com.hphtv.movielibrary.fragment.newdialoag.entity.GenreTagItem"/>
+     <import type="com.hphtv.movielibrary.ui.homepage.genretag.GenreTagItem"/>
         <variable
             name="tag"
-            type="com.hphtv.movielibrary.fragment.newdialoag.entity.GenreTagItem" />
+            type="GenreTagItem" />
     </data>
 
     <CheckedTextView

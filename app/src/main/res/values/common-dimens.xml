@@ -2,4 +2,5 @@
 <resources>
     <dimen name="homebtn_w">36dp</dimen>
     <dimen name="key_prompt_label_textsize">24sp</dimen>
+    <dimen name="shortcut_diaolog_margin">15dp</dimen>
 </resources>

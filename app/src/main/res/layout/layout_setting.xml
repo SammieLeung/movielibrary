@@ -91,7 +91,7 @@
 
             </LinearLayout>
 
-            <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
+            <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
                 android:id="@+id/device_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -100,7 +100,7 @@
                 android:fadeScrollbars="false"
                 android:scrollbarThumbVertical="@drawable/scollerbar"
                 android:scrollbarTrackVertical="@drawable/scollerbar_bg"
-                android:scrollbars="vertical"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
+                android:scrollbars="vertical"></com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll>
 
             <RelativeLayout
                 android:id="@id/ml_footer"

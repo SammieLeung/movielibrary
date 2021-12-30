@@ -1,10 +1,8 @@
 package com.hphtv.movielibrary.listener;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 
-import com.hphtv.movielibrary.activity.AppBaseActivity;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.data.Constants;
 
 /**

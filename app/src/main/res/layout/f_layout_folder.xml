@@ -5,8 +5,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/pm_container_padding"
-        android:paddingRight="@dimen/pm_container_padding"
+        android:paddingLeft="@dimen/shortcut_container_padding"
+        android:paddingRight="@dimen/shortcut_container_padding"
 
         android:background="@drawable/background_corners"
         android:orientation="vertical">
@@ -14,8 +14,8 @@
         <ImageButton
             android:id="@+id/btn_exit"
             android:src="@mipmap/ic_back"
-            android:layout_marginTop="@dimen/pm_container_padding"
-            android:layout_marginBottom="@dimen/pm_container_padding"
+            android:layout_marginTop="@dimen/shortcut_container_padding"
+            android:layout_marginBottom="@dimen/shortcut_container_padding"
             android:layout_width="@dimen/homebtn_w"
             android:layout_height="@dimen/homebtn_w"
             android:text="@string/btn_exit" />
@@ -32,10 +32,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_added_folders"
                 android:layout_width="0dp"
-                android:paddingLeft="@dimen/pm_container_padding"
-                android:paddingRight="@dimen/pm_container_padding"
+                android:paddingLeft="@dimen/shortcut_container_padding"
+                android:paddingRight="@dimen/shortcut_container_padding"
                 android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/pm_container_padding"
+                android:layout_marginRight="@dimen/shortcut_container_padding"
                 android:layout_weight="5"
                 />
             <androidx.appcompat.widget.LinearLayoutCompat

@@ -97,7 +97,7 @@ public class DeviceInitThread extends Thread {
         }
 
 //        //TODO 清理数据库 (需要
-        int ret = mVideoFileDao.deleteOutdated(System.currentTimeMillis());
+//        int ret = mVideoFileDao.deleteOutdated(System.currentTimeMillis());
 //        LogUtil.v(TAG, "delete outdated videofile " + ret);
     }
 }

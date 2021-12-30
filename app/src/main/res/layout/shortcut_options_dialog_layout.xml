@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{dialogTitle}" />
+
+        <include
+            layout="@layout/shortcut_options_item_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/shortcut_scan_diaolg_item_height"
+            app:subTitle="@{typeItem.optionList.get(typeItem.pos)}"
+            app:title="@{typeItem.title}" />
+
+        <include
+            layout="@layout/shortcut_options_item_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/shortcut_scan_diaolg_item_height"
+            app:subTitle="@{accessItem.optionList.get(accessItem.pos)}"
+            app:title="@{accessItem.title}" />
+
+        <include
+            layout="@layout/shortcut_options_item_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/shortcut_scan_diaolg_item_height"
+            app:subTitle="@{nameItem.optionList.get(nameItem.pos)}"
+            app:title="@{nameItem.title}" />
+    </LinearLayout>
+
+    <data>
+
+        <import type="com.hphtv.movielibrary.ui.shortcutmanager.bean.ShortcutOptionsItem" />
+
+        <variable
+            name="dialogTitle"
+            type="String" />
+
+        <variable
+            name="typeItem"
+            type="ShortcutOptionsItem" />
+
+        <variable
+            name="accessItem"
+            type="ShortcutOptionsItem" />
+
+        <variable
+            name="nameItem"
+            type="ShortcutOptionsItem" />
+    </data>
+</layout>

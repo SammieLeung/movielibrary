@@ -31,7 +31,7 @@ public class VideoFile implements Serializable {
     public String dirPath;
     public String filename;
     @ColumnInfo(name = "is_scanned",defaultValue = "0")
-    public int isScanned;
+    public int isScanned=0;
 
     public String keyword;
 
@@ -44,6 +44,10 @@ public class VideoFile implements Serializable {
     public int season=-1;
     @ColumnInfo(defaultValue = "-1")
     public int episode=-1;
+
+    public VideoFile(){
+
+    }
 
     @Override
     public boolean equals(Object o) {

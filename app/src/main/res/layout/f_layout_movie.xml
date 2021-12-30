@@ -10,10 +10,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll
+        <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
             android:id="@+id/rv_movies"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></com.hphtv.movielibrary.view.RecyclerViewWithMouseScroll>
+            android:layout_height="match_parent"></com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll>
 
         <TextView
             android:id="@+id/tips_empty"

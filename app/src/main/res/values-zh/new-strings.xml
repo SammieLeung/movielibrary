@@ -19,5 +19,21 @@
     <string name="filter_box_smb_device">SMB设备</string>
 
     <!--    文件夹管理-->
-    <string name="pm_item_add_shortcut">添加索引</string>
+    <string name="shortcut_item_add_shortcut">添加索引</string>
+    <string name="shortcut_scan_dialog_item_shortcut_type">影片类型</string>
+    <string name="shortcut_scan_dialog_item_shortcut_access">影片分级</string>
+    <string name="shortcut_scan_dialog_item_shortcut_name">索引名称</string>
+    <string name="shortcut_scan_dialog_confirm">确认扫描</string>
+    <!--   文件夹管理->影片分类-->
+    <string name="shortcut_type_auto">智能</string>
+    <string name="shortcut_type_movie">电影</string>
+    <string name="shortcut_type_tv">电视</string>
+    <string name="shortcut_type_child">儿童</string>
+    <string name="shortcut_type_variety_show">综艺</string>
+    <string name="shortcut_type_animate">动画</string>
+    <!--    文件管理->影片分级-->
+    <string name="shortcut_access_adult_only">不适合儿童</string>
+    <string name="shortcut_access_all_ages">全年龄</string>
+    <!--    文件管理->索引默认名称-->
+    <string name="shortcut_name_default">默认</string>
 </resources>

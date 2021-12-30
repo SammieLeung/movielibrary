@@ -24,7 +24,7 @@ import java.util.Objects;
                         "ON MVCF.path=VF.path " +
                         "JOIN " + TABLE.MOVIE + " AS M " +
                         "ON MVCF.id=M.id " +
-                        "JOIN " + TABLE.MOVIE_GENRE_CROSS_REF + " AS MGCF  " +
+                        "LEFT OUTER JOIN " + TABLE.MOVIE_GENRE_CROSS_REF + " AS MGCF  " +
                         "ON M.id=MGCF.id " +
                         "LEFT OUTER JOIN " + TABLE.GENRE + " AS G " +
                         "ON MGCF.genre_id = G.genre_id",

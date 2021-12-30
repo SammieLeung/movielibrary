@@ -16,7 +16,7 @@
         android:id="@+id/fl_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".activity.MovieDetailActivity">
+        tools:context=".ui.detail.MovieDetailActivity">
 
 
         <ImageView
@@ -71,37 +71,37 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <com.hphtv.movielibrary.view.DrawTopButton
+                    <com.hphtv.movielibrary.ui.view.DrawTopButton
                         android:id="@+id/btn_play"
                         style="@style/DrawTopButtonStyle"
                         android:text="@string/play"
                         app:dtbDrawableTop="@drawable/ic_detial_play" />
 
-                    <com.hphtv.movielibrary.view.DrawTopButton
+                    <com.hphtv.movielibrary.ui.view.DrawTopButton
                         android:id="@+id/btn_trailer"
                         style="@style/DrawTopButtonStyle"
                         android:text="@string/pic_vedio"
                         app:dtbDrawableTop="@drawable/ic_detail_trailer" />
 
-                    <com.hphtv.movielibrary.view.DrawTopButton
+                    <com.hphtv.movielibrary.ui.view.DrawTopButton
                         android:id="@+id/btn_favorite"
                         style="@style/DrawTopButtonStyle"
                         android:text="@string/tx_favorite"
                         app:dtbDrawableTop="@drawable/ic_detial_star" />
 
-                    <com.hphtv.movielibrary.view.DrawTopButton
+                    <com.hphtv.movielibrary.ui.view.DrawTopButton
                         android:id="@+id/btn_edit"
                         style="@style/DrawTopButtonStyle"
                         android:text="@string/edit"
                         app:dtbDrawableTop="@drawable/ic_detail_edit" />
 
-                    <com.hphtv.movielibrary.view.DrawTopButton
+                    <com.hphtv.movielibrary.ui.view.DrawTopButton
                         android:id="@+id/btn_remove"
                         style="@style/DrawTopButtonStyle"
                         android:text="@string/remove"
                         app:dtbDrawableTop="@drawable/ic_detail_del" />
 
-                    <com.hphtv.movielibrary.view.DrawTopButton
+                    <com.hphtv.movielibrary.ui.view.DrawTopButton
                         android:id="@+id/btn_exit"
                         style="@style/DrawTopButtonStyle"
                         android:text="@string/filelist_back"
@@ -401,7 +401,7 @@
                 android:layout_centerInParent="true">
 
 
-                <com.hphtv.movielibrary.view.CircleRecyelerViewWithMouseScroll
+                <com.hphtv.movielibrary.ui.view.CircleRecyelerViewWithMouseScroll
                     android:id="@+id/rv_trailer"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent" />

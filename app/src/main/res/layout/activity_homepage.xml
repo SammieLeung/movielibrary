@@ -40,7 +40,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <com.hphtv.movielibrary.view.VerticalViewPager
+                        <com.hphtv.movielibrary.ui.view.VerticalViewPager
                             android:id="@+id/viewpager"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"

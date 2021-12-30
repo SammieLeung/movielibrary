@@ -212,5 +212,5 @@
 #umeng
 
 -keep class android.support.v7.widget.AppCompatBackgroundHelper { *; }
--keep class com.hphtv.movielibrary.view.DrawTopButton { *; }
+-keep class com.hphtv.movielibrary.ui.view.DrawTopButton { *; }
 

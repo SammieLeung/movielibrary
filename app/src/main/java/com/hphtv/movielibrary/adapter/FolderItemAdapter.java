@@ -1,17 +1,14 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.activity.AppBaseActivity;
-import com.hphtv.movielibrary.activity.bean.FolderItem;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.shortcutmanager.bean.FolderItem;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FolderAddItemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
@@ -36,6 +33,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     private List<CommonViewHolder> mViewHolderList = new ArrayList<>();
     private Context mContext;
     private PosterManagerEventHandler mEventHandler;
+    private OnClickListener mOnClickListener;
 
     Comparator mComparator = (Comparator<FolderItem>) (o1, o2) -> {
 
@@ -68,25 +66,13 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         } else {
             FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
-            binding.getRoot().setOnClickListener(mOnClickListener);
+            binding.getRoot().setOnClickListener(v -> {
+                if(mOnClickListener!=null)
+                    mOnClickListener.onClick((FolderItem) v.getTag());
+            });
             return vh;
         }
     }
-
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            FolderItem folderItem = (FolderItem) v.getTag();
-            Shortcut shortcut = folderItem.item;
-            if (shortcut.devcieType > 5) {
-                Intent intent = new Intent();
-                intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
-                intent.putExtra(Constants.Extras.NETWORK_DIR_URI, shortcut.queryUri);
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-            }
-
-        }
-    };
 
     @Override
     public int getItemViewType(int position) {
@@ -110,7 +96,6 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         return 1 + mFolderItemList.size();
     }
 
-
     public void addAllShortcuts(List<Shortcut> shortcutList) {
         Iterator<FolderItem> iterator = mFolderItemList.listIterator();
         while (iterator.hasNext()) {
@@ -126,7 +111,6 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         notifyDataSetChanged();
     }
 
-
     public void add(Shortcut shortcut) {
         FolderItem folderItem = getFolderItem(shortcut);
         if (!mFolderItemList.contains(folderItem)) {
@@ -135,7 +119,6 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             notifyItemInserted(mFolderItemList.size());
         }
     }
-
 
     public FolderItem getFolderItem(Shortcut shortcut) {
         FolderItem folderItem = new FolderItem();
@@ -170,4 +153,11 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             mEventHandler.pickerClose();
     }
 
+    public interface OnClickListener{
+        void onClick(FolderItem item);
+    }
+
+    public void setOnClickListener(OnClickListener listener){
+       mOnClickListener=listener;
+    }
 }

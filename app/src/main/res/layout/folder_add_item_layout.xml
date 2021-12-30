@@ -11,9 +11,9 @@
     <RelativeLayout
         android:onClick="@{()->posterHandler.openShortcutPicker()}"
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/pm_container_padding"
+        android:layout_marginBottom="@dimen/shortcut_container_padding"
         android:background="@drawable/blue_stroke_select_bg_2"
-        android:layout_height="@dimen/pm_item_height">
+        android:layout_height="@dimen/shortcut_item_height">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"
@@ -28,9 +28,9 @@
                 android:layout_centerVertical="true"
                 android:src="@mipmap/add_device" />
             <TextView
-                android:layout_marginLeft="@dimen/pm_container_padding"
-                android:text="@string/pm_item_add_shortcut"
-                android:textSize="@dimen/pm_item_textsize"
+                android:layout_marginLeft="@dimen/shortcut_container_padding"
+                android:text="@string/shortcut_item_add_shortcut"
+                android:textSize="@dimen/shortcut_item_textsize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </androidx.appcompat.widget.LinearLayoutCompat>

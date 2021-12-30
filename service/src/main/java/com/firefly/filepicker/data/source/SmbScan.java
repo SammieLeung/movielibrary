@@ -63,19 +63,21 @@ public class SmbScan extends AbstractScanFiles {
 //            if (smbFile.getURL().getUserInfo() == null) {
 //                CIFSContext cifsContext =
 //                        SambaAuthHelper.read(mContext, SambaAuthHelper.getSmbAuthKey(smbFile));
-            CIFSContext cifsContext=null;
+            CIFSContext cifsContext = null;
             Credential credential = SambaAuthHelper.getInstance().getCredential(mNode.getId());
-            if(credential==null){
-                    Uri tmpUri=Uri.parse(mNode.getId());
-                    String userInfo=tmpUri.getUserInfo();
-                    if(!TextUtils.isEmpty(userInfo)){
-                        String[] splitStrs=userInfo.split(":");
-                        if(splitStrs.length>1){
-                            cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(splitStrs[0],splitStrs[1]));
-                        }
+            if (credential == null) {
+                Uri tmpUri = Uri.parse(mNode.getId());
+                String userInfo = tmpUri.getUserInfo();
+                if (!TextUtils.isEmpty(userInfo)) {
+                    String[] splitStrs = userInfo.split(":");
+                    if (splitStrs.length > 1) {
+                        cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(splitStrs[0], splitStrs[1]));
                     }
-            }else{
-                cifsContext=SambaAuthHelper.getInstance().getCIFSContext(mNode.getId());
+                }
+            }
+
+            if (cifsContext == null) {
+                cifsContext = SambaAuthHelper.getInstance().getCIFSContext(mNode.getId());
             }
 //            if (TextUtils.isEmpty(credential.getUsername()) && TextUtils.isEmpty(credential.getPassword())) {
 //                cifsContext=JcifsUtils.getBaseContext(true).withAnonymousCredentials();
@@ -128,7 +130,7 @@ public class SmbScan extends AbstractScanFiles {
                 return;
             } else if (file.isDirectory()) {
 //                if (depth > 0) {//TODO 需要增加搜索深度限制
-                    scan(file, depth - 1);
+                scan(file, depth - 1);
 //                }
             } else {
                 FileItem item = null;
@@ -136,8 +138,6 @@ public class SmbScan extends AbstractScanFiles {
                     String contentType = file.getContentType() != null ?
                             file.getContentType()
                             : URLConnection.guessContentTypeFromName(file.getName());
-                    Log.d(TAG, "scan: contentType "+contentType+" name:"+file.getName());
-
                     if (mContentTypePre == null
                             || (contentType != null && contentType.startsWith(mContentTypePre))) {
                         item = new FileItem(
@@ -152,8 +152,8 @@ public class SmbScan extends AbstractScanFiles {
 
                         addResultItem(item);
                     }
-                }catch (Exception e){
-                    Log.e(TAG,"error:name "+file.getPath());
+                } catch (Exception e) {
+                    Log.e(TAG, "error:name " + file.getPath());
 
                 }
 

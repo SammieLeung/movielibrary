@@ -67,9 +67,18 @@ public interface MovieDao {
      * @return
      */
     @Transaction
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
-            "(SELECT VF.path FROM " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_path=DEV.path) AS VF__DEV " +
-            "ON MOVIE__VF.path=VF__DEV.path AND MOVIE__VF.source=:source) and id=:id")
+//    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
+//            "(SELECT VF.path FROM " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_path=DEV.path) AS VF__DEV " +
+//            "ON MOVIE__VF.path=VF__DEV.path AND MOVIE__VF.source=:source) and id=:id")
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN " +
+            "(SELECT MVCF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MVCF  " +
+            "JOIN " + TABLE.VIDEOFILE + " AS VF  " +
+            "ON MVCF.path=VF.path AND MVCF.source =:source " +
+            "JOIN " + TABLE.SHORTCUT + " AS ST " +
+            "ON VF.dir_path=ST.uri  " +
+            "JOIN " + TABLE.DEVICE + " AS DEV  " +
+            "ON DEV.path=ST.device_path OR ST.device_type > 5) " +
+            "AND id=:id")
     public MovieWrapper queryMovieWrapperById(long id, String source);
 
 
@@ -114,7 +123,7 @@ public interface MovieDao {
     public MovieDataView queryMovieDataViewByMovieId(String movie_id, String source);
 
     /**
-     * @param device_uri  设备id
+     * @param device_uri 设备id
      * @param year       年份
      * @param genre_name 类型
      * @param order      排序方式

@@ -216,7 +216,6 @@ public class DeviceMonitorService extends Service {
         }
     }
 
-
     /**
      * 接受设备挂载广播
      */
@@ -263,8 +262,9 @@ public class DeviceMonitorService extends Service {
                     startScanWithNotScannedFiles();
                     break;
                 case Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI:
-                    String query_uri=intent.getStringExtra(Constants.Extras.NETWORK_DIR_URI);
-                    startScanNetworkFiles(query_uri);
+                    String query_uri = intent.getStringExtra(Constants.Extras.QUERY_URI);
+                    String network_dirpath = intent.getStringExtra(Constants.Extras.NETWORK_DIR_PATH);
+                    startScanNetworkFiles(query_uri, network_dirpath);
                     break;
             }
         }
@@ -282,7 +282,6 @@ public class DeviceMonitorService extends Service {
 
         }
     };
-
 
     /**
      * 扫描本地所有挂载设备并扫描文件
@@ -347,33 +346,63 @@ public class DeviceMonitorService extends Service {
     }
 
 
-    public void startScanNetworkFiles(String query_dir){
+    public void startScanNetworkFiles(String query_dir, String networkPath) {
         Observable.just(query_dir)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(Schedulers.from(mSingleThreadPool))
-                .map(uri->{
-                    Cursor cursor=getContentResolver().query(Uri.parse(uri),null,null,null,null);
-                    if(cursor!=null){
-                        while (cursor.moveToNext()){
-                            Log.w(TAG, "startScanNetworkFiles:document_id "+  cursor.getString(cursor.getColumnIndex("document_id")) );
-                            Log.w(TAG, "startScanNetworkFiles:mime_type "+  cursor.getString(cursor.getColumnIndex("mime_type")) );
-                            Log.w(TAG, "startScanNetworkFiles:_display_name "+  cursor.getString(cursor.getColumnIndex("_display_name")) );
-                            Log.w(TAG, "startScanNetworkFiles:last_modified "+  cursor.getString(cursor.getColumnIndex("last_modified")) );
-                            Log.w(TAG, "startScanNetworkFiles:_size "+  cursor.getString(cursor.getColumnIndex("_size")) );
-                            Log.w(TAG, "startScanNetworkFiles:path "+  cursor.getString(cursor.getColumnIndex("path")) );
-                            Log.w(TAG, "startScanNetworkFiles:file_source "+  cursor.getString(cursor.getColumnIndex("file_source")) );
+                .map(uri -> {
+                    List<VideoFile> videoFileList = new ArrayList<>();
+                    Cursor cursor = getContentResolver().query(Uri.parse(uri), null, null, null, null);
+                    if (cursor != null) {
+                        while (cursor.moveToNext()) {
+//                            Log.w(TAG, "startScanNetworkFiles:document_id "+  cursor.getString(cursor.getColumnIndex("document_id")) );
+//                            Log.w(TAG, "startScanNetworkFiles:mime_type "+  cursor.getString(cursor.getColumnIndex("mime_type")) );
+//                            Log.w(TAG, "startScanNetworkFiles:_display_name "+  cursor.getString(cursor.getColumnIndex("_display_name")) );
+//                            Log.w(TAG, "startScanNetworkFiles:last_modified "+  cursor.getString(cursor.getColumnIndex("last_modified")) );
+//                            Log.w(TAG, "startScanNetworkFiles:_size "+  cursor.getString(cursor.getColumnIndex("_size")) );
+//                            Log.w(TAG, "startScanNetworkFiles:path "+  cursor.getString(cursor.getColumnIndex("path")) );
+//                            Log.w(TAG, "startScanNetworkFiles:file_source "+  cursor.getString(cursor.getColumnIndex("file_source")) );
+//                            VideoFile videoFile=new VideoFile();
+//                            videoFile.path= cursor.getString(cursor.getColumnIndex("path"));
+//                            videoFile.filename=cursor.getString(cursor.getColumnIndex("_display_name"));
+//                            videoFile.dirPath=networkPath;
+                            String path = cursor.getString(cursor.getColumnIndex("path"));
+                            String filename = cursor.getString(cursor.getColumnIndex("_display_name"));
+                            String dirPath = networkPath;
+
+                            VideoFile videoFile = mVideoFileDao.queryByPath(path);
+                            if (videoFile != null) {
+                                if (videoFile.isScanned == 0)
+                                    videoFileList.add(videoFile);
+                            } else {
+                                videoFile = new VideoFile();
+                                videoFile.path = cursor.getString(cursor.getColumnIndex("path"));
+                                videoFile.filename = filename;
+                                videoFile.dirPath = dirPath;
+                                long vid = mVideoFileDao.insertOrIgnore(videoFile);
+                                videoFile.vid = vid;
+                                videoFileList.add(videoFile);
+                            }
+
                         }
 
                     }
-                    return 1;
+                    return videoFileList;
                 })
-                .subscribe(new SimpleObserver<Integer>() {
+                .onErrorReturn(throwable -> new ArrayList<>())
+                .subscribe(new SimpleObserver<List<VideoFile>>() {
                     @Override
-                    public void onAction(Integer integer) {
-
+                    public void onAction(List<VideoFile> videoFiles) {
+                        if (videoFiles != null && videoFiles.size() > 0) {
+                            if (mMovieScanService != null)
+                                mMovieScanService.addToPairingQueue(videoFiles);
+                        } else {    //TODO mPosterPairingDevice处理
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH));
+                        }
                     }
                 });
     }
+
     /**
      * 获取所以未扫描的文件
      */
@@ -381,6 +410,7 @@ public class DeviceMonitorService extends Service {
         List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedVideoFiles();
         return mountedDeviceFiles;
     }
+
 
     public class MonitorBinder extends Binder {
         public DeviceMonitorService getService() {
