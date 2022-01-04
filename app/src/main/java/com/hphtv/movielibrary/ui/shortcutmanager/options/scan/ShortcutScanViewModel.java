@@ -1,10 +1,12 @@
-package com.hphtv.movielibrary.ui.shortcutmanager;
+package com.hphtv.movielibrary.ui.shortcutmanager.options;
 
 import android.app.Application;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.ui.BaseAndroidViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.bean.ShortcutOptionsItem;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -26,6 +28,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
     private ShortcutOptionsItem mNameItem, mAccessItem, mTypeItem;
+    private Shortcut mShortcut;
 
     public ShortcutOptionsViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -45,5 +48,50 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
         List<String> nameList = new ArrayList<>();
         nameList.add(getString(R.string.shortcut_name_default));
         mNameItem = new ShortcutOptionsItem(getString(R.string.shortcut_scan_dialog_item_shortcut_name), nameList);
+    }
+
+
+    public Shortcut getShortcut() {
+        return mShortcut;
+    }
+
+    public void setShortcut(Shortcut shortcut) {
+        mShortcut = shortcut;
+    }
+
+    public ShortcutOptionsItem getNameItem() {
+        return mNameItem;
+    }
+
+    public void setNameItem(ShortcutOptionsItem nameItem) {
+        mNameItem = nameItem;
+    }
+
+    public ShortcutOptionsItem getAccessItem() {
+        return mAccessItem;
+    }
+
+    public void setAccessItem(ShortcutOptionsItem accessItem) {
+        mAccessItem = accessItem;
+    }
+
+    public ShortcutOptionsItem getTypeItem() {
+        return mTypeItem;
+    }
+
+    public void setTypeItem(ShortcutOptionsItem typeItem) {
+        mTypeItem = typeItem;
+    }
+
+    public  void showShortcutType(View v){
+
+    }
+
+    public  void showAccessPermission(View v){
+
+    }
+
+    public  void showEditName(View v){
+
     }
 }

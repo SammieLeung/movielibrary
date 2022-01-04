@@ -11,22 +11,33 @@
     </data>
 
     <RelativeLayout
+        android:id="@+id/view_options"
+        android:background="@drawable/new_text_item_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/shortcut_scan_diaolg_item_padding_lr"
+        android:paddingRight="@dimen/shortcut_scan_diaolg_item_padding_lr">
         <TextView
+            android:duplicateParentState="true"
             android:id="@+id/tv_title"
             android:text="@{title}"
+            android:textColor="@drawable/new_textcolor_state"
+            android:textSize="@dimen/shortcut_scan_diaolg_item_textsize"
             android:gravity="center_vertical"
             android:layout_alignParentStart="true"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"/>
 
         <TextView
+            android:duplicateParentState="true"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:textColor="@drawable/new_textcolor_state"
+            android:textSize="@dimen/shortcut_scan_diaolg_item_textsize"
             android:layout_alignParentEnd="true"
             android:layout_toRightOf="@id/tv_title"
-            android:drawableEnd="@mipmap/ic_back"
+            android:drawableEnd="@mipmap/icon_new_more"
+            android:drawableTint="@drawable/new_textcolor_state"
             android:drawablePadding="10dp"
             android:gravity="right|center_vertical"
             android:text="@{subTitle}" />
