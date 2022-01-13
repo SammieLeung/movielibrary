@@ -202,14 +202,14 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-    public void selectMovie(String source, String movie_id,boolean is_favorite, MovieWrapperCallback movieWrapperCallback) {
+    public void selectMovie( String movie_id,String source,Constants.SearchType type,boolean is_favorite, MovieWrapperCallback movieWrapperCallback) {
 
         Observable.just(source)
                 .map(new Function<String, MovieWrapper>() {
                     @Override
                     public MovieWrapper apply(String _source) throws Throwable {
                         //TODO 增加可选搜索类型
-                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source,Constants.SearchType.movie.name()).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source,type.name()).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                         return wrapper;
                     }
                 })

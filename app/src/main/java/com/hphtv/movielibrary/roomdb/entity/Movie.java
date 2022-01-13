@@ -20,7 +20,7 @@ import java.util.Locale;
  * author: Sam Leung
  * date:  21-5-14
  */
-@Entity(tableName = TABLE.MOVIE, indices = {@Index(value = {"movie_id", "source"}, unique = true)})
+@Entity(tableName = TABLE.MOVIE, indices = {@Index(value = {"movie_id", "type","source"}, unique = true)})
 public class Movie implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public long id;
@@ -34,7 +34,7 @@ public class Movie implements Serializable {
     public String source;//来源
     public Constants.SearchType type;//电影？电视剧  movie/tv
     @ColumnInfo(name = "acccess_permission")
-    public Constants.AccessPermission accessPermission;//分级 R-限制级 G-全年龄 C-儿童 PG-辅导
+    public Constants.AccessPermission accessPermission;//分级 ALL_AGE,ADAULT
     public String poster;//海报
     public String region;//制片国家/地区
     @ColumnInfo(name = "release_date")

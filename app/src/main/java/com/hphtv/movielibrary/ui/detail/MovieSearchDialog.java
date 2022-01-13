@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.adapter.MovieSearchAdapter;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutUnionsearchBinding;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 
@@ -63,8 +64,9 @@ public class MovieSearchDialog extends DialogFragment {
         mAdapter.setOnItemClickListener(movie -> {
             String movie_id = movie.movieId;
             String source = movie.source;
+            Constants.SearchType type=movie.type;
             if(mOnSelectPosterListener!=null){
-                mOnSelectPosterListener.OnSelect(source,movie_id);
+                mOnSelectPosterListener.OnSelect(movie_id,source,type);
             }
             dismiss();
         });
@@ -100,7 +102,7 @@ public class MovieSearchDialog extends DialogFragment {
 
     private OnSelectPosterListener mOnSelectPosterListener;
     public interface OnSelectPosterListener {
-        void OnSelect(String source, String movie_id);
+        void OnSelect( String movie_id,String source,Constants.SearchType type);
     }
 
     public void setOnSelectPosterListener(OnSelectPosterListener onSelectPosterListener) {

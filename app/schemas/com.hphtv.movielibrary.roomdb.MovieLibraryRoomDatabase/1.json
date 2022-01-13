@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0b4431b066111f1d17b3755aba6d9b52",
+    "identityHash": "2e0efaf56394fc0eee942c79faac9ce2",
     "entities": [
       {
         "tableName": "actor",
@@ -345,13 +345,14 @@
         },
         "indices": [
           {
-            "name": "index_movie_movie_id_source",
+            "name": "index_movie_movie_id_type_source",
             "unique": true,
             "columnNames": [
               "movie_id",
+              "type",
               "source"
             ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_movie_movie_id_source` ON `${TABLE_NAME}` (`movie_id`, `source`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_movie_movie_id_type_source` ON `${TABLE_NAME}` (`movie_id`, `type`, `source`)"
           }
         ],
         "foreignKeys": []
@@ -966,7 +967,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b4431b066111f1d17b3755aba6d9b52')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2e0efaf56394fc0eee942c79faac9ce2')"
     ]
   }
 }

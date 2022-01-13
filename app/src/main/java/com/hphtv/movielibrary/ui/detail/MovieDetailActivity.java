@@ -223,18 +223,19 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private void editVideoInfo() {
         String keyword = mBinding.getWrapper().videoFiles.get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
-        movieSearchFragment.setOnSelectPosterListener((source, movie_id) -> {
+        movieSearchFragment.setOnSelectPosterListener((movie_id,source,type) -> {
             startLoading();
             boolean is_favoirte = false;//默认收藏状态为false
             if (mCurWrapper != null && mCurWrapper.movie != null) {
                 String last_movie_id = mCurWrapper.movie.movieId;
                 is_favoirte = mCurWrapper.movie.isFavorite;//获取当前收藏状态
+                //TODO 更正发送信息
                 BroadcastHelper.sendBroadcastMovieUpdateSync(this, last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
             } else {
                 BroadcastHelper.sendBroadcastMovieAddSync(this, movie_id);//向手机助手发送添加电影的广播
             }
             //选择新电影逻辑
-            mViewModel.selectMovie(source, movie_id, is_favoirte, movieWrapper -> {
+            mViewModel.selectMovie( movie_id,source,type, is_favoirte, movieWrapper -> {
                 prepareMovieWrapper(movieWrapper.movie.id);
                 setActivityResult();
                 stopLoading();
