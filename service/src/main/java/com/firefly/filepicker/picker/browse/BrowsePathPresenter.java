@@ -50,6 +50,7 @@ import org.fourthline.cling.support.model.container.Container;
 import org.fourthline.cling.support.model.item.Item;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -138,7 +139,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         }
     };
 
-    private SmbFileFilter mFileFilter = f -> {
+    private SmbFileFilter mSmbFileFilter = f -> {
         final String filename = f.getName();
         try {
             if (f.isFile()) { // IMPORTANT: call the _noquery version to avoid network access
@@ -158,6 +159,24 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
 
     private boolean mKeepHiddenFiles = true;
+    private String[] mAllowExtensionFilter;
+    private FileFilter  mFileFilter=f->{
+        String filename=f.getName();
+        if(f.isDirectory()&&!filename.startsWith(".")){
+            return true;
+        }else if(f.isFile()) {
+            String ext = f.getName().substring(f.getName().lastIndexOf('.') + 1).toLowerCase();
+            if (TextUtils.isEmpty(ext) && mAllowExtensionFilter != null&&mAllowExtensionFilter.length>0) {
+                for(String filt:mAllowExtensionFilter){
+                    if(ext.equalsIgnoreCase(filt)&&!filt.isEmpty()){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
+
 
     protected boolean keepFile(String filename) {
         // don't keep a hidden file
@@ -403,6 +422,10 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     @Override
     public void setEnableSelectConfirm(boolean enableSelectConfirm) {
         mEnableSelectConfirm = enableSelectConfirm;
+    }
+
+    public void setAllowExtensionFilter(String[] allowExtensionFilter) {
+        mAllowExtensionFilter = allowExtensionFilter;
     }
 
     @Override
@@ -761,7 +784,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     private void localPath(Node parent) {
         File parentFile = new File(parent.getId());
-        File[] files = parentFile.listFiles();
+        File[] files = parentFile.listFiles(mFileFilter);
 
         if (files == null) {
             updateTreeView(parent);
@@ -944,7 +967,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
                         if (SmbFileHelper.getType(smbFile) != SmbFile.TYPE_WORKGROUP) {
                             type = Node.SAMBA;
                         }
-                        SmbFile[] files = smbFile.listFiles(mFileFilter);
+                        SmbFile[] files = smbFile.listFiles(mSmbFileFilter);
                         Log.d(TAG, "run: " + smbFile.getURL() + " " + smbFile.getShare() + " " + smbFile.getServer());
                         SambaAuthHelper.getInstance().addTempCIFSContext((SmbFile) node.getItem(), cifsContext);//暂不保存
                         for (SmbFile f : files) {
@@ -1075,6 +1098,7 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         }
         node.addChild(child);
     }
+
 
 
 }

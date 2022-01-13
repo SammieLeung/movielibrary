@@ -8,11 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerEventHandler;
 import com.hphtv.movielibrary.ui.shortcutmanager.bean.FolderItem;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FolderAddItemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
-import com.hphtv.movielibrary.listener.PosterManagerEventHandler;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+
+import static android.net.wifi.rtt.CivicLocationKeys.STATE;
 
 /**
  * author: Sam Leung
@@ -32,7 +34,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     private List<FolderItem> mFolderItemList = new ArrayList<>();
     private List<CommonViewHolder> mViewHolderList = new ArrayList<>();
     private Context mContext;
-    private PosterManagerEventHandler mEventHandler;
+    private ShortcutManagerEventHandler mEventHandler;
     private OnClickListener mOnClickListener;
 
     Comparator mComparator = (Comparator<FolderItem>) (o1, o2) -> {
@@ -51,7 +53,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
     public FolderItemAdapter(Context context) {
         mContext = context;
-        mEventHandler = new PosterManagerEventHandler((AppBaseActivity) mContext);
+        mEventHandler = new ShortcutManagerEventHandler((AppBaseActivity) mContext);
     }
 
     @NonNull
@@ -67,7 +69,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
             binding.getRoot().setOnClickListener(v -> {
-                if(mOnClickListener!=null)
+                if (mOnClickListener != null)
                     mOnClickListener.onClick((FolderItem) v.getTag());
             });
             return vh;
@@ -76,15 +78,15 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0)
-            return TYPE_HEAD;
+//        if (position == 0)
+//            return TYPE_HEAD;
         return TYPE_FOLDER;
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommonViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_FOLDER) {
-            FolderItem folderItem = mFolderItemList.get(position - 1);
+            FolderItem folderItem = mFolderItemList.get(position);
             CommonViewHolder<FolderItemLayoutBinding> vh = holder;
             vh.mDataBinding.setItem(folderItem);
             vh.mDataBinding.getRoot().setTag(folderItem);
@@ -93,7 +95,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
     @Override
     public int getItemCount() {
-        return 1 + mFolderItemList.size();
+        return mFolderItemList.size();
     }
 
     public void addAllShortcuts(List<Shortcut> shortcutList) {
@@ -127,6 +129,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         folderItem.type = shortcut.devcieType;
         folderItem.file_count = shortcut.fileCount;
         folderItem.poster_count = shortcut.posterCount;
+        folderItem.state = shortcut.isScanned == 1 ? FolderItem.State.SCANNED : FolderItem.State.UNSCANNED;
         switch (folderItem.type) {
             case Constants.DeviceType.DEVICE_TYPE_SMB:
                 String smbUri = shortcut.uri;
@@ -135,11 +138,11 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
                 break;
             case Constants.DeviceType.DEVICE_TYPE_DLNA:
                 String dlnaUri = shortcut.uri;
-                String[] splits=dlnaUri.split(":");
-                if(splits.length>=3){
-                    dlnaUri=splits[2];
+                String[] splits = dlnaUri.split(":");
+                if (splits.length >= 3) {
+                    dlnaUri = splits[2];
                 }
-                folderItem.sub_title =dlnaUri;
+                folderItem.sub_title = dlnaUri;
                 break;
             default:
                 folderItem.sub_title = shortcut.uri;
@@ -153,11 +156,11 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             mEventHandler.pickerClose();
     }
 
-    public interface OnClickListener{
+    public interface OnClickListener {
         void onClick(FolderItem item);
     }
 
-    public void setOnClickListener(OnClickListener listener){
-       mOnClickListener=listener;
+    public void setOnClickListener(OnClickListener listener) {
+        mOnClickListener = listener;
     }
 }

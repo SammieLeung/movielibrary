@@ -7,61 +7,57 @@
         android:layout_height="match_parent"
         android:paddingLeft="@dimen/shortcut_container_padding"
         android:paddingRight="@dimen/shortcut_container_padding"
-
-        android:background="@drawable/background_corners"
+        android:background="@drawable/new_main_background"
         android:orientation="vertical">
 
-        <ImageButton
-            android:id="@+id/btn_exit"
-            android:src="@mipmap/ic_back"
-            android:layout_marginTop="@dimen/shortcut_container_padding"
-            android:layout_marginBottom="@dimen/shortcut_container_padding"
-            android:layout_width="@dimen/homebtn_w"
-            android:layout_height="@dimen/homebtn_w"
-            android:text="@string/btn_exit" />
-
-
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_below="@id/btn_exit"
-            android:layout_width="match_parent"
-            android:layout_above="@id/tv_tips"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_added_folders"
-                android:layout_width="0dp"
-                android:paddingLeft="@dimen/shortcut_container_padding"
-                android:paddingRight="@dimen/shortcut_container_padding"
-                android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/shortcut_container_padding"
-                android:layout_weight="5"
-                />
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="3"/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
         <TextView
-            android:id="@+id/tv_tips"
-            android:textSize="@dimen/key_prompt_label_textsize"
-            android:text="@string/key_prompt_text"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
+            android:drawableLeft="@drawable/icon_new_back"
+            android:textSize="39sp"
+            android:id="@+id/btn_exit"
+            android:drawableTint="@drawable/new_title_textcolor_state"
+            android:textColor="@drawable/new_title_textcolor_state"
+            android:drawablePadding="15dp"
+            android:src="@mipmap/ic_back"
+            android:layout_marginTop="61dp"
+            android:layout_marginBottom="64dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/shortcut_manager" />
+        <Button
+            android:focusedByDefault="true"
+            android:id="@+id/btn_add_device"
+            android:onClick="@{()->posterHandler.openShortcutPicker()}"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="75dp"
+            style="@style/common_btn_smalltext_style"
+            android:text="@string/add_shortcut"
+            android:drawableLeft="@drawable/icon_add_device_24dp"
+            android:drawableTint="@drawable/icon_add_device_24dp_tint"
+            android:drawablePadding="5dp"
+            android:layout_width="191dp"
+            android:layout_height="57dp"
+            android:paddingLeft="22dp"
+            android:paddingRight="22dp"
+            />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_added_folders"
+            android:layout_width="match_parent"
+            android:layout_below="@id/btn_exit"
+            android:layout_height="match_parent"
+            />
 
     </RelativeLayout>
 
     <data>
 
         <import type="android.view.View" />
-
+        <import type="com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerEventHandler"/>
         <variable
-            name="show_hidden"
-            type="Boolean"></variable>
+            name="posterHandler"
+            type="ShortcutManagerEventHandler" />
     </data>
 
 </layout>

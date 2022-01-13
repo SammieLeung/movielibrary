@@ -2,5 +2,15 @@
 <resources>
     <dimen name="homebtn_w">36dp</dimen>
     <dimen name="key_prompt_label_textsize">24sp</dimen>
-    <dimen name="shortcut_diaolog_margin">15dp</dimen>
+    <dimen name="common_textview_dialog_w">518dp</dimen>
+    <dimen name="common_textview_dialog_content_textsize">26sp</dimen>
+
+    <dimen name="common_edittext_dialog_w">525dp</dimen>
+    <dimen name="common_edittext_dialog_edit_w">428dp</dimen>
+    <dimen name="common_edittext_dialog_edit_h">60dp</dimen>
+
+    <dimen name="common_edittext_dialog_btn_w">195dp</dimen>
+    <dimen name="common_edittext_dialog_btn_h">53dp</dimen>
+
+
 </resources>

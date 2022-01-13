@@ -108,6 +108,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         Log.d(TAG, "onResume: "+mViewModel.toString());
     }
 
+
     @Override
     protected void onPause() {
         LogUtil.v(TAG, "onPause()");
@@ -180,9 +181,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
         intentFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
         intentFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
-        intentFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+        intentFilter.addAction(Constants.BroadCastMsg.RESCAN_ALL);
         intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_START);
-        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH);
+        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
         intentFilter.addAction(Constants.BroadCastMsg.MATCHED_MOVIE);
         intentFilter.addAction(Constants.BroadCastMsg.START_LOADING);
         intentFilter.addAction(Constants.BroadCastMsg.STOP_LOADING);
@@ -670,8 +671,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                         mHomePageFragment.addMovie(mid);
                     }
                     break;
-                case Constants.BroadCastMsg.MOVIE_SCRAP_FINISH:
+                case Constants.BroadCastMsg.MOVIE_SCRAP_STOP:
                     postDelayMovieRefresh(0);
+
                     break;
                 case Constants.ACTION_FAVORITE_MOVIE_CHANGE:
                     mFavoriteFragment.notifyUpdate();

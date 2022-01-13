@@ -1,10 +1,12 @@
 package com.hphtv.movielibrary.scraper.respone;
 
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
@@ -12,6 +14,9 @@ import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.hphtv.movielibrary.data.Constants.Scraper.TMDB;
+import static com.hphtv.movielibrary.data.Constants.Scraper.TMDB_EN;
 
 /**
  * author: Sam Leung
@@ -30,23 +35,24 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
     private class Data implements ResponeEntity<MovieWrapper> {
         private String movie_id;
         private String title;
-        private String title_en;
         private String year;
         private String released;
         private String duration;
         private String[] genre;
         private People[] directors;
-        private People[] writers;
+        private People[] writers;//TODO 添加 writers
         private People[] actors;
         private String plot;
         private String language;
         private String country;
+        private String tagline;
         private String poster;
         private String rating;
         private String type;
         private Video[] videos;
         private Img[] stage_img;
-        private String api;
+        private String api;//TMDB/TMDB_EN
+        private Season[] seasons;
 
 
         @Override
@@ -54,7 +60,6 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             Movie movie = new Movie();
             movie.movieId = String.valueOf(movie_id);
             movie.title = title;
-            movie.otherTitle = title_en;
             movie.ratings = rating;
             movie.poster = poster;
             movie.releaseDate = released;
@@ -64,7 +69,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movie.plot = plot;
             movie.year = year;
             movie.language = language;
-            movie.type = "movie";//todo 换回type
+            movie.type = Constants.SearchType.valueOf(type);//todo 换回type
             movie.source = api;
 
             List<Genre> genreList = new ArrayList<>();
@@ -124,6 +129,29 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
                 }
             }
 
+            List<com.hphtv.movielibrary.roomdb.entity.Season> seasonList = new ArrayList<>();
+            if (seasons != null && seasons.length > 0) {
+                for (Season season : seasons) {
+                    com.hphtv.movielibrary.roomdb.entity.Season dbSeason = new com.hphtv.movielibrary.roomdb.entity.Season();
+                    dbSeason.episodeCount = season.episode_count;
+                    dbSeason.seasonNumber = season.season_number;
+                    dbSeason.airDate = season.air_date;
+                    switch (api) {
+                        case TMDB_EN:
+                            dbSeason.nameEN = season.name;
+                            dbSeason.posterEN = season.poster_path;
+                            dbSeason.plotEN = season.overview;
+                            break;
+                        default:
+                            dbSeason.name = season.name;
+                            dbSeason.poster = season.poster_path;
+                            dbSeason.plot = season.overview;
+                            break;
+                    }
+                    seasonList.add(dbSeason);
+                }
+            }
+
 
             MovieWrapper movieWrapper = new MovieWrapper();
             movieWrapper.movie = movie;
@@ -132,6 +160,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movieWrapper.genres = genreList;
             movieWrapper.trailers = trailerList;
             movieWrapper.stagePhotos = stagePhotoList;
+            movieWrapper.seasons=seasonList;
 
             return movieWrapper;
         }
@@ -154,6 +183,15 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
         private class Img {
             private long img_id;
             private String img_url;
+        }
+
+        private class Season {
+            private String air_date;
+            private int episode_count;
+            private String name;
+            private String overview;
+            private String poster_path;
+            private int season_number;
         }
     }
 

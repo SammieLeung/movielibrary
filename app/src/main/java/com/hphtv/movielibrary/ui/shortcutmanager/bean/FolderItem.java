@@ -18,7 +18,11 @@ public class FolderItem {
     public int type;
     public int poster_count;
     public int file_count;
-    public int state;
+    public State state;
+
+    public  enum State {
+        UNSCANNED,SCANNING,SCANNED
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -32,4 +36,5 @@ public class FolderItem {
     public int hashCode() {
         return Objects.hash(item);
     }
+
 }

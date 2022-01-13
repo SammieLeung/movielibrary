@@ -45,13 +45,37 @@
     <dimen name="filter_box_item_textsize">24sp</dimen>
     <dimen name="filter_box_headitem_height">34dp</dimen>
 
-    <!--    文件夹管理-->
-    <dimen name="shortcut_container_padding">20dp</dimen>
+    <!-- 索引管理-->
+    <dimen name="shortcut_container_padding">72dp</dimen>
     <dimen name="shortcut_item_textsize">24sp</dimen>
-    <dimen name="shortcut_item_height">101dp</dimen>
+    <dimen name="shortcut_item_small_textsize">17sp</dimen>
+
+    <dimen name="shortcut_item_height">98dp</dimen>
     <dimen name="shortcut_item_radius">15dp</dimen>
-    <!--    文件扫描-->
-    <dimen name="shortcut_scan_title_height">84dp</dimen>
-    <dimen name="shortcut_scan_title_textsize">24sp</dimen>
+    <!-- 扫描弹窗-->
+    <dimen name="shortcut_scan_dialog_margin">15dp</dimen>
+
+    <dimen name="shortcut_scan_dialog_h">490dp</dimen>
+    <dimen name="shortcut_scan_dialog_w">525dp</dimen>
+
+    <dimen name="shortcut_scan_dialog_title_m_top">25dp</dimen>
+    <dimen name="shortcut_scan_dialog_title_m_bottom">45dp</dimen>
+
+    <dimen name="shortcut_scan_dialog_title_textsize">24sp</dimen>
+
+
     <dimen name="shortcut_scan_diaolg_item_height">60dp</dimen>
+    <dimen name="shortcut_scan_diaolg_item_margin_bottom">15dp</dimen>
+    <dimen name="shortcut_scan_diaolg_item_textsize">23sp</dimen>
+    <dimen name="shortcut_scan_diaolg_item_padding_lr">16dp</dimen>
+    <dimen name="shortcut_scan_diaolg_btn_w">435dp</dimen>
+    <dimen name="shortcut_scan_diaolg_btn_h">68dp</dimen>
+
+    <!-- 扫描弹窗->子项菜单 -->
+    <dimen name="shortcut_scan_subdiaolg_padding_lr">30dp</dimen>
+    <dimen name="shortcut_scan_subdiaolg_padding_tb">45dp</dimen>
+
+    <dimen name="shortcut_scan_subdiaolg_btn_w">320dp</dimen>
+
+
 </resources>

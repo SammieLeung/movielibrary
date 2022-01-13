@@ -1,5 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+
+    <style name="common_btn_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/new_common_btn_bg</item>
+    </style>
+    <style name="common_btn_smalltext_style" parent="common_btn_style">
+        <item name="android:textSize">23sp</item>
+    </style>
+    <style name="close_btn_style">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:layout_marginTop">23dp</item>
+        <item name="android:layout_marginRight">23dp</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:src">@mipmap/icon_close</item>
+        <item name="android:tint">@drawable/icon_close_tint</item>
+    </style>
+
+    <style name="common_dialog_btn_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/new_common_dialog_btn_bg</item>
+    </style>
+    <style name="common_dialog_btn_smalltext_style" parent="common_dialog_btn_style">
+        <item name="android:textSize">23sp</item>
+    </style>
+
+    <style name="common_edittext_style">
+        <item name="android:background">@drawable/new_edittext_bg</item>
+        <item name="android:layout_width">@dimen/common_edittext_dialog_edit_w</item>
+        <item name="android:layout_height">@dimen/common_edittext_dialog_edit_h</item>
+        <item name="android:textSize">23sp</item>
+        <item name="android:textColorHint">#535367</item>
+        <item name="android:paddingLeft">30dp</item>
+        <item name="android:paddingRight">30dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:singleLine">true</item>
+
+    </style>
+
     <style name="filter_box_title_text_style">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@android:color/white</item>
@@ -10,4 +52,10 @@
         <item name="android:background">@drawable/filter_box_main_bg</item>
         <item name="android:layout_marginRight">@dimen/filter_box_common_margin</item>
     </style>
+    
+    <style name="include_size_shortcut_scan_item">
+        <item name="android:layout_height">60dp</item>
+        <item name="android:layout_width">465dp</item>
+    </style>
+
 </resources>

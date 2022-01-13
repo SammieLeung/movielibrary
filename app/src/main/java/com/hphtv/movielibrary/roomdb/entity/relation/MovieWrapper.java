@@ -8,6 +8,7 @@ import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
@@ -56,6 +57,10 @@ public class MovieWrapper implements Serializable {
     @Relation(parentColumn = "id",
             entityColumn = "movie_id")
     public List<StagePhoto> stagePhotos;//剧照，一对多
+
+    @Relation(parentColumn = "id",
+    entityColumn = "movie_id")//分季,一对多
+    public List<Season> seasons;
 
     public String toGenreString() {
         StringBuffer sb = new StringBuffer();

@@ -14,6 +14,7 @@ import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
@@ -28,6 +29,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
+ * 设备管理页
  * author: Sam Leung
  * date:  2021/8/24
  */
@@ -37,6 +39,7 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
     private DeviceDao mDeviceDao;
     private ShortcutDao mShortcutDao;
     private boolean passwordhasBeenSet = false;
+
 
     public ShortcutManagerViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -48,6 +51,10 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
         passwordhasBeenSet = TextUtils.isEmpty(password) ? false : true;
     }
 
+    /**
+     * 读取所有索引
+     * @param callback
+     */
     public void loadShortcuts(Callback callback) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
@@ -65,20 +72,12 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                 });
     }
 
-//    public void loadHiddenScanDirectory(Callback callback) {
-//        Observable.just("")
-//                .subscribeOn(Schedulers.io())
-//                .map(s -> {
-//                    List<ScanDirectory> scanDirectoryList = mScanDirectoryDao.queryAllHiddenScanDirectories();
-//                    return scanDirectoryList;
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(scanDirectoryList -> {
-//                    if (callback != null)
-//                        callback.refreshHiddenScanDirectoryList(scanDirectoryList);
-//                });
-//    }
 
+    /**
+     * 添加索引
+     * @param uri
+     * @param callback
+     */
     public void addShortcut(Uri uri, Callback callback) {
         Observable.just(uri)
                 .subscribeOn(Schedulers.io())
@@ -98,7 +97,7 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                                 LogUtil.v("id " + device.id + " localpath:" + device.path);
                                 Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                                 if (shortcut == null) {
-                                    shortcut = new Shortcut(path, device.type, null, null,null);
+                                    shortcut = new Shortcut(path, device.type, null, null,path);
                                     shortcut.devicePath=device.path;
                                     mShortcutDao.insertShortcut(shortcut);
                                 }
@@ -129,6 +128,11 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
 
     }
 
+    /**
+     * 移除索引
+     * @param shortcut
+     * @param callback
+     */
     public void removeShortcut(Shortcut shortcut, Callback callback) {
         Observable.just(shortcut)
                 .subscribeOn(Schedulers.io())
@@ -141,41 +145,12 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                 });
     }
 
-//    public void moveToHidden(String path, Callback callback) {
-//        Observable.just(path)
-//                .subscribeOn(Schedulers.io())
-//                .doOnNext(_path -> {
-//                    mScanDirectoryDao.updateScanDirectoryHiddenState(_path, true);
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(s -> {
-//                    loadShortcuts(callback);
-//                    loadHiddenScanDirectory(callback);
-//                });
-//
-//    }
-//
-//    public void moveToPublic(String path, Callback callback) {
-//        Observable.just(path)
-//                .subscribeOn(Schedulers.io())
-//                .doOnNext(_path -> {
-//                    mScanDirectoryDao.updateScanDirectoryHiddenState(_path, false);
-//                })
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(s -> {
-//                    loadShortcuts(callback);
-//                    loadHiddenScanDirectory(callback);
-//                });
-//    }
 
-//    public boolean isPasswordHasBeenSet() {
-//        return passwordhasBeenSet;
-//    }
-
+    /**
+     * 用于更新UI
+     */
     public interface Callback {
         void refreshShortcutList(List<Shortcut> shortcutList);
-
         void addShortcut(Shortcut shortcut);
-
     }
 }

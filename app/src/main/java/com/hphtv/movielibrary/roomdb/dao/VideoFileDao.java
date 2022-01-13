@@ -44,7 +44,10 @@ public interface VideoFileDao {
     public List<VideoFile> queryAll();
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_path <=5 AND is_scanned=0")
-    public List<VideoFile> queryAllNotScanedVideoFiles();
+    public List<VideoFile> queryAllLocalUnScannedVideoFiles();
+
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE dir_path=:dirPath AND is_scanned=0")
+    public List<VideoFile> queryUnScannedVideoFiles(String dirPath);
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path=:path")
     public VideoFile queryByPath(String path);

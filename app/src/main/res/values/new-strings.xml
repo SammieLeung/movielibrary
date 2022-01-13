@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="confirm">OK</string>
+    <string name="cancel">Cancel</string>
+    <!--    历史播放-->
     <string name="history_list_title">Recently Played</string>
     <string name="history_list_empty">No watch history</string>
     <string name="category_list_title">Category Browse</string>
@@ -18,12 +21,24 @@
     <string name="filter_box_dlna_device">DLNA</string>
     <string name="filter_box_smb_device">SMB</string>
 
-    <!--    文件夹管理-->
-    <string name="shortcut_item_add_shortcut">Add Shortcut</string>
+    <!--    索引管理-->
+    <string name="add_shortcut">Add</string>
+    <string name="shortcut_manager">Device</string>
+    <string name="shortcut_state_unscanned">Unscanned</string>
+    <string name="shortcut_state_scanned">Scanned</string>
+    <string name="shortcut_state_scanning">Scanning</string>
+    <string name="scanning_in_background">Scanning in Background</string>
+
     <string name="shortcut_scan_dialog_item_shortcut_type">Movie Type</string>
     <string name="shortcut_scan_dialog_item_shortcut_access">Permission</string>
     <string name="shortcut_scan_dialog_item_shortcut_name">Name</string>
     <string name="shortcut_scan_dialog_confirm">Scan</string>
+    <string name="shortcut_options_dialog_remove">Remove</string>
+    <string name="shortcut_options_dialog_rescan">Rescan</string>
+
+    <string name="shortcut_remove_dialog_content">Remove folder %s?</string>
+
+
     <!--   文件夹管理->影片分类-->
     <string name="shortcut_type_auto">Auto</string>
     <string name="shortcut_type_movie">Movie</string>
@@ -36,4 +51,7 @@
     <string name="shortcut_access_all_ages">All Ages</string>
     <!--    文件管理->索引默认名称-->
     <string name="shortcut_name_default">Default</string>
+    <string name="shortcut_name_editdialog_title">Eidt Name</string>
+    <string name="shortcut_name_editdialog_hint">Please enter a name</string>
+
 </resources>

@@ -16,6 +16,7 @@ public class Constants {
     public static final String PACKAGE_FILE_PICKER = "com.firefly.filepicker";
     public static final String ACTION_FILE_PICKER = "com.firefly.FILE_PICKER";
     public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
+
     /**
      * 设备路径与id映射
      */
@@ -46,6 +47,7 @@ public class Constants {
     }
 
 
+
     public interface DeviceType {
         int DEVICE_TYPE_LOCAL = -1;
         /**
@@ -73,17 +75,18 @@ public class Constants {
         int DEVICE_TYPE_SMB = 7;
     }
 
-    public enum FolderType {
-        MOVIE,//电影
-        TV_SERIES,//电视节目
-        VARIETY_SHOW,//综艺节目
-        ANIMATE,//动画
-        OTHER,//其他
+    public enum SearchType {
+        auto,//智能匹配
+        movie,//电影
+        tv,//电视节目
+//        VARIETY_SHOW,//综艺节目
+//        CARTOON,//儿童节目
+//        ANIMATE,//动画
+//        OTHER,//其他
     }
 
     public enum AccessPermission{
-        NORMAL,
-        CHILDREN,
+        ALL_AGE,
         ADULT
     }
 
@@ -134,6 +137,10 @@ public class Constants {
         //详情页
         String MODE = "mode";
         String MOVIE_ID = "movie_id";
+        String SUCCESS_COUNT ="success_count";
+        String SCANNED_COUNT="scanned_count";
+        String TOTAL ="total";
+        String SHORTCUT_URI ="shortcut_uri";
         String UNRECOGNIZE_FILE_KEYWORD = "keyword";
 
         String CURRENT_FRAGMENT = "current_fragment";
@@ -144,6 +151,8 @@ public class Constants {
         String DEVICE_NETWORKPATH = "device_networkpath";
         String MOUNT_TYPE = "device_type";
         String QUERY_URI ="query_uri";
+        String QUERY_SHORTCUT ="query_shortcut";
+        String SEARCH_TYPE ="search_type";
         String NETWORK_DIR_PATH="network_dir_path";
         String IS_FROM_NETWORK = "is_from_network";
         String DEVICE_ID = "device_id";
@@ -176,16 +185,20 @@ public class Constants {
         /**
          * 重新扫描设备
          */
-        String RESCAN_DEVICE = "com.rockchips.mediacenter.rescan_device";
+        String RESCAN_ALL = "com.station.rescan_all";
 
         String MOVIE_SCRAP_START= "action.movie.scrap.start";
-        String MOVIE_SCRAP_FINISH = "action.movie.scrap.finish";
+        String MOVIE_SCRAP_STOP = "action.movie.scrap.stop";
+        String SHORTCUT_SCRAP_START="action.short.scrap.start";
+        String SHORTCUT_SCRAP_STOP="action.short.scrap.finish";
+
         String MATCHED_MOVIE="action.movie.matched";
+        String MATCHED_MOVIE_FAILED="action.movie.matched.failed";
+
+
         String FOLDER_REFRESH = "action.movie.folder.refresh";
         String START_LOADING = "action.home.startloading";
         String STOP_LOADING = "action.home.stoploading";
-
-
     }
 
 

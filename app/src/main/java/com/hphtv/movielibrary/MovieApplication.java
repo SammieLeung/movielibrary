@@ -64,4 +64,5 @@ public class MovieApplication extends Application {
     public static MovieApplication getInstance(){
         return sMovieApplication;
     }
+
 }

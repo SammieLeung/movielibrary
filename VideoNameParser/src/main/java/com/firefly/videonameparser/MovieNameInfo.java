@@ -1,5 +1,7 @@
 package com.firefly.videonameparser;
 
+import android.text.TextUtils;
+
 import java.util.ArrayList;
 
 public class MovieNameInfo {
@@ -75,7 +77,26 @@ public class MovieNameInfo {
         return (episodes != null) && (episodes.size() > 0);
     }
 
-    ;
+    public String toEpisode(String prefix){
+        if(TextUtils.isEmpty(prefix))
+            prefix="0";
+        if(saneEpisode()){
+            StringBuffer sb=new StringBuffer();
+            if(episodes.size()<=2) {
+                for (int i : episodes) {
+                    sb.append(prefix + i + "-");
+                }
+                sb.substring(0,sb.length()-1);
+            }else {
+                for (int i : episodes) {
+                    sb.append(prefix + i + ",");
+                }
+                sb.substring(0,sb.length()-1);
+            }
+            return sb.toString();
+        }
+        return "";
+    }
 
 
     public String getName() {

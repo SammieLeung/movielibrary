@@ -49,14 +49,14 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
         mCurrentKeyword = keyword.trim();
         mMovieLinkedList.clear();
         mCurrentPage = 1;
-        notifyNewSearch(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage, pageSize * 3, mSource), adapter);
+        notifyNewSearch(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage,mSource), adapter);
 //        mCurrentPage = 3;
     }
 
     public void loading(MovieSearchAdapter adapter) {
         if (TextUtils.isEmpty(mCurrentKeyword))
             return;
-        notifyLoadingMore(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage + 1, pageSize, mSource), adapter);
+        notifyLoadingMore(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage + 1, mSource), adapter);
     }
 
     private void notifyNewSearch(Observable<? extends ResponeEntity<List<Movie>>> observable, MovieSearchAdapter adapter) {

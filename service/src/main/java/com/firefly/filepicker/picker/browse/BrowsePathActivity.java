@@ -28,6 +28,7 @@ public class BrowsePathActivity extends AppCompatActivity {
     public final static String ARG_FRAGMENT_TITLE = "title";
     public final static String ARG_SUPPORT_NET = "supportNet";
     public static final String ARG_ENABLE_CONFIRM_DIALOG = "enableConfrimDialog";
+    public static final String ARG_ALLOW_EXTENIONS="allow_extenions";
 
     private static final int REQUEST_CODE_CHECK_PERMISSION = 1000;
     private BrowsePathPresenter mPresenter;
@@ -93,6 +94,7 @@ public class BrowsePathActivity extends AppCompatActivity {
         String fragmentTitle = getIntent().getStringExtra(ARG_FRAGMENT_TITLE);
         boolean supportNet = getIntent().getBooleanExtra(ARG_SUPPORT_NET, true);
         boolean enableConfirm = getIntent().getBooleanExtra(ARG_ENABLE_CONFIRM_DIALOG, true);
+        String[] allExtenions=getIntent().getStringArrayExtra(ARG_ALLOW_EXTENIONS);
         mFragment = new BrowsePathFragment();
         mFragment.setTitle(fragmentTitle);
 
@@ -104,6 +106,8 @@ public class BrowsePathActivity extends AppCompatActivity {
         mPresenter.setBrowseType(browseType);
         mPresenter.setSupportNet(supportNet);
         mPresenter.setEnableSelectConfirm(enableConfirm);
+        mPresenter.setAllowExtensionFilter(allExtenions);
+
     }
 
     @Override

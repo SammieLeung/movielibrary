@@ -44,7 +44,6 @@
     <dimen name="dialog_fragment_search_result_img_w">119dp</dimen>
     <dimen name="dialog_fragment_search_result_img_h">157dp</dimen>
     
-    <dimen name="folder_dialog_item_textsize">20sp</dimen>
 
     <dimen name="folder_dialog_img_w">48dp</dimen>
 

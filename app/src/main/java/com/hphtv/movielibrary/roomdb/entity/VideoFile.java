@@ -40,10 +40,8 @@ public class VideoFile implements Serializable {
 
     @ColumnInfo(name = "last_playtime",defaultValue = "0")
     public long lastPlayTime;//上次播放时间
-    @ColumnInfo(defaultValue = "-1")
-    public int season=-1;
-    @ColumnInfo(defaultValue = "-1")
-    public int episode=-1;
+    public int season=0;
+    public String episode="";
 
     public VideoFile(){
 
@@ -66,13 +64,10 @@ public class VideoFile implements Serializable {
     public String toString() {
         return "VideoFile{" +
                 "vid=" + vid +
-                ", path='" + path + '\'' +
-                ", devicePath='" + devicePath + '\'' +
-                ", dirPath='" + dirPath + '\'' +
                 ", filename='" + filename + '\'' +
-                ", isScanned=" + isScanned +
                 ", keyword='" + keyword + '\'' +
-                ", addTime=" + addTime +
+                ", season=" + season +
+                ", episode='" + episode + '\'' +
                 '}';
     }
 }

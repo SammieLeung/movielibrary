@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -17,7 +18,7 @@ import java.util.Objects;
  * date:  2021/11/30
  */
 @Entity(tableName = TABLE.SHORTCUT, indices = {@Index(value = {"uri"}, unique = true)})
-public class Shortcut {
+public class Shortcut implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "shortcut_id")
@@ -35,7 +36,7 @@ public class Shortcut {
     @ColumnInfo(name = "poster_count")
     public int posterCount = 0;
     @ColumnInfo(name = "folder_type")
-    public Constants.FolderType folderType;
+    public Constants.SearchType folderType;
     public Constants.AccessPermission access;
     @ColumnInfo(name = "query_uri")
     public String queryUri;
@@ -43,8 +44,8 @@ public class Shortcut {
     public int isScanned = 0;
 
     public Shortcut(String uri, int devcieType, String name, String firendlyName, String queryUri) {
-        this.folderType = Constants.FolderType.MOVIE;
-        this.access = Constants.AccessPermission.NORMAL;
+        this.folderType = Constants.SearchType.auto;
+        this.access = Constants.AccessPermission.ALL_AGE;
         this.uri = uri;
         this.devcieType = devcieType;
         this.queryUri = queryUri;
@@ -79,5 +80,23 @@ public class Shortcut {
     @Override
     public int hashCode() {
         return Objects.hash(uri);
+    }
+
+    @Override
+    public String toString() {
+        return "Shortcut{" +
+                "shortcutId=" + shortcutId +
+                ", name='" + name + '\'' +
+                ", devicePath='" + devicePath + '\'' +
+                ", firendlyName='" + firendlyName + '\'' +
+                ", uri='" + uri + '\'' +
+                ", devcieType=" + devcieType +
+                ", fileCount=" + fileCount +
+                ", posterCount=" + posterCount +
+                ", folderType=" + folderType +
+                ", access=" + access +
+                ", queryUri='" + queryUri + '\'' +
+                ", isScanned=" + isScanned +
+                '}';
     }
 }

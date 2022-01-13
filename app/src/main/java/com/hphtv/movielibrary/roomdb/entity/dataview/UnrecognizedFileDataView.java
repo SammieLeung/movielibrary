@@ -15,7 +15,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "JOIN "+TABLE.SHORTCUT+" AS ST " +
                 "ON VF.dir_path=ST.uri " +
                 "JOIN "+TABLE.DEVICE+" AS DEV " +
-                "ON DEV.path=ST.device_path OR ST.device_path > 5",
+                "ON DEV.path=ST.device_path OR ST.device_type > 5",
         viewName = VIEW.UNRECOGNIZEDFILE_DATAVIEW)
 public class UnrecognizedFileDataView {
     public long vid;

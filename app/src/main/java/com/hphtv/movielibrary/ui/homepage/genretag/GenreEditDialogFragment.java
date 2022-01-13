@@ -29,6 +29,11 @@ public class GenreEditDialogFragment extends BaseDialogFragment2<GenreEditDialog
     }
 
     @Override
+    protected boolean createViewModel() {
+        return false;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         prepareGenreList();

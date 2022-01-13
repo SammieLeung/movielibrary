@@ -21,13 +21,27 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
     @Override
     public List<Movie> toEntity() {
         List<Movie> movies = new ArrayList<>();
-        if (data!=null&&data.list != null)
+        if (data != null && data.list != null)
             for (Data.SearchMovie searchMovie : data.list) {
-                Movie movie=searchMovie.toEntity();
-                movie.source= TextUtils.isEmpty(data.source)?null:data.source.toUpperCase();
+                Movie movie = searchMovie.toEntity();
+                movie.source = TextUtils.isEmpty(data.source) ? null : data.source.toUpperCase();
                 movies.add(movie);
             }
         return movies;
+    }
+
+    public MovieSearchRespone combine(MovieSearchRespone respone) {
+        if (respone.data == null || respone.data.list == null) {
+            return this;
+        } else if (this.data != null) {
+            if (this.data.list == null)
+                this.data.list = new ArrayList<>();
+            this.data.list.addAll(respone.data.list);
+            this.data.total = this.data.list.size();
+            return this;
+        } else {
+            return this;
+        }
     }
 
     private class Data {
@@ -38,12 +52,13 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
         private class SearchMovie implements ResponeEntity<Movie> {
             private String movie_id;
             private String title;
-            private String title_en;
             private String year;
             private String type;
             private String poster;
-            private String genre;
-            private String actors;
+            private String genre;//一般为空
+            private String rating;
+            private String actors;//一般为空
+            private String plot;
 
 
             @Override
@@ -51,11 +66,12 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
                 Movie movie = new Movie();
                 movie.movieId = movie_id;
                 movie.title = title;
-                movie.otherTitle = title_en;
                 movie.tag = genre;
                 movie.tag2 = actors;
-                movie.type = type;
+                movie.type =  Constants.SearchType.valueOf(type);
                 movie.releaseDate = year;
+                movie.ratings=rating;
+                movie.plot=plot;
                 movie.poster = poster;
                 return movie;
             }

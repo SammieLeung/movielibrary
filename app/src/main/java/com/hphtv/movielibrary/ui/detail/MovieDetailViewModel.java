@@ -12,12 +12,14 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieActorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
+import com.hphtv.movielibrary.roomdb.dao.SeasonDao;
 import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao;
 import com.hphtv.movielibrary.roomdb.dao.TrailerDao;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
@@ -70,6 +72,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
     private VideoFileDao mVideoFileDao;
     private TrailerDao mTrailerDao;
     private StagePhotoDao mStagePhotoDao;
+    private SeasonDao mSeasonDao;
 
 
     private ExecutorService mSingleThreadPool;
@@ -98,6 +101,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
         mTrailerDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getTrailerDao();
         mStagePhotoDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getStagePhotoDao();
+        mSeasonDao=MovieLibraryRoomDatabase.getDatabase(getApplication()).getSeasonDao();
     }
 
     public void loadMovieWrapper(long id, MovieWrapperCallback callback) {
@@ -204,7 +208,8 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .map(new Function<String, MovieWrapper>() {
                     @Override
                     public MovieWrapper apply(String _source) throws Throwable {
-                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                        //TODO 增加可选搜索类型
+                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source,Constants.SearchType.movie.name()).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                         return wrapper;
                     }
                 })
@@ -256,6 +261,8 @@ public class MovieDetailViewModel extends AndroidViewModel {
         List<Actor> actorList = movieWrapper.actors;
         List<Trailer> trailerList = movieWrapper.trailers;
         List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
+        List<Season> seasonList=movieWrapper.seasons;
+
         //插入电影到数据库
         movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
@@ -316,6 +323,13 @@ public class MovieDetailViewModel extends AndroidViewModel {
             }
         }
 
+        for(Season season:seasonList){
+            if(season!=null){
+                season.movieId=movie_id;
+                mSeasonDao.insertOrIgnore(season);
+            }
+        }
+
         for (VideoFile videoFile : videoFileList) {
             MovieVideoFileCrossRef movieVideoFileCrossRef = new MovieVideoFileCrossRef();
             movieVideoFileCrossRef.id = movie_id;
@@ -323,6 +337,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
             movieVideoFileCrossRef.source = source;
             mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
             videoFile.isScanned = 1;
+            videoFile.keyword=movie.title;
             mVideoFileDao.update(videoFile);
         }
 

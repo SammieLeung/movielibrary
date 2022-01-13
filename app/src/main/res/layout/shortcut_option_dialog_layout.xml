@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+      >
+        <RelativeLayout
+            android:layout_width="@dimen/shortcut_scan_dialog_w"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/view_main_dialog"
+                android:layout_width="@dimen/shortcut_scan_dialog_w"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:background="@drawable/new_common_dialog_bg"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/shortcut_scan_dialog_title_textsize"
+                    android:layout_marginTop="@dimen/shortcut_scan_dialog_title_m_top"
+                    android:layout_marginBottom="@dimen/shortcut_scan_dialog_title_m_bottom"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:text="@{dialogTitle}" />
+
+
+                <Button
+                    android:id="@+id/btn_scan"
+                    android:text="@string/shortcut_options_dialog_rescan"
+                    android:focusedByDefault="true"
+                    style="@style/common_dialog_btn_style"
+                    android:layout_width="@dimen/shortcut_scan_diaolg_btn_w"
+                    android:layout_height="@dimen/shortcut_scan_diaolg_btn_h"
+                    android:layout_marginBottom="38dp"/>
+                <Button
+                    android:id="@+id/btn_remove"
+                    android:text="@string/shortcut_options_dialog_remove"
+                    style="@style/common_dialog_btn_style"
+                    android:layout_width="@dimen/shortcut_scan_diaolg_btn_w"
+                    android:layout_height="@dimen/shortcut_scan_diaolg_btn_h"
+                    android:layout_marginBottom="50dp"/>
+
+            </LinearLayout>
+            <ImageView
+               style="@style/close_btn_style"
+                android:id="@+id/btn_close"/>
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+    <data>
+
+        <import type="com.hphtv.movielibrary.ui.shortcutmanager.bean.ShortcutOptionsItem" />
+        <import type="androidx.databinding.ObservableBoolean"/>
+        <import type="android.view.View"/>
+
+        <variable
+            name="dialogTitle"
+            type="String" />
+    </data>
+</layout>

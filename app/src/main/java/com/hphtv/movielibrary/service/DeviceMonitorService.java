@@ -20,15 +20,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
-import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
+import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.DeviceMountThread;
-import com.hphtv.movielibrary.service.Thread.FileScanThread;
+import com.hphtv.movielibrary.service.Thread.LocalFileScanHelper;
+import com.hphtv.movielibrary.util.ServiceStatusHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.AppUtils;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
 
@@ -39,7 +42,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,6 +54,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -70,9 +78,8 @@ public class DeviceMonitorService extends Service {
     private ExecutorService mFileScanExecutor;
     private ExecutorService mSingleThreadPool;
 
-    private DeviceDao mDeviceDao;
     private VideoFileDao mVideoFileDao;
-    private ScanDirectoryDao mScanDirectoryDao;
+    private ShortcutDao mShortcutDao;
     private int mScanFlag = 0;
 
 
@@ -90,6 +97,23 @@ public class DeviceMonitorService extends Service {
         super.onCreate();
         initThreadPools();
         initDb();
+    }
+
+    /**
+     * 初始化数据库类
+     */
+    private void initDb() {
+        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
+        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
+        mShortcutDao = movieLibraryRoomDatabase.getShortcutDao();
+    }
+
+    //初始化线程池
+    private void initThreadPools() {
+        mDeviceMountExecutor = Executors.newSingleThreadExecutor();
+        mFileScanExecutor = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        mDeviceInitExecutor = Executors.newSingleThreadExecutor();
+        mSingleThreadPool = Executors.newSingleThreadExecutor();
     }
 
     /**
@@ -131,23 +155,6 @@ public class DeviceMonitorService extends Service {
         unbindServices();
     }
 
-    /**
-     * 初始化数据库类
-     */
-    private void initDb() {
-        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
-        mDeviceDao = movieLibraryRoomDatabase.getDeviceDao();
-        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
-        mScanDirectoryDao = movieLibraryRoomDatabase.getScanDirectoryDao();
-    }
-
-    //初始化线程池
-    private void initThreadPools() {
-        mDeviceMountExecutor = Executors.newSingleThreadExecutor();
-        mFileScanExecutor = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        mDeviceInitExecutor = Executors.newSingleThreadExecutor();
-        mSingleThreadPool = Executors.newSingleThreadExecutor();
-    }
 
     private void bindServices() {
         Intent intent = new Intent();
@@ -190,7 +197,6 @@ public class DeviceMonitorService extends Service {
             };
             mStorageManager = (StorageManager) getApplication().getSystemService(Context.STORAGE_SERVICE);
             mStorageManager.registerStorageVolumeCallback(getMainExecutor(), (StorageManager.StorageVolumeCallback) mStorageVolumeCallback);
-
         } else {
             IntentFilter newFilter = new IntentFilter();
             newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
@@ -201,7 +207,7 @@ public class DeviceMonitorService extends Service {
         IntentFilter localFilter = new IntentFilter();
         localFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
         localFilter.addAction(Constants.BroadCastMsg.DEVICE_DOWN);
-        localFilter.addAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+        localFilter.addAction(Constants.BroadCastMsg.RESCAN_ALL);
         localFilter.addAction(Constants.BroadCastMsg.POSTER_PAIRING);
         localFilter.addAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
@@ -255,16 +261,22 @@ public class DeviceMonitorService extends Service {
                     break;
                 case Constants.BroadCastMsg.DEVICE_DOWN:
                     break;
-                case Constants.BroadCastMsg.RESCAN_DEVICE:
+                case Constants.BroadCastMsg.RESCAN_ALL:
                     reScanDevices();
                     break;
                 case Constants.BroadCastMsg.POSTER_PAIRING:
-                    startScanWithNotScannedFiles();
+                    if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
+                        Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
+                        startScanLocalShortcut(shortcut);
+                    } else {
+                        startScanAllLocalUnScannedFiles();
+                    }
                     break;
                 case Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI:
-                    String query_uri = intent.getStringExtra(Constants.Extras.QUERY_URI);
-                    String network_dirpath = intent.getStringExtra(Constants.Extras.NETWORK_DIR_PATH);
-                    startScanNetworkFiles(query_uri, network_dirpath);
+                    if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
+                        Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
+                        startScanNetworkFiles(shortcut);
+                    }
                     break;
             }
         }
@@ -317,55 +329,131 @@ public class DeviceMonitorService extends Service {
     }
 
     public void executeOnFileScanThread() {
-        mFileScanExecutor.execute(new FileScanThread(this));
+        Observable.just("")
+                .observeOn(Schedulers.from(mFileScanExecutor))
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                        LocalFileScanHelper.scanAllLocalShortcuts(getBaseContext());
+                    }
+                });
+//        mFileScanExecutor.execute(new FileScanThread(this));
     }
 
-    public void startScanWithNotScannedFiles() {
-        Observable.just("")
-                .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .observeOn(Schedulers.from(mSingleThreadPool))
-                .map(arg -> {
-                    List<VideoFile> videoFiles = getNotScannedFiles();
-                    return videoFiles;
+    public void startScanLocalShortcut(Shortcut shortcut) {
+        Observable.just(shortcut)
+                .observeOn(Schedulers.newThread())
+                .map(shortcut1 -> {
+                    LocalFileScanHelper.scanShortcut(getApplication(), shortcut1);
+                    List<VideoFile> videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut1.uri);
+                    Object[] data = new Object[2];
+                    data[0] = shortcut1;
+                    data[1] = videoFileList;
+                    return data;
+
                 })
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
-                    return new ArrayList<VideoFile>();
+                    return new Object[0];
                 })
-                .subscribe(new SimpleObserver<List<VideoFile>>() {
+                .subscribe(new SimpleObserver<Object[]>() {
                     @Override
-                    public void onAction(List<VideoFile> videoFiles) {
-                        if (videoFiles != null && videoFiles.size() > 0) {
-                            if (mMovieScanService != null)
-                                mMovieScanService.addToPairingQueue(videoFiles);
-                        } else {    //TODO mPosterPairingDevice处理
-                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH));
+                    public void onAction(Object[] data) {
+                        if (data.length == 2) {
+                            Shortcut shortcut = (Shortcut) data[0];
+                            List<VideoFile> videoFileList = (List<VideoFile>) data[1];
+                            if (videoFileList != null && videoFileList.size() > 0) {
+                                if (mMovieScanService != null)
+                                    mMovieScanService.scanVideo(shortcut, videoFileList);
+                            } else {    //TODO mPosterPairingDevice处理
+                                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
+                                ServiceStatusHelper.removeView(DeviceMonitorService.this);
+
+                            }
                         }
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (!AppUtils.isAppInBackground(getBaseContext()))
+                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
                     }
                 });
     }
 
+    public void startScanAllLocalUnScannedFiles() {
+        Observable.just("")
+                .subscribeOn(Schedulers.newThread())
+                .map(arg -> {
+                    List<VideoFile> unScannedFiles = getUnScannedLocalFiles();
+                    HashMap<String,List<VideoFile>> map=new HashMap<>();
+                    for(VideoFile videoFile:unScannedFiles){
+                        if(map.get(videoFile.dirPath)==null){
+                            map.put(videoFile.dirPath,new ArrayList<>());
+                        }else{
+                            map.get(videoFile.dirPath).add(videoFile);
+                        }
+                    }
+                    Set<String> shortcutUris=  map.keySet();
+                    Iterator<String> urisIterator=shortcutUris.iterator();
+                    List<Object[]> dataList=new ArrayList<>();
+                    if(urisIterator.hasNext()){
+                        String uri=urisIterator.next();
+                        Shortcut shortcut=mShortcutDao.queryShortcutByUri(uri);
+                        if(shortcut!=null){
+                            Object[] data=new Object[2];
+                            data[0]=shortcut;
+                            data[1]=map.get(uri);
+                            dataList.add(data);
+                        }
+                    }
+                    return dataList;
 
-    public void startScanNetworkFiles(String query_dir, String networkPath) {
-        Observable.just(query_dir)
-                .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .observeOn(Schedulers.from(mSingleThreadPool))
-                .map(uri -> {
+                })
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    return new ArrayList<>();
+                })
+                .subscribe(new SimpleObserver<List<Object[]>>() {
+                    @Override
+                    public void onAction(List<Object[]> dataList) {
+                        if(dataList.size()>0){
+                            Log.w(Thread.currentThread().getName(), "StartScanAllUnScannedVideos=>" );
+                            for(Object[] objArr:dataList) {
+                                if(objArr!=null&&objArr.length==2) {
+                                    Shortcut shortcut = (Shortcut) objArr[0];
+                                    List<VideoFile> videoFileList = (List<VideoFile>) objArr[1];
+                                    Log.w(Thread.currentThread().getName(), shortcut.firendlyName );
+                                    if (mMovieScanService != null)
+                                        mMovieScanService.scanVideo(shortcut,videoFileList);
+                                }
+                            }
+                        }else{
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
+                            ServiceStatusHelper.removeView(DeviceMonitorService.this);
+                        }
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (!AppUtils.isAppInBackground(getBaseContext()))
+                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
+                    }
+                });
+    }
+
+    public void startScanNetworkFiles(Shortcut shortcut) {
+        Observable.just(shortcut)
+                .subscribeOn(Schedulers.newThread())
+                .map(shortcut1 -> {
                     List<VideoFile> videoFileList = new ArrayList<>();
-                    Cursor cursor = getContentResolver().query(Uri.parse(uri), null, null, null, null);
+                    String queryUri = shortcut1.queryUri;
+                    String networkPath = shortcut1.uri;
+                    Cursor cursor = getContentResolver().query(Uri.parse(queryUri), null, null, null, null);
                     if (cursor != null) {
                         while (cursor.moveToNext()) {
-//                            Log.w(TAG, "startScanNetworkFiles:document_id "+  cursor.getString(cursor.getColumnIndex("document_id")) );
-//                            Log.w(TAG, "startScanNetworkFiles:mime_type "+  cursor.getString(cursor.getColumnIndex("mime_type")) );
-//                            Log.w(TAG, "startScanNetworkFiles:_display_name "+  cursor.getString(cursor.getColumnIndex("_display_name")) );
-//                            Log.w(TAG, "startScanNetworkFiles:last_modified "+  cursor.getString(cursor.getColumnIndex("last_modified")) );
-//                            Log.w(TAG, "startScanNetworkFiles:_size "+  cursor.getString(cursor.getColumnIndex("_size")) );
-//                            Log.w(TAG, "startScanNetworkFiles:path "+  cursor.getString(cursor.getColumnIndex("path")) );
-//                            Log.w(TAG, "startScanNetworkFiles:file_source "+  cursor.getString(cursor.getColumnIndex("file_source")) );
-//                            VideoFile videoFile=new VideoFile();
-//                            videoFile.path= cursor.getString(cursor.getColumnIndex("path"));
-//                            videoFile.filename=cursor.getString(cursor.getColumnIndex("_display_name"));
-//                            videoFile.dirPath=networkPath;
                             String path = cursor.getString(cursor.getColumnIndex("path"));
                             String filename = cursor.getString(cursor.getColumnIndex("_display_name"));
                             String dirPath = networkPath;
@@ -383,22 +471,37 @@ public class DeviceMonitorService extends Service {
                                 videoFile.vid = vid;
                                 videoFileList.add(videoFile);
                             }
-
                         }
-
                     }
-                    return videoFileList;
+                    LogUtil.v("startScanNetworkFiles [" + shortcut1.firendlyName + "] filecount:" + videoFileList.size());
+                    Object[] data = new Object[2];
+                    data[0] = shortcut1;
+                    data[1] = videoFileList;
+                    return data;
                 })
-                .onErrorReturn(throwable -> new ArrayList<>())
-                .subscribe(new SimpleObserver<List<VideoFile>>() {
+                .onErrorReturn(throwable -> new Object[0])
+                .subscribe(new SimpleObserver<Object[]>() {
                     @Override
-                    public void onAction(List<VideoFile> videoFiles) {
-                        if (videoFiles != null && videoFiles.size() > 0) {
-                            if (mMovieScanService != null)
-                                mMovieScanService.addToPairingQueue(videoFiles);
-                        } else {    //TODO mPosterPairingDevice处理
-                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_FINISH));
+                    public void onAction(Object[] data) {
+                        if (data.length == 2) {
+                            Shortcut shortcut = (Shortcut) data[0];
+                            List<VideoFile> videoFileList = (List<VideoFile>) data[1];
+                            if (videoFileList != null && videoFileList.size() > 0) {
+                                if (mMovieScanService != null)
+                                    mMovieScanService.scanVideo(shortcut, videoFileList);
+                            } else {    //TODO mPosterPairingDevice处理
+                                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
+                                ServiceStatusHelper.removeView(DeviceMonitorService.this);
+
+                            }
                         }
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (!AppUtils.isAppInBackground(getBaseContext()))
+                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
                     }
                 });
     }
@@ -406,11 +509,9 @@ public class DeviceMonitorService extends Service {
     /**
      * 获取所以未扫描的文件
      */
-    private List<VideoFile> getNotScannedFiles() {
-        List<VideoFile> mountedDeviceFiles = mVideoFileDao.queryAllNotScanedVideoFiles();
-        return mountedDeviceFiles;
+    private List<VideoFile> getUnScannedLocalFiles() {
+        return mVideoFileDao.queryAllLocalUnScannedVideoFiles();
     }
-
 
     public class MonitorBinder extends Binder {
         public DeviceMonitorService getService() {

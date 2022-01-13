@@ -1,7 +1,12 @@
 package com.hphtv.movielibrary.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.activity.result.ActivityResult;
@@ -10,8 +15,11 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.MovieApplication;
+import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.util.ServiceStatusHelper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.view.mvvm.activity.BaseInflateActivity;
 
@@ -20,7 +28,7 @@ import com.station.kit.view.mvvm.activity.BaseInflateActivity;
  * @date 19-3-26
  */
 public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseInflateActivity<VM, VDB> {
-
+    private static Handler mHanlder=new Handler(Looper.getMainLooper());
     public final String TAG = this.getClass().getSimpleName();
     LoadingDialogFragment mLoadingDialogFragment;
     private ActivityResultLauncher mActivityResultLauncher;
@@ -46,8 +54,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
 
     }
 
-    ;
-
     public void startActivityForResult(Intent intent) {
         mActivityResultLauncher.launch(intent);
     }
@@ -62,11 +68,18 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     @Override
     protected void onPause() {
         super.onPause();
+        mHanlder.postDelayed(() -> ServiceStatusHelper.pauseView(),100);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        mHanlder.removeCallbacksAndMessages(null);
+        ServiceStatusHelper.resumeView();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
 
     public MovieApplication getApp() {
@@ -79,7 +92,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
             mLoadingDialogFragment = new LoadingDialogFragment();
             mLoadingDialogFragment.show(getSupportFragmentManager(), TAG);
         }
-
     }
 
     public void stopLoading() {
@@ -96,4 +108,13 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         super.onBackPressed();
         stopLoading();
     }
+
+    BroadcastReceiver mReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equalsIgnoreCase(Constants.BroadCastMsg.MOVIE_SCRAP_STOP)){
+                ServiceStatusHelper.removeView(context);
+            }
+        }
+    };
 }

@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <application
         android:name=".MovieApplication"
         android:allowBackup="true"
@@ -27,6 +27,14 @@
         android:label="@string/app_name"
         android:theme="@style/MyTheme">
 
+        <activity-alias
+            android:name=".activity.HomePageActivity"
+            android:targetActivity=".ui.homepage.HomePageActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
         <activity
             android:name=".ui.detail.MovieDetailActivity"
             android:label="@string/app_name"
@@ -36,10 +44,6 @@
             android:name=".ui.homepage.HomePageActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".ui.homepage.NewPageAcitivity">
             <intent-filter>

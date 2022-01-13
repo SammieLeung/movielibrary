@@ -1,9 +1,5 @@
 package com.hphtv.movielibrary.util.retrofit;
 
-import com.hphtv.movielibrary.scraper.api.mtime.MtimeURL;
-import com.hphtv.movielibrary.scraper.api.mtime.request.MtimeApiRequest;
-import com.hphtv.movielibrary.scraper.api.omdb.OmdbURL;
-import com.hphtv.movielibrary.scraper.api.omdb.request.OmdbApiRequest;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbURL;
 import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
 
@@ -24,13 +20,6 @@ public class RetrofiTools {
 
     }
 
-    public static MtimeApiRequest createMtimeRequest() {
-        return MTimeRetrofitBuilder().create(MtimeApiRequest.class);
-    }
-
-    public static OmdbApiRequest createOmdbApiRequest() {
-        return OmdbRetrofitBuilder().create(OmdbApiRequest.class);
-    }
 
     public static TmdbApiRequest createTmdbApiRequest() {
             return TmdbRetrofitBuilder().create(TmdbApiRequest.class);
@@ -38,25 +27,6 @@ public class RetrofiTools {
 
     public static TmdbApiRequest createTmdbApiRequest_EN(){
         return TmdbRetrofitBuilder_EN().create(TmdbApiRequest.class);
-    }
-
-
-    private static Retrofit MTimeRetrofitBuilder() {
-        return new Retrofit.Builder()
-                .baseUrl(MtimeURL.BASE_URL)// 设置网络请求的Url地址
-                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .client(getOkHttpClient())
-                .build();
-    }
-
-    private static Retrofit OmdbRetrofitBuilder() {
-        return new Retrofit.Builder()
-                .baseUrl(OmdbURL.BASE_URL)// 设置网络请求的Url地址
-                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
-                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .client(getOkHttpClient())
-                .build();
     }
 
     private static Retrofit TmdbRetrofitBuilder() {

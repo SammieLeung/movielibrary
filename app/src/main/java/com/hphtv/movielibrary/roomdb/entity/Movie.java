@@ -8,6 +8,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Until;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
 import org.intellij.lang.annotations.Language;
@@ -31,11 +32,9 @@ public class Movie implements Serializable {
     public String plot;//剧情
     public String ratings;//评分
     public String source;//来源
-    public String type;//电影？电视剧  movie/tv
-    @ColumnInfo(name = "season_count")
-    public int seasonCount;//季数
-    @ColumnInfo(name = "episode_count")
-    public int episodeCount;//集数
+    public Constants.SearchType type;//电影？电视剧  movie/tv
+    @ColumnInfo(name = "acccess_permission")
+    public Constants.AccessPermission accessPermission;//分级 R-限制级 G-全年龄 C-儿童 PG-辅导
     public String poster;//海报
     public String region;//制片国家/地区
     @ColumnInfo(name = "release_date")
@@ -55,7 +54,6 @@ public class Movie implements Serializable {
     @ColumnInfo(name = "last_playtime")
     public long lastPlayTime;//上次播放时间
 
-    public String certification;//分级 R-限制级 G-全年龄 C-儿童 PG-辅导
 
 
     @Ignore

@@ -54,7 +54,7 @@ public class FileManagerFragment extends BaseFragment<FileManagerFragmentViewMod
         super.onActivityResultCallback(result);
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent intent = new Intent();
-            intent.setAction(Constants.BroadCastMsg.RESCAN_DEVICE);
+            intent.setAction(Constants.BroadCastMsg.RESCAN_ALL);
             LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
             ((HomepageViewModel) getAppBaseActivity().getViewModel()).getCurrentFragmentPos().postValue(HomePageActivity.HOME_PAGE_FRAGMENT);
         }

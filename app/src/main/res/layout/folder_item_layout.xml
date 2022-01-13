@@ -2,77 +2,98 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+        <import type="android.text.TextUtils"/>
         <import type="android.view.View"/>
         <import type="com.hphtv.movielibrary.ui.shortcutmanager.bean.FolderItem"/>
+
         <variable name="item"
             type="FolderItem"/>
+        <variable
+            name="state"
+            type="FolderItem.State" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/shortcut_item_height"
-        android:paddingLeft="@dimen/shortcut_container_padding"
-        android:paddingRight="@dimen/shortcut_container_padding"
-        android:layout_marginBottom="@dimen/shortcut_container_padding"
-        android:background="@drawable/blue_stroke_select_bg_2"
+        android:paddingLeft="43dp"
+        android:paddingRight="43dp"
+        android:layout_marginBottom="26dp"
+        android:background="@drawable/new_shortcut_item_bg"
         >
+        <ImageView
+            android:layout_alignParentStart="true"
+            android:id="@+id/img_icon"
+            android:src="@mipmap/icon_new_folder"
+            android:layout_centerVertical="true"
+            android:layout_width="45dp"
+            android:layout_marginRight="23dp"
+            android:layout_height="wrap_content"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_alignParentStart="true"
-            android:layout_toStartOf="@id/view_shortcut_status"
+            android:layout_toEndOf="@id/img_icon"
+            android:layout_toStartOf="@id/tv_shorcut_status"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-
             android:orientation="vertical">
-            <TextView
-                android:textSize="@dimen/shortcut_item_textsize"
-                style="@style/folder_item_text"
-                android:gravity="center_vertical"
-                android:singleLine="true"
-                android:id="@+id/tv_shorcut_name"
-                android:text="@{item.title}"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="50dp"
+                android:layout_marginBottom="7dp"
+                android:orientation="horizontal">
+                <TextView
+                    style="@style/folder_item_text"
+                    android:id="@+id/tv_shorcut_name"
+                    android:text="@{item.title}"
+                    android:layout_alignParentStart="true"
+                    android:ellipsize="middle"
+                    android:gravity="bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"/>
+                <TextView
+                    android:id="@+id/tv_spilt"
+                    android:layout_toEndOf="@+id/tv_shorcut_name"
+                    style="@style/folder_item_small_text"
+                    android:gravity="bottom"
+                    android:singleLine="true"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:text='@{TextUtils.isEmpty(item.title)?"":"|"}'
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+              />
+                <TextView
+                    android:layout_toEndOf="@+id/tv_spilt"
+                    android:layout_alignParentEnd="true"
+                    style="@style/folder_item_small_text"
+                    android:gravity="bottom|left"
+                    android:text="@{String.valueOf(item.poster_count)+'/'+String.valueOf(item.file_count)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
 
-            </TextView>
+            </RelativeLayout>
+
             <TextView
-                android:textSize="@dimen/shortcut_item_textsize"
-                android:singleLine="true"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"
                 android:id="@+id/tv_shorcut_uri"
                 android:text="@{item.sub_title}"
+                style="@style/folder_item_small_text"
+                android:gravity="top"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_height="match_parent"
+               />
         </androidx.appcompat.widget.LinearLayoutCompat>
-        <RelativeLayout
-            android:id="@+id/view_shortcut_status"
+        <TextView
             android:layout_alignParentEnd="true"
-            android:layout_width="200dp"
+            android:text="@{item.state==state.SCANNED?@string/shortcut_state_scanned:item.state==state.UNSCANNED?@string/shortcut_state_unscanned:@string/shortcut_state_scanning}"
             android:gravity="center"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <TextView
-                android:textSize="@dimen/shortcut_item_textsize"
-                android:text="@{String.valueOf(item.poster_count)}"
-                android:gravity="center"
-                android:id="@+id/tv_shorcut_status_1"
-                android:layout_marginRight="@dimen/shortcut_container_padding"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"/>
-            <TextView
-                android:text="@{String.valueOf(item.file_count)}"
-                android:textSize="@dimen/shortcut_item_textsize"
-                android:gravity="center"
-                android:layout_toRightOf="@id/tv_shorcut_status_1"
-                android:id="@+id/tv_shorcut_status_2"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"/>
-        </RelativeLayout>
+            style="@style/folder_item_text"
+            android:drawableTint="@color/white"
+            android:drawablePadding="9dp"
+            android:drawableEnd="@drawable/icon_new_more"
+            android:id="@+id/tv_shorcut_status"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"/>
+
 
     </RelativeLayout>
 </layout>

@@ -2,10 +2,10 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
-        <import type="com.hphtv.movielibrary.listener.PosterManagerEventHandler"/>
+        <import type="com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerEventHandler"/>
         <variable
             name="posterHandler"
-            type="PosterManagerEventHandler" />
+            type="ShortcutManagerEventHandler" />
     </data>
 
     <RelativeLayout
@@ -29,7 +29,7 @@
                 android:src="@mipmap/add_device" />
             <TextView
                 android:layout_marginLeft="@dimen/shortcut_container_padding"
-                android:text="@string/shortcut_item_add_shortcut"
+                android:text="@string/add_shortcut"
                 android:textSize="@dimen/shortcut_item_textsize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

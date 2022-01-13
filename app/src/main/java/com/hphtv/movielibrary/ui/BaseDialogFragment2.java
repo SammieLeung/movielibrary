@@ -27,16 +27,22 @@ import java.lang.reflect.Type;
  * author: Sam Leung
  * date:  2021/8/31
  */
-public abstract class BaseDialogFragment2<VM extends AndroidViewModel,VDB extends ViewDataBinding> extends DialogFragment {
+public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends DialogFragment {
     protected VDB mBinding;
     protected VM mViewModel;
 
 
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (!createViewModel())
+            mViewModel = ViewModelHelper.createAndroidViewModel(this, this.getClass());
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        mBinding = ViewDataBindingHelper.inflateVDB(getContext(),this.getClass());
-        mViewModel= ViewModelHelper.createAndroidViewModel(getContext(),this,this.getClass());
+        mBinding = ViewDataBindingHelper.inflateVDB(getContext(), this.getClass());
         return mBinding.getRoot();
     }
 
@@ -51,11 +57,9 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel,VDB extend
     public void onStart() {
         super.onStart();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
+    protected abstract boolean createViewModel();
 
 }
