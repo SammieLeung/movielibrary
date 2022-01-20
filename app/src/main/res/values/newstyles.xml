@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
-    <style name="common_btn_style">
-        <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:background">@drawable/new_common_btn_bg</item>
-    </style>
-    <style name="common_btn_smalltext_style" parent="common_btn_style">
-        <item name="android:textSize">23sp</item>
-    </style>
     <style name="close_btn_style">
         <item name="android:layout_width">20dp</item>
         <item name="android:layout_height">20dp</item>
@@ -20,11 +11,19 @@
         <item name="android:tint">@drawable/icon_close_tint</item>
     </style>
 
+    <style name="common_btn_style">
+        <item name="android:textSize">21sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/new_common_btn_bg</item>
+    </style>
+
+
     <style name="common_dialog_btn_style">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:background">@drawable/new_common_dialog_btn_bg</item>
     </style>
+
     <style name="common_dialog_btn_smalltext_style" parent="common_dialog_btn_style">
         <item name="android:textSize">23sp</item>
     </style>
@@ -42,6 +41,37 @@
 
     </style>
 
+    <style name="detail_btn_style" parent="common_btn_style">
+        <item name="android:paddingStart">40dp</item>
+        <item name="android:paddingEnd">40dp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">63dp</item>
+        <item name="android:layout_marginRight">23dp</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+
+    <style name="common_label_text_style" parent="wrap_style">
+        <item name="android:textSize">23sp</item>
+        <item name="android:textColor">#CCCCCC</item>
+    </style>
+
+    <style name="common_content_text_style" parent="wrap_style">
+        <item name="android:textSize">23sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="detial_viewmore_title_style">
+        <item name="android:textSize">23sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="detial_viewmore_content_style">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">#AAAAAA</item>
+    </style>
+
     <style name="filter_box_title_text_style">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@android:color/white</item>
@@ -52,10 +82,22 @@
         <item name="android:background">@drawable/filter_box_main_bg</item>
         <item name="android:layout_marginRight">@dimen/filter_box_common_margin</item>
     </style>
-    
+
+    <style name="homepage_head_title">
+        <item name="android:paddingLeft">@dimen/homepage_main_margin</item>
+        <item name="android:paddingRight">@dimen/homepage_main_margin</item>
+        <item name="android:textSize">35sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <style name="include_size_shortcut_scan_item">
         <item name="android:layout_height">60dp</item>
         <item name="android:layout_width">465dp</item>
     </style>
 
+
+    <style name="wrap_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 </resources>

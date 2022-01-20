@@ -88,7 +88,8 @@ public class HomePageFragementViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<List<MovieDataView>>() {
                     @Override
                     public void onAction(List<MovieDataView> movieDataViews) {
-                        callback.runOnUIThread(movieDataViews);
+                        if (callback != null)
+                            callback.runOnUIThread(movieDataViews);
                     }
                 });
     }

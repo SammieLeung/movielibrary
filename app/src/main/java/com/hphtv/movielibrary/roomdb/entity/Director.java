@@ -1,5 +1,8 @@
 package com.hphtv.movielibrary.roomdb.entity;
 
+import android.text.TextUtils;
+import android.widget.TextView;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -23,6 +26,6 @@ public class Director implements Serializable {
 
     @Override
     public String toString() {
-        return name + "(" + nameEn + ")";
+        return name + (!TextUtils.isEmpty(nameEn)? "(" + nameEn + ")":"");
     }
 }

@@ -36,19 +36,12 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        onCreate();
-        init();
         ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
         mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
             Log.v(AppBaseActivity.this.getClass().getSimpleName(), "onActivityResult resultCode=" + result.getResultCode());
             onActivityResultCallback(result);
         });
     }
-
-    /**
-     * 处理onCreate()
-     */
-    protected abstract void onCreate();
 
     protected void onActivityResultCallback(ActivityResult result) {
 
@@ -58,12 +51,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         mActivityResultLauncher.launch(intent);
     }
 
-    /**
-     * 初始化
-     */
-    private void init() {
-
-    }
 
     @Override
     protected void onPause() {

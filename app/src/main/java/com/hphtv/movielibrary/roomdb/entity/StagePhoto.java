@@ -14,11 +14,12 @@ import java.io.Serializable;
  */
 @Entity (tableName = TABLE.STAGEPHOTO)
 public class StagePhoto implements Serializable {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "stage_id")
     public long stageId;
     @ColumnInfo(name = "movie_id")
     public long movieId;
+    @ColumnInfo(name = "img_url")
     public String imgUrl;
 
 }

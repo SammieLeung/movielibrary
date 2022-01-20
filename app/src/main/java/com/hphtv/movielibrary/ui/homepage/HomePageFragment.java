@@ -45,6 +45,11 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
     protected void onViewCreated() {
         initView();
     }
@@ -53,7 +58,7 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
      * 初始化
      */
     private void initView() {
-        StaggeredGridLayoutManager mGridLayoutManager = new StaggeredGridLayoutManager( mColums, GridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager mGridLayoutManager = new StaggeredGridLayoutManager(mColums, GridLayoutManager.VERTICAL);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mMovieAdapter = new MovieAdapter(getContext(), mMovieDataViewList);
         mMovieAdapter.setOnItemClickListener((view, data) -> {
@@ -70,18 +75,19 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
     }
 
     public void notifyUpdate(Device device, String year, String genre, int sortType, boolean isDesc) {
-        mViewModel.prepareMovies(device, year, genre, sortType, isDesc, args -> {
-            List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
-            refresh(movieDataViews);
-            notifyStopLoading();
-        });
+        if(mViewModel!=null)
+            mViewModel.prepareMovies(device, year, genre, sortType, isDesc, args -> {
+                List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
+                refresh(movieDataViews);
+                notifyStopLoading();
+            });
     }
 
-    public void addMovie(String movie_id){
+    public void addMovie(String movie_id) {
         mViewModel.getMovieDataView(movie_id, args -> {
-            if(args!=null&&args.length>0){
+            if (args != null && args.length > 0) {
                 mBinding.tipsEmpty.setVisibility(View.GONE);
-                MovieDataView movieDataView= (MovieDataView) args[0];
+                MovieDataView movieDataView = (MovieDataView) args[0];
                 mMovieAdapter.put(movieDataView);
             }
         });
@@ -95,9 +101,6 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
         }
         mMovieAdapter.addAll(movieDataViews);
     }
-
-
-
 
 
 }

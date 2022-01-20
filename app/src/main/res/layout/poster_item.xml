@@ -17,13 +17,12 @@
             android:layout_width="wrap_content"
             android:duplicateParentState="true"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="vertical">
             <com.lqm.roundview.RoundImageView
-                app:border_width="4dp"
+                app:border_width="@dimen/poster_border_width"
                 android:duplicateParentState="true"
-                android:layout_marginLeft="@dimen/poster_item_1_margin"
                 android:background="@drawable/round_rect_item_bg"
-                android:layout_marginRight="@dimen/poster_item_1_margin"
                 app:border_color="@android:color/transparent"
                 app:corner_radius="@dimen/poster_item_1_radius"
                 android:id="@+id/rv_poster"
@@ -32,9 +31,14 @@
             <TextView
                 android:id="@+id/tv_title"
                 android:text="@{title}"
+                android:textSize="26sp"
+                android:textColor="@color/white"
                 android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:layout_marginTop="14dp"
                 android:layout_width="@dimen/poster_item_1_w"
-                android:layout_height="@dimen/poster_item_1_tv_h"/>
+                android:layout_height="wrap_content"/>
         </LinearLayout>
 
     </RelativeLayout>

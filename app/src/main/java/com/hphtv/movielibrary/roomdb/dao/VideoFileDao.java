@@ -8,6 +8,7 @@ import androidx.room.Update;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
+import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
@@ -63,6 +64,9 @@ public interface VideoFileDao {
 
     @Query("SELECT * FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" WHERE last_playtime!=0 ORDER BY last_playtime DESC")
     public List<UnrecognizedFileDataView> queryHistoryMovieDataView();
+
+    @Query("SELECT * FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" WHERE source=:source or source=''")
+    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
     public void deleteByDevice(String devicePath, List<String> paths);

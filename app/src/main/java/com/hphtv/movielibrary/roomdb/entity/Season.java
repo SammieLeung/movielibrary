@@ -13,7 +13,7 @@ import com.hphtv.movielibrary.roomdb.TABLE;
 @Entity(tableName = TABLE.SEASON)
 public class Season {
 
-        @PrimaryKey
+        @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "season_id")
         public long seasonId;
         @ColumnInfo(name = "movie_id")

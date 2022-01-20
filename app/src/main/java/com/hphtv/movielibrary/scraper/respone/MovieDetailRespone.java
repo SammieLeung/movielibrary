@@ -77,6 +77,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
                 for (String genreItem : genre) {
                     Genre genre = new Genre();
                     genre.name = genreItem;
+                    genre.source = api;
                     genreList.add(genre);
                 }
             }
@@ -160,7 +161,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movieWrapper.genres = genreList;
             movieWrapper.trailers = trailerList;
             movieWrapper.stagePhotos = stagePhotoList;
-            movieWrapper.seasons=seasonList;
+            movieWrapper.seasons = seasonList;
 
             return movieWrapper;
         }

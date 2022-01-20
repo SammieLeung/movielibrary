@@ -9,6 +9,7 @@ import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
+import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
 
@@ -25,7 +26,7 @@ import java.util.List;
 // getThumbnail方法
 public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLayoutMovieBinding> {
     private HistoryListAdapter mHistoryListAdapter;
-    private List<UnrecognizedFileDataView> mUnrecognizedFileDataViewList =new ArrayList<>();
+    private List<HistoryMovieDataView> mUnrecognizedFileDataViewList =new ArrayList<>();
 
     public static HistoryFragment newInstance(int pos) {
         Bundle args = new Bundle();
@@ -40,9 +41,9 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mUnrecognizedFileDataViewList);
-        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
+        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
             @Override
-            public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
+            public void onItemClick(View view, int postion, HistoryMovieDataView data) {
                 mViewModel.playingVideo(data.path, data.filename, dataViewList -> {
                     updateMovie(dataViewList);
                     notifyStopLoading();
@@ -58,18 +59,19 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
     }
 
     public void notifyUpdate(){
-        mViewModel.prepareHistory(unrecognizedFileDataViews -> {
+        if (mViewModel != null)
+            mViewModel.prepareHistory(unrecognizedFileDataViews -> {
             updateMovie(unrecognizedFileDataViews);
             notifyStopLoading();
         });
     }
 
-    private void updateMovie(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
-        if (unrecognizedFileDataViews.size() > 0) {
+    private void updateMovie(List<HistoryMovieDataView> historyList) {
+        if (historyList.size() > 0) {
             mBinding.tipsEmpty.setVisibility(View.GONE);
         } else {
             mBinding.tipsEmpty.setVisibility(View.VISIBLE);
         }
-        mHistoryListAdapter.addAll(unrecognizedFileDataViews);
+        mHistoryListAdapter.addAll(historyList);
     }
 }

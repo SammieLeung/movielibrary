@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
 //		debug("新世纪福音战士：终.mp4");
 //		debug("[迅雷下载www.xiamp4.com]铁血孤儿[第05话].mp4");
 		debug("狮子王.The.Lion.King.1994.BD1080P.X264.AAC.Mandarin&English.CHS-ENG.mp4");
+		debug("Braveheart.1995.2160p.BluRay.x265.10bit.SDR.DTS-HD.MA.TrueHD.7.1.Atmos-SWTYBLZ");
 //		debug("[www.domp4.com]跛豪.1991.BD1080p.国粤双语.mp4");
 //		debug("/storage/emulated/0/Download/[www.domp4.com]跛豪.1991.BD1080p.国粤双语/[www.domp4.com]跛豪.1991.BD1080p.国粤双语.mp4");
 //        debug("[Death_Note][32][ms32].mp4");
@@ -59,8 +60,7 @@ public class MainActivity extends Activity {
 //		Log.v(TAG, "********************");
 		VideoNameParser mParser2=new VideoNameParser();
         MovieNameInfo info2=mParser2.parseVideoName(name);
-        Log.v(TAG, "ParseName 222:"+info2.toString());
-        Log.v(TAG, "ParseName 222:"+info2.getName());
+        Log.v(TAG, "debug->"+info2.toString());
         Log.v(TAG, "********************");
 	}
 

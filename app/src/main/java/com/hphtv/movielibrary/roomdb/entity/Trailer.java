@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 @Entity(tableName = TABLE.TRAILER)
 public class Trailer  implements Serializable {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "trailer_id")
     public long trailerId;
     public String url;

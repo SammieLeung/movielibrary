@@ -19,37 +19,38 @@ import com.hphtv.movielibrary.data.Constants;
  */
 public class GlideTools {
 
-    private static GlideUrl buildGlideUrl(String photo){
+    private static GlideUrl buildGlideUrl(String photo) {
         GlideUrl path;
         //需要特殊处理
-        if(photo.startsWith("http://img31.mtime.cn/")){
-            path  = new GlideUrl(photo,
+        if (photo.startsWith("http://img31.mtime.cn/")) {
+            path = new GlideUrl(photo,
                     new LazyHeaders.Builder()
-                            .addHeader("Accept-Encoding","gzip, deflate")
+                            .addHeader("Accept-Encoding", "gzip, deflate")
                             .build());
-        }else{
-            path  = new GlideUrl(photo,
+        } else {
+            path = new GlideUrl(photo,
                     new LazyHeaders.Builder()
                             .build());
         }
         return path;
     }
 
-    public static RequestBuilder<Drawable> GlideWrapper(Context context,String path){
-        if(TextUtils.isEmpty(path)||!(path.startsWith("http")||path.startsWith("/")))
+    public static RequestBuilder<Drawable> GlideWrapper(Context context, String path) {
+        if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/"))) {
             return Glide.with(context)
                     .load(R.mipmap.ic_poster_default)
                     .placeholder(R.mipmap.ic_poster_default)
                     .error(R.mipmap.ic_poster_default);
-        else {
+        } else {
             return Glide.with(context)
                     .load(buildGlideUrl(path))
-//                    .thumbnail(0.3f)
-//                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-//                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
-                    .placeholder(R.mipmap.ic_poster_default)
-                    .error(R.mipmap.ic_poster_default);
+//                    .thumbnail(0.3f);
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION));
+//                    .placeholder(R.mipmap.ic_poster_default)
+//                    .error(R.mipmap.ic_poster_default);
         }
     }
+
 
 }

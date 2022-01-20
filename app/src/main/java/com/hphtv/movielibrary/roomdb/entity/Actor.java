@@ -1,5 +1,7 @@
 package com.hphtv.movielibrary.roomdb.entity;
 
+import android.text.TextUtils;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -24,6 +26,6 @@ public class Actor  implements Serializable {
 
     @Override
     public String toString() {
-        return name+"("+nameEn+")";
+        return name + (!TextUtils.isEmpty(nameEn)? "(" + nameEn + ")":"");
     }
 }

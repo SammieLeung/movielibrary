@@ -73,7 +73,21 @@ public class MovieWrapper implements Serializable {
         }
         return sb.toString();
     }
-
+    public String toDirectorString() {
+        StringBuffer sb = new StringBuffer();
+        if(directors!=null) {
+            int i = 0;
+            for (Director director : directors) {
+                if (i >= 3)
+                    break;
+                sb.append(director.toString() + " | ");
+                i++;
+            }
+            if (sb.length() > 0)
+                sb.replace(sb.lastIndexOf(" | "), sb.length(), "");
+        }
+        return sb.toString();
+    }
     public String toActorString() {
         StringBuffer sb = new StringBuffer();
         if(actors!=null) {
@@ -81,11 +95,11 @@ public class MovieWrapper implements Serializable {
             for (Actor actor : actors) {
                 if (i >= 3)
                     break;
-                sb.append(actor.toString() + ",");
+                sb.append(actor.toString() + " | ");
                 i++;
             }
             if (sb.length() > 0)
-                sb.replace(sb.lastIndexOf(","), sb.length(), "");
+                sb.replace(sb.lastIndexOf(" | "), sb.length(), "");
         }
         return sb.toString();
     }

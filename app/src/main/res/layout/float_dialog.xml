@@ -7,21 +7,36 @@
             name="text"
             type="String" />
     </data>
-
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/new_common_dialog_bg">
-        <com.github.ybq.android.spinkit.SpinKitView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="5dp"
-            app:SpinKit_Color="@color/white"
-            app:SpinKit_Style="Circle"/>
+        android:layout_marginBottom="56dp"
+        android:layout_marginEnd="72dp"
+        android:paddingLeft="22dp"
+        android:background="@drawable/new_floatwindow_bg">
         <TextView
             android:gravity="center"
-            android:layout_width="100dp"
+            android:textSize="17sp"
+            android:textColor="@color/white"
+            android:layout_width="wrap_content"
             android:layout_height="50dp"
             android:text="@{text}"/>
+        <com.github.ybq.android.spinkit.SpinKitView
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:minWidth="23dp"
+            android:minHeight="23dp"
+            android:maxHeight="23dp"
+            android:maxWidth="23dp"
+            app:SpinKit_Color="#634EB7"
+            app:SpinKit_Style="Circle"/>
     </LinearLayout>
+    </FrameLayout>
+
 </layout>

@@ -14,6 +14,7 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -56,6 +58,8 @@ import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
@@ -115,11 +119,13 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         super.onPause();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         unbindService(mServiceConnection);
+        mHandler.removeCallbacksAndMessages(null);
     }
 
 
     @Override
-    protected void onCreate() {
+    protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         LogUtil.v(TAG, "processLogic==>OnCreate");
         mTagAll = getResources().getString(R.string.tx_all);
         mTitleArr = new String[]{getResources().getString(R.string.lb_title), getResources().getString(R.string.lb_sort_directory), getResources().getString(R.string.lb_setting)};
@@ -353,7 +359,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         mFramentList.add(mFavoriteFragment);
         mFramentList.add(mFileManagerFragment);
         //设置ViewPager
-        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager(), mFramentList, mTitleArr);
+        mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager());
+        mPageAdapter.addAllFragments(mFramentList);
+        mPageAdapter.addAllTitles(Arrays.asList(mTitleArr));
         mBinding.viewpager.setAdapter(mPageAdapter);
         mBinding.viewpager.setOffscreenPageLimit(4);
         mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

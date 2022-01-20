@@ -2,6 +2,8 @@
 <resources>
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
+
+
     <!--    历史播放-->
     <string name="history_list_title">Recently Played</string>
     <string name="history_list_empty">No watch history</string>
@@ -27,7 +29,7 @@
     <string name="shortcut_state_unscanned">Unscanned</string>
     <string name="shortcut_state_scanned">Scanned</string>
     <string name="shortcut_state_scanning">Scanning</string>
-    <string name="scanning_in_background">Scanning in Background</string>
+    <string name="scanning_in_background">Scanning video in Background</string>
 
     <string name="shortcut_scan_dialog_item_shortcut_type">Movie Type</string>
     <string name="shortcut_scan_dialog_item_shortcut_access">Permission</string>
@@ -53,5 +55,38 @@
     <string name="shortcut_name_default">Default</string>
     <string name="shortcut_name_editdialog_title">Eidt Name</string>
     <string name="shortcut_name_editdialog_hint">Please enter a name</string>
+
+    <!--详情页-->
+    <string name="director">Directors</string>
+    <string name="actors">Characters</string>
+    <string name="plot_s">Overview</string>
+    <string name="plot_expand">View More</string>
+    <string name="plot_fold">Fold</string>
+    <string name="plot_s_empty">No introduction.</string>
+    <string name="btn_play">Play</string>
+    <string name="btn_favorite">Like</string>
+    <string name="btn_expand">More</string>
+    <string name="btn_edit">Update</string>
+    <string name="btn_delete">Remove</string>
+    <string name="label_recommandvideo">Recommendations</string>
+    <string name="recommand_empty">No Recommendations.</string>
+    <!--详情 更多详情-->
+    <string name="actor_list">Characters</string>
+    <string name="video_list">Videos</string>
+
+
+    <!--新主页-->
+    <!--新主页按钮组-->
+    <string name="childmode">Child Mode</string>
+    <string name="search">Search</string>
+    <string name="homepage">Home</string>
+    <string name="settings">Settings</string>
+
+    <!--主页tab-->
+    <string name="tab_homepage">Home</string>
+    <string name="tab_movie">Movie</string>
+    <string name="tab_undefine">Unknow</string>
+    <string name="tab_tv">TV</string>
+    <string name="tab_child">Cartoon</string>
 
 </resources>

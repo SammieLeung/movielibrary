@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/constraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/new_main_background"
+           >
+
+            <Button
+                android:id="@+id/btn_search"
+                style="@style/homepage_circle_btn_style"
+                android:layout_width="wrap_content"
+                android:layout_toStartOf="@id/btn_folder_manager"
+                android:drawableLeft="@drawable/icon_circle_search"
+                android:text="@string/search" />
+
+            <Button
+                android:id="@+id/btn_folder_manager"
+                style="@style/homepage_circle_btn_style"
+                android:layout_width="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="72dp"
+                android:drawableLeft="@drawable/icon_circle_folder"
+                android:text="@string/shortcut_manager" />
+
+            <!--        <Button-->
+            <!--            android:id="@+id/btn_child_mode"-->
+            <!--            style="@style/homepage_circle_btn_style"-->
+            <!--            android:layout_toStartOf="@id/btn_settings" />-->
+
+            <!--        <Button-->
+            <!--            android:id="@+id/btn_settings"-->
+            <!--            style="@style/homepage_circle_btn_style"-->
+            <!--            android:layout_marginRight="72dp"-->
+            <!--            android:layout_alignParentEnd="true" />-->
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tablayout"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_below="@id/btn_search"
+                app:tabIndicatorHeight="0dp"
+                app:tabBackground="@drawable/new_common_tab_bg"
+                android:layout_marginLeft="72dp"
+                app:tabRippleColor="@android:color/transparent"
+                android:layout_marginTop="5dp" />
+
+            <com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
+                android:id="@+id/viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tablayout" />
+        </RelativeLayout>
+</androidx.core.widget.NestedScrollView>
+    <data>
+
+    </data>
+</layout>

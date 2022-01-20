@@ -6,19 +6,8 @@
     -->
     <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:colorPrimary">@color/color_primary</item>
-        <item name="android:typeface">serif</item>
+        <!--        <item name="android:typeface">serif</item>-->
     </style>
-
-    <style name="star" parent="@android:style/Widget.Holo.RatingBar.Indicator">
-        <item name="android:progressDrawable">@drawable/ly_star</item>
-    </style>
-    <style name="star2" parent="@android:style/Widget.Holo.RatingBar.Indicator">
-        <item name="android:progressDrawable">@drawable/ly_star_s</item>
-        <item name="android:maxHeight">24dp</item>
-        <item name="android:minHeight">24dp</item>
-    </style>
-
-
 
 
     <style name="DialogStyle" parent="@android:style/Theme.Dialog">
@@ -29,22 +18,24 @@
         <item name="android:windowBackground">@drawable/new_common_dialog_bg</item>
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+
     <style name="DialogStyle.transparent" parent="DialogStyle">
-
         <item name="android:windowBackground">@android:color/transparent</item>
-
     </style>
-    <declare-styleable name="FloatKeyboard">
-        <attr name="offsetDis" format="dimension" />
-    </declare-styleable>
 
     <style name="Theme.Transparent" parent="Theme.AppCompat.Dialog">
-        <item name="android:windowIsTranslucent">true</item>//此对话框的背景
-        <item name="android:windowBackground">@android:color/transparent</item>//对话框是否透明
-        <item name="android:windowContentOverlay">@null</item>//对话框是否有遮盖
-        <item name="android:windowNoTitle">true</item>//对话框无标题
-        <item name="android:windowIsFloating">true</item> //对话框是否浮动
-        <item name="android:backgroundDimEnabled">true</item>//是否允许对话框的背景变暗
+        <!-- 此对话框的背景-->
+        <item name="android:windowIsTranslucent">true</item>
+        <!--对话框是否透明-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--对话框是否有遮盖-->
+        <item name="android:windowContentOverlay">@null</item>
+        <!--对话框无标题-->
+        <item name="android:windowNoTitle">true</item>
+        <!--对话框是否浮动-->
+        <item name="android:windowIsFloating">true</item>
+        <!--是否允许对话框的背景变暗-->
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 
     <style name="MyCheckBoxStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
@@ -63,7 +54,6 @@
         <item name="dtbDrawableTopSize">46dp</item>
     </style>
 
-
     <style name="folder_item_text">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/white</item>
@@ -71,17 +61,38 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+
     <style name="folder_item_small_text">
         <item name="android:textSize">17sp</item>
         <item name="android:textColor">#888888</item>
         <item name="android:singleLine">true</item>
         <item name="android:gravity">center_vertical</item>
     </style>
+
     <style name="rount_image_view_style">
         <item name="shapeAppearance">@style/RoundedStyle</item>
     </style>
+
     <style name="RoundedStyle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">30dp</item>
     </style>
+
+    <style name="homepage_circle_btn_style">
+        <item name="android:background">@drawable/circle_btn_bg</item>
+        <item name="android:layout_width">@dimen/homepage_circle_btn_w</item>
+        <item name="android:layout_height">@dimen/homepage_circle_btn_w</item>
+        <item name="android:layout_marginLeft">23dp</item>
+        <item name="android:layout_marginTop">23dp</item>
+        <item name="android:paddingLeft">11dp</item>
+        <item name="android:paddingRight">11dp</item>
+        <item name="android:drawablePadding">6dp</item>
+        <item name="drawableTint">@drawable/circle_btn_icon_tint</item>
+
+    </style>
+
+    <declare-styleable name="FloatKeyboard">
+        <attr name="offsetDis" format="dimension" />
+    </declare-styleable>
 </resources>

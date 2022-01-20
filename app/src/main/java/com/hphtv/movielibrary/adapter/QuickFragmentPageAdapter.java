@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,20 +13,22 @@ import java.util.List;
  */
 
 public class QuickFragmentPageAdapter<T extends Fragment> extends FragmentPagerAdapter {
-    private List<T> mList;
-    private String[] mTitles;
+    protected List<T> mList=new ArrayList<>();
+    protected List<String> mTitleList=new ArrayList<>();
 
-    /**
-     * @param list
-     * @param titles PageTitles
-     */
-    public QuickFragmentPageAdapter(FragmentManager fm,List<T> list, String[] titles) {
+    public QuickFragmentPageAdapter(FragmentManager fm){
         super(fm);
-        mList = list;
-        mTitles = titles;
     }
 
+    public void addAllFragments(List list){
+        mList.clear();
+        mList.addAll(list);
+    }
 
+    public void addAllTitles(List list){
+        mTitleList.clear();
+        mTitleList.addAll(list);
+    }
     @Override
     public Fragment getItem(int position) {
         return mList.get(position);
@@ -38,7 +41,7 @@ public class QuickFragmentPageAdapter<T extends Fragment> extends FragmentPagerA
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return mTitles == null ? super.getPageTitle(position) : mTitles[position];
+        return mTitleList == null ? super.getPageTitle(position) : mTitleList.get(position);
     }
 
 

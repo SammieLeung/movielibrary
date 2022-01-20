@@ -4,60 +4,155 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.firefly.videonameparser.MainActivity;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.MovieTrailerAdapter;
-import com.hphtv.movielibrary.adapter.MovieTrailerAdapter.OnRecyclerViewItemClickListener;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
+import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.databinding.LayoutDetailBinding;
+import com.hphtv.movielibrary.databinding.LayoutNewDetailBinding;
 import com.hphtv.movielibrary.effect.GlideBlurTransformation;
-import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
-import com.hphtv.movielibrary.util.VideoPlayTools;
-import com.station.kit.util.ToastUtil;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.DensityUtil;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.Timer;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import me.khrystal.library.widget.ItemViewMode;
-import me.khrystal.library.widget.ScaleXCenterViewMode;
+import io.reactivex.rxjava3.disposables.Disposable;
 
-public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutDetailBinding> {
-    public static final String TAG = "MovieDetailActivity";
-
-    private ItemViewMode mItemViewMode;
-    private LinearLayoutManager mLayoutManager;
-    private MovieTrailerAdapter mMovieTrailerAdapter;
+public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutNewDetailBinding> {
+    public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private MovieWrapper mCurWrapper;
+    private NewMovieItemListAdapter mRecommandMovieAdapter;
+
+    private  BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Constants.ACTION_FAVORITE_MOVIE_CHANGE)) {
+                String movie_id = intent.getStringExtra("movie_id");
+                String curMovieId = mCurWrapper != null ? mCurWrapper.movie.movieId : "";
+                if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
+                    boolean is_favorite = intent.getBooleanExtra("is_favorite", false);
+                    mBinding.btnFavorite.setSelected(is_favorite);
+                    refreshParent();
+                }
+            }
+        }
+    };
+
+
+    public OnClickListener mClickListener = view -> {
+        switch (view.getId()) {
+            case R.id.btn_edit:
+                editVideoInfo();
+                break;
+            case R.id.btn_play:
+                if (mBinding.getWrapper() != null) {
+                    if (mBinding.getWrapper().videoFiles.size() == 1) {
+                        startLoading();
+                        String path = mBinding.getWrapper().videoFiles.get(0).path;
+                        String name = mBinding.getWrapper().videoFiles.get(0).filename;
+                        playVideo(mBinding.getWrapper(), path, name);
+                    } else if (mBinding.getWrapper().videoFiles.size() > 1) {
+                        showRadioDialog();
+                    }
+                }
+                break;
+            case R.id.btn_remove:
+                ConfirmDialogFragment confirmDialogFragment = ConfirmDialogFragment.newInstance();
+                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm))
+                        .setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
+                            @Override
+                            public void OK() {
+                                removeMovie();
+                            }
+
+                            @Override
+                            public void Cancel() {
+
+                            }
+                        });
+                confirmDialogFragment.show(getSupportFragmentManager(), TAG);
+                break;
+            case R.id.btn_favorite:
+                toggleFavroite();
+                break;
+            case R.id.btn_expand:
+                mBinding.setExpand(!mBinding.getExpand());
+                break;
+            case R.id.tv_more:
+                showViewMoreDialog();
+                break;
+        }
+    };
 
     @Override
-    protected void onCreate() {
-        // 初始化
+    protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         initView();
-        this.onNewIntent(getIntent());
     }
 
+
+    public void initView() {
+        mBinding.setExpand(false);
+        mBinding.btnEdit.setOnClickListener(mClickListener);
+        mBinding.btnPlay.setOnClickListener(mClickListener);
+        mBinding.btnRemove.setOnClickListener(mClickListener);
+        mBinding.btnFavorite.setOnClickListener(mClickListener);
+        mBinding.btnExpand.setOnClickListener(mClickListener);
+        mBinding.tvMore.setOnClickListener(mClickListener);
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this, RecyclerView.HORIZONTAL,false);
+        mRecommandMovieAdapter=new NewMovieItemListAdapter(this,new ArrayList<>());
+        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this,72),DensityUtil.dip2px(this,15)));
+        mBinding.rvRecommand.setLayoutManager(linearLayoutManager);
+        mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
+        mRecommandMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
+            @Override
+            public void onItemClick(View view, int postion, MovieDataView data) {
+                prepareMovieWrapper(data.id);
+            }
+
+            @Override
+            public void onItemFocus(View view, boolean hasFocus) {
+
+            }
+        });
+    }
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -67,11 +162,13 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             mViewModel.setCurrentMode(currentMode);
             switch (currentMode) {
                 case Constants.MovieDetailMode.MODE_WRAPPER:
+                    mBinding.setUnmatch(false);
                     long movieId = intent.getLongExtra(Constants.Extras.MOVIE_ID, -1);
                     prepareMovieWrapper(movieId);//1.加载电影数据
                     break;
                 case Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
                     String unrecognizedFileKeyword = intent.getStringExtra(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD);
+                    mBinding.setUnmatch(true);
                     prepareUnrecogizedFile(unrecognizedFileKeyword);//2.组合未识别文件数据
                     break;
             }
@@ -84,29 +181,78 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * @param movieId
      */
     private void prepareMovieWrapper(long movieId) {
-        mBinding.btnFavorite.setVisibility(View.VISIBLE);
-        mBinding.btnTrailer.setVisibility(View.VISIBLE);
-        mBinding.btnRemove.setVisibility(View.VISIBLE);
-        mViewModel.loadMovieWrapper(movieId, wrapper -> {
-            if (wrapper != null) {
-                mCurWrapper = wrapper;
-                mBinding.setWrapper(mCurWrapper);
-                String stagePhoto = "";
-                if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
-                    Random random = new Random();
-                    int index = random.nextInt(wrapper.stagePhotos.size());
-                    stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
-                }
-                GlideTools.GlideWrapper(this, wrapper.movie.poster).error(R.mipmap.ic_poster_default)
-                        .into(mBinding.ivCover);
-                GlideTools.GlideWrapper(this, stagePhoto)
-                        .apply(RequestOptions.bitmapTransform(new GlideBlurTransformation(MovieDetailActivity.this, 25, 3)))
-                        .error(R.mipmap.ic_poster_default)
-                        .into(mBinding.ivStage);
-                mBinding.btnFavorite.setFavoriteState(wrapper.movie.isFavorite);
-                mMovieTrailerAdapter.addItems(wrapper.trailers);
-            }
-        });
+        mViewModel.loadMovieWrapper(movieId)
+                .subscribe(new SimpleObserver<MovieWrapper>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        startLoading();
+                    }
+
+                    @Override
+                    public void onAction(MovieWrapper wrapper) {
+                        if (wrapper != null) {
+                            mCurWrapper = wrapper;
+                            mBinding.setWrapper(mCurWrapper);
+                            String stagePhoto = "";
+                            if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
+                                Random random = new Random();
+                                int index = random.nextInt(wrapper.stagePhotos.size());
+                                stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
+                            }
+//                GlideTools.GlideWrapper(this, wrapper.movie.poster).error(R.mipmap.ic_poster_default)
+//                        .into(mBinding.ivCover);
+//                GlideTools.GlideWrapper(this, stagePhoto)
+//                        .apply(RequestOptions.bitmapTransform(new GlideBlurTransformation(MovieDetailActivity.this, 25, 3)))
+//                        .error(R.mipmap.ic_poster_default)
+//                        .into(mBinding.ivStage);
+                            mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
+                            if(!TextUtils.isEmpty(stagePhoto)){
+                                GlideTools.GlideWrapper(MovieDetailActivity.this,stagePhoto).into(mBinding.ivStagephoto);
+                            }else{
+                                GlideTools.GlideWrapper(MovieDetailActivity.this,wrapper.movie.poster).into(mBinding.ivStagephoto);
+                            }
+                            mViewModel.loadTags().subscribe(new SimpleObserver<List<String>>() {
+                                @Override
+                                public void onAction(List<String> tagList) {
+                                    Context context=MovieDetailActivity.this;
+                                    int paddingTop=DensityUtil.dip2px(context,5);
+                                    int paddingLeft=DensityUtil.dip2px(context,11);
+                                    mBinding.viewTags.removeAllViews();
+                                    for(String tag:tagList){
+                                        TextView textView=new TextView(context);
+                                        textView.setText(tag);
+                                        textView.setTextSize(20);
+                                        textView.setTextColor(Color.parseColor("#FFCCCCCC"));
+                                        textView.setBackground(getDrawable(R.drawable.detail_tag));
+                                        textView.setPadding(paddingLeft,paddingTop,paddingLeft,paddingTop);
+                                        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+                                        layoutParams.rightMargin=DensityUtil.dip2px(context,23);
+                                        mBinding.viewTags.addView(textView,layoutParams);
+                                    }
+                                }
+                            });
+                            mViewModel.loadRecommand(mCurWrapper.genres).subscribe(new SimpleObserver<List<MovieDataView>>() {
+                                @Override
+                                public void onAction(List<MovieDataView> movieDataViewList) {
+                                    if(movieDataViewList!=null&&movieDataViewList.size()>0) {
+                                        mBinding.setRecommand(true);
+                                        mRecommandMovieAdapter.addAll(movieDataViewList);
+                                        mRecommandMovieAdapter.notifyDataSetChanged();
+                                    }else{
+                                        mBinding.setRecommand(false);
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        stopLoading();
+                    }
+                });
     }
 
     /**
@@ -115,12 +261,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * @param keyword
      */
     private void prepareUnrecogizedFile(String keyword) {
-        mBinding.btnFavorite.setVisibility(View.GONE);
-        mBinding.btnTrailer.setVisibility(View.GONE);
-        mBinding.btnRemove.setVisibility(View.GONE);
         mViewModel.loadUnrecogizedFile(keyword, unrecognizedFileDataViewList -> {
             if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
-                Glide.with(this).load(R.mipmap.ic_poster_default).error(R.mipmap.ic_poster_default).into(mBinding.ivCover);
+                Glide.with(this).load(R.mipmap.ic_poster_default).error(R.mipmap.ic_poster_default).into(mBinding.ivStagephoto);
                 MovieWrapper movieWrapper = new MovieWrapper();
                 movieWrapper.videoFiles = new ArrayList<>();
                 StringBuffer stringBuffer = new StringBuffer();
@@ -154,7 +297,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         this.onNewIntent(getIntent());
     }
 
-
     @Override
     protected void onPause() {
         stopLoading();
@@ -167,55 +309,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         super.onDestroy();
     }
 
-    public void initView() {
-        mBinding.btnEdit.setOnClickListener(mClickListener);
-        mBinding.btnTrailer.setOnClickListener(mClickListener);
-        mBinding.btnPlay.setOnClickListener(mClickListener);
-        mBinding.btnRemove.setOnClickListener(mClickListener);
-        mBinding.btnFavorite.setOnClickListener(mClickListener);
-        mBinding.btnExit.setOnClickListener(mClickListener);
-
-        mBinding.rvTrailer.setOnCenterItemFocusListener((v, isViewOnCenter) -> {
-            if (isViewOnCenter) {
-                v.findViewById(R.id.text_group_trailer).setVisibility(View.VISIBLE);
-            } else {
-                v.findViewById(R.id.text_group_trailer).setVisibility(View.GONE);
-            }
-        });
-
-        mBinding.svDetail.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                mBinding.btnPlay.requestFocus();
-            }
-        });
-        initMovieTrailerList();
-    }
-
-    /**
-     * 预告片组件初始化。
-     */
-    private void initMovieTrailerList() {
-
-        // 创建默认的线性LayoutManager
-        mLayoutManager = new LinearLayoutManager(this);
-        mLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
-
-        mBinding.rvTrailer.setLayoutManager(mLayoutManager);
-
-        mItemViewMode = new ScaleXCenterViewMode();
-        mBinding.rvTrailer.setViewMode(mItemViewMode);
-        mBinding.rvTrailer.setNeedCenterForce(true);
-        mBinding.rvTrailer.setNeedLoop(true);
-        // 如果可以确定每个item的高度是固定的，设置这个选项可以提高性能
-        mBinding.rvTrailer.setHasFixedSize(true);
-        // 创建并设置Adapter
-        mMovieTrailerAdapter = new MovieTrailerAdapter(MovieDetailActivity.this,
-                new ArrayList<>());
-        mBinding.rvTrailer.setAdapter(mMovieTrailerAdapter);
-        mMovieTrailerAdapter
-                .setOnItemClickListener(mCenterItemClickListener);
-        mBinding.viewTrailer.setOnClickListener(v -> hideMovieTrailer());
-    }
 
     /**
      * 编辑封面信息
@@ -237,7 +330,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             //选择新电影逻辑
             mViewModel.selectMovie( movie_id,source,type, is_favoirte, movieWrapper -> {
                 prepareMovieWrapper(movieWrapper.movie.id);
-                setActivityResult();
+                refreshParent();
                 stopLoading();
             });
         });
@@ -255,7 +348,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 String movie_id = (String) args[0];
                 BroadcastHelper.sendBroadcastMovieRemoveSync(this, movie_id);//向手机助手发送电影移除的广播
             }
-            setActivityResult();
+            refreshParent();
             stopLoading();
             finish();
             Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
@@ -273,75 +366,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 int is_favorite = isFavorite == true ? 1 : 0;
                 BroadcastHelper.sendBroadcastMovieUpdateSync(this, movie_id, movie_id, is_favorite);//向手机助手发送电影更改的广播
                 mCurWrapper.movie.isFavorite = isFavorite;
-                mBinding.btnFavorite.setFavoriteState(isFavorite);
-                setActivityResult();
+                mBinding.btnFavorite.setSelected(isFavorite);
+                refreshParent();
             }
         });
-    }
-
-    /**
-     * 显示电影预告片
-     */
-    private void showMovieTrailer() {
-        if (mMovieTrailerAdapter.getRealItemCount() > 0) {
-            mBinding.viewTrailer.setVisibility(View.VISIBLE);
-            if (mBinding.rvTrailer.getChildAt(0) != null)
-                mBinding.rvTrailer.getChildAt(0).requestFocus();
-        } else {
-            ToastUtil.newInstance(this).toast(getResources().getString(R.string.toastmsg_no_trailer_found));
-        }
-    }
-
-    /**
-     * 隐藏电影预告片
-     */
-    private void hideMovieTrailer() {
-        mBinding.viewTrailer.setVisibility(View.GONE);
-    }
-
-    /**
-     * 判断预告片弹出框是否显示
-     *
-     * @return
-     */
-    private boolean isMovieTrailerShowing() {
-        return mBinding.viewTrailer.getVisibility() == RelativeLayout.VISIBLE;
-    }
-
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
-                if (isMovieTrailerShowing())
-                    if (mBinding.rvTrailer.findFocus() == null) {
-                        mBinding.rvTrailer.getChildAt(0).requestFocus();
-                        return true;
-                    } else {
-                        if (mBinding.rvTrailer.getChildAt(0).isFocused()) {
-                            return false;
-                        }
-                    }
-
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                if (isMovieTrailerShowing()) {
-                    int postion = mBinding.rvTrailer.getChildCount() - 1;
-                    if (mBinding.rvTrailer.findFocus() == null) {
-                        mBinding.rvTrailer.getChildAt(postion).requestFocus();
-                        return true;
-                    } else {
-
-                        if (mBinding.rvTrailer.getChildAt(postion).isFocused()) {
-                            return false;
-                        }
-                    }
-                }
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP) {
-                if (isMovieTrailerShowing()) {
-                    return true;
-                }
-            }
-        }
-        return super.dispatchKeyEvent(event);
     }
 
     public void showRadioDialog() {
@@ -363,99 +391,21 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
 
+    public void showViewMoreDialog(){
+        MovieDetialPlotDialog dialog=MovieDetialPlotDialog.newInstance(mBinding.nestScrollview);
+        dialog.show(getSupportFragmentManager(),"");
+    }
+
     private void playVideo(MovieWrapper wrapper, String path, String name) {
         startLoading();
         mViewModel.playingVideo(wrapper, path, name);
-        setActivityResult();
+        refreshParent();
     }
 
     /**
      * 返回时刷新主页
      */
-    private void setActivityResult() {
+    private void refreshParent() {
         setResult(1);
     }
-
-    @Override
-    public void onBackPressed() {
-        if (isMovieTrailerShowing())
-            hideMovieTrailer();
-        else {
-            finish();
-        }
-    }
-
-
-    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Constants.ACTION_FAVORITE_MOVIE_CHANGE)) {
-                String movie_id = intent.getStringExtra("movie_id");
-                String curMovieId = mCurWrapper != null ? mCurWrapper.movie.movieId : "";
-                if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
-                    boolean is_favorite = intent.getBooleanExtra("is_favorite", false);
-                    mBinding.btnFavorite.setFavoriteState(is_favorite);
-                    setActivityResult();
-                }
-            }
-        }
-    };
-
-
-    public OnClickListener mClickListener = view -> {
-
-        switch (view.getId()) {
-            case R.id.btn_edit:
-                editVideoInfo();
-                break;
-            case R.id.btn_trailer:
-                showMovieTrailer();
-                break;
-            case R.id.btn_play:
-                if (mBinding.getWrapper() != null) {
-                    if (mBinding.getWrapper().videoFiles.size() == 1) {
-                        startLoading();
-                        String path = mBinding.getWrapper().videoFiles.get(0).path;
-                        String name = mBinding.getWrapper().videoFiles.get(0).filename;
-                        playVideo(mBinding.getWrapper(), path, name);
-                    } else if (mBinding.getWrapper().videoFiles.size() > 1) {
-                        showRadioDialog();
-                    }
-                }
-                break;
-            case R.id.btn_remove:
-                ConfirmDialogFragment confirmDialogFragment = ConfirmDialogFragment.newInstance();
-                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm))
-                        .setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
-                            @Override
-                            public void OK() {
-                                removeMovie();
-                            }
-
-                            @Override
-                            public void Cancel() {
-
-                            }
-                        });
-                confirmDialogFragment.show(getSupportFragmentManager(), TAG);
-
-                break;
-            case R.id.btn_favorite:
-                toggleFavroite();
-                break;
-            case R.id.btn_exit:
-                finish();
-                break;
-        }
-    };
-
-    OnRecyclerViewItemClickListener mCenterItemClickListener = (view, trailer) -> {
-        if (trailer != null) {
-            startLoading();
-            VideoPlayTools.play(getApplicationContext(), Uri.parse(trailer.url));
-            Observable.timer(2, TimeUnit.SECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(aLong -> stopLoading());
-        }
-    };
 }

@@ -462,6 +462,7 @@ public class MovieScanService extends Service {
         movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
         movie.addTime = System.currentTimeMillis();
         long id = mMovieDao.insertOrIgnoreMovie(movie);
+        //多对多可以先插入数据库
         mGenreDao.insertGenres(genreList);
         mActorDao.insertActors(actorList);
         mDirectorDao.insertDirectors(directorList);

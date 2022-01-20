@@ -11,6 +11,7 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.GenreTag;
+import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
@@ -58,7 +59,7 @@ public class NewpageViewModel extends AndroidViewModel {
     public void prepareHistory(Callback callback) {
         Observable.just("")
                 .map(s -> {
-                    List<UnrecognizedFileDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView();
+                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource());
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())

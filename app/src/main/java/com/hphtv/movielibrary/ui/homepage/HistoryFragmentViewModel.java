@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.VideoPlayTools;
@@ -40,7 +41,7 @@ public class HistoryFragmentViewModel extends AndroidViewModel {
     public void prepareHistory(Callback callback) {
         Observable.just("")
                 .map(s -> {
-                    List<UnrecognizedFileDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView();
+                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource());
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -71,6 +72,6 @@ public class HistoryFragmentViewModel extends AndroidViewModel {
     }
 
     public interface Callback {
-        void runOnUIThread(List<UnrecognizedFileDataView> dataViewList);
+        void runOnUIThread(List<HistoryMovieDataView> dataViewList);
     }
 }

@@ -158,6 +158,15 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source);
 
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            "AND genre_name in (:genre_name) "+
+            "AND id!=:id "+
+            " GROUP BY id " +
+            " ORDER BY add_time DESC "
+    )
+    public List<MovieDataView> queryRecommand(String source,List<String> genre_name,long id);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);
 

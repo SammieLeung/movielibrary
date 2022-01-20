@@ -2,6 +2,8 @@ package com.hphtv.movielibrary.util;
 
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -9,6 +11,7 @@ import android.view.WindowManager;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FloatDialogBinding;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.LogUtil;
 
 import static android.content.Context.WINDOW_SERVICE;
 
@@ -34,8 +37,8 @@ public class ServiceStatusHelper {
             layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
 
             layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            layoutParams.x = DensityUtil.px2dip(context, 636);
-            layoutParams.y = DensityUtil.px2dip(context, -370);
+            layoutParams.gravity= Gravity.BOTTOM|Gravity.END;
+
             wm.addView(sFloatDialogBinding.getRoot(), layoutParams);
         }
     }

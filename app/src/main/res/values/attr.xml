@@ -8,4 +8,9 @@
     <declare-styleable name="FavoriteCollection">
         <attr name="isFavorite" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="FastblurImageView">
+        <attr name="scale" format="integer"></attr>
+        <attr name="radius" format="integer"></attr>
+    </declare-styleable>
 </resources>

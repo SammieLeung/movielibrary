@@ -160,21 +160,22 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
 
     private boolean mKeepHiddenFiles = true;
     private String[] mAllowExtensionFilter;
-    private FileFilter  mFileFilter=f->{
-        String filename=f.getName();
-        if(f.isDirectory()&&!filename.startsWith(".")){
+    private FileFilter mFileFilter = f -> {
+        String filename = f.getName();
+        if (f.isDirectory() && !filename.startsWith(".")) {
             return true;
-        }else if(f.isFile()) {
-            String ext = f.getName().substring(f.getName().lastIndexOf('.') + 1).toLowerCase();
-            if (TextUtils.isEmpty(ext) && mAllowExtensionFilter != null&&mAllowExtensionFilter.length>0) {
-                for(String filt:mAllowExtensionFilter){
-                    if(ext.equalsIgnoreCase(filt)&&!filt.isEmpty()){
+        } else if (f.isFile()) {
+            if (mAllowExtensionFilter != null && mAllowExtensionFilter.length > 0) {
+                String ext = f.getName().lastIndexOf('.') >= 0 ? f.getName().substring(f.getName().lastIndexOf('.') + 1).toLowerCase() : "";
+                for (String filt : mAllowExtensionFilter) {
+                    if (ext.equalsIgnoreCase(filt)) {
                         return true;
                     }
                 }
+                return false;
             }
         }
-        return false;
+        return true;
     };
 
 
@@ -919,8 +920,8 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
     private void sambaPath(Node node) {
         SmbFile smbFile = null;
         node.setChildren(null);
-        CIFSContext cifsContext = SambaAuthHelper.getInstance().  getCIFSContext(node.getId());
-        sambaGetPath(node,cifsContext);
+        CIFSContext cifsContext = SambaAuthHelper.getInstance().getCIFSContext(node.getId());
+        sambaGetPath(node, cifsContext);
 //        switch (node.getType()) {
 //            case Node.SAMBA_DEVICE:
 //                sambaGetPath(node, cifsContext);
@@ -1098,7 +1099,6 @@ public class BrowsePathPresenter implements BrowsePathContract.Presenter {
         }
         node.addChild(child);
     }
-
 
 
 }

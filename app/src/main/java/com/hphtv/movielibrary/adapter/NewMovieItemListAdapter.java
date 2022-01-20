@@ -21,9 +21,9 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class RecentlyAddListAdapter extends BaseAdapter2<PosterItemBinding, BaseAdapter2.ViewHolder, MovieDataView> {
+public class NewMovieItemListAdapter extends BaseAdapter2<PosterItemBinding, BaseAdapter2.ViewHolder, MovieDataView> {
 
-    public RecentlyAddListAdapter(Context context, List<MovieDataView> movieDataViewList) {
+    public NewMovieItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {
         super(context, movieDataViewList);
     }
 

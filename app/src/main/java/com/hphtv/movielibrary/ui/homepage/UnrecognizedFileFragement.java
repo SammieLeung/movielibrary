@@ -63,15 +63,15 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
      * 刷新未识别内容
      */
     public void notifyUpdate() {
-        mViewModel.prepareUnrecognizedFile(unrecognizedFileDataViewList -> {
-            if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
-                mBinding.tipsEmpty.setVisibility(View.GONE);
-                mAdapter.addAll(unrecognizedFileDataViewList);
-            } else {
-                mAdapter.addAll(unrecognizedFileDataViewList);
-                mBinding.tipsEmpty.setVisibility(View.VISIBLE);
-            }
-            notifyStopLoading();
-        });
+        if (mViewModel != null)
+            mViewModel.prepareUnrecognizedFile(unrecognizedFileDataViewList -> {
+                if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
+                    mBinding.tipsEmpty.setVisibility(View.GONE);
+                    mAdapter.addAll(unrecognizedFileDataViewList);
+                } else {
+                    mBinding.tipsEmpty.setVisibility(View.VISIBLE);
+                }
+                notifyStopLoading();
+            });
     }
 }

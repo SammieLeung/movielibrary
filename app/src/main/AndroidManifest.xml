@@ -45,7 +45,7 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".ui.homepage.NewPageAcitivity">
+        <activity android:name=".ui.homepage.NewHomePageActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />

@@ -41,7 +41,7 @@ public class HomepageViewModel extends AndroidViewModel {
 
     private List<Device> mConditionDevices = new ArrayList<>();
 
-    private MutableLiveData<Integer> mCurrentFragmentPos=new MutableLiveData<>();
+    private MutableLiveData<Integer> mCurrentFragmentPos = new MutableLiveData<>();
 
     public HomepageViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -88,7 +88,7 @@ public class HomepageViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
-                      callback.runOnUIThread();
+                        callback.runOnUIThread();
                     }
                 });
     }
@@ -114,15 +114,13 @@ public class HomepageViewModel extends AndroidViewModel {
                     public void onAction(String s) {
                         switch (s) {
                             case HomepageViewModel.PREPARE_CONDITIONS:
-                                callback.runOnUIThread();
+                                if (callback != null)
+                                    callback.runOnUIThread();
                                 break;
                         }
                     }
                 });
     }
-
-
-
 
 
     public static final String GET_NOT_SCAN_VIDEOFILES = "get_not_scan_videofiles";

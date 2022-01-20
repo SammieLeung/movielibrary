@@ -50,7 +50,8 @@ public class FavoriteFragment extends BaseFragment<FavoriteFragmentViewModel, FL
     }
 
     public void notifyUpdate(){
-        mViewModel.prepareFavorite(dataViewList -> {
+        if (mViewModel != null)
+            mViewModel.prepareFavorite(dataViewList -> {
             updateMovie(dataViewList);
             notifyStopLoading();
         });

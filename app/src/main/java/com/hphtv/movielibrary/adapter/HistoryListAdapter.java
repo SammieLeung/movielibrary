@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.HistoryItemBinding;
+import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.util.ThumbnailUtils;
 
@@ -20,10 +22,10 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class HistoryListAdapter extends BaseAdapter2<HistoryItemBinding, BaseAdapter2.ViewHolder,UnrecognizedFileDataView> {
+public class HistoryListAdapter extends BaseAdapter2<HistoryItemBinding, BaseAdapter2.ViewHolder,HistoryMovieDataView> {
 
-    public HistoryListAdapter(Context context, List<UnrecognizedFileDataView> unrecognizedFileDataViewList) {
-        super(context, unrecognizedFileDataViewList);
+    public HistoryListAdapter(Context context, List<HistoryMovieDataView> historyList) {
+        super(context, historyList);
     }
 
     @Override
@@ -34,12 +36,11 @@ public class HistoryListAdapter extends BaseAdapter2<HistoryItemBinding, BaseAda
     @Override
     public void onBindViewHolder(@NonNull @NotNull BaseAdapter2.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        UnrecognizedFileDataView unrecognizedFileDataView = mList.get(position);
+        HistoryMovieDataView dataView = mList.get(position);
         HistoryItemBinding binding = (HistoryItemBinding) holder.mBinding;
-        Bitmap bitmap= ThumbnailUtils.getVideoThumb(unrecognizedFileDataView.path,15);
-        Glide.with(mContext).load(bitmap)
+        Glide.with(mContext).load(!TextUtils.isEmpty(dataView.stage_photo)?dataView.stage_photo:dataView.poster).centerCrop()
                 .into(binding.ivImg);
-        binding.setTitle(unrecognizedFileDataView.filename);
+        binding.setTitle(!TextUtils.isEmpty(dataView.source)?dataView.title:!TextUtils.isEmpty(dataView.keyword)?dataView.keyword:dataView.filename);
     }
 }
 

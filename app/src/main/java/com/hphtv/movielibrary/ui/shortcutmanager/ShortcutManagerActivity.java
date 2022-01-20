@@ -2,12 +2,14 @@ package com.hphtv.movielibrary.ui.shortcutmanager;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -54,7 +56,8 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
     };
 
     @Override
-    protected void onCreate() {
+    protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         mOptionsViewModel=new ViewModelProvider(this).get(ShortcutOptionsViewModel.class);
         mOptionsViewModel.setShortcutManagerViewModel(mViewModel);
         mOptionsViewModel.setUICallback(mCallback);

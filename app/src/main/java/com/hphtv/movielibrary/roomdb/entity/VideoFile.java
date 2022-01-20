@@ -12,6 +12,8 @@ import androidx.room.PrimaryKey;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**

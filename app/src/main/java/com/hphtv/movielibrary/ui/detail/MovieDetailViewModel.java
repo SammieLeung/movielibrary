@@ -1,11 +1,12 @@
 package com.hphtv.movielibrary.ui.detail;
 
 import android.app.Application;
-import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
@@ -21,6 +22,7 @@ import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
@@ -79,6 +81,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
     private MovieWrapper mMovieWrapper;
     private int mCurrentMode;
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViewList;
+    private List<MovieDataView> mRecommandList = new ArrayList<>();
 
     private String mSource;
 
@@ -101,24 +104,17 @@ public class MovieDetailViewModel extends AndroidViewModel {
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
         mTrailerDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getTrailerDao();
         mStagePhotoDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getStagePhotoDao();
-        mSeasonDao=MovieLibraryRoomDatabase.getDatabase(getApplication()).getSeasonDao();
+        mSeasonDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getSeasonDao();
     }
 
-    public void loadMovieWrapper(long id, MovieWrapperCallback callback) {
-        Observable.just(id)
+    public Observable<MovieWrapper> loadMovieWrapper(long id) {
+        return Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
                     mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id, mSource);
                     return mMovieWrapper;
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<MovieWrapper>() {
-                    @Override
-                    public void onAction(MovieWrapper movieWrapper) {
-                        if (callback != null)
-                            callback.runOnUIThread(movieWrapper);
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public void loadUnrecogizedFile(String keyword, UnrecognizedFileCallback callback) {
@@ -136,6 +132,44 @@ public class MovieDetailViewModel extends AndroidViewModel {
                             callback.runOnUIThread(unrecognizedFileDataViewList);
                     }
                 });
+    }
+
+    public Observable<List<MovieDataView>> loadRecommand(List<Genre> list) {
+        return Observable.just(list)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .map(new Function<List<Genre>, List<MovieDataView>>() {
+                    @Override
+                    public List<MovieDataView> apply(List<Genre> list) throws Throwable {
+                        List<String> genreName = new ArrayList<>();
+                        for (Genre genre : list) {
+                            genreName.add(genre.name);
+                        }
+                        List<MovieDataView> dataViewList = new ArrayList<>();
+                        dataViewList.addAll(mMovieDao.queryRecommand(ScraperSourceTools.getSource(), genreName, mMovieWrapper.movie.id));
+                        return dataViewList;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<List<String>> loadTags() {
+        return Observable.just(mMovieWrapper)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .map(movieWrapper -> {
+                    List<String> tagList = new ArrayList<>();
+                    if (!TextUtils.isEmpty(movieWrapper.movie.releaseArea)) {
+                        tagList.add(movieWrapper.movie.releaseArea);
+                    }
+                    if (movieWrapper.genres.size() > 0) {
+                        for (int i = 0; i < movieWrapper.genres.size() && i < 3; i++) {
+                            tagList.add(movieWrapper.genres.get(i).name);
+                        }
+                    }
+                    if (!TextUtils.isEmpty(movieWrapper.movie.year)) {
+                        tagList.add(movieWrapper.movie.year);
+                    }
+                    return tagList;
+                }).observeOn(AndroidSchedulers.mainThread());
     }
 
     public void setFavorite(MovieWrapper movieWrapper, Callback2 callback2) {
@@ -158,19 +192,14 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-
-    public void playTralier(Trailer trailer) {
-        VideoPlayTools.play(getApplication(), Uri.parse(trailer.url));
-    }
-
     public void playingVideo(MovieWrapper wrapper, String path, String name) {
         Observable.just(path)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 //记录播放时间，作为播放记录
                 .doOnNext(filepath -> {
-                    long currentTime=System.currentTimeMillis();
+                    long currentTime = System.currentTimeMillis();
                     mVideoFileDao.updateLastPlaytime(filepath, currentTime);
-                    mMovieDao.updateLastPlaytime(wrapper.movie.movieId,currentTime);
+                    mMovieDao.updateLastPlaytime(wrapper.movie.movieId, currentTime);
                     SharePreferencesTools.getInstance(getApplication()).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, wrapper.movie.poster);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -187,9 +216,9 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(s -> {
                     long id = mMovieWrapper.movie.id;
-                    String movie_id=mMovieWrapper.movie.movieId;
+                    String movie_id = mMovieWrapper.movie.movieId;
                     mMovieVideofileCrossRefDao.deleteById(id);
-                    mMovieDao.updateFavorite(false,id);//电影的收藏状态在删除时要设置为false
+                    mMovieDao.updateFavorite(false, id);//电影的收藏状态在删除时要设置为false
                     return movie_id;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -202,14 +231,14 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-    public void selectMovie( String movie_id,String source,Constants.SearchType type,boolean is_favorite, MovieWrapperCallback movieWrapperCallback) {
+    public void selectMovie(String movie_id, String source, Constants.SearchType type, boolean is_favorite, MovieWrapperCallback movieWrapperCallback) {
 
         Observable.just(source)
                 .map(new Function<String, MovieWrapper>() {
                     @Override
                     public MovieWrapper apply(String _source) throws Throwable {
                         //TODO 增加可选搜索类型
-                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source,type.name()).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source, type.name()).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
                         return wrapper;
                     }
                 })
@@ -220,7 +249,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .doOnNext(wrapper -> {
                     if (wrapper.movie == null)
                         return;
-                    wrapper.movie.isFavorite=is_favorite;
+                    wrapper.movie.isFavorite = is_favorite;
                     String[] paths;
                     if (mCurrentMode == Constants.MovieDetailMode.MODE_WRAPPER) {
                         paths = new String[mMovieWrapper.videoFiles.size()];
@@ -247,6 +276,23 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
+    public Observable<String> loadFileList(){
+        return Observable.just(mMovieWrapper)
+                .subscribeOn(Schedulers.from(mSingleThreadPool))
+                .map(new Function<MovieWrapper, String>() {
+                    @Override
+                    public String apply(MovieWrapper wrapper) throws Throwable {
+                        List<VideoFile> list=wrapper.videoFiles;
+                        StringBuffer sb=new StringBuffer();
+                        for(VideoFile videoFile:list){
+                            sb.append(videoFile.path+"\n");
+                        }
+                        return sb.toString();
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     /**
      * 保存MovieWrapper实体
@@ -261,7 +307,7 @@ public class MovieDetailViewModel extends AndroidViewModel {
         List<Actor> actorList = movieWrapper.actors;
         List<Trailer> trailerList = movieWrapper.trailers;
         List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
-        List<Season> seasonList=movieWrapper.seasons;
+        List<Season> seasonList = movieWrapper.seasons;
 
         //插入电影到数据库
         movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
@@ -323,9 +369,9 @@ public class MovieDetailViewModel extends AndroidViewModel {
             }
         }
 
-        for(Season season:seasonList){
-            if(season!=null){
-                season.movieId=movie_id;
+        for (Season season : seasonList) {
+            if (season != null) {
+                season.movieId = movie_id;
                 mSeasonDao.insertOrIgnore(season);
             }
         }
@@ -337,15 +383,22 @@ public class MovieDetailViewModel extends AndroidViewModel {
             movieVideoFileCrossRef.source = source;
             mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
             videoFile.isScanned = 1;
-            videoFile.keyword=movie.title;
+            videoFile.keyword = movie.title;
             mVideoFileDao.update(videoFile);
         }
 
+    }
 
+    public MovieWrapper getMovieWrapper() {
+        return mMovieWrapper;
     }
 
     public void setCurrentMode(int currentMode) {
         mCurrentMode = currentMode;
+    }
+
+    public List<MovieDataView> getRecommandList() {
+        return mRecommandList;
     }
 
     public interface Callback2 {

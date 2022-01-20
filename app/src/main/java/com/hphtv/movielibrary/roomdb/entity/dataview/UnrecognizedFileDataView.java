@@ -26,7 +26,7 @@ public class UnrecognizedFileDataView {
     public String device_uri;
     public long last_playtime;
     public long add_time;
-    public int episode;
+    public String episode;
     public int season;
 
 

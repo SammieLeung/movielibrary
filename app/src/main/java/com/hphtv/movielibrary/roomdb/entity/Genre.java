@@ -13,12 +13,13 @@ import java.io.Serializable;
  * author: Sam Leung
  * date:  2021/5/27
  */
-@Entity(tableName = TABLE.GENRE, indices = {@Index(value = "name", unique = true)})
+@Entity(tableName = TABLE.GENRE, indices = {@Index(value = {"name","source"}, unique = true)})
 public class Genre implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "genre_id")
     public long genreId;
     public String name;
+    public String source;
 
     @Override
     public String toString() {

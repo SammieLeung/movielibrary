@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
@@ -33,7 +34,8 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     private MovieAdapter mMovieAdapter;
 
     @Override
-    protected void onCreate() {
+    protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         prepearT9();
         initView();
         mViewModel.init();
