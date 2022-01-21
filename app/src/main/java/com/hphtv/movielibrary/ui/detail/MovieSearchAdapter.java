@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.adapter;
+package com.hphtv.movielibrary.ui.detail;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.adapter.CommonViewHolder;
 import com.hphtv.movielibrary.databinding.UnionsearchMovieFooterBinding;
 import com.hphtv.movielibrary.databinding.UnionsearchMovieItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
@@ -31,7 +32,6 @@ import java.util.List;
  * date:  2021/8/12
  */
 public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
-    public static final float SCALE_SIZE = 1.1f;
     private final static int TYPE_CONTENT = 0;//正常内容
     private final static int TYPE_FOOTER = 1;//下拉刷新
 
@@ -69,6 +69,8 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             Movie movie = mMovieList.get(position);
             vh.mDataBinding.setMovie(movie);
             GlideTools.GlideWrapper(mContext, movie.poster)
+                    .placeholder(R.mipmap.default_poster)
+                    .error(R.mipmap.default_poster)
                     .into(vh.mDataBinding.ivCover);
         }
     }
@@ -172,26 +174,6 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             mDataBinding.getRoot().setOnClickListener(v -> {
                 if (mOnClickListener != null)
                     mOnClickListener.onClick(mDataBinding.getMovie());
-            });
-            mDataBinding.getRoot().setOnFocusChangeListener((v, hasFocus) -> {
-                if (hasFocus) {
-                    ViewCompat.animate(v).scaleX(SCALE_SIZE).scaleY(SCALE_SIZE).translationZ(1).start();
-                    mDataBinding.viewTop.setVisibility(View.VISIBLE);
-                } else {
-                    mDataBinding.viewTop.setVisibility(View.GONE);
-                    ViewCompat.animate(v).scaleX(1f).scaleY(1f).translationZ(0).start();
-                }
-            });
-            mDataBinding.getRoot().setOnHoverListener((v, event) -> {
-                //获取焦点时变化
-                if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-                    ViewCompat.animate(v).scaleX(SCALE_SIZE).scaleY(SCALE_SIZE).translationZ(1).start();
-                    mDataBinding.viewTop.setVisibility(View.VISIBLE);
-                } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-                    mDataBinding.viewTop.setVisibility(View.GONE);
-                    ViewCompat.animate(v).scaleX(1f).scaleY(1f).translationZ(0).start();
-                }
-                return false;
             });
         }
     }

@@ -22,7 +22,7 @@
     <string name="rate_not">暂无评分</string>
     <string name="rate">%1$s分</string>
     <string name="edit">编辑</string>
-    <string name="hint">电影</string>
+    <string name="hint">请输入关键字</string>
     <string name="ratingsCounts">( %1$s人评价 )</string>
     <string name="sortby">%1$s|%2$s %3$s</string>
     <string name="lb_sort_device">设备</string>
@@ -156,7 +156,7 @@
     <string name="checkbox_del_video_file">清除文件信息(不会删除文件)?</string>
     <string name="toast_del_success">删除成功！</string>
     <string name="toast_UnknownHostException">网络错误！</string>
-    <string name="toast_loadmore_end">到底了~</string>
+    <string name="toast_loadmore_end">搜索不到更多内容</string>
 
     <string name="title_hide_private">隐藏私密文件</string>
     <string name="tips_for_show_private_videos">已经显示私密视频</string>

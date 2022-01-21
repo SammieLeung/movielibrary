@@ -30,6 +30,8 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source")
     public Movie queryByMovieId(String movie_id, String source);
 
+    @Query("SELECT * FROM "+TABLE.MOVIE+" AS M JOIN "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" AS MF ON MF.id=M.id AND MF.path=:path AND MF.source=:source")
+    public Movie queryByKeyword(String path,String source);
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
             "SET is_favorite=:isFavorite " +

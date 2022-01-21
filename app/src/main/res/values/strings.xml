@@ -20,7 +20,7 @@
     <string name="rate_not">No Score</string>
     <string name="rate">"%1$s "</string>
     <string name="edit">Edit</string>
-    <string name="hint">Movie</string>
+    <string name="hint">keyword</string>
     <string name="ratingsCounts">( %1$s people )</string>
     <string name="sortby">%1$s|%2$s %3$s</string>
     <string name="lb_title" translatable="false">MediaStation</string>
@@ -160,7 +160,7 @@
     <string name="checkbox_del_video_file">Clear file information (do not delete files)?</string>
     <string name="toast_del_success">Delete Success!</string>
     <string name="toast_UnknownHostException">Network error!</string>
-    <string name="toast_loadmore_end">It\'s the end~</string>
+    <string name="toast_loadmore_end">Couldn\'t find more data</string>
     <string name="title_hide_private">Hide Pirvate Videos</string>
     <string name="tips_for_hide_private_videos">Private videos have been hidden</string>
     <string name="tips_for_show_private_videos">Private videos have been shown</string>

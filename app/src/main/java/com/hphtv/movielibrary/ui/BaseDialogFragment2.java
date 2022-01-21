@@ -35,7 +35,7 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB exten
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!createViewModel())
+        if (createViewModel()==null)
             mViewModel = ViewModelHelper.createAndroidViewModel(this, this.getClass());
     }
 
@@ -60,6 +60,6 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB exten
         getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
-    protected abstract boolean createViewModel();
+    protected abstract VM createViewModel();
 
 }

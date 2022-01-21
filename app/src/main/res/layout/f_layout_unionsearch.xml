@@ -2,56 +2,89 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-    <LinearLayout
-        android:id="@+id/rl_search_dialog_bg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/c2b323e"
-        android:orientation="vertical">
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+       >
 
         <RelativeLayout
-            android:layout_width="711dp"
-            android:layout_height="wrap_content">
-
-            <Button
-                style="@style/DrawTopButtonStyle"
-                android:id="@+id/btn_search"
-                android:layout_width="170dp"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:text="@string/btn_search"
-                android:textAllCaps="false" />
-
-            <EditText
-                android:id="@+id/et_box_name"
-                android:layout_width="match_parent"
-                android:layout_height="38.6dp"
-                android:layout_toLeftOf="@id/btn_search"
-                android:background="@drawable/et_bg"
-                android:hint="@string/hint"
-                android:imeOptions="actionSearch"
-                android:maxLength="100"
-                android:paddingLeft="38.6dp"
-                android:singleLine="true"
-                android:textColor="#dddddd"
-                android:textSize="15sp" />
-
-            <ImageView
+            android:background="@drawable/detail_poster_bg"
+            android:layout_width="841dp"
+            android:layout_height="625dp"
+            android:gravity="center|top"
+            android:orientation="vertical">
+            <TextView
+                android:layout_centerHorizontal="true"
+                android:id="@+id/tv_title"
+                android:text="@string/edit_title"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="38dp"
                 android:layout_width="wrap_content"
-                android:layout_height="38.6dp"
-                android:scaleType="center"
-                android:src="@mipmap/search" />
+                android:layout_height="wrap_content"/>
+            <RelativeLayout
+                android:layout_below="@id/tv_title"
+                android:layout_marginTop="38dp"
+                android:layout_marginLeft="38dp"
+                android:layout_marginRight="38dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <EditText
+                    android:id="@+id/et_box_name"
+                    android:layout_width="552dp"
+                    android:layout_height="60dp"
+
+                    android:background="@drawable/new_edittext_bg"
+                    android:hint="@string/hint"
+                    android:paddingLeft="32dp"
+                    android:paddingRight="32dp"
+                    android:imeOptions="actionSearch"
+                    android:maxLength="100"
+                    android:singleLine="true"
+                    android:textColor="@color/white"
+                    android:textSize="23sp" />
+                <Spinner
+                    style="@style/common_spiner"
+                    android:layout_toEndOf="@id/et_box_name"
+                    android:layout_marginLeft="15dp"
+                    android:id="@+id/spinner"
+                    android:layout_width="114dp"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:dropDownWidth="114dp"
+                    android:dropDownSelector="@drawable/spinner_dropitem_selector"
+                    android:popupBackground="@drawable/new_edittext_bg"
+                    android:spinnerMode="dropdown"
+                    android:textAllCaps="false" />
+                <ImageButton
+                    android:background="@drawable/new_common_spinner_bg"
+                    android:layout_toEndOf="@id/spinner"
+                    android:id="@+id/btn_search"
+                    android:layout_width="80dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/icon_circle_search_35"
+                    android:textAllCaps="false" />
+
+                <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
+                    android:id="@+id/recyclerview_search_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/et_box_name"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="21dp"
+                     />
+
+            </RelativeLayout>
+            <ImageView
+                style="@style/close_btn_style"
+                android:id="@+id/btn_close"/>
         </RelativeLayout>
 
+    </RelativeLayout>
 
-        <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
-            android:id="@+id/recyclerview_search_result"
-            android:layout_width="711dp"
-            android:layout_height="match_parent"
-            android:layout_below="@id/et_box_name"></com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll>
-
-    </LinearLayout>
 
     <data>
 

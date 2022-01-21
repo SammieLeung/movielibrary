@@ -60,4 +60,9 @@
         <item>@string/category_favorite</item>
     </string-array>
 
+    <string-array name="search_type">
+        <item>@string/shortcut_type_auto</item>
+        <item>@string/shortcut_type_movie</item>
+        <item>@string/shortcut_type_tv</item>
+    </string-array>
 </resources>

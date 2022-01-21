@@ -41,11 +41,11 @@ public class TmdbApiService {
 
 
     public static Observable<MovieSearchRespone> movieSearch(String keyword, int pageIndex, String api) {
-        return unionSearch(keyword, pageIndex, api, Constants.SearchType.movie.name(),null);
+        return movieSearch(keyword, pageIndex, api, null);
     }
 
     public static Observable<MovieSearchRespone> tvSearch(String keyword, int pageIndex, String api) {
-        return unionSearch(keyword, pageIndex, api, Constants.SearchType.movie.name(), null);
+        return tvSearch(keyword, pageIndex, api, null);
     }
 
     public static Observable<MovieSearchRespone> movieSearch(String keyword, int pageIndex, String api, String year) {
@@ -53,7 +53,7 @@ public class TmdbApiService {
     }
 
     public static Observable<MovieSearchRespone> tvSearch(String keyword, int pageIndex, String api,String year) {
-        return unionSearch(keyword, pageIndex, api, Constants.SearchType.movie.name(), year);
+        return unionSearch(keyword, pageIndex, api, Constants.SearchType.tv.name(), year);
     }
 
     public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String api, String type, String year) {

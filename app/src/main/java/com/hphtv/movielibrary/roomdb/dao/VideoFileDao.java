@@ -44,6 +44,9 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE)
     public List<VideoFile> queryAll();
 
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE keyword=:keyword AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source)")
+    public List<VideoFile> queryVideoFileListByKeyword(String keyword,String source);
+
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE device_path <=5 AND is_scanned=0")
     public List<VideoFile> queryAllLocalUnScannedVideoFiles();
 

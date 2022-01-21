@@ -59,11 +59,5 @@
         <variable
             name="dialogTitle"
             type="String" />
-        <variable
-            name="inputHint"
-            type="String" />
-        <variable
-            name="inputText"
-            type="String" />
     </data>
 </layout>

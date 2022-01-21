@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.MovieSearchAdapter;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
@@ -18,7 +17,6 @@ import com.station.kit.util.ToastUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.UnknownHostException;
-import java.util.LinkedList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -33,30 +31,40 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
     private int pageSize = 9;
     private int mCurrentPage;
     private String mSource;
+    private int mSearchMode;
 
     private String mCurrentKeyword;
-    private LinkedList<Movie> mMovieLinkedList;
 
     public MovieSearchDialogViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSource = ScraperSourceTools.getSource();
-        mMovieLinkedList = new LinkedList<>();
     }
 
     public void refresh(String keyword, MovieSearchAdapter adapter) {
         if (TextUtils.isEmpty(keyword))
             return;
         mCurrentKeyword = keyword.trim();
-        mMovieLinkedList.clear();
+        adapter.clearAll();
         mCurrentPage = 1;
-        notifyNewSearch(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage,mSource), adapter);
+        notifyNewSearch(autoSearch(mCurrentPage), adapter);
 //        mCurrentPage = 3;
     }
 
     public void loading(MovieSearchAdapter adapter) {
         if (TextUtils.isEmpty(mCurrentKeyword))
             return;
-        notifyLoadingMore(TmdbApiService.unionSearch(mCurrentKeyword, mCurrentPage + 1, mSource), adapter);
+        notifyLoadingMore(autoSearch(mCurrentPage+1), adapter);
+    }
+
+    public Observable<? extends ResponeEntity<List<Movie>>> autoSearch(int page) {
+        switch (mSearchMode) {
+            case 1:
+                return TmdbApiService.movieSearch(mCurrentKeyword, page, mSource);
+            case 2:
+                return TmdbApiService.tvSearch(mCurrentKeyword, page, mSource);
+            default:
+                return TmdbApiService.unionSearch(mCurrentKeyword, page, mSource);
+        }
     }
 
     private void notifyNewSearch(Observable<? extends ResponeEntity<List<Movie>>> observable, MovieSearchAdapter adapter) {
@@ -135,4 +143,8 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
         mCurrentKeyword = currentKeyword;
     }
 
+    public void setSearchMode(int searchMode,MovieSearchAdapter adapter) {
+        mSearchMode=searchMode;
+        refresh(mCurrentKeyword,adapter);
+    }
 }

@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,9 +40,8 @@ public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
     }
 
     @Override
-    protected boolean createViewModel() {
-        mViewModel=new ViewModelProvider(getActivity()).get(MovieDetailViewModel.class);
-        return true;
+    protected MovieDetailViewModel createViewModel() {
+        return mViewModel=new ViewModelProvider(getActivity()).get(MovieDetailViewModel.class);
     }
 
     @Override
@@ -54,6 +52,7 @@ public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),62),DensityUtil.dip2px(getContext(),22)));
         mBinding.rvActorList.setAdapter(mActorPosterItemListApdater);
         mBinding.setPlot(mViewModel.getMovieWrapper().movie.plot);
+        mBinding.btnFold.setOnClickListener(v->dismiss());
         mViewModel.loadFileList().subscribe(new SimpleObserver<String>() {
             @Override
             public void onAction(String s) {

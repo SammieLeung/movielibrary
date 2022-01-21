@@ -6,7 +6,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.MovieLibraryItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
@@ -34,7 +33,7 @@ public class UnrecognizedFileListAdapter extends BaseAdapter<MovieLibraryItemBin
     public void onBindViewHolder(@NonNull @NotNull BaseAdapter.ViewHolder holder, int position) {
         UnrecognizedFileDataView unrecognizedFileDataView = mList.get(position);
         MovieLibraryItemBinding binding = (MovieLibraryItemBinding) holder.mBinding;
-        Glide.with(mContext).load(R.mipmap.ic_poster_default)
+        Glide.with(mContext).load(R.mipmap.default_poster)
                 .into(binding.ivImg);
         binding.tvTitle.setText(unrecognizedFileDataView.keyword);
         binding.rvRating.setVisibility(View.GONE);

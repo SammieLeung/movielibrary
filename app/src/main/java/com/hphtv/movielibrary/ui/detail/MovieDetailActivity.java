@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,17 +23,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.transition.Transition;
-import com.firefly.videonameparser.MainActivity;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseAdapter2;
+import com.hphtv.movielibrary.adapter.BaseScaleApater;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailBinding;
-import com.hphtv.movielibrary.effect.GlideBlurTransformation;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
@@ -41,24 +35,39 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Timer;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutNewDetailBinding> {
+    public static final int REMOVE=1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private MovieWrapper mCurWrapper;
     private NewMovieItemListAdapter mRecommandMovieAdapter;
+    private Handler mUIHandler =new Handler(Looper.getMainLooper()){
+        @Override
+        public void dispatchMessage(@NonNull Message msg) {
+            super.dispatchMessage(msg);
+            switch (msg.what)
+            {
+                case REMOVE:
+                    refreshParent();
+                    stopLoading();
+                    finish();
+                    Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     private  BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -87,27 +96,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         startLoading();
                         String path = mBinding.getWrapper().videoFiles.get(0).path;
                         String name = mBinding.getWrapper().videoFiles.get(0).filename;
-                        playVideo(mBinding.getWrapper(), path, name);
+                        playVideo(path, name);
                     } else if (mBinding.getWrapper().videoFiles.size() > 1) {
                         showRadioDialog();
                     }
                 }
                 break;
             case R.id.btn_remove:
-                ConfirmDialogFragment confirmDialogFragment = ConfirmDialogFragment.newInstance();
-                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm))
-                        .setOnClickListener(new ConfirmDialogFragment.OnClickListener() {
-                            @Override
-                            public void OK() {
-                                removeMovie();
-                            }
-
-                            @Override
-                            public void Cancel() {
-
-                            }
-                        });
-                confirmDialogFragment.show(getSupportFragmentManager(), TAG);
+                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mUIHandler);
+                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm)).show(getSupportFragmentManager(),TAG);
                 break;
             case R.id.btn_favorite:
                 toggleFavroite();
@@ -120,6 +117,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 break;
         }
     };
+
+
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -141,15 +140,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this,72),DensityUtil.dip2px(this,15)));
         mBinding.rvRecommand.setLayoutManager(linearLayoutManager);
         mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
-        mRecommandMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
+        mRecommandMovieAdapter.setOnItemClickListener(new BaseScaleApater.OnRecyclerViewItemActionListener<MovieDataView>() {
             @Override
             public void onItemClick(View view, int postion, MovieDataView data) {
                 prepareMovieWrapper(data.id);
-            }
-
-            @Override
-            public void onItemFocus(View view, boolean hasFocus) {
-
             }
         });
     }
@@ -263,7 +257,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private void prepareUnrecogizedFile(String keyword) {
         mViewModel.loadUnrecogizedFile(keyword, unrecognizedFileDataViewList -> {
             if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
-                Glide.with(this).load(R.mipmap.ic_poster_default).error(R.mipmap.ic_poster_default).into(mBinding.ivStagephoto);
+                Glide.with(this).load(R.mipmap.default_poster).error(R.mipmap.default_poster).into(mBinding.ivStagephoto);
                 MovieWrapper movieWrapper = new MovieWrapper();
                 movieWrapper.videoFiles = new ArrayList<>();
                 StringBuffer stringBuffer = new StringBuffer();
@@ -339,23 +333,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
 
     /**
-     * 删除电影和电影文件信息
-     */
-    private void removeMovie() {
-        startLoading();
-        mViewModel.removeMovieWrapper(args -> {
-            if (args != null && args.length > 0) {
-                String movie_id = (String) args[0];
-                BroadcastHelper.sendBroadcastMovieRemoveSync(this, movie_id);//向手机助手发送电影移除的广播
-            }
-            refreshParent();
-            stopLoading();
-            finish();
-            Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    /**
      * 切换收藏状态
      */
     private void toggleFavroite() {
@@ -373,20 +350,24 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     public void showRadioDialog() {
-        CustomRadioDialogFragment dialogFragment = CustomRadioDialogFragment.newInstance(mBinding.getWrapper());
-        dialogFragment.setOnClickListener(new CustomRadioDialogFragment.OnClickListener() {
+        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mBinding.getWrapper());
+        dialogFragment.setPlayingVideo(new VideoSelectDialog.PlayVideoListener() {
             @Override
-            public void doPositiveClick(MovieWrapper movieWrapper, VideoFile videoFile) {
-                String path = videoFile.path;
-                String name = videoFile.filename;
-                playVideo(movieWrapper, path, name);
-            }
+            public void playVideo(Observable<String> observable) {
+                observable.subscribe(new SimpleObserver<String>() {
 
-            @Override
-            public void doItemSelect(MovieWrapper movieWrapper, VideoFile videoFile) {
-                doPositiveClick(movieWrapper, videoFile);
-            }
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        startLoading();
+                    }
 
+                    @Override
+                    public void onAction(String s) {
+                        refreshParent();
+                    }
+                });
+            }
         });
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
@@ -396,9 +377,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         dialog.show(getSupportFragmentManager(),"");
     }
 
-    private void playVideo(MovieWrapper wrapper, String path, String name) {
+    private void playVideo(String path, String name) {
         startLoading();
-        mViewModel.playingVideo(wrapper, path, name);
+        mViewModel.playingVideo(path, name);
         refreshParent();
     }
 

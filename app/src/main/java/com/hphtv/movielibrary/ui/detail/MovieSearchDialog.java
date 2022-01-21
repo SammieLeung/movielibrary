@@ -1,22 +1,29 @@
 package com.hphtv.movielibrary.ui.detail;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.adapter.MovieSearchAdapter;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutUnionsearchBinding;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 /**
  * author: Sam Leung
@@ -27,6 +34,7 @@ public class MovieSearchDialog extends DialogFragment {
     private FLayoutUnionsearchBinding mBinding;
     private MovieSearchDialogViewModel mViewModel;
     private MovieSearchAdapter mAdapter;
+    private ArrayAdapter<String> mSpinnerAdapter;
 
     public static MovieSearchDialog newInstance(String keyword) {
         Bundle args = new Bundle();
@@ -70,8 +78,8 @@ public class MovieSearchDialog extends DialogFragment {
             }
             dismiss();
         });
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
-        mBinding.recyclerviewSearchResult.setLayoutManager(gridLayoutManager);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
+        mBinding.recyclerviewSearchResult.setLayoutManager(layoutManager);
         mBinding.recyclerviewSearchResult.setAdapter(mAdapter);
         mBinding.recyclerviewSearchResult.addOnScrollListener(new OnMovieLoadListener() {
             @Override
@@ -82,22 +90,39 @@ public class MovieSearchDialog extends DialogFragment {
         mBinding.btnSearch.setOnClickListener(v -> {
             mAdapter.clearAll();
             String keyword = mBinding.etBoxName.getText().toString();
-            search(keyword);
+            mViewModel.refresh(keyword, mAdapter);
         });
+        mBinding.btnClose.setOnClickListener(v->dismiss());
         if (mViewModel.getCurrentKeyword() != null) {
             mBinding.etBoxName.setText(mViewModel.getCurrentKeyword());
             mBinding.etBoxName.setSelection(0, mViewModel.getCurrentKeyword().length());
         }
+        mSpinnerAdapter= new ArrayAdapter<>(getContext(),R.layout.spinner_layout, Arrays.asList(getResources().getStringArray(R.array.search_type)));
+        mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropitem_layout);
+        mBinding.spinner.setAdapter(mSpinnerAdapter);
+        mBinding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mViewModel.setSearchMode(position,mAdapter);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        search(mViewModel.getCurrentKeyword());
-    }
-
-    private void search(String keyword) {
-        mViewModel.refresh(keyword, mAdapter);
     }
 
     private OnSelectPosterListener mOnSelectPosterListener;

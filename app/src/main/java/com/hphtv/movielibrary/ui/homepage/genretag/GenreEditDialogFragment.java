@@ -29,8 +29,8 @@ public class GenreEditDialogFragment extends BaseDialogFragment2<GenreEditDialog
     }
 
     @Override
-    protected boolean createViewModel() {
-        return false;
+    protected GenreEditDialogViewModel createViewModel() {
+        return null;
     }
 
     @Override

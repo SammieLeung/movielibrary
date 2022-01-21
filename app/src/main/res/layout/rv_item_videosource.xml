@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="title"
+            type="String" />
+        <variable
+            name="path"
+            type="String" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="22dp"
+        android:paddingRight="22dp"
+        android:paddingTop="15dp"
+        android:background="@drawable/new_list_item_bg"
+        android:paddingBottom="15dp">
+            <TextView
+                android:duplicateParentState="true"
+                android:id="@+id/tv_title"
+                android:text="@{title}"
+                android:singleLine="true"
+                android:ellipsize="middle"
+                android:textStyle="bold"
+                android:textSize="21sp"
+                android:drawablePadding="15dp"
+                android:textColor="@color/white"
+                android:drawableRight="@drawable/icon_new_more_21dp"
+                android:drawableTint="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        <TextView
+            android:duplicateParentState="true"
+            android:id="@+id/tv_path"
+            android:textSize="17sp"
+            android:textColor="@color/white"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:text="@{path}"
+            android:layout_marginTop="15dp"
+            android:layout_below="@id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+</layout>

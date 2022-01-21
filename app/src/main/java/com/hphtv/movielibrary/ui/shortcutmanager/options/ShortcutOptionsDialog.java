@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.ui.shortcutmanager.options;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -8,14 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ShortcutOptionDialogLayoutBinding;
-import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
-import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.remove.ShortcutRemoveConfirmDialog;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.scan.ShortcutScanDialog;
 
@@ -35,9 +29,8 @@ public class ShortcutOptionsDialog extends BaseDialogFragment2<ShortcutOptionsVi
         return fragment;
     }
     @Override
-    protected boolean createViewModel() {
-        mViewModel=new ViewModelProvider(getActivity()).get(ShortcutOptionsViewModel.class);
-        return true;
+    protected ShortcutOptionsViewModel createViewModel() {
+        return mViewModel=new ViewModelProvider(getActivity()).get(ShortcutOptionsViewModel.class);
     }
 
     @Override

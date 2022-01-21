@@ -1,19 +1,20 @@
-package com.hphtv.movielibrary.ui;
+package com.hphtv.movielibrary;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
-import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * author: Sam Leung
- * date:  2021/12/30
+ * date:  2022/1/21
  */
-public abstract class BaseAndroidViewModel extends AndroidViewModel {
+public class BaseAndroidViewModel extends AndroidViewModel {
+
     public BaseAndroidViewModel(@NonNull @NotNull Application application) {
         super(application);
     }
@@ -22,4 +23,10 @@ public abstract class BaseAndroidViewModel extends AndroidViewModel {
         return getApplication().getString(resId);
     }
 
+    @NonNull
+    @NotNull
+    @Override
+    public MovieApplication getApplication() {
+        return super.getApplication();
+    }
 }

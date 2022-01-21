@@ -7,12 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
-import com.hphtv.movielibrary.ui.BaseAndroidViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.bean.ShortcutOptionsItem;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;

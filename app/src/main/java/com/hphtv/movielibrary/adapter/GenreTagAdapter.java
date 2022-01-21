@@ -8,13 +8,11 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.RoundRectItem2Binding;
 import com.hphtv.movielibrary.databinding.RoundRectItemBinding;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,11 +30,6 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
         super(context, list);
     }
 
-
-    @Override
-    protected int getBaseItemLayoutId() {
-        return super.getBaseItemLayoutId();
-    }
 
     @NonNull
     @NotNull
@@ -79,7 +72,7 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull BaseAdapter2.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
         holder.mBinding.getRoot().setTag(position);
         if (getItemViewType(position) == TYPE_ADD) {
             RoundRectItem2Binding binding = (RoundRectItem2Binding) holder.mBinding;

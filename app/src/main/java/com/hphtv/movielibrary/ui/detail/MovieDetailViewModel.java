@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
@@ -30,6 +31,7 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.StringTools;
 import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
@@ -47,6 +49,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,7 +62,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/6/15
  */
-public class MovieDetailViewModel extends AndroidViewModel {
+public class MovieDetailViewModel extends BaseAndroidViewModel {
     public static final String FROM_DB = "from_db";
     public static final String FROM_NETWORK = "from_network";
 
@@ -157,8 +160,9 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movieWrapper -> {
                     List<String> tagList = new ArrayList<>();
-                    if (!TextUtils.isEmpty(movieWrapper.movie.releaseArea)) {
-                        tagList.add(movieWrapper.movie.releaseArea);
+                    if (!TextUtils.isEmpty(movieWrapper.movie.region)) {
+                        Locale locale=new Locale.Builder().setRegion(movieWrapper.movie.region).build();
+                        tagList.add(locale.getDisplayName());
                     }
                     if (movieWrapper.genres.size() > 0) {
                         for (int i = 0; i < movieWrapper.genres.size() && i < 3; i++) {
@@ -192,27 +196,17 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-    public void playingVideo(MovieWrapper wrapper, String path, String name) {
-        Observable.just(path)
-                .subscribeOn(Schedulers.from(mSingleThreadPool))
-                //记录播放时间，作为播放记录
-                .doOnNext(filepath -> {
-                    long currentTime = System.currentTimeMillis();
-                    mVideoFileDao.updateLastPlaytime(filepath, currentTime);
-                    mMovieDao.updateLastPlaytime(wrapper.movie.movieId, currentTime);
-                    SharePreferencesTools.getInstance(getApplication()).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, wrapper.movie.poster);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
+    public void playingVideo(String path, String name) {
+        getApplication().playingMovie(path,name)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
-                    public void onAction(String path) {
-                        VideoPlayTools.play(getApplication(), path, name);
+                    public void onAction(String s) {
                     }
                 });
     }
 
-    public void removeMovieWrapper(Callback2 callback) {
-        Observable.just("")
+    public Observable<String> removeMovieWrapper() {
+        return Observable.just("")
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(s -> {
                     long id = mMovieWrapper.movie.id;
@@ -221,14 +215,8 @@ public class MovieDetailViewModel extends AndroidViewModel {
                     mMovieDao.updateFavorite(false, id);//电影的收藏状态在删除时要设置为false
                     return movie_id;
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String movie_id) {
-                        if (callback != null)
-                            callback.runOnUIThread(movie_id);
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
+
     }
 
     public void selectMovie(String movie_id, String source, Constants.SearchType type, boolean is_favorite, MovieWrapperCallback movieWrapperCallback) {
@@ -276,16 +264,16 @@ public class MovieDetailViewModel extends AndroidViewModel {
                 });
     }
 
-    public Observable<String> loadFileList(){
+    public Observable<String> loadFileList() {
         return Observable.just(mMovieWrapper)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(new Function<MovieWrapper, String>() {
                     @Override
                     public String apply(MovieWrapper wrapper) throws Throwable {
-                        List<VideoFile> list=wrapper.videoFiles;
-                        StringBuffer sb=new StringBuffer();
-                        for(VideoFile videoFile:list){
-                            sb.append(videoFile.path+"\n");
+                        List<VideoFile> list = wrapper.videoFiles;
+                        StringBuffer sb = new StringBuffer();
+                        for (VideoFile videoFile : list) {
+                            sb.append(StringTools.hideSmbAuthInfo(videoFile.path) + "\n");
                         }
                         return sb.toString();
                     }

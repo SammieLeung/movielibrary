@@ -14,6 +14,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FolderAddItemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.util.StringTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -133,8 +134,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         switch (folderItem.type) {
             case Constants.DeviceType.DEVICE_TYPE_SMB:
                 String smbUri = shortcut.uri;
-                smbUri = smbUri.replaceFirst("smb://.*@", "smb://");
-                folderItem.sub_title = smbUri;
+                folderItem.sub_title = StringTools.hideSmbAuthInfo(smbUri);
                 break;
             case Constants.DeviceType.DEVICE_TYPE_DLNA:
                 String dlnaUri = shortcut.uri;

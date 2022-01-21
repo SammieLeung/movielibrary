@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.ui.common.ConfirmDialog;
-import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,9 +28,8 @@ public class ShortcutRemoveConfirmDialog extends ConfirmDialog<ShortcutOptionsVi
     }
 
     @Override
-    protected boolean createViewModel() {
-        mViewModel = new ViewModelProvider(getActivity()).get(ShortcutOptionsViewModel.class);
-        return true;
+    protected ShortcutOptionsViewModel createViewModel() {
+        return mViewModel = new ViewModelProvider(getActivity()).get(ShortcutOptionsViewModel.class);
     }
 
     @Override
@@ -42,12 +40,15 @@ public class ShortcutRemoveConfirmDialog extends ConfirmDialog<ShortcutOptionsVi
         mBinding.btnCancel.setOnClickListener(this::cancel);
     }
 
-    private void confirm(View v) {
+    @Override
+    public void confirm(View v) {
         mViewModel.removeShortcut(mViewModel.getShortcut());
         dismiss();
     }
 
-    private void cancel(View v) {
+    @Override
+    public void cancel(View v) {
         dismiss();
     }
+
 }

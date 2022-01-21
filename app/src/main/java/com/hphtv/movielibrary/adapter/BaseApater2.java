@@ -12,6 +12,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.station.kit.view.mvvm.ViewDataBindingHelper;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -23,13 +25,11 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public abstract class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.ViewHolder, T> extends RecyclerView.Adapter<VH> implements View.OnClickListener, View.OnFocusChangeListener , View.OnHoverListener {
-    public static final float ZOOM_RATIO = 1.05f;
-    protected static int POSTION = 1;
+public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.ViewHolder, T> extends RecyclerView.Adapter<VH> implements View.OnClickListener {
     protected Context mContext;
     protected List<T> mList;
 
-    public BaseAdapter2(Context context, List<T> list) {
+    public BaseApater2(Context context, List<T> list) {
         mContext = context;
         mList = list;
     }
@@ -37,7 +37,7 @@ public abstract class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseA
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        VDB binding = DataBindingUtil.inflate(LayoutInflater.from(mContext), getBaseItemLayoutId(), parent, false);
+        VDB binding = ViewDataBindingHelper.inflateVDB(mContext,this.getClass());
         VH viewHolder = null;
         try {
             Type superclass = getClass().getGenericSuperclass();
@@ -63,8 +63,6 @@ public abstract class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseA
     }
 
 
-    protected abstract int getBaseItemLayoutId();
-
     @Override
     public int getItemCount() {
         return mList.size();
@@ -79,30 +77,13 @@ public abstract class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseA
         }
     }
 
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (mOnItemClickListener != null) {
-            mOnItemClickListener.onItemFocus(v, hasFocus);
-        }
-    }
-
-    @Override
-    public boolean onHover(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-            ViewCompat.animate((View) v).scaleX(ZOOM_RATIO).scaleY(ZOOM_RATIO).translationZ(1).start();
-        } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).start();
-        }
-        return false;
-    }
-
     public void addAll(List data) {
         mList.clear();
         mList.addAll(data);
         notifyDataSetChanged();
     }
 
-    public void removeAll() {
+    public void clearAll() {
         mList.clear();
         notifyDataSetChanged();
     }
@@ -120,9 +101,14 @@ public abstract class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseA
      * @param data
      * @param position
      */
-    public void addItem(T data, int position) {
+    public void add(T data, int position) {
         mList.add(position, data);
         notifyItemInserted(position); // Attention!
+    }
+
+    public void add(T data){
+        mList.add(data);
+        notifyItemInserted(mList.size()-1);
     }
 
 
@@ -134,20 +120,15 @@ public abstract class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseA
 
     public interface OnRecyclerViewItemActionListener<T> {
         void onItemClick(View view, int postion, T data);
-
-        void onItemFocus(View view, boolean hasFocus);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder{
         public ViewDataBinding mBinding;
 
         public ViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.getRoot().setOnClickListener(BaseAdapter2.this::onClick);
-            mBinding.getRoot().setOnFocusChangeListener(BaseAdapter2.this::onFocusChange);
-            mBinding.getRoot().setOnHoverListener(BaseAdapter2.this::onHover);
+            mBinding.getRoot().setOnClickListener(BaseApater2.this::onClick);
         }
-
     }
 }

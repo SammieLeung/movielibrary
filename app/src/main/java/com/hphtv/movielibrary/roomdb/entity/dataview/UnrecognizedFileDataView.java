@@ -5,6 +5,8 @@ import androidx.room.DatabaseView;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 
+import java.io.Serializable;
+
 /**
  * author: Sam Leung
  * date:  2021/6/22
@@ -17,7 +19,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "JOIN "+TABLE.DEVICE+" AS DEV " +
                 "ON DEV.path=ST.device_path OR ST.device_type > 5",
         viewName = VIEW.UNRECOGNIZEDFILE_DATAVIEW)
-public class UnrecognizedFileDataView {
+public class UnrecognizedFileDataView implements Serializable {
     public long vid;
     public String filename;
     public String keyword;

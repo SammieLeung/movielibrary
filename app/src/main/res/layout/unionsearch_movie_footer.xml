@@ -4,18 +4,18 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/fragment_unionsearch_margin">
-
-
+        >
             <com.github.ybq.android.spinkit.SpinKitView
+                android:layout_marginTop="150dp"
+                android:layout_marginBottom="150dp"
                 android:id="@+id/view_loading"
-                android:background="@drawable/spin_kit_view_background"
-                style="@style/SpinKitView.Large.Wave"
-                android:layout_width="@dimen/unionsearch_movie_cover_w"
+                style="@style/SpinKitView.Circle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true" />
+                android:layout_centerHorizontal="true" />
             <TextView
                 android:id="@+id/tv_tips"
+                android:textSize="23sp"
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"></TextView>

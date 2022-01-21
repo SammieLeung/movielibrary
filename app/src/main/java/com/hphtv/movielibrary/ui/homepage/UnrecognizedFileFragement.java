@@ -7,15 +7,20 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.UnrecognizedFileListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
+import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * author: Sam Leung
@@ -49,13 +54,26 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mBinding.rvMovies.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener((view, data) -> {
-            Intent intent = new Intent(getContext(),
-                    MovieDetailActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD, data.keyword);
-            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE);
-            intent.putExtras(bundle);
-            startActivityForResultFromParent(intent);
+//
+//            Intent intent = new Intent(getContext(),
+//                    MovieDetailActivity.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putString(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD, data.keyword);
+//            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE);
+//            intent.putExtras(bundle);
+//            startActivityForResultFromParent(intent);
+            mViewModel.playingVideo(data)
+                    .subscribe(videoFileList -> {
+                        if(videoFileList.size()==1){
+                            mViewModel.getApplication().playingMovie(videoFileList.get(0).path,videoFileList.get(0).filename)
+                            .subscribe(s -> {
+
+                            });
+                        }else if(videoFileList.size()>1){
+                            VideoSelectDialog videoSelectDialog=VideoSelectDialog.newInstance(data);
+                            videoSelectDialog.show(getChildFragmentManager(),"");
+                        }
+                    });
         });
     }
 

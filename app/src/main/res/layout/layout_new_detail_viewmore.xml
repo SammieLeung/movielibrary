@@ -38,6 +38,20 @@
                     style="@style/detial_viewmore_title_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+                <Button
+                    android:id="@+id/btn_fold"
+                    android:layout_marginTop="64dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="84dp"
+                    android:text="@string/plot_fold"
+                    android:background="@drawable/btn_bg_detial_plot_fold"
+                    android:textSize="21sp"
+                    android:paddingLeft="18dp"
+                    android:paddingRight="18dp"
+                    android:textColor="@color/white"
+                    android:drawableLeft="@drawable/ic_fold"
+                    android:layout_width="103dp"
+                    android:layout_height="43dp"/>
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_actor_list"
                     android:layout_marginTop="24dp"

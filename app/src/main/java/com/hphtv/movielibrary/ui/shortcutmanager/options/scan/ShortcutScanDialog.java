@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ShortcutScanDialogLayoutBinding;
-import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.DialogAction;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewModel;
@@ -60,9 +59,8 @@ public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewM
     }
 
     @Override
-    protected boolean createViewModel() {
-        mViewModel=new ViewModelProvider(getActivity()).get(ShortcutOptionsViewModel.class);
-        return true;
+    protected ShortcutOptionsViewModel createViewModel() {
+        return mViewModel=new ViewModelProvider(getActivity()).get(ShortcutOptionsViewModel.class);
     }
 
     @Override

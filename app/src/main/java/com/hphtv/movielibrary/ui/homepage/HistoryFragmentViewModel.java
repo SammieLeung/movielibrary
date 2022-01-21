@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
@@ -27,7 +28,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/8/21
  */
-public class HistoryFragmentViewModel extends AndroidViewModel {
+public class HistoryFragmentViewModel extends BaseAndroidViewModel {
     private VideoFileDao mVideoFileDao;
     private String mSource;
 
@@ -53,19 +54,10 @@ public class HistoryFragmentViewModel extends AndroidViewModel {
     }
 
     public void playingVideo(String path, String name,Callback callback) {
-        Observable.just(path)
-                .subscribeOn(Schedulers.io())
-                //记录播放时间，作为播放记录
-                .doOnNext(filepath -> {
-                    mVideoFileDao.updateLastPlaytime(filepath, System.currentTimeMillis());
-                    String poster=mVideoFileDao.getPoster(filepath,mSource);
-                    SharePreferencesTools.getInstance(getApplication()).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
+        getApplication().playingMovie(path,name)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
-                    public void onAction(String path) {
-                        VideoPlayTools.play(getApplication(), path, name);
+                    public void onAction(String s) {
                         prepareHistory(callback);
                     }
                 });
