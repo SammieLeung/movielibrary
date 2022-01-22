@@ -18,6 +18,7 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -91,6 +92,12 @@ public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel,
         obj = getArguments().getSerializable(MOVIE_WRAPPER);
         if (obj != null && obj instanceof MovieWrapper) {
             MovieWrapper wrapper = (MovieWrapper) obj;
+            wrapper.videoFiles.sort(new Comparator<VideoFile>() {
+                @Override
+                public int compare(VideoFile o1, VideoFile o2) {
+                    return o1.filename.compareTo(o2.filename);
+                }
+            });
             mVideoSelectListAdapter.addAll(wrapper.videoFiles);
         }
     }
