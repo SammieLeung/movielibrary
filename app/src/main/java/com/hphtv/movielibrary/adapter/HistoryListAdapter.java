@@ -29,7 +29,7 @@ public class HistoryListAdapter extends BaseScaleApater<HistoryItemBinding, Base
         super.onBindViewHolder(holder, position);
         HistoryMovieDataView dataView = mList.get(position);
         HistoryItemBinding binding = (HistoryItemBinding) holder.mBinding;
-        Glide.with(mContext).load(!TextUtils.isEmpty(dataView.stage_photo)?dataView.stage_photo:dataView.poster).centerCrop()
+        Glide.with(mContext).load(!TextUtils.isEmpty(dataView.stage_photo)?dataView.stage_photo:dataView.poster).placeholder(R.mipmap.default_poster)
                 .into(binding.ivImg);
         binding.setTitle(!TextUtils.isEmpty(dataView.source)?dataView.title:!TextUtils.isEmpty(dataView.keyword)?dataView.keyword:dataView.filename);
     }

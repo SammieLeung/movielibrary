@@ -81,7 +81,6 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
         super.onActivityResultCallback(result);
         mShortcutManagerEventHandler.pickerClose();
         if (result.getResultCode() == RESULT_OK) {
-
             final Uri uri = result.getData().getData();
             mViewModel.addShortcut(uri, mCallback);
             setResult(Activity.RESULT_OK);
@@ -123,6 +122,7 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
         @Override
         public void refreshShortcutList(List<Shortcut> shortcutList) {
             mFolderItemAdapter.addAllShortcuts(shortcutList);
+            setResult(RESULT_OK);
         }
 
         @Override

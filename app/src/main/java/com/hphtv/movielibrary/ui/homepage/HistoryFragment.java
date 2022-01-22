@@ -9,8 +9,10 @@ import com.hphtv.movielibrary.adapter.BaseScaleApater;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
+import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,8 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mUnrecognizedFileDataViewList);
+        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),3));
+
         mHistoryListAdapter.setOnItemClickListener(new BaseScaleApater.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
             @Override
             public void onItemClick(View view, int postion, HistoryMovieDataView data) {

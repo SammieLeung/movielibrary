@@ -136,7 +136,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         switch (result.getResultCode()) {
-            case 1:
+            case RESULT_OK:
                 needRefresh = true;
                 break;
             default:

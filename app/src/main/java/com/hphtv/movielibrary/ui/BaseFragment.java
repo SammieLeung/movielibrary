@@ -36,7 +36,6 @@ import java.lang.reflect.Type;
 public abstract class BaseFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends Fragment {
     protected VDB mBinding;
     protected VM mViewModel;
-    protected int mColums = 6;
 
     protected Handler mHandler = new Handler(Looper.getMainLooper());
     private ActivityResultLauncher mActivityResultLauncher;

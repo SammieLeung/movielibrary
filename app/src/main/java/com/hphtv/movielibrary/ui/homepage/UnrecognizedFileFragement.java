@@ -7,6 +7,9 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
+import com.hphtv.movielibrary.adapter.NewVideoFileItemListAdapter;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.UnrecognizedFileListAdapter;
@@ -15,6 +18,7 @@ import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
+import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +32,7 @@ import io.reactivex.rxjava3.functions.Consumer;
  */
 public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragmentViewModel, FLayoutMovieBinding> {
     public static final String TAG = UnrecognizedFileFragement.class.getSimpleName();
-    private UnrecognizedFileListAdapter mAdapter;
+    private NewVideoFileItemListAdapter mAdapter;
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViewList;
 
 
@@ -49,11 +53,13 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
     @Override
     protected void onViewCreated() {
         mUnrecognizedFileDataViewList = new ArrayList<>();
-        mAdapter = new UnrecognizedFileListAdapter(getContext(), mUnrecognizedFileDataViewList);
-        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), mColums, GridLayoutManager.VERTICAL, false);
+        mAdapter = new NewVideoFileItemListAdapter(getContext(), mUnrecognizedFileDataViewList);
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mBinding.rvMovies.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener((view, data) -> {
+        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
+
+        mAdapter.setOnItemClickListener((view,postion, data) -> {
 //
 //            Intent intent = new Intent(getContext(),
 //                    MovieDetailActivity.class);

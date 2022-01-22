@@ -20,7 +20,7 @@
             android:duplicateParentState="true"
             android:gravity="center_horizontal">
 
-            <ImageView
+            <com.lqm.roundview.RoundImageView
                 android:id="@+id/iv_img"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/history_h"
