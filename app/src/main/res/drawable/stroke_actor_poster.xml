@@ -2,15 +2,15 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
         <shape android:shape="ring" android:thickness="@dimen/poster_border_width" android:innerRadius="39dp" android:useLevel="false">
-            <!--            <stroke android:color="#FF634EB7" android:width="4dp"></stroke>-->
-            <solid android:color="#FF634EB7" />
+            <!--            <stroke android:color="@color/main_focus" android:width="4dp"></stroke>-->
+            <solid android:color="@color/main_focus" />
 
         </shape>
     </item>
     <item android:state_hovered="true">
         <shape android:shape="ring" android:thickness="@dimen/poster_border_width" android:innerRadius="39dp" android:useLevel="false">
-            <!--            <stroke android:color="#FF634EB7" android:width="4dp"></stroke>-->
-            <solid android:color="#FF634EB7" />
+            <!--            <stroke android:color="@color/main_focus" android:width="4dp"></stroke>-->
+            <solid android:color="@color/main_focus" />
 
         </shape>
     </item>

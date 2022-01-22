@@ -13,14 +13,15 @@
         <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
             android:id="@+id/rv_movies"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll>
+            android:layout_height="match_parent" />
 
         <TextView
             android:id="@+id/tips_empty"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:text="@string/tips2"
-            android:textSize="21.3sp"
+            android:textStyle="bold"
+            android:textSize="23dp"
             android:gravity="center" />
     </RelativeLayout>
 </layout>

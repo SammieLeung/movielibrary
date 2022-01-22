@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:drawable="@drawable/dialog_button_focus" />
-    <item android:state_hovered="true" android:drawable="@drawable/dialog_button_focus" />
-    <item android:state_pressed="true" android:drawable="@drawable/dialog_button_focus" />
-    <item android:drawable="@drawable/dialog_button_normal" />
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="8dp" />
+            <gradient android:angle="90" android:endColor="#876AFF" android:startColor="#42327E "></gradient>
+        </shape>
+    </item>
+    <item android:state_hovered="true">
+        <shape>
+            <corners android:radius="8dp" />
+            <gradient android:angle="90" android:endColor="#9C85F2" android:startColor="#6048BE"></gradient>
+        </shape>
+    </item>
+    <item android:state_focused="true">
+        <shape>
+            <corners android:radius="8dp" />
+            <gradient android:angle="90" android:endColor="#9C85F2" android:startColor="#6048BE"></gradient>
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#323254"/>
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
 </selector>

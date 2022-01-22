@@ -387,6 +387,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 返回时刷新主页
      */
     private void refreshParent() {
-        setResult(1);
+        setResult(RESULT_OK);
     }
 }

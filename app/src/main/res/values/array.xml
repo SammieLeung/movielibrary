@@ -5,7 +5,7 @@
         <item>@string/left_menu_title_unrecognizedfile</item>
         <item>@string/left_menu_title_history</item>
         <item>@string/left_menu_title_favorite</item>
-        <item>@string/left_menu_title_manager</item>
+<!--        <item>@string/left_menu_title_manager</item>-->
         <item>@string/left_menu_title_exit</item>
     </string-array>
 
@@ -14,7 +14,7 @@
         <item>@drawable/ic_videos</item>
         <item>@drawable/ic_history</item>
         <item>@drawable/ic_favorite</item>
-        <item>@drawable/ic_setting</item>
+<!--        <item>@drawable/ic_setting</item>-->
         <item>@drawable/ic_exit</item>
     </string-array>
 

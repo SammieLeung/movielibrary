@@ -31,7 +31,7 @@
             android:id="@+id/nest_scrollview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#1E2039">
+            android:background="@color/main_bg_color_end">
             <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

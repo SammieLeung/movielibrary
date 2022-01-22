@@ -2,4 +2,9 @@
 <resources>
     <color name="dialog_bg">#282842</color>
     <color name="detail_rating_textcolor">#FFFF501A</color>
+    <color name="main_bg_color_start">#1B222E</color>
+    <color name="main_bg_color_end">#1E2039</color>
+    <color name="main_focus">#FF634EB7</color>
+    <color name="main_press">#FF4C389B</color>
+
 </resources>

@@ -4,17 +4,14 @@
         <layer-list>
             <item>
                 <shape >
-                    <solid android:color="@color/c167c98"></solid>
+                    <solid android:color="@color/main_press"></solid>
                 </shape>
             </item>
             <item android:left="66dp">
                 <shape >
-                    <solid android:color="@color/c1c9bbe"></solid>
+                    <solid android:color="@color/main_focus"></solid>
                 </shape>
             </item>
         </layer-list>
     </item>
-    <!--<item android:state_pressed="true"  android:drawable="@color/c27bbfa" />-->
-    <!--<item android:state_focused="true"  android:drawable="@color/theme_color" />-->
-    <!--<item android:drawable="@color/c50ffffff" />-->
 </selector>

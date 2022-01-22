@@ -3,16 +3,16 @@
     <item android:state_focused="true">
         <shape>
             <corners android:radius="@dimen/round_rect_radius"/>
-<!--            <stroke android:color="#FF634EB7" android:width="4dp"></stroke>-->
-            <stroke android:color="#FF634EB7" android:width="@dimen/poster_border_width"></stroke>
+<!--            <stroke android:color="@color/main_focus" android:width="4dp"></stroke>-->
+            <stroke android:color="@color/main_focus" android:width="@dimen/poster_border_width"></stroke>
 
         </shape>
     </item>
     <item android:state_hovered="true">
         <shape>
             <corners android:radius="@dimen/round_rect_radius"/>
-<!--            <stroke android:color="#FF634EB7" android:width="4dp"></stroke>-->
-            <stroke android:color="#FF634EB7" android:width="@dimen/poster_border_width"></stroke>
+<!--            <stroke android:color="@color/main_focus" android:width="4dp"></stroke>-->
+            <stroke android:color="@color/main_focus" android:width="@dimen/poster_border_width"></stroke>
 
         </shape>
     </item>

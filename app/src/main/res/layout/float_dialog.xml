@@ -34,7 +34,7 @@
             android:minHeight="23dp"
             android:maxHeight="23dp"
             android:maxWidth="23dp"
-            app:SpinKit_Color="#634EB7"
+            app:SpinKit_Color="@color/main_focus"
             app:SpinKit_Style="Circle"/>
     </LinearLayout>
     </FrameLayout>

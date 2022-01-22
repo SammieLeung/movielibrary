@@ -52,6 +52,7 @@ import com.hphtv.movielibrary.ui.homepage.filterbox.FilterBoxDialogFragment;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.service.MovieScanService;
+import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.util.FormatterTools;
 import com.hphtv.movielibrary.ui.view.CategoryView;
 import com.station.kit.util.DensityUtil;
@@ -214,8 +215,8 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      */
     private void initButtons() {
         //弹出筛选窗口
-//        mBinding.btnViewSortbox.setOnClickListener(v -> mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0));
-        mBinding.btnViewSortbox.setOnClickListener(new View.OnClickListener() {
+//        mBinding.btnFilter.setOnClickListener(v -> mPopupWindow.showAtLocation(v, Gravity.BOTTOM, 0, 0));
+        mBinding.btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FilterBoxDialogFragment filterBoxDialogFragment=FilterBoxDialogFragment.newInstance();
@@ -227,20 +228,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             Intent intent = new Intent(this, PinyinSearchActivity.class);
             startActivity(intent);
         });
-        mBinding.btnSearch.setOnHoverListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-                ViewCompat.animate(v).scaleY(1.1f).scaleX(1.1f).start();
-            } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-                ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
-            }
-            return false;
-        });
-        mBinding.btnSearch.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                ViewCompat.animate(v).scaleY(1.1f).scaleX(1.1f).start();
-            } else {
-                ViewCompat.animate(v).scaleY(1f).scaleX(1f).start();
-            }
+        mBinding.btnFolderManager.setOnClickListener(v->{
+            Intent intent = new Intent(this, ShortcutManagerActivity.class);
+            startActivityForResult(intent);
         });
     }
 
@@ -357,13 +347,13 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
         mFramentList.add(mUnrecognizedFileFragement);
         mFramentList.add(mHistoryFragment);
         mFramentList.add(mFavoriteFragment);
-        mFramentList.add(mFileManagerFragment);
+//        mFramentList.add(mFileManagerFragment);
         //设置ViewPager
         mPageAdapter = new QuickFragmentPageAdapter(getSupportFragmentManager());
         mPageAdapter.addAllFragments(mFramentList);
         mPageAdapter.addAllTitles(Arrays.asList(mTitleArr));
         mBinding.viewpager.setAdapter(mPageAdapter);
-        mBinding.viewpager.setOffscreenPageLimit(4);
+        mBinding.viewpager.setOffscreenPageLimit(3);
         mBinding.viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -373,9 +363,9 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             public void onPageSelected(int position) {
                 mBinding.leftmenuListview.setSelection(position);
                 if (position != HOME_PAGE_FRAGMENT) {
-                    mBinding.btnViewSortbox.setVisibility(View.GONE);
+                    mBinding.btnFilter.setVisibility(View.GONE);
                 } else {
-                    mBinding.btnViewSortbox.setVisibility(View.VISIBLE);
+                    mBinding.btnFilter.setVisibility(View.VISIBLE);
                 }
                 LogUtil.v("onPageSelected " + position);
             }
@@ -429,7 +419,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
      */
     private void updateCateGoryView() {
         mFilterBinding.categoryview.setDevices(mViewModel.getConditionDevices()).setYears(mViewModel.getConditionYears()).setGenres(mViewModel.getConditionGenres()).create();
-        updateDeviceText();
+//        updateDeviceText();//TODO
         notifyAllFragmentsUpdate();
     }
 
@@ -487,27 +477,28 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
 
     /**
      * 升级设备文字
+     * TODO
      */
-    private void updateDeviceText() {
-
-        Device device = mFilterBinding.categoryview.getDevice();
-        String year = mFilterBinding.categoryview.getYear();
-        String genre = mFilterBinding.categoryview.getGenre();
-
-        StringBuffer buffer = new StringBuffer();
-        if (device != null)
-            buffer.append(FormatterTools.getDeviceName(this, device));
-        if (!TextUtils.isEmpty(year))
-            buffer.append("|" + year);
-        if (!TextUtils.isEmpty(genre))
-            buffer.append("|" + genre);
-        if (buffer.length() == 0)
-            buffer.append(mTagAll);
-        if (buffer.toString().startsWith("|"))
-            buffer.replace(0, 1, "");
-
-        mBinding.tvSortDevice.setText(buffer.toString());
-    }
+//    private void updateDeviceText() {
+//
+//        Device device = mFilterBinding.categoryview.getDevice();
+//        String year = mFilterBinding.categoryview.getYear();
+//        String genre = mFilterBinding.categoryview.getGenre();
+//
+//        StringBuffer buffer = new StringBuffer();
+//        if (device != null)
+//            buffer.append(FormatterTools.getDeviceName(this, device));
+//        if (!TextUtils.isEmpty(year))
+//            buffer.append("|" + year);
+//        if (!TextUtils.isEmpty(genre))
+//            buffer.append("|" + genre);
+//        if (buffer.length() == 0)
+//            buffer.append(mTagAll);
+//        if (buffer.toString().startsWith("|"))
+//            buffer.replace(0, 1, "");
+//
+////        mBinding.tvSortDevice.setText(buffer.toString());
+//    }
 
     public void notifyAllFragmentsUpdate() {
         notifyHomePage();
@@ -611,7 +602,7 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
                 LogUtil.v(" sotType " + sortType + " isDesc " + isDesc);
 
                 startLoading();
-                updateDeviceText();
+//                updateDeviceText();//TODO
                 notifyHomePage();
             }
 

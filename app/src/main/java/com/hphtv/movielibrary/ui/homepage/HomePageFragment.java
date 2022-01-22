@@ -7,13 +7,17 @@ import android.view.View;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.adapter.MovieAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
+import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +30,7 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
 
     public static final String TAG = HomePageFragment.class.getSimpleName();
 
-    private MovieAdapter mMovieAdapter;// 电影列表适配器
+    private NewMovieItemListAdapter mMovieAdapter;// 电影列表适配器
     private List<MovieDataView> mMovieDataViewList = new ArrayList<>();// 电影数据
 
 
@@ -58,10 +62,14 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
      * 初始化
      */
     private void initView() {
-        StaggeredGridLayoutManager mGridLayoutManager = new StaggeredGridLayoutManager(mColums, GridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager mGridLayoutManager = new StaggeredGridLayoutManager(5, GridLayoutManager.VERTICAL);
+//        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(),5);
+
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
-        mMovieAdapter = new MovieAdapter(getContext(), mMovieDataViewList);
-        mMovieAdapter.setOnItemClickListener((view, data) -> {
+        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
+
+        mMovieAdapter = new NewMovieItemListAdapter(getContext(), mMovieDataViewList);
+        mMovieAdapter.setOnItemClickListener((view, postion, data) -> {
             Intent intent = new Intent(HomePageFragment.this.getContext(),
                     MovieDetailActivity.class);
             Bundle bundle = new Bundle();
@@ -75,7 +83,7 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
     }
 
     public void notifyUpdate(Device device, String year, String genre, int sortType, boolean isDesc) {
-        if(mViewModel!=null)
+        if (mViewModel != null)
             mViewModel.prepareMovies(device, year, genre, sortType, isDesc, args -> {
                 List<MovieDataView> movieDataViews = (List<MovieDataView>) args[0];
                 refresh(movieDataViews);

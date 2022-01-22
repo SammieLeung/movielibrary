@@ -88,6 +88,7 @@
     <string name="search">搜索</string>
     <string name="homepage">主页</string>
     <string name="settings">设置</string>
+    <string name="filter">筛选</string>
 
     <!--主页tab-->
     <string name="tab_homepage">主页</string>

@@ -86,6 +86,7 @@
     <string name="search">Search</string>
     <string name="homepage">Home</string>
     <string name="settings">Settings</string>
+    <string name="filter">Filter</string>
 
     <!--主页tab-->
     <string name="tab_homepage">Home</string>

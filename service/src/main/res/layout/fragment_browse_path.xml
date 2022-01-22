@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_weight="1"
-            android:background="#38383b"
+            android:background="#202732"
             android:gravity="center_vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
@@ -49,7 +49,7 @@
                 android:layout_centerVertical="true"
                 android:scaleType="centerInside"
                 android:background="@drawable/dialog_button_selector_2"
-                android:src="@drawable/ic_back_service"></ImageButton>
+                android:src="@drawable/ic_back_white"></ImageButton>
         </RelativeLayout>
 
         <LinearLayout

@@ -1,9 +1,7 @@
 package com.hphtv.movielibrary.effect;
 
-import android.content.Context;
 import android.graphics.Rect;
-import androidx.annotation.DimenRes;
-import androidx.annotation.NonNull;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
@@ -14,33 +12,29 @@ import android.view.View;
 
 public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecoration {
 
-    private int mItemOffset;
-    private int mCloum;
-    private Context context;
+    private int mRowSpacing;
+    private int mColumnSpacing;
+    private int mSpanCount;
 
-    public GridSpacingItemDecorationVertical(int itemOffset, int cloum) {
-        mItemOffset = itemOffset;
-        mCloum = cloum;
+    public GridSpacingItemDecorationVertical(int rowSpacing, int columnSpacing, int spanCount) {
+        mRowSpacing = rowSpacing;
+        mColumnSpacing = columnSpacing;
+        mSpanCount = spanCount;
     }
 
-
-    public GridSpacingItemDecorationVertical(@NonNull Context context, @DimenRes int itemOffsetId, int mCloum) {
-        this(context.getResources().getDimensionPixelSize(itemOffsetId), mCloum);
-        this.context=context;
-    }
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent,
                                RecyclerView.State state) {
-       if(mCloum!=-1){
-           int pos=parent.indexOfChild(view);
-           if(pos%mCloum==0){
-               outRect.set(0,0,mItemOffset,mItemOffset);
-           }else if(pos%mCloum==(mCloum-1)){
-               outRect.set(mItemOffset,0,0,mItemOffset);
-           }else{
-               outRect.set(mItemOffset/2,0,mItemOffset,mItemOffset);
-           }
-       }
+        if (mSpanCount != -1) {
+            int pos = parent.getChildAdapterPosition(view);
+            if (pos % mSpanCount == 0) {
+                outRect.set(mColumnSpacing / 2, mRowSpacing/2, mColumnSpacing / 2, mRowSpacing/2);
+            } else if (pos % mSpanCount == (mSpanCount - 1)) {
+                outRect.set(mColumnSpacing / 2, mRowSpacing/2, mColumnSpacing / 2, mRowSpacing/2);
+            } else {
+                outRect.set(mColumnSpacing / 2, mRowSpacing/2, mColumnSpacing / 2, mRowSpacing/2);
+            }
+        }
     }
 }

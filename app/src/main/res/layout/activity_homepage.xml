@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:background="@mipmap/library_background" />
+           />
 
         <androidx.drawerlayout.widget.DrawerLayout
             android:id="@+id/drawlayout"
@@ -27,7 +27,7 @@
                 android:id="@+id/view_content"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/c60000000">
+                android:background="@drawable/new_main_background">
 
 
                 <FrameLayout
@@ -35,18 +35,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="100dp">
-
-                    <RelativeLayout
+                    <com.hphtv.movielibrary.ui.view.VerticalViewPager
+                        android:id="@+id/viewpager"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <com.hphtv.movielibrary.ui.view.VerticalViewPager
-                            android:id="@+id/viewpager"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="54dp" />
-                    </RelativeLayout>
-
+                        android:layout_marginLeft="30dp"
+                        android:layout_height="match_parent"/>
                     <ImageView
                         android:id="@+id/open_menu_btn"
                         android:layout_width="wrap_content"
@@ -58,24 +51,21 @@
                         android:rotation="-180"
                         android:src="@mipmap/ic_menu_btn" />
                 </FrameLayout>
-
-
             </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="262dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="left"
-                android:background="@color/c30000000"
+                android:background="#101017"
                 android:orientation="vertical">
-
                 <ListView
                     android:id="@+id/leftmenu_listview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="100dp"
                     android:divider="@null"
-                    android:listSelector="@drawable/st_episode_select"></ListView>
+                    android:listSelector="@drawable/st_episode_select" />
             </LinearLayout>
         </androidx.drawerlayout.widget.DrawerLayout>
 
@@ -84,73 +74,44 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_alignParentTop="true"
-            android:paddingLeft="14dp"
-            android:paddingRight="58dp">
+            >
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/lb_title"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_alignParentBottom="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:text="@string/left_menu_title_homepage"
+                android:textSize="48sp"
+                android:layout_marginLeft="70dp"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/lb_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:minWidth="180dp"
-                    android:text="@string/left_menu_title_homepage"
-                    android:textSize="30sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/btn_search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="173dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@android:color/transparent"
-                    android:drawableLeft="@drawable/ic_search"
-                    android:focusable="true"
-                    android:textAllCaps="false"
-                    android:text="@string/tx_search"
-                    android:drawablePadding="12dp"
-                    android:textColor="@color/tx_dbdbdb"
-                    android:textSize="22sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/btn_view_sortbox"
+            <Button
+                android:id="@+id/btn_filter"
+                style="@style/homepage_circle_btn_style"
+                android:layout_toStartOf="@id/btn_search"
                 android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:background="@drawable/ic_cate_bg_draw"
-                android:focusable="true"
-                android:gravity="right"
-                android:orientation="horizontal">
+                android:drawableLeft="@drawable/icon_circle_filter"
+                android:text="@string/filter" />
 
-                <TextView
-                    android:id="@+id/tv_sort_device"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:gravity="center"
-                    android:paddingLeft="10dp"
-                    android:text="@string/lb_sort_directory"
-                    android:textColor="@color/tx_fff"
-                    android:textSize="18sp" />
+            <Button
+                android:id="@+id/btn_search"
+                style="@style/homepage_circle_btn_style"
+                android:layout_width="wrap_content"
+                android:layout_toStartOf="@id/btn_folder_manager"
+                android:drawableLeft="@drawable/icon_circle_search"
+                android:text="@string/search" />
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:src="@mipmap/ic_spite" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/btn_folder_manager"
+                style="@style/homepage_circle_btn_style"
+                android:layout_width="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="72dp"
+                android:drawableLeft="@drawable/icon_circle_folder"
+                android:text="@string/shortcut_manager" />
+
 
 
         </RelativeLayout>
