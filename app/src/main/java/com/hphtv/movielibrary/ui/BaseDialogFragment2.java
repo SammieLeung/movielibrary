@@ -15,6 +15,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import com.hphtv.movielibrary.R;
 import com.station.kit.view.mvvm.ViewDataBindingHelper;
 import com.station.kit.view.mvvm.ViewModelHelper;
 
@@ -57,6 +58,7 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB exten
     public void onStart() {
         super.onStart();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        getDialog().getWindow().getAttributes().windowAnimations= R.style.DialogAnimation;
         getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
     }
 

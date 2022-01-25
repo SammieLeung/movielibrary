@@ -56,7 +56,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
     }
 
-    public void prepareDevices(Callback callback) {
+    public void prepareDevices(FilterBoxDeviceAdapter adapter) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
@@ -84,13 +84,12 @@ public class FilterBoxViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<List<Object>>() {
                     @Override
                     public void onAction(List<Object> dataList) {
-                        if (callback != null)
-                            callback.runOnUIThread(dataList);
+                        adapter.addAll(dataList);
                     }
                 });
     }
 
-    public void prepareGenres(Callback callback) {
+    public void prepareGenres(FilterBoxAdapter adapter) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
@@ -100,13 +99,12 @@ public class FilterBoxViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<List<String>>() {
                     @Override
                     public void onAction(List<String> genresList) {
-                        if (callback != null)
-                            callback.runOnUIThread(genresList);
+                        adapter.addAll(genresList);
                     }
                 });
     }
 
-    public void prepareYears(Callback callback) {
+    public void prepareYears(FilterBoxAdapter adapter) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
@@ -116,13 +114,12 @@ public class FilterBoxViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<List<String>>() {
                     @Override
                     public void onAction(List<String> yearList) {
-                        if (callback != null)
-                            callback.runOnUIThread(yearList);
+                        adapter.addAll(yearList);
                     }
                 });
     }
 
-    public void prepareOrders(Callback callback){
+    public void prepareOrders(FilterBoxOrderAdapter adapter){
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
@@ -137,8 +134,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
                 .subscribe(new SimpleObserver<List<String>>() {
                     @Override
                     public void onAction(List<String> orderList) {
-                        if(callback!=null)
-                            callback.runOnUIThread(orderList);
+                        adapter.addAll(orderList);
                     }
                 });
     }
@@ -183,10 +179,6 @@ public class FilterBoxViewModel extends AndroidViewModel {
 
     private String getString(int resId){
         return getApplication().getString(resId);
-    }
-
-    public interface Callback {
-        void runOnUIThread(Object... args);
     }
 
 }

@@ -1,9 +1,12 @@
 package com.hphtv.movielibrary.ui.detail;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.ActorPosterItemListApdater;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailViewmoreBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
@@ -44,9 +48,11 @@ public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         return mViewModel=new ViewModelProvider(getActivity()).get(MovieDetailViewModel.class);
     }
 
+    @Nullable
+    @org.jetbrains.annotations.Nullable
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, Bundle savedInstanceState) {
+        View view= super.onCreateView(inflater, container, savedInstanceState);
         mActorPosterItemListApdater=new ActorPosterItemListApdater(getContext(),mViewModel.getMovieWrapper().actors);
         mBinding.rvActorList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL,false));
         mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),62),DensityUtil.dip2px(getContext(),22)));
@@ -59,6 +65,13 @@ public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
                 mBinding.setFilelist(s);
             }
         });
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
     }
 
     @Override
@@ -66,7 +79,6 @@ public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         super.onResume();
         mHandler.postDelayed(mRunnable,0);
     }
-
     @Override
     public void onPause() {
         super.onPause();

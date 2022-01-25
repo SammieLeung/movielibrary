@@ -46,15 +46,6 @@
 
     </style>
 
-    <style name="detail_btn_style" parent="common_btn_style">
-        <item name="android:paddingStart">40dp</item>
-        <item name="android:paddingEnd">40dp</item>
-        <item name="android:drawablePadding">16dp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">63dp</item>
-        <item name="android:layout_marginRight">23dp</item>
-        <item name="android:textSize">21sp</item>
-    </style>
 
     <style name="common_label_text_style" parent="wrap_style">
         <item name="android:textSize">23sp</item>
@@ -64,6 +55,15 @@
     <style name="common_content_text_style" parent="wrap_style">
         <item name="android:textSize">23sp</item>
         <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <style name="detail_btn_style" parent="common_btn_style">
+        <item name="android:paddingStart">40dp</item>
+        <item name="android:paddingEnd">40dp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">63dp</item>
+        <item name="android:layout_marginRight">23dp</item>
+        <item name="android:textSize">21sp</item>
     </style>
 
     <style name="detial_viewmore_title_style">
@@ -75,6 +75,11 @@
     <style name="detial_viewmore_content_style">
         <item name="android:textSize">17sp</item>
         <item name="android:textColor">#AAAAAA</item>
+    </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_aphla_in</item>
+        <item name="android:windowExitAnimation">@anim/dialog_aphla_out</item>
     </style>
 
     <style name="filter_box_title_text_style">

@@ -99,27 +99,19 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
     }
 
     private void prepareDevices() {
-        mViewModel.prepareDevices(args -> {
-            mDeviceAdapter.addAll((List<Object>) args[0]);
-        });
+        mViewModel.prepareDevices(mDeviceAdapter);
     }
 
     private void prepareGenres() {
-        mViewModel.prepareGenres(args -> {
-            mGenreAdapter.addAll((List<String>) args[0]);
-        });
+        mViewModel.prepareGenres(mGenreAdapter);
     }
 
     private void prepareYears() {
-        mViewModel.prepareYears(args -> {
-            mYearsApdater.addAll((List<String>) args[0]);
-        });
+        mViewModel.prepareYears(mYearsApdater);
     }
 
     private void prepareOrders(){
-        mViewModel.prepareOrders(args -> {
-            mOrderAdapter.addAll((List<String>) args[0]);
-        });
+        mViewModel.prepareOrders(mOrderAdapter);
     }
 
     @Override
