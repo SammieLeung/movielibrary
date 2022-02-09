@@ -39,6 +39,7 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
     private DeviceDao mDeviceDao;
     private ShortcutDao mShortcutDao;
     private boolean passwordhasBeenSet = false;
+    private List<Shortcut> mShortcutList;
 
 
     public ShortcutManagerViewModel(@NonNull @NotNull Application application) {
@@ -59,8 +60,8 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    List<Shortcut> shortcutList = mShortcutDao.queryAllShortcuts();
-                    return shortcutList;
+                    mShortcutList= mShortcutDao.queryAllShortcuts();
+                    return mShortcutList;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<Shortcut>>() {
@@ -99,7 +100,8 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                                 if (shortcut == null) {
                                     shortcut = new Shortcut(path, device.type, null, null,path);
                                     shortcut.devicePath=device.path;
-                                    mShortcutDao.insertShortcut(shortcut);
+                                    long id=mShortcutDao.insertShortcut(shortcut);
+                                    shortcut.shortcutId=id;
                                 }
                                 return shortcut;
                             }
@@ -110,10 +112,12 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                         if (shortcut == null) {
                             if (deviceTypeStr.equals("samba")) {
                                 shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, null, null,queryUri.toString());
-                                mShortcutDao.insertShortcut(shortcut);
+                                long id=mShortcutDao.insertShortcut(shortcut);
+                                shortcut.shortcutId=id;
                             } else {
                                 shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_DLNA, null, null,queryUri.toString());
-                                mShortcutDao.insertShortcut(shortcut);
+                                long id=mShortcutDao.insertShortcut(shortcut);
+                                shortcut.shortcutId=id;
                             }
                         }
                         return shortcut;

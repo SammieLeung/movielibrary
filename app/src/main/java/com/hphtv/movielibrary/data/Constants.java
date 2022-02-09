@@ -140,7 +140,7 @@ public class Constants {
         String SUCCESS_COUNT ="success_count";
         String SCANNED_COUNT="scanned_count";
         String TOTAL ="total";
-        String SHORTCUT_URI ="shortcut_uri";
+        String SHORTCUT ="shortcut";
         String UNRECOGNIZE_FILE_KEYWORD = "keyword";
 
         String CURRENT_FRAGMENT = "current_fragment";

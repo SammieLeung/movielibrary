@@ -47,7 +47,6 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
         loadData();
     }
 
-
     private void loadData() {
         mFolderTypeList.add(getString(R.string.shortcut_type_auto));
         mFolderTypeList.add(getString(R.string.shortcut_type_movie));

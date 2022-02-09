@@ -18,8 +18,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.MovieApplication;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.util.ServiceStatusHelper;
+import com.station.kit.util.AppUtils;
 import com.station.kit.util.LogUtil;
 import com.station.kit.view.mvvm.activity.BaseInflateActivity;
 
@@ -65,6 +67,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         mHanlder.removeCallbacksAndMessages(null);
         ServiceStatusHelper.resumeView();
         IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_START);
         intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
@@ -99,8 +102,15 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     BroadcastReceiver mReceiver=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equalsIgnoreCase(Constants.BroadCastMsg.MOVIE_SCRAP_STOP)){
-                ServiceStatusHelper.removeView(context);
+            String action=intent.getAction();
+            switch (action){
+                case Constants.BroadCastMsg.MOVIE_SCRAP_START:
+                    if(!AppUtils.isAppInBackground(AppBaseActivity.this))
+                        ServiceStatusHelper.addView(getString(R.string.scanning_in_background),AppBaseActivity.this);
+                    break;
+                case Constants.BroadCastMsg.MOVIE_SCRAP_STOP:
+                    ServiceStatusHelper.removeView(context);
+                    break;
             }
         }
     };

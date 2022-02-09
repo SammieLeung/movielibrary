@@ -23,8 +23,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import static android.net.wifi.rtt.CivicLocationKeys.STATE;
-
 /**
  * author: Sam Leung
  * date:  2021/8/25
@@ -108,14 +106,14 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             }
         }
         for (Shortcut shortcut : shortcutList) {
-            mFolderItemList.add(getFolderItem(shortcut));
+            mFolderItemList.add(buildFolderItem(shortcut));
         }
         mFolderItemList.sort(mComparator);
         notifyDataSetChanged();
     }
 
     public void add(Shortcut shortcut) {
-        FolderItem folderItem = getFolderItem(shortcut);
+        FolderItem folderItem = buildFolderItem(shortcut);
         if (!mFolderItemList.contains(folderItem)) {
             mFolderItemList.add(folderItem);
             mFolderItemList.sort(mComparator);
@@ -123,14 +121,15 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         }
     }
 
-    public FolderItem getFolderItem(Shortcut shortcut) {
+    public FolderItem buildFolderItem(Shortcut shortcut) {
         FolderItem folderItem = new FolderItem();
+        folderItem.uri = shortcut.uri;
         folderItem.title = shortcut.firendlyName;
         folderItem.item = shortcut;
         folderItem.type = shortcut.devcieType;
         folderItem.file_count = shortcut.fileCount;
         folderItem.poster_count = shortcut.posterCount;
-        folderItem.state = shortcut.isScanned == 1 ? FolderItem.State.SCANNED : FolderItem.State.UNSCANNED;
+        folderItem.state = shortcut.isScanned == 2 ? FolderItem.State.SCANNING : shortcut.isScanned == 1 ? FolderItem.State.SCANNED : FolderItem.State.UNSCANNED;
         switch (folderItem.type) {
             case Constants.DeviceType.DEVICE_TYPE_SMB:
                 String smbUri = shortcut.uri;
@@ -149,6 +148,18 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
         }
         return folderItem;
+    }
+
+    public void updateShortcut(Shortcut shortcut) {
+        for (int i = 0; i < mFolderItemList.size(); i++) {
+            FolderItem folderItem = mFolderItemList.get(i);
+            String uri=shortcut.uri;
+            if (folderItem.uri.equals(uri)) {
+                folderItem = buildFolderItem(shortcut);
+                mFolderItemList.set(i, folderItem);
+                notifyItemChanged(i);
+            }
+        }
     }
 
     public void pickerClose() {

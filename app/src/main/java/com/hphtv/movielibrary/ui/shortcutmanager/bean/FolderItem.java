@@ -19,6 +19,7 @@ public class FolderItem {
     public int poster_count;
     public int file_count;
     public State state;
+    public String uri;
 
     public  enum State {
         UNSCANNED,SCANNING,SCANNED
@@ -29,7 +30,7 @@ public class FolderItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FolderItem that = (FolderItem) o;
-        return item.equals(that.item);
+        return uri.equals(that.uri);
     }
 
     @Override
