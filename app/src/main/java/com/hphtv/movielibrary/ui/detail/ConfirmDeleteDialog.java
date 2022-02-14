@@ -2,20 +2,14 @@ package com.hphtv.movielibrary.ui.detail;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.databinding.ComponentBaseDialogFragmentBinding;
 import com.hphtv.movielibrary.ui.common.ConfirmDialog;
-import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;

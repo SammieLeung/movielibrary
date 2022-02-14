@@ -6,8 +6,10 @@
     <dimen name="hs_detail_info">10.0dip</dimen>
     <dimen name="itemOffset">4dp</dimen>
     <dimen name="icon_f">10dp</dimen>
-    <dimen name="fkeyboard_width">120dp</dimen>
-    <dimen name="keybtn_item_width">67dp</dimen>
+    <dimen name="fkeyboard_width">182dp</dimen>
+    <dimen name="keybtn_item_w">127dp</dimen>
+    <dimen name="keybtn_item_h">116dp</dimen>
+
     <!--For MovieClassification-->
     <dimen name="poster_width">312dp</dimen>
     <dimen name="poster_height">414dp</dimen>

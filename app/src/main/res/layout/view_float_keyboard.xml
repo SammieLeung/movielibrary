@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/fk2"
+        android:layout_width="39dp"
+        android:background="@drawable/t9_floatkey_edge_bg"
+        android:layout_height="39dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="3dp"
+        android:focusable="true"
+        android:textSize="27sp"
+        android:textColor="@drawable/t9_floatkey_textcolor"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/fk1"
+        android:background="@drawable/t9_floatkey_edge_bg"
+        android:layout_width="39dp"
+        android:layout_height="39dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="3dp"
+        android:focusable="true"
+        android:textSize="27sp"
+        android:textColor="@drawable/t9_floatkey_textcolor"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/fk_center"
+        android:layout_width="89dp"
+        android:layout_height="89dp"
+        android:layout_centerInParent="true"
+        android:textSize="38sp"
+        android:focusable="true"
+        android:background="@drawable/t9_floatkey_center_bg"
+        android:textColor="@drawable/t9_floatkey_textcolor"
+        android:gravity="center" />
+
+
+    <TextView
+        android:id="@+id/fk3"
+        android:background="@drawable/t9_floatkey_edge_bg"
+        android:layout_width="39dp"
+        android:layout_height="39dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:focusable="true"
+        android:layout_marginLeft="3dp"
+        android:textSize="27sp"
+        android:textColor="@drawable/t9_floatkey_textcolor"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/fk4"
+        android:background="@drawable/t9_floatkey_edge_bg"
+        android:layout_width="39dp"
+        android:layout_height="39dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:focusable="true"
+        android:textColor="@drawable/t9_floatkey_textcolor"
+        android:layout_marginBottom="3dp"
+        android:textSize="27sp"
+        android:gravity="center" />
+</merge>

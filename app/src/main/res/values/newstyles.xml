@@ -110,4 +110,21 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+    
+    <style name="title_style">
+        <item name="android:drawableLeft">@drawable/icon_new_back</item>
+        <item name="android:textSize">39sp</item>
+        <item name="android:drawableTint">@drawable/new_title_textcolor_state</item>
+        <item name="android:textColor">@drawable/new_title_textcolor_state</item>
+        <item name="android:drawablePadding">15dp</item>
+        <item name="android:src">@mipmap/ic_back</item>
+        <item name="android:layout_marginTop">61dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="localsearch_tabTextAppearance">
+        <item name="android:textSize">23sp</item>
+    </style>
 </resources>

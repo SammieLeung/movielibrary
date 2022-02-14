@@ -35,18 +35,18 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
-            ViewCompat.animate((View) v).scaleX(ZOOM_RATIO).scaleY(ZOOM_RATIO).translationZ(1).start();
+            ViewCompat.animate((View) v).scaleX(ZOOM_RATIO).scaleY(ZOOM_RATIO).translationZ(1).setDuration(200).start();
         } else {
-            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).start();
+            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(200).start();
         }
     }
 
     @Override
     public boolean onHover(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-            ViewCompat.animate((View) v).scaleX(ZOOM_RATIO).scaleY(ZOOM_RATIO).translationZ(1).start();
+            ViewCompat.animate((View) v).scaleX(ZOOM_RATIO).scaleY(ZOOM_RATIO).translationZ(1).setDuration(200).start();
         } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).start();
+            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(200).start();
         }
         return false;
     }

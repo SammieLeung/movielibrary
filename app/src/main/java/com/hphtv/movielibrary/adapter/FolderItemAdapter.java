@@ -11,7 +11,6 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerEventHandler;
 import com.hphtv.movielibrary.ui.shortcutmanager.bean.FolderItem;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.databinding.FolderAddItemLayoutBinding;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.util.StringTools;
@@ -59,12 +58,12 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     @NotNull
     @Override
     public CommonViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        if (viewType == TYPE_HEAD) {
-            FolderAddItemLayoutBinding binding = FolderAddItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            CommonViewHolder<FolderAddItemLayoutBinding> vh = new CommonViewHolder<>(binding);
-            binding.setPosterHandler(mEventHandler);
-            return vh;
-        } else {
+//        if (viewType == TYPE_HEAD) {
+//            FolderAddItemLayoutBinding binding = FolderAddItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+//            CommonViewHolder<FolderAddItemLayoutBinding> vh = new CommonViewHolder<>(binding);
+//            binding.setPosterHandler(mEventHandler);
+//            return vh;
+//        } else {
             FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
             CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
             binding.getRoot().setOnClickListener(v -> {
@@ -72,7 +71,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
                     mOnClickListener.onClick((FolderItem) v.getTag());
             });
             return vh;
-        }
+//        }
     }
 
     @Override

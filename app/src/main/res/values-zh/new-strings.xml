@@ -97,4 +97,8 @@
     <string name="tab_tv">电视</string>
     <string name="tab_child">儿童</string>
 
+    <!--本地搜索页tab-->
+    <string name="tab_local_search_all">全部 (%d)</string>
+    <string name="tab_local_search_movie">电影 (%d)</string>
+    <string name="tab_local_search_tv">电视剧 (%d)</string>
 </resources>

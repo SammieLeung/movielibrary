@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tv_key3"
+    android:layout_width="@dimen/keybtn_item_w"
+    android:layout_height="@dimen/keybtn_item_h"
+    android:background="@drawable/t9_keybtn_bg_br"
+    android:gravity="center">
+    <TextView
+        android:duplicateParentState="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:text="@string/k_clear"
+        android:textColor="@drawable/new_list_item_textcolor_state"
+        android:textSize="21sp"
+        app:drawableTint="@drawable/new_list_item_textcolor_state"
+        app:drawableStartCompat="@drawable/icon_clear" />
+</RelativeLayout>

@@ -26,8 +26,8 @@
                 app:border_color="@android:color/transparent"
                 app:corner_radius="@dimen/poster_item_1_radius"
                 android:id="@+id/rv_poster"
-                android:layout_width="@dimen/poster_item_1_w"
-                android:layout_height="@dimen/poster_item_1_h"/>
+                android:layout_width="@dimen/poster_item_large_w"
+                android:layout_height="@dimen/poster_item_large_h"/>
             <TextView
                 android:id="@+id/tv_title"
                 android:text="@{title}"
@@ -36,8 +36,8 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:ellipsize="middle"
-                android:layout_marginTop="14dp"
-                android:layout_width="@dimen/poster_item_1_w"
+                android:layout_marginTop="17dp"
+                android:layout_width="@dimen/poster_item_large_w"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
 

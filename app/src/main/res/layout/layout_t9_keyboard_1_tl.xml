@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="text"
+            type="String" />
+    </data>
+    <TextView
+        android:id="@+id/tv_key1"
+        android:text="@{text}"
+        android:layout_width="@dimen/keybtn_item_w"
+        android:layout_height="@dimen/keybtn_item_h"
+        android:textSize="42sp"
+        android:background="@drawable/t9_keybtn_bg_tl"
+        android:gravity="center"
+        android:textColor="@drawable/new_list_item_textcolor_state"/>
+</layout>

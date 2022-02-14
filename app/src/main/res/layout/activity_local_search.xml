@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+   >
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="isEmpty"
+            type="boolean" />
+        <variable
+            name="showTab"
+            type="boolean" />
+    </data>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/new_main_background">
+
+        <TextView
+            style="@style/title_style"
+            android:id="@+id/btn_exit"
+            android:layout_marginLeft="@dimen/shortcut_container_padding"
+            android:text="@string/search"
+            />
+        <FrameLayout
+            android:layout_below="@id/btn_exit"
+            android:id="@+id/view_t9_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="53dp">
+
+
+            <RelativeLayout
+                android:id="@+id/view_inputgroup"
+                android:layout_width="379dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="72dp"
+                android:layout_marginRight="32dp">
+
+                <EditText
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="62dp"
+                    android:focusable="false"
+                    android:enabled="false"
+                    android:background="@drawable/new_shortcut_item_bg"
+                    android:hint="@string/tx_search_input_hint"
+                    android:paddingLeft="25dp"
+                    android:drawableLeft="@drawable/icon_circle_search"
+                    android:paddingRight="25dp"
+                    android:drawablePadding="14dp"
+                    android:textSize="23sp" />
+
+
+                <RelativeLayout
+                    android:id="@+id/rv_keyboard_t9"
+                    android:layout_width="match_parent"
+                    android:layout_height="463dp"
+                    android:layout_below="@id/et_search"
+                    android:layout_marginTop="30dp">
+
+                    <include
+                        android:id="@+id/k1"
+                        android:background="@drawable/t9_keybtn_bg_tl"
+                        layout="@layout/layout_t9_keyboard_1_tl"
+                        app:text="@{@string/k1}"/>
+                    <View
+                        android:layout_toEndOf="@id/k1"
+                        android:id="@+id/divider_1"
+                        android:layout_width="1dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/divier_line"
+                        />
+
+                    <include
+                        android:id="@+id/k2"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_toEndOf="@id/divider_1"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k2}"
+                        app:subtext="@{@string/ks2}">
+                    </include>
+                    <View
+                        android:id="@+id/divider_2"
+                        android:layout_width="1dp"
+                        android:layout_toEndOf="@id/k2"
+                        android:layout_height="match_parent"
+                        android:background="@color/divier_line"
+                        />
+                    <include
+                        android:id="@+id/k3"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_toEndOf="@id/divider_2"
+                        layout="@layout/layout_t9_keyboard_2_tr"
+                        app:text="@{@string/k3}"
+                        app:subtext="@{@string/ks3}"/>
+                    <View
+                        android:id="@+id/divider_3"
+                        android:layout_width="match_parent"
+                        android:layout_below="@id/k1"
+                        android:layout_height="1dp"
+                        android:background="@color/divier_line"
+                        />
+                    <include
+                        android:id="@+id/k4"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_3"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k4}"
+                        app:subtext="@{@string/ks4}"/>
+                    <View
+                        android:id="@+id/divider_4"
+                        android:layout_width="match_parent"
+                        android:layout_below="@id/k4"
+                        android:layout_height="1dp"
+                        android:background="@color/divier_line"
+                        />
+                    <include
+                        android:id="@+id/k7"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_4"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k7}"
+                        app:subtext="@{@string/ks7}"/>
+                    <View
+                        android:id="@+id/divider_5"
+                        android:layout_width="match_parent"
+                        android:layout_below="@id/k7"
+                        android:layout_height="1dp"
+                        android:background="@color/divier_line"
+                        />
+                    <include
+                        android:id="@+id/k5"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_3"
+                        android:layout_toEndOf="@id/divider_1"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k5}"
+                        app:subtext="@{@string/ks5}"/>
+                    <include
+                        android:id="@+id/k6"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_3"
+                        android:layout_toEndOf="@id/divider_2"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k6}"
+                        app:subtext="@{@string/ks6}"/>
+                    <include
+                        android:id="@+id/k8"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_4"
+                        android:layout_toEndOf="@id/divider_1"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k8}"
+                        app:subtext="@{@string/ks8}"/>
+                    <include
+                        android:id="@+id/k9"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_4"
+                        android:layout_toEndOf="@id/divider_2"
+                        layout="@layout/layout_t9_keyboard_2"
+                        app:text="@{@string/k9}"
+                        app:subtext="@{@string/ks9}"/>
+                    <include
+                        android:id="@+id/kdel"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_5"
+                        layout="@layout/layout_t9_keyboard_3_bl"
+                       />
+                    <include
+                        android:id="@+id/k0"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_5"
+                        android:layout_toEndOf="@id/divider_1"
+                        layout="@layout/layout_t9_keyboard_1"
+                        app:text="@{@string/k0}"/>
+                    <include
+                        android:id="@+id/kclear"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_5"
+                        android:layout_toEndOf="@id/divider_2"
+                        layout="@layout/layout_t9_keyboard_3_br"
+                        />
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+
+            <com.hphtv.movielibrary.ui.view.FloatKeyboard
+                android:id="@+id/floatkeyboard"
+                android:layout_width="@dimen/fkeyboard_width"
+                android:layout_height="@dimen/fkeyboard_width"
+                android:visibility="gone"
+                android:background="@drawable/t9_floatkey_bg"
+                app:offsetDis="@dimen/fkeyboard_width">
+
+            </com.hphtv.movielibrary.ui.view.FloatKeyboard>
+
+
+        </FrameLayout>
+
+        <RelativeLayout
+            android:layout_toRightOf="@id/view_t9_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tablayout"
+                android:visibility="@{showTab?View.VISIBLE:View.GONE}"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="61dp"
+                android:layout_height="wrap_content"
+                app:tabTextAppearance="@style/localsearch_tabTextAppearance"
+                app:tabIndicatorHeight="5dp"
+                app:tabGravity="center"
+                app:tabBackground="@drawable/round_rect_item_2_bg"
+                app:tabRippleColor="@android:color/transparent"
+                app:tabIndicator="@drawable/tabindicator"
+                app:tabPaddingBottom="9dp"
+                app:tabIndicatorColor="@color/main_focus"
+                app:tabTextColor="#FFAAAAAA"
+                app:tabSelectedTextColor="@color/main_focus"
+                />
+
+
+            <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
+                android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}"
+                android:id="@+id/rv_search_movies"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/tablayout"
+                />
+
+            <TextView
+                android:visibility="@{isEmpty?View.VISIBLE:View.GONE}"
+                android:id="@+id/tv_empty_tips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/local_search_empty_tips"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="24sp" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+</layout>

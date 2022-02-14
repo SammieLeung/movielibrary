@@ -116,6 +116,7 @@ dependencies {
 
     //圆角图片
     implementation 'com.lqm:RoundImageView:1.0.0'
+
     //测试相关类
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

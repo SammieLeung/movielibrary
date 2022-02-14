@@ -6,5 +6,5 @@
     <color name="main_bg_color_end">#1E2039</color>
     <color name="main_focus">#FF634EB7</color>
     <color name="main_press">#FF4C389B</color>
-
+    <color name="divier_line">#FF343E5A</color>
 </resources>

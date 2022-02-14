@@ -9,29 +9,84 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.T9KeyBoradAdapter;
-import com.hphtv.movielibrary.adapter.MovieAdapter;
+import com.hphtv.movielibrary.adapter.NewMovieLargeItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.databinding.LayoutMovieSearchBinding;
+import com.hphtv.movielibrary.databinding.ActivityLocalSearchBinding;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
+import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * author: Sam Leung
  * date:  2021/8/19
  */
-public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, LayoutMovieSearchBinding> {
-    private MovieAdapter mMovieAdapter;
+public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, ActivityLocalSearchBinding> {
+    private NewMovieLargeItemListAdapter mMovieAdapter;
+
+    private View.OnClickListener mOnClickListener = v -> {
+        if (mBinding.floatkeyboard.isShowed()) {
+            mBinding.floatkeyboard.hide();
+        }
+        switch (v.getId()) {
+            case R.id.k0:
+                mBinding.etSearch.append("0");
+                break;
+            case R.id.k1:
+                mBinding.etSearch.append("1");
+                break;
+            case R.id.k2:
+                showFloatKeyboard(v, new String[]{"2", "B", "A", "C"});
+                break;
+            case R.id.k3:
+                showFloatKeyboard(v, new String[]{"3", "E", "D", "F"});
+                break;
+            case R.id.k4:
+                showFloatKeyboard(v, new String[]{"4", "H", "G", "I"});
+                break;
+            case R.id.k5:
+                showFloatKeyboard(v, new String[]{"5", "K", "J", "L"});
+                break;
+            case R.id.k6:
+                showFloatKeyboard(v, new String[]{"6", "N", "M", "O"});
+                break;
+            case R.id.k7:
+                showFloatKeyboard(v, new String[]{"7", "Q", "P", "R", "S"});
+                break;
+            case R.id.k8:
+                showFloatKeyboard(v, new String[]{"8", "U", "T", "V"});
+                break;
+            case R.id.k9:
+                showFloatKeyboard(v, new String[]{"9", "X", "W", "Y", "Z"});
+                break;
+            case R.id.kdel:
+                Editable editable = mBinding.etSearch.getText();
+                int len = editable.length();
+                if (len > 0)
+                    editable.delete(len - 1, len);
+                break;
+            case R.id.kclear:
+                mBinding.etSearch.getText().clear();
+                break;
+        }
+    };
+
+    private void showFloatKeyboard(View v, String[] datas) {
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mBinding.viewInputgroup.getLayoutParams();
+        int offset_left = layoutParams.leftMargin;
+        int offset_top = layoutParams.topMargin + mBinding.etSearch.getHeight() + ((RelativeLayout.LayoutParams) mBinding.rvKeyboardT9.getLayoutParams()).topMargin;
+        mBinding.floatkeyboard.setDatas(datas);
+        mBinding.floatkeyboard.show(v, offset_left, offset_top);
+    }
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -51,63 +106,19 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     }
 
     private void prepearT9() {
-        List<Object[]> datas = new ArrayList<Object[]>();
-        String[] s1 = getResources().getStringArray(R.array.k1);
-        String[] s2 = getResources().getStringArray(R.array.k2);
-        String[] s3 = getResources().getStringArray(R.array.k3);
-        String[] s4 = getResources().getStringArray(R.array.k4);
-        String[] s5 = getResources().getStringArray(R.array.k5);
-        String[] s6 = getResources().getStringArray(R.array.k6);
-        String[] s7 = getResources().getStringArray(R.array.k7);
-        String[] s8 = getResources().getStringArray(R.array.k8);
-        String[] s9 = getResources().getStringArray(R.array.k9);
-        String[] sc = getResources().getStringArray(R.array.kc);
-        String[] s0 = getResources().getStringArray(R.array.k0);
-        Integer[] sback = new Integer[]{R.mipmap.keyboard_del};
-
-        datas.add(s1);
-        datas.add(s2);
-        datas.add(s3);
-        datas.add(s4);
-        datas.add(s5);
-        datas.add(s6);
-        datas.add(s7);
-        datas.add(s8);
-        datas.add(s9);
-        datas.add(sc);
-        datas.add(s0);
-        datas.add(sback);
-        GridLayoutManager t9LayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
-        T9KeyBoradAdapter t9KeyBoradAdapter = new T9KeyBoradAdapter(this, datas);
-        t9KeyBoradAdapter.setOnKeyBoardClickListener((view, pos, keyValues) -> {
-            if (pos > 0 && pos < 9) {
-                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) mBinding.viewInputgroup.getLayoutParams();
-                int offset_left = layoutParams.leftMargin;
-                int offset_top = layoutParams.topMargin + mBinding.etSearch.getHeight() + ((RelativeLayout.LayoutParams) mBinding.rvKeyboardT9.getLayoutParams()).topMargin;
-                mBinding.floatkeyboard.setDatas((String[]) keyValues);
-                mBinding.floatkeyboard.show(view, offset_left, offset_top);
-            } else {
-                if (mBinding.floatkeyboard.isShowed()) {
-                    mBinding.floatkeyboard.hide();
-                }
-                switch (pos) {
-                    case 0:
-                    case 10:
-                        mBinding.etSearch.append(((TextView) view.findViewById(R.id.kbi_single_num)).getText());
-                        break;
-                    case 9:
-                        mBinding.etSearch.getText().clear();
-                        break;
-                    case 11:
-                        Editable editable = mBinding.etSearch.getText();
-                        int len = editable.length();
-                        if (len > 0)
-                            editable.delete(len - 1, len);
-                }
-            }
-        });
-        mBinding.rvKeyboardT9.setLayoutManager(t9LayoutManager);
-        mBinding.rvKeyboardT9.setAdapter(t9KeyBoradAdapter);
+        mBinding.k0.tvKey1.setOnClickListener(mOnClickListener);
+        mBinding.k1.tvKey1.setOnClickListener(mOnClickListener);
+        mBinding.k2.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k3.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k4.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k5.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k5.tvKey2.requestFocus();
+        mBinding.k6.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k7.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k8.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.k9.tvKey2.setOnClickListener(mOnClickListener);
+        mBinding.kclear.setOnClickListener(mOnClickListener);
+        mBinding.kdel.setOnClickListener(mOnClickListener);
 
         mBinding.floatkeyboard.setOnKeyListener((v, keyCode, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -153,8 +164,8 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     }
 
     private void initView() {
-        mMovieAdapter = new MovieAdapter(this, new ArrayList());
-        mMovieAdapter.setOnItemClickListener((view, data) -> {
+        mMovieAdapter = new NewMovieLargeItemListAdapter(this, new ArrayList());
+        mMovieAdapter.setOnItemClickListener((view, postion, data) -> {
             Intent intent = new Intent(PinyinSearchActivity.this,
                     MovieDetailActivity.class);
             Bundle bundle = new Bundle();
@@ -163,7 +174,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
             intent.putExtras(bundle);
 
         });
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 4, GridLayoutManager.VERTICAL, false);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mBinding.btnExit.setOnClickListener(v -> finish());
         mBinding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
@@ -184,27 +195,78 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         });
         mBinding.rvSearchMovies.setAdapter(mMovieAdapter);
         mBinding.rvSearchMovies.setLayoutManager(gridLayoutManager);
+        mBinding.rvSearchMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(this, 30), DensityUtil.dip2px(this, 30), 3));
+        TabLayout.Tab tab1 = mBinding.tablayout.newTab();
+        TabLayout.Tab tab2 = mBinding.tablayout.newTab();
+        TabLayout.Tab tab3 = mBinding.tablayout.newTab();
+        mBinding.tablayout.addTab(tab1);
+        mBinding.tablayout.addTab(tab2);
+        mBinding.tablayout.addTab(tab3);
 
+        mBinding.tablayout.selectTab(mBinding.tablayout.getTabAt(0));
+        mBinding.tablayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        mMovieAdapter.getFilter().filter(null);
+                        break;
+                    case 1:
+                        mMovieAdapter.getFilter().filter(Constants.SearchType.movie.name());
+                        break;
+                    case 2:
+                        mMovieAdapter.getFilter().filter(Constants.SearchType.tv.name());
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+    }
+
+    private void setTabs(int a, int b, int c) {
+        mBinding.tablayout.getTabAt(0).setText(getString(R.string.tab_local_search_all, a));
+        mBinding.tablayout.getTabAt(1).setText(getString(R.string.tab_local_search_movie, b));
+        mBinding.tablayout.getTabAt(2).setText(getString(R.string.tab_local_search_tv, c));
+
+        mBinding.tablayout.selectTab(mBinding.tablayout.getTabAt(0));
     }
 
     private void search(String pinyin) {
         mViewModel.search(pinyin, data -> {
             if (data.size() > 0) {
                 hideEmptyTips();
+                mBinding.setShowTab(true);
                 mMovieAdapter.addAll(data);
+                int count = 0;
+                for (int i = 0; i < mMovieAdapter.getRealCount(); i++) {
+                    if (data.get(i).type == Constants.SearchType.movie)
+                        count++;
+                }
+                setTabs(mMovieAdapter.getRealCount(), count, mMovieAdapter.getRealCount() - count);
             } else {
-                mMovieAdapter.removeAll();
+                mMovieAdapter.clearAll();
+                mBinding.setShowTab(false);
                 showEmptyTips();
             }
         });
     }
 
     private void showEmptyTips() {
-        mBinding.tvEmptyTips.setVisibility(View.VISIBLE);
+        mBinding.setIsEmpty(true);
     }
 
     private void hideEmptyTips() {
-        mBinding.tvEmptyTips.setVisibility(View.GONE);
+        mBinding.setIsEmpty(false);
     }
 
 }

@@ -55,7 +55,7 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieWriterCrossRef;
         ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, GenreTag.class,Shortcut.class,
         Season.class},
         views = {MovieDataView.class, UnrecognizedFileDataView.class, HistoryMovieDataView.class},
-        version = 2)
+        version = 1)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO

@@ -95,4 +95,9 @@
     <string name="tab_tv">TV</string>
     <string name="tab_child">Cartoon</string>
 
+    <!--本地搜索页tab-->
+    <string name="tab_local_search_all">All (%d)</string>
+    <string name="tab_local_search_movie">Movie (%d)</string>
+    <string name="tab_local_search_tv">TV Series (%d)</string>
+
 </resources>

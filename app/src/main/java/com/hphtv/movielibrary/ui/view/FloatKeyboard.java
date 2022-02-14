@@ -30,7 +30,7 @@ public class FloatKeyboard extends RelativeLayout {
         this.context = context;
         this.setFocusable(true);
         mFloatKeyboard = this;
-        LayoutInflater.from(context).inflate(R.layout.component_float_keyboard, this, true);
+        LayoutInflater.from(context).inflate(R.layout.view_float_keyboard, this, true);
         tv_center = (TextView) findViewById(R.id.fk_center);
         tv_left = (TextView) findViewById(R.id.fk1);
         tv_top = (TextView) findViewById(R.id.fk2);

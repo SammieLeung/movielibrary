@@ -1,64 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="k1"  translatable="false">
-        <item>1</item>
+    <string name="k1" translatable="false">1</string>
+    <string name="k2" translatable="false">2</string>
+    <string name="k3" translatable="false">3</string>
+    <string name="k4" translatable="false">4</string>
+    <string name="k5" translatable="false">5</string>
+    <string name="k6" translatable="false">6</string>
+    <string name="k7" translatable="false">7</string>
+    <string name="k8" translatable="false">8</string>
+    <string name="k9" translatable="false">9</string>
+    <string name="k0" translatable="false">0</string>
 
-    </string-array>
-    <string-array name="k2"  translatable="false">
-        <item>2</item>
-        <item>A</item>
-        <item>B</item>
-        <item>C</item>
-    </string-array>
-    <string-array name="k3"  translatable="false">
-        <item>3</item>
-        <item>D</item>
-        <item>E</item>
-        <item>F</item>
-    </string-array>
-    <string-array name="k4"  translatable="false">
-        <item>4</item>
-        <item>G</item>
-        <item>H</item>
-        <item>I</item>
-    </string-array>
-    <string-array name="k5"  translatable="false">
-        <item>5</item>
-        <item>J</item>
-        <item>K</item>
-        <item>L</item>
-    </string-array>
-    <string-array name="k6"  translatable="false">
-        <item>6</item>
-        <item>M</item>
-        <item>N</item>
-        <item>O</item>
-    </string-array>
-    <string-array name="k7"  translatable="false">
-        <item>7</item>
-        <item>P</item>
-        <item>Q</item>
-        <item>R</item>
-        <item>S</item>
-    </string-array>
-    <string-array name="k8"  translatable="false">
-        <item>8</item>
-        <item>T</item>
-        <item>U</item>
-        <item>V</item>
-    </string-array>
-    <string-array name="k9"  translatable="false">
-        <item>9</item>
-        <item>W</item>
-        <item>X</item>
-        <item>Y</item>
-        <item>Z</item>
-    </string-array>
-    <string-array name="k0"  translatable="false">
-        <item>0</item>
-    </string-array>
-    <string-array name="kc"  translatable="false">
-        <item>C</item>
-    </string-array>
+    <string name="ks2" translatable="false">ABC</string>
+    <string name="ks3" translatable="false">DEF</string>
+    <string name="ks4" translatable="false">GHI</string>
+    <string name="ks5" translatable="false">JKL</string>
+    <string name="ks6" translatable="false">MNO</string>
+    <string name="ks7" translatable="false">PQRS</string>
+    <string name="ks8" translatable="false">TUV</string>
+    <string name="ks9" translatable="false">WXYZ</string>
+
+    <string name="k_del">DEL</string>
+    <string name="k_clear">CLEAR</string>
 
 </resources>

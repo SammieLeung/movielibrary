@@ -31,7 +31,8 @@
     <dimen name="poster_item_1_tv_h">38dp</dimen>
     <dimen name="poster_item_1_textsize">38sp</dimen>
     <dimen name="poster_border_width">6dp</dimen>
-
+    <dimen name="poster_item_large_w">264dp</dimen>
+    <dimen name="poster_item_large_h">367dp</dimen>
     <dimen name="genre_edit_dialog_w">305dp</dimen>
     <dimen name="genre_edit_dialog_h">434dp</dimen>
     <dimen name="genre_item_h">38dp</dimen>

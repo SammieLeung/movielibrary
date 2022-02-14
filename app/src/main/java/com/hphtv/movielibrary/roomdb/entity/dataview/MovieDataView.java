@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.roomdb.entity.dataview;
 
 import androidx.room.DatabaseView;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
 
 @DatabaseView(
         value =
-                "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,VF.path AS file_uri,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite " +
+                "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,VF.path AS file_uri,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite " +
                         "FROM " + TABLE.VIDEOFILE + " AS VF " +
                         "JOIN " + TABLE.SHORTCUT + " AS ST  " +
                         "ON VF.dir_path=ST.uri " +
@@ -39,6 +40,7 @@ public class MovieDataView {
     public String ratings;
     public String year;
     public String source;
+    public Constants.SearchType type;
     public String file_uri;
     public String dir_uri;
     public String device_uri;

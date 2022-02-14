@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:id="@+id/tv_key2"
+        android:layout_width="@dimen/keybtn_item_w"
+        android:background="@drawable/t9_keybtn_bg"
+        android:layout_height="@dimen/keybtn_item_h">
+
+        <TextView
+            android:duplicateParentState="true"
+            android:id="@+id/tv_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="21sp"
+            android:gravity="center"
+            android:text="@{text}"
+            android:textColor="@drawable/new_list_item_textcolor_state"
+            android:textSize="36sp" />
+
+        <TextView
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_num"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="-6dp"
+            android:gravity="center"
+            android:text="@{subtext}"
+            android:textColor="@drawable/new_list_item_textcolor_state"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <data>
+
+        <variable
+            name="text"
+            type="String" />
+
+        <variable
+            name="subtext"
+            type="String" />
+    </data>
+
+</layout>
