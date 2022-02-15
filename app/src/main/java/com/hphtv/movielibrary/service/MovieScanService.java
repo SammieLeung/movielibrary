@@ -18,6 +18,7 @@ import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
+import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
@@ -360,6 +361,7 @@ public class MovieScanService extends Service {
                                             if (!movieId.equals("-1")) {
                                                 int success = successCount.incrementAndGet();
                                                 sendMatchMovieSuccess(st, movieId, success, scannedCount, total);
+                                                BroadcastHelper.sendBroadcastMovieAddSync(getBaseContext(),movieId);
                                                 LogUtil.w(TAG, "onAction(" + scannedCount + ") movieId:" + movieId);
                                             } else {
                                                 sendMatchMovieFailed(st, scannedCount, total);

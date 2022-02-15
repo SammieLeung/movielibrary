@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.ui.detail;
 
+import android.content.BroadcastReceiver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.ui.common.ConfirmDialog;
+import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,8 +66,9 @@ public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
                     }
 
                     @Override
-                    public void onAction(String s) {
+                    public void onAction(String movie_id) {
                         mWeakReference.get().sendEmptyMessage(MovieDetailActivity.REMOVE);
+                        BroadcastHelper.sendBroadcastMovieRemoveSync(getContext(),movie_id);
                         dismiss();
                     }
                 });
