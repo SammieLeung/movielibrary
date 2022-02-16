@@ -156,8 +156,8 @@
     <string name="checkbox_del_video_file">清除文件信息(不会删除文件)?</string>
     <string name="toast_del_success">删除成功！</string>
     <string name="toast_UnknownHostException">网络错误！</string>
+    <string name="toast_newsearh_notfound">抱歉，没有找到相关结果。\n请检查您的输入或尝试其他关键字</string>
     <string name="toast_loadmore_end">搜索不到更多内容</string>
-
     <string name="title_hide_private">隐藏私密文件</string>
     <string name="tips_for_show_private_videos">已经显示私密视频</string>
     <string name="tips_for_hide_private_videos">已经隐藏私密视频</string>

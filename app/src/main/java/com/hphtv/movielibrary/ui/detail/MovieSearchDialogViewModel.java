@@ -56,6 +56,14 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
         notifyLoadingMore(autoSearch(mCurrentPage+1), adapter);
     }
 
+    /**
+     * 根据对应模式调用相应接口搜索
+     * 电影模式
+     * 电视模式
+     * 混合模式（电影+电视）
+     * @param page
+     * @return
+     */
     public Observable<? extends ResponeEntity<List<Movie>>> autoSearch(int page) {
         switch (mSearchMode) {
             case 1:
@@ -78,11 +86,11 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
                     @Override
                     public void onAction(List<Movie> movies) {
                         if (movies == null || movies.size() == 0) {
-                            ToastUtil.newInstance(getApplication()).toast(getApplication().getString(R.string.toast_loadmore_end));
+                            adapter.cancelLoadingAndShowTips(getApplication().getString(R.string.toast_newsearh_notfound));
                         } else {
                             adapter.setMovies(movies);
+                            adapter.cancelLoading();
                         }
-                        adapter.cancelLoading();
                     }
 
                     @Override
@@ -94,7 +102,6 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
                         } else {
                             msg = e.getMessage();
                         }
-                        ToastUtil.newInstance(getApplication()).toast(msg);
                         adapter.cancelLoadingAndShowTips(msg);
 
                     }

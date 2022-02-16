@@ -87,6 +87,7 @@ public class MovieSearchDialog extends DialogFragment {
                 mViewModel.loading(mAdapter);
             }
         });
+        //搜索按钮
         mBinding.btnSearch.setOnClickListener(v -> {
             mAdapter.clearAll();
             String keyword = mBinding.etBoxName.getText().toString();
