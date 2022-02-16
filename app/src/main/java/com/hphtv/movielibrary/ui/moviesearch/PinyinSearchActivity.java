@@ -99,9 +99,10 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
-        if (result.getResultCode() == 1) {
+        if (result.getResultCode() == RESULT_OK) {
             mViewModel.init();
             mBinding.etSearch.getText().clear();
+            setResult(RESULT_OK);
         }
     }
 
@@ -172,6 +173,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
             bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
             bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
             intent.putExtras(bundle);
+            startActivityForResult(intent);
 
         });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
