@@ -29,9 +29,8 @@ public interface GenreDao {
     @Query("SELECT genre_id FROM "+TABLE.GENRE +" WHERE name in (:names)")
     public long[] queryByName(List<String> names);
 
-    @Query("SELECT genre_name FROM "+ VIEW.MOVIE_DATAVIEW +" WHERE source=:source GROUP BY genre_name;")
+    @Query("SELECT genre_name FROM "+ VIEW.MOVIE_DATAVIEW +" WHERE source=:source AND genre_name!=\"\" GROUP BY genre_name;")
     public List<String> queryGenresBySource(String source);
-
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertGenreTag(GenreTag genreTag);

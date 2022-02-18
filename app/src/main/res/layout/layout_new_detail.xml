@@ -107,6 +107,7 @@
 
                     <TextView
                         style="@style/common_label_text_style"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="23dp"
                         android:text="@string/plot_s" />
@@ -200,11 +201,10 @@
                     android:text="@string/label_recommandvideo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-
                  </androidx.appcompat.widget.LinearLayoutCompat>
                 <androidx.recyclerview.widget.RecyclerView
                     android:visibility="@{!recommand?View.GONE:View.VISIBLE}"
-                    android:layout_marginTop="25dp"
+                    android:layout_marginTop="23dp"
                     android:id="@+id/rv_recommand"
                     android:layout_below="@id/view_main"
                     android:layout_width="match_parent"

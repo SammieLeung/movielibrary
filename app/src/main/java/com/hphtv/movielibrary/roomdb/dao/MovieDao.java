@@ -31,17 +31,17 @@ public interface MovieDao {
     public Movie queryByMovieId(String movie_id, String source);
 
     @Query("SELECT * FROM "+TABLE.MOVIE+" WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path AND source=:source)")
-    public Movie queryByKeyword(String path,String source);
+    public Movie queryByFilePath(String path, String source);
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
             "SET is_favorite=:isFavorite " +
             "WHERE id=:id")
-    public int updateFavorite(boolean isFavorite, long id);
+    public int updateFavoriteState(boolean isFavorite, long id);
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
             "SET is_favorite=:isFavorite " +
             "WHERE movie_id=:movie_id")
-    public int updateFavoriteByMovieId(boolean isFavorite, String movie_id);
+    public int updateFavoriteStateByMovieId(boolean isFavorite, String movie_id);
 
     @Query("UPDATE " + TABLE.MOVIE +
             " SET last_playtime=:last_playtime" +
@@ -94,6 +94,9 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE source=:source and movie_id=:movie_id")
     public MovieWrapper queryMovieWrapperByMovieId(String movie_id, String source);
 
+
+    @Query("SELECT * FROM "+TABLE.MOVIE+" WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path AND source=:source)")
+    public MovieWrapper queryMovieWrapperByFilePath(String path, String source);
     /**
      * 按照来源分页查找
      *
@@ -168,6 +171,15 @@ public interface MovieDao {
             " ORDER BY add_time DESC "
     )
     public List<MovieDataView> queryRecommand(String source,List<String> genre_name,long id);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            "AND genre_name in (:genre_name) "+
+            "AND id NOT IN (:ids) "+
+            " GROUP BY id " +
+            " ORDER BY add_time DESC "
+    )
+    public List<MovieDataView> queryRecommand(String source,List<String> genre_name,List<Long> ids);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);

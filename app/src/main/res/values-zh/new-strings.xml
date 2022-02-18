@@ -10,7 +10,8 @@
     <string name="history_list_empty">暂无观看记录</string>
     <string name="category_list_title">分类浏览</string>
     <string name="recently_added_list_title">最近添加</string>
-
+    <string name="my_favorite_list_title">我的收藏</string>
+    <string name="recommand_list_title">推荐影片</string>
 
     <!--分类浏览-->
     <string name="category_all">全部</string>
@@ -101,4 +102,6 @@
     <string name="tab_local_search_all">全部 (%d)</string>
     <string name="tab_local_search_movie">电影 (%d)</string>
     <string name="tab_local_search_tv">电视剧 (%d)</string>
+
+    <string name="genre_add">自定义</string>
 </resources>

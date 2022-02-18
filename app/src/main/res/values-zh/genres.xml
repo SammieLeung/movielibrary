@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action">动作</string>
+    <string name="adventure">冒险</string>
+    <string name="animation">动画</string>
+    <string name="comedy">喜剧</string>
+    <string name="crime">犯罪</string>
+    <string name="documentary">纪录</string>
+    <string name="drama">剧情</string>
+    <string name="family">家庭</string>
+    <string name="fantasy">奇幻</string>
+    <string name="history">历史</string>
+    <string name="horror">恐怖</string>
+    <string name="music">音乐</string>
+    <string name="mystery">悬疑</string>
+    <string name="romance">爱情</string>
+    <string name="science_fiction">科幻</string>
+    <string name="tv_movie">电视电影</string>
+    <string name="thriller">惊悚</string>
+    <string name="war">战争</string>
+    <string name="western">西部</string>
+
+    <string name="action_and_adventure">动作冒险</string>
+    <string name="kids">儿童</string>
+    <string name="news">新闻</string>
+    <string name="reality">真人秀</string>
+    <string name="sci_fi_and_fantasy">Sci-Fi &amp; Fantasy</string>
+    <string name="soap">肥皂剧</string>
+    <string name="talk">脱口秀</string>
+    <string name="war_and_politics">War &amp; Politics</string>
+
+
+
+</resources>

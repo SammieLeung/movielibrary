@@ -24,7 +24,7 @@
                 android:id="@+id/iv_img"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/history_h"
-                android:background="@drawable/round_rect_item_bg"
+                android:background="@drawable/poster_item_bg"
                 android:duplicateParentState="true"
                 app:border_width="4dp"
                 app:border_color="@android:color/transparent"
@@ -39,8 +39,9 @@
             <TextView
                 android:id="@id/tv_title"
                 android:text="@{title}"
+                android:layout_marginTop="15dp"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/iv_img"
                 android:duplicateParentState="true"
                 android:ellipsize="end"
@@ -49,7 +50,7 @@
                 android:paddingLeft="4dp"
                 android:paddingRight="4dp"
                 android:textColor="@color/tx_fff"
-                android:textSize="18sp" />
+                android:textSize="23sp" />
         </RelativeLayout>
 
 

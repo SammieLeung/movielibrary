@@ -11,14 +11,14 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  */
 @DatabaseView(
         viewName = VIEW.HISTORY_MOVIE_DATAVIEW,
-        value = "SELECT u.filename,u.keyword,u.path,u.last_playtime,v.poster,v.source,v.title,st.img_url as stage_photo " +
+        value = "SELECT u.filename,u.keyword,u.path,u.last_playtime,m.poster,m.source,m.title,st.img_url as stage_photo " +
                 "FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" AS u " +
-                "LEFT OUTER JOIN "+VIEW.MOVIE_DATAVIEW+" AS v " +
-                "ON u.path=v.file_uri " +
+                "LEFT OUTER JOIN "+VIEW.MOVIE_DATAVIEW+" AS m " +
+                "ON u.path=m.file_uri " +
                 "LEFT OUTER JOIN "+ TABLE.STAGEPHOTO +" AS st " +
-                "ON st.movie_id=v.id "+
+                "ON st.movie_id=m.id "+
                 "WHERE u.last_playtime!=0 " +
-                "GROUP BY u.path,v.source " +
+                "GROUP BY u.path,m.source " +
                 "ORDER BY u.last_playtime DESC;"
 )
 public class HistoryMovieDataView {

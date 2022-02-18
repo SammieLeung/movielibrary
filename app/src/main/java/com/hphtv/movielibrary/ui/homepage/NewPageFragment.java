@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.hphtv.movielibrary.adapter.CircleItemAdapter;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
@@ -31,19 +30,22 @@ import java.util.List;
  */
 public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel, ActivityNewpageBinding> {
     private HistoryListAdapter mHistoryListAdapter;
-    private CircleItemAdapter mCircleItemAdapter;
     private GenreTagAdapter mGenreTagAdapter;
     private NewMovieItemListAdapter mRecentlyAddListAdapter;
+    private NewMovieItemListAdapter mFavoriteListAdapter;
+    private NewMovieItemListAdapter mRecommandListAdapter;
+
     private List<HistoryMovieDataView> mRecentlyPlayedList = new ArrayList<>();
     private List<String> mGenreTagList = new ArrayList<>();
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
+    private List<MovieDataView> mFavoriteList=new ArrayList<>();
+    private List<MovieDataView> mRecommandList=new ArrayList<>();
 
     public NewPageFragment(NewHomePageActivity activity) {
         super(activity);
     }
 
     public static NewPageFragment newInstance(NewHomePageActivity activity, int positon) {
-
         Bundle args = new Bundle();
         args.putInt(NoScrollAutofitHeightViewPager.POSITION, positon);
         NewPageFragment fragment = new NewPageFragment(activity);
@@ -56,7 +58,6 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     @org.jetbrains.annotations.Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, Bundle savedInstanceState) {
-
         View view = super.onCreateView(inflater, container, savedInstanceState);
         int pos = getArguments().getInt(NoScrollAutofitHeightViewPager.POSITION);
         getViewPager().setViewPosition(view, pos);
@@ -80,13 +81,16 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         prepareHistoryData();
         prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
+        prepareFavorite();
+        prepareRecommand();
     }
 
     private void initViews() {
         initRecentlyPlayedList();
-//        initCategoryList();
         initGenreList();
         initRecentlyAddedList();
+        initFavoriteList();
+        initRecommandList();
     }
 
     /**
@@ -95,7 +99,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initRecentlyPlayedList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvHistoryList.setLayoutManager(mLayoutManager);
-        mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),75),DensityUtil.dip2px(getContext(),15)));
+        mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),72),DensityUtil.dip2px(getContext(),15),DensityUtil.dip2px(getContext(),15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
 //        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
 //
@@ -149,6 +153,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initGenreList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvGenreList.setLayoutManager(mLayoutManager);
+        mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),72),DensityUtil.dip2px(getContext(),12),DensityUtil.dip2px(getContext(),12)));
         mGenreTagAdapter = new GenreTagAdapter(getContext(), mGenreTagList);
 //        mGenreTagAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<String>() {
 //            @Override
@@ -167,7 +172,6 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
 //        });
 
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
-
     }
 
     /**
@@ -176,6 +180,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initRecentlyAddedList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
+        mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),72),DensityUtil.dip2px(getContext(),15),DensityUtil.dip2px(getContext(),30)));
         mRecentlyAddListAdapter = new NewMovieItemListAdapter(getContext(), mRecentlyAddedList);
 //        mRecentlyAddListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
 //
@@ -193,6 +198,25 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
 //        });
         mBinding.rvRecentlyAdded.setAdapter(mRecentlyAddListAdapter);
 
+    }
+
+    /**
+     * 初始化我的收藏
+     */
+    private void initFavoriteList(){
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mBinding.rvFavorite.setLayoutManager(mLayoutManager);
+        mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),72),DensityUtil.dip2px(getContext(),15),DensityUtil.dip2px(getContext(),30)));
+        mFavoriteListAdapter = new NewMovieItemListAdapter(getContext(), mFavoriteList);
+        mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
+    }
+
+    private void initRecommandList(){
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mBinding.rvRecommand.setLayoutManager(mLayoutManager);
+        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),72),DensityUtil.dip2px(getContext(),15),DensityUtil.dip2px(getContext(),30)));
+        mRecommandListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
+        mBinding.rvRecommand.setAdapter(mRecommandListAdapter);
     }
 
 
@@ -223,4 +247,13 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
             mRecentlyAddListAdapter.addAll(list);
         });
     }
+
+    private void prepareFavorite(){
+        mViewModel.prepareFavorite(list -> mFavoriteListAdapter.addAll(list));
+    }
+
+    private void prepareRecommand(){
+        mViewModel.prepareRecommand(list->mRecommandListAdapter.addAll(list));
+    }
+
 }

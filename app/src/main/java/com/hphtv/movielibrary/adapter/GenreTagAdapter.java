@@ -1,7 +1,10 @@
 
 package com.hphtv.movielibrary.adapter;
 
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +14,15 @@ import androidx.databinding.DataBindingUtil;
 
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.databinding.RoundRectItem2Binding;
 import com.hphtv.movielibrary.databinding.RoundRectItemBinding;
+import com.hphtv.movielibrary.ui.homepage.NewHomePageActivity;
+import com.hphtv.movielibrary.ui.homepage.NewPageFragment;
+import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.logging.Handler;
 
 /**
  * author: Sam Leung
@@ -25,9 +31,9 @@ import java.util.List;
 public class GenreTagAdapter extends RoundRectItemAdapter {
     public static final int TYPE_ITEM = 0;
     public static final int TYPE_ADD = 1;
-
     public GenreTagAdapter(Context context, List<String> list) {
         super(context, list);
+        setZoomRatio(1.15f);
     }
 
 
@@ -35,15 +41,9 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        if (viewType == TYPE_ADD) {
-            RoundRectItem2Binding binding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.round_rect_item_2, parent, false);
-            ViewHolder viewHolder = new ViewHolder(binding);
-            return viewHolder;
-        } else {
             RoundRectItemBinding binding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.round_rect_item, parent, false);
             ViewHolder viewHolder = new ViewHolder(binding);
             return viewHolder;
-        }
     }
 
     @Override
@@ -72,23 +72,31 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
     }
 
     @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        super.onFocusChange(v, hasFocus);
+        if(hasFocus){
+        }
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
         holder.mBinding.getRoot().setTag(position);
+        RoundRectItemBinding binding = (RoundRectItemBinding) holder.mBinding;
         if (getItemViewType(position) == TYPE_ADD) {
-            RoundRectItem2Binding binding = (RoundRectItem2Binding) holder.mBinding;
+            binding.setTitle(mContext.getString(R.string.genre_add));
         } else {
-            RoundRectItemBinding binding = (RoundRectItemBinding) holder.mBinding;
             binding.setTitle(mList.get(position));
         }
     }
 
-    private AddGenreListener mAddGenreListener;
+    private GenreListener mAddGenreListener;
 
-    public interface AddGenreListener{
+    public interface GenreListener {
         void addGenre();
     }
 
-    public void setAddGenreListener(AddGenreListener addGenreListener) {
+    public void setOnGenreListener(GenreListener addGenreListener) {
         mAddGenreListener = addGenreListener;
     }
+
 }

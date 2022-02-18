@@ -3,11 +3,6 @@ package com.hphtv.movielibrary;
 import android.app.Application;
 import android.content.Intent;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStore;
-import androidx.lifecycle.ViewModelStoreOwner;
-
 import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.hphtv.movielibrary.data.Constants;
@@ -15,11 +10,7 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
-import com.hphtv.movielibrary.ui.homepage.HistoryFragmentViewModel;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
@@ -27,15 +18,8 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.SharePreferencesTools;
 import com.umeng.analytics.MobclickAgent;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MovieApplication extends Application {
@@ -102,7 +86,7 @@ public class MovieApplication extends Application {
 
                     long currentTime = System.currentTimeMillis();
                     videoFileDao.updateLastPlaytime(filepath, currentTime);
-                    Movie movie = movieDao.queryByKeyword(filepath, ScraperSourceTools.getSource());
+                    Movie movie = movieDao.queryByFilePath(filepath, ScraperSourceTools.getSource());
                     if (movie != null)
                         movieDao.updateLastPlaytime(movie.movieId, currentTime);
                     String poster = videoFileDao.getPoster(filepath,  ScraperSourceTools.getSource());

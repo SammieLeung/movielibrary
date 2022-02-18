@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.ui.detail;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.ActorPosterItemListApdater;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailViewmoreBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
@@ -55,7 +53,7 @@ public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         View view= super.onCreateView(inflater, container, savedInstanceState);
         mActorPosterItemListApdater=new ActorPosterItemListApdater(getContext(),mViewModel.getMovieWrapper().actors);
         mBinding.rvActorList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL,false));
-        mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),62),DensityUtil.dip2px(getContext(),22)));
+        mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(),62),DensityUtil.dip2px(getContext(),22),DensityUtil.dip2px(getContext(),22)));
         mBinding.rvActorList.setAdapter(mActorPosterItemListApdater);
         mBinding.setPlot(mViewModel.getMovieWrapper().movie.plot);
         mBinding.btnFold.setOnClickListener(v->dismiss());

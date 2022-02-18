@@ -3,43 +3,85 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
+        <import type="android.text.TextUtils"/>
+        <import type="com.hphtv.movielibrary.data.Constants.SearchType"/>
         <variable
             name="title"
             type="String" />
+        <variable
+            name="rating"
+            type="String" />
+        <variable
+            name="tag"
+            type="String" />
+        <variable
+            name="type"
+            type="SearchType" />
     </data>
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
-        <LinearLayout
-         android:layout_centerVertical="true"
-            android:layout_width="wrap_content"
+        <com.lqm.roundview.RoundImageView
             android:duplicateParentState="true"
-            android:layout_height="wrap_content"
+            app:border_width="@dimen/poster_border_width"
+            app:border_color="@android:color/transparent"
+            app:corner_radius="@dimen/poster_item_1_radius"
+            android:background="@drawable/poster_item_bg"
+            android:id="@+id/rv_poster"
+            android:layout_width="@dimen/poster_item_1_w"
+            android:layout_height="@dimen/poster_item_1_h"/>
+        <TextView
+            android:id="@+id/tv_title"
+            android:text="@{title}"
+            android:textSize="23sp"
+            android:textColor="@color/white"
             android:gravity="center"
-            android:orientation="vertical">
-            <com.lqm.roundview.RoundImageView
-                app:border_width="@dimen/poster_border_width"
-                android:duplicateParentState="true"
-                android:background="@drawable/round_rect_item_bg"
-                app:border_color="@android:color/transparent"
-                app:corner_radius="@dimen/poster_item_1_radius"
-                android:id="@+id/rv_poster"
-                android:layout_width="@dimen/poster_item_1_w"
-                android:layout_height="@dimen/poster_item_1_h"/>
-            <TextView
-                android:id="@+id/tv_title"
-                android:text="@{title}"
-                android:textSize="23sp"
-                android:textColor="@color/white"
-                android:gravity="center"
-                android:singleLine="true"
-                android:ellipsize="middle"
-                android:layout_marginTop="14dp"
-                android:layout_width="@dimen/poster_item_1_w"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:layout_below="@id/rv_poster"
+            android:layout_marginTop="14dp"
+            android:layout_width="@dimen/poster_item_1_w"
+            android:layout_height="wrap_content"/>
 
+        <TextView
+            android:visibility="@{!TextUtils.isEmpty(tag)&amp;&amp;type==SearchType.tv?View.VISIBLE:View.GONE}"
+            android:textSize="17sp"
+            android:text="@{tag}"
+            android:gravity="center"
+            android:layout_marginTop="11dp"
+            android:layout_marginRight="11dp"
+            android:paddingLeft="11dp"
+            android:paddingRight="11dp"
+            android:textColor="@color/white"
+            android:background="@drawable/poster_item_tag_bg"
+            android:layout_alignEnd="@id/rv_poster"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"/>
+
+        <TextView
+            android:visibility="@{!TextUtils.isEmpty(tag)&amp;&amp;type==SearchType.tv?View.VISIBLE:View.GONE}"
+            android:textSize="17sp"
+            android:text="@{tag}"
+            android:gravity="center"
+            android:layout_marginTop="11dp"
+            android:layout_marginRight="11dp"
+            android:paddingLeft="11dp"
+            android:paddingRight="11dp"
+            android:textColor="@color/white"
+            android:background="@drawable/poster_item_ep_bg"
+            android:layout_alignEnd="@id/rv_poster"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"/>
+        <TextView
+            android:text="@{rating}"
+            android:textSize="18sp"
+            android:layout_alignBottom="@id/rv_poster"
+            android:layout_marginLeft="18dp"
+            android:layout_marginBottom="13dp"
+            android:textColor="#FFE56B45"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </RelativeLayout>
 </layout>

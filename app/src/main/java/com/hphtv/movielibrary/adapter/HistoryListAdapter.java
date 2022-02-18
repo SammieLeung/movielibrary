@@ -19,9 +19,9 @@ import java.util.List;
  * date:  2021/6/26
  */
 public class HistoryListAdapter extends BaseScaleApater<HistoryItemBinding, BaseScaleApater.ViewHolder,HistoryMovieDataView> {
-
     public HistoryListAdapter(Context context, List<HistoryMovieDataView> historyList) {
         super(context, historyList);
+        setZoomRatio(1.1f);
     }
 
     @Override

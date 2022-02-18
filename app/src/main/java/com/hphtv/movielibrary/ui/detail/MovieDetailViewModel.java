@@ -4,10 +4,8 @@ import android.app.Application;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
-import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
@@ -32,7 +30,6 @@ import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.StringTools;
-import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -42,7 +39,6 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -183,7 +179,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     public Boolean apply(MovieWrapper wrapper) throws Throwable {
                         boolean isFavorite = !wrapper.movie.isFavorite;
                         long id = wrapper.movie.id;
-                        mMovieDao.updateFavorite(isFavorite, id);
+                        mMovieDao.updateFavoriteState(isFavorite, id);
                         boolean is_favorite = mMovieDao.queryFavorite(id);
                         return is_favorite;
                     }
@@ -212,7 +208,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     long id = mMovieWrapper.movie.id;
                     String movie_id = mMovieWrapper.movie.movieId;
                     mMovieVideofileCrossRefDao.deleteById(id);
-                    mMovieDao.updateFavorite(false, id);//电影的收藏状态在删除时要设置为false
+                    mMovieDao.updateFavoriteState(false, id);//电影的收藏状态在删除时要设置为false
                     return movie_id;
                 })
                 .observeOn(AndroidSchedulers.mainThread());

@@ -10,6 +10,8 @@
     <string name="history_list_empty">No watch history</string>
     <string name="category_list_title">Category Browse</string>
     <string name="recently_added_list_title">Recently Added</string>
+    <string name="my_favorite_list_title">Favorite</string>
+    <string name="recommand_list_title">Recommand</string>
 
     <!--分类浏览-->
     <string name="category_all">All</string>
@@ -100,4 +102,5 @@
     <string name="tab_local_search_movie">Movie (%d)</string>
     <string name="tab_local_search_tv">TV Series (%d)</string>
 
+    <string name="genre_add">Custom</string>
 </resources>

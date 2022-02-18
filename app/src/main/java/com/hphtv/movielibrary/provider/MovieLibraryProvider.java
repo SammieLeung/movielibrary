@@ -146,7 +146,7 @@ public class MovieLibraryProvider extends ContentProvider {
                 if (selectionArgs != null && selectionArgs.length > 0) {
                     String movie_id = selectionArgs[0];
                     boolean is_favorite = values.getAsBoolean("is_favorite");
-                    int res = mMovieDao.updateFavoriteByMovieId(is_favorite, movie_id);
+                    int res = mMovieDao.updateFavoriteStateByMovieId(is_favorite, movie_id);
                     sendRefreshFavoriteBroadcast(movie_id,is_favorite);
                     return res;
                 }

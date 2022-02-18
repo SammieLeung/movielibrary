@@ -1,15 +1,10 @@
 package com.hphtv.movielibrary.effect;
 
-import android.content.Context;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.station.kit.util.DensityUtil;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,13 +14,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
     private int mSpecialSpace;
-    private int mSpace;
+    private int mLRspace;
+    private int mTBspace;
 
     public static final String TAG = SpacingItemDecoration.class.getSimpleName();
 
-    public SpacingItemDecoration(int specialSpace,int normalSpace) {
+    public SpacingItemDecoration(int specialSpace,int lrspace,int tbspace) {
         mSpecialSpace=specialSpace;
-        mSpace=normalSpace;
+        mLRspace =lrspace;
+        mTBspace=tbspace;
     }
 
 
@@ -35,25 +32,25 @@ public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
             int pos = (int) view.getTag();
             if (pos == 0) {
                 outRect.left = mSpecialSpace;
-                outRect.right = mSpace;
-                outRect.top = mSpace;
-                outRect.bottom = mSpace;
+                outRect.right = mLRspace;
+                outRect.top = mTBspace;
+                outRect.bottom = mTBspace;
             } else if (pos == state.getItemCount() - 1) {
-                outRect.left = mSpace;
+                outRect.left = mLRspace;
                 outRect.right = mSpecialSpace;
-                outRect.top = mSpace;
-                outRect.bottom = mSpace;
+                outRect.top = mTBspace;
+                outRect.bottom = mTBspace;
             } else {
-                outRect.left = mSpace;
-                outRect.right = mSpace;
-                outRect.top = mSpace;
-                outRect.bottom = mSpace;
+                outRect.left = mLRspace;
+                outRect.right = mLRspace;
+                outRect.top = mTBspace;
+                outRect.bottom = mTBspace;
             }
         } else {
-            outRect.left = mSpace;
-            outRect.right = mSpace;
-            outRect.top = mSpace;
-            outRect.bottom = mSpace;
+            outRect.left = mLRspace;
+            outRect.right = mLRspace;
+            outRect.top = mTBspace;
+            outRect.bottom = mTBspace;
         }
 
     }

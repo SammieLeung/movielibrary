@@ -137,15 +137,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.tvMore.setOnClickListener(mClickListener);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this, RecyclerView.HORIZONTAL,false);
         mRecommandMovieAdapter=new NewMovieItemListAdapter(this,new ArrayList<>());
-        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this,72),DensityUtil.dip2px(this,15)));
+        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this,72),DensityUtil.dip2px(this,15),DensityUtil.dip2px(this,30)));
         mBinding.rvRecommand.setLayoutManager(linearLayoutManager);
         mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
-        mRecommandMovieAdapter.setOnItemClickListener(new BaseScaleApater.OnRecyclerViewItemActionListener<MovieDataView>() {
-            @Override
-            public void onItemClick(View view, int postion, MovieDataView data) {
-                prepareMovieWrapper(data.id);
-            }
-        });
+        mRecommandMovieAdapter.setOnItemClickListener((view, postion, data) -> prepareMovieWrapper(data.id));
     }
 
     @Override
