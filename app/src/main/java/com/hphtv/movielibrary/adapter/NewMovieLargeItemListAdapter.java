@@ -34,7 +34,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleApater<PosterItemLarg
     @Override
     public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        MovieDataView movieDataView = mList.get(position);
+        MovieDataView movieDataView = mFilterMovieDataViewList.get(position);
         PosterItemLargeBinding binding = (PosterItemLargeBinding) holder.mBinding;
         Glide.with(mContext).load(movieDataView.poster)
                 .placeholder(R.mipmap.default_poster)
