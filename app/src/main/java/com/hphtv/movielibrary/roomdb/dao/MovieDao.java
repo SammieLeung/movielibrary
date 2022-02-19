@@ -95,6 +95,7 @@ public interface MovieDao {
     public MovieWrapper queryMovieWrapperByMovieId(String movie_id, String source);
 
 
+    @Transaction
     @Query("SELECT * FROM "+TABLE.MOVIE+" WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path AND source=:source)")
     public MovieWrapper queryMovieWrapperByFilePath(String path, String source);
     /**

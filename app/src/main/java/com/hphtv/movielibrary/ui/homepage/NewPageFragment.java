@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
@@ -41,27 +42,15 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
 
-    public NewPageFragment(NewHomePageActivity activity) {
-        super(activity);
+    public NewPageFragment(IAutofitHeight autofitHeight,int postion) {
+        super(autofitHeight, postion);
     }
 
-    public static NewPageFragment newInstance(NewHomePageActivity activity, int positon) {
+    public static NewPageFragment newInstance(IAutofitHeight autofitHeight, int positon) {
         Bundle args = new Bundle();
-        args.putInt(NoScrollAutofitHeightViewPager.POSITION, positon);
-        NewPageFragment fragment = new NewPageFragment(activity);
+        NewPageFragment fragment = new NewPageFragment(autofitHeight,positon);
         fragment.setArguments(args);
         return fragment;
-    }
-
-
-    @Nullable
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        int pos = getArguments().getInt(NoScrollAutofitHeightViewPager.POSITION);
-        getViewPager().setViewPosition(view, pos);
-        return view;
     }
 
     @Override
@@ -101,51 +90,16 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvHistoryList.setLayoutManager(mLayoutManager);
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
-//        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
-//
-//            @Override
-//            public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
-//                mViewModel.playingVideo(data.path, data.filename, list -> {
-//                    updateRecentlyPlayed((List<UnrecognizedFileDataView>) list);
-////                notifyStopLoading();
-//                });
-//            }
-//
-//            @Override
-//            public void onItemFocus(View view, boolean hasFocus) {
-//                if (hasFocus) {
-//                    mBinding.scrollView.smoothScrollTo(0, 0);
-//                }
-//            }
-//        });
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
+        mHistoryListAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
+            @Override
+            public void onItemClick(View view, int postion, HistoryMovieDataView data) {
+                mViewModel.playingVideo(data.path, data.filename, list -> {
+
+                });
+            }
+        });
     }
-
-
-    /**
-     * 初始化分类列表
-     */
-//    private void initCategoryList() {
-//        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-//        mBinding.rvCategoryList.setLayoutManager(mLayoutManager);
-//        List<String> categoryList = Arrays.asList(getResources().getStringArray(R.array.category_title_array).clone());
-//        mCircleItemAdapter = new CircleItemAdapter(getContext(), categoryList);
-//        mCircleItemAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<String>() {
-//            @Override
-//            public void onItemClick(View view, int postion, String data) {
-//
-//            }
-//
-//            @Override
-//            public void onItemFocus(View view, boolean hasFocus) {
-//                if (hasFocus) {
-//                    mBinding.scrollView.smoothScrollTo(0, 200);
-//                }
-//            }
-//        });
-//        mBinding.rvCategoryList.setAdapter(mCircleItemAdapter);
-//    }
-
 
     /**
      * 初始化电影类型分类列表
@@ -155,23 +109,16 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvGenreList.setLayoutManager(mLayoutManager);
         mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
         mGenreTagAdapter = new GenreTagAdapter(getContext(), mGenreTagList);
-//        mGenreTagAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<String>() {
-//            @Override
-//            public void onItemClick(View view, int postion, String data) {
-//                if(postion==mGenreTagAdapter.getItemCount()-1){
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onItemFocus(View view, boolean hasFocus) {
-//                if (hasFocus) {
-//                    mBinding.scrollView.smoothScrollTo(0, 400);
-//                }
-//            }
-//        });
-
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
+        mGenreTagAdapter.setOnGenreListener(new GenreTagAdapter.GenreListener() {
+            @Override
+            public void addGenre() {
+
+            }
+        });
+        mGenreTagAdapter.setOnItemClickListener((view, postion, data) -> {
+
+        });
     }
 
     /**

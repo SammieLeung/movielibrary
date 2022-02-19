@@ -23,11 +23,14 @@ import java.util.List;
 public class NewHomePageTabAdapter extends FragmentStatePagerAdapter {
     private NewPageFragment mNewPageFragment;
     protected List<Fragment> mList=new ArrayList<>();
-    public NewHomePageTabAdapter(Context context, FragmentManager fm) {
+    public NewHomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
         super(fm);
-        mNewPageFragment=NewPageFragment.newInstance((NewHomePageActivity) context,0);
+//        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,0);
+//        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,1);
 
-        mList.add(mNewPageFragment);
+        mList.add(NewPageFragment.newInstance(autofitHeight,0));
+        mList.add(NewPageFragment.newInstance(autofitHeight,1));
+        mList.add(NewPageFragment.newInstance(autofitHeight,2));
 
     }
 

@@ -91,21 +91,21 @@
             <Button
                 android:id="@+id/btn_filter"
                 style="@style/homepage_circle_btn_style"
-                android:layout_toStartOf="@id/btn_search"
+                android:layout_toStartOf="@id/btn_pinyin_search"
                 android:layout_width="wrap_content"
                 android:drawableLeft="@drawable/icon_circle_filter"
                 android:text="@string/filter" />
 
             <Button
-                android:id="@+id/btn_search"
+                android:id="@+id/btn_pinyin_search"
                 style="@style/homepage_circle_btn_style"
                 android:layout_width="wrap_content"
-                android:layout_toStartOf="@id/btn_folder_manager"
+                android:layout_toStartOf="@id/btn_shortcutmanager"
                 android:drawableLeft="@drawable/icon_circle_search"
                 android:text="@string/search" />
 
             <Button
-                android:id="@+id/btn_folder_manager"
+                android:id="@+id/btn_shortcutmanager"
                 style="@style/homepage_circle_btn_style"
                 android:layout_width="wrap_content"
                 android:layout_alignParentEnd="true"

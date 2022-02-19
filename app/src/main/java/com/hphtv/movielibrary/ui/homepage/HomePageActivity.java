@@ -224,11 +224,11 @@ public class HomePageActivity extends AppBaseActivity<HomepageViewModel, Activit
             }
         });
         //本地搜索按钮
-        mBinding.btnSearch.setOnClickListener(v -> {
+        mBinding.btnPinyinSearch.setOnClickListener(v -> {
             Intent intent = new Intent(this, PinyinSearchActivity.class);
             startActivity(intent);
         });
-        mBinding.btnFolderManager.setOnClickListener(v->{
+        mBinding.btnShortcutmanager.setOnClickListener(v->{
             Intent intent = new Intent(this, ShortcutManagerActivity.class);
             startActivityForResult(intent);
         });

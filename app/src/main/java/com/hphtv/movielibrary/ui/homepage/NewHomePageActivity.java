@@ -1,22 +1,26 @@
 package com.hphtv.movielibrary.ui.homepage;
 
 import android.animation.ObjectAnimator;
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
 
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 
+import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.LayoutHomepageTabBinding;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
+import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
@@ -27,27 +31,43 @@ import com.station.kit.util.LogUtil;
  */
 public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight {
     private NewHomePageTabAdapter mNewHomePageTabAdapter;
-    private Handler mHandler = new Handler(Looper.getMainLooper());
-    private ObjectAnimator mPageDownObjectAnimator;
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
+        mBinding.viewpager.setOffscreenPageLimit(2);
         mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
+        mBinding.btnPinyinSearch.setOnClickListener(this::startPinyinSearchPage);
+        mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
         initTab();
         autoScrollListener(mBinding.nsv);
     }
 
     private void initTab() {
-//        mBinding.tablayout.getTabAt(0).setCustomView()
         mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
+        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
+        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_movie)));
+
         for (int i = 0; i < mBinding.tablayout.getTabCount(); i++) {
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mBinding.tablayout.getTabAt(i).view.getLayoutParams();//
             params.rightMargin = DensityUtil.dip2px(this, 32);
             mBinding.tablayout.getTabAt(i).view.setLayoutParams(params);
         }
+        mBinding.tablayout.getViewTreeObserver()
+                .addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
+                    //实现Tablayout的焦点从其他非子布局到其子布局时，焦点始终在已选的TabView上。
+                    if (oldFocus != null && !(oldFocus instanceof TabLayout.TabView) && newFocus != null && newFocus instanceof TabLayout.TabView) {
+                        int pos = mBinding.tablayout.getSelectedTabPosition();
+                        mBinding.tablayout.getTabAt(pos).view.requestFocus();
+                    }
+                    //实现焦点从一个TabView移动到其他TabView时，选中其他TabView。
+                    if (oldFocus != null && oldFocus instanceof TabLayout.TabView && newFocus != null && newFocus instanceof TabLayout.TabView) {
+                        TabLayout.TabView view= (TabLayout.TabView) newFocus;
+                        view.getTab().select();
+                    }
+                });
     }
 
     /**
@@ -56,8 +76,23 @@ public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, A
      * @return
      */
     @Override
-    public NoScrollAutofitHeightViewPager getViewPager() {
+    public NoScrollAutofitHeightViewPager getAutofitHeightViewPager() {
         return mBinding.viewpager;
+    }
+
+    /**
+     * 打开搜索页
+     *
+     * @param view
+     */
+    private void startPinyinSearchPage(View view) {
+        Intent intent = new Intent(this, PinyinSearchActivity.class);
+        startActivityForResult(intent);
+    }
+
+    private void startShortcutManager(View v) {
+        Intent intent = new Intent(this, ShortcutManagerActivity.class);
+        startActivityForResult(intent);
     }
 
     private View buildTabView(String text) {
@@ -76,7 +111,6 @@ public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, A
         int heightPixel = outMetrics.heightPixels;
         view.getViewTreeObserver()
                 .addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
-                    LogUtil.v("focus change");
                     if (newFocus != null) {
                         int[] ints = new int[2];
                         newFocus.getLocationInWindow(ints);
@@ -102,6 +136,6 @@ public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, A
     private void pageScroll(int offset) {
         LogUtil.v("pageScroll");
 
-        mBinding.nsv.smoothScrollBy(0,offset);
+        mBinding.nsv.smoothScrollBy(0, offset);
     }
 }

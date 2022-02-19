@@ -14,15 +14,15 @@
            >
 
             <Button
-                android:id="@+id/btn_search"
+                android:id="@+id/btn_pinyin_search"
                 style="@style/homepage_circle_btn_style"
                 android:layout_width="wrap_content"
-                android:layout_toStartOf="@id/btn_folder_manager"
+                android:layout_toStartOf="@id/btn_shortcutmanager"
                 android:drawableLeft="@drawable/icon_circle_search"
                 android:text="@string/search" />
 
             <Button
-                android:id="@+id/btn_folder_manager"
+                android:id="@+id/btn_shortcutmanager"
                 style="@style/homepage_circle_btn_style"
                 android:layout_width="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -44,7 +44,7 @@
                 android:id="@+id/tablayout"
                 android:layout_width="wrap_content"
                 android:layout_height="56dp"
-                android:layout_below="@id/btn_search"
+                android:layout_below="@id/btn_pinyin_search"
                 app:tabIndicatorHeight="0dp"
                 app:tabBackground="@drawable/new_common_tab_bg"
                 android:layout_marginLeft="72dp"

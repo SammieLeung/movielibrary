@@ -32,6 +32,7 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
                 .placeholder(R.mipmap.default_poster)
                 .into(binding.rvPoster);
         binding.setTitle(movieDataView.title);
+        binding.setRating(movieDataView.ratings);
     }
 }
 
