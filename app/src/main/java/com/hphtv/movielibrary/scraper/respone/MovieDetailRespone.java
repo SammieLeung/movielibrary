@@ -69,7 +69,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movie.plot = plot;
             movie.year = year;
             movie.language = language;
-            movie.type = Constants.SearchType.valueOf(type);//todo 换回type
+            movie.type = Constants.SearchType.valueOf(type);
             movie.source = api;
 
             List<Genre> genreList = new ArrayList<>();
@@ -137,18 +137,10 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
                     dbSeason.episodeCount = season.episode_count;
                     dbSeason.seasonNumber = season.season_number;
                     dbSeason.airDate = season.air_date;
-                    switch (api) {
-                        case TMDB_EN:
-                            dbSeason.nameEN = season.name;
-                            dbSeason.posterEN = season.poster_path;
-                            dbSeason.plotEN = season.overview;
-                            break;
-                        default:
-                            dbSeason.name = season.name;
-                            dbSeason.poster = season.poster_path;
-                            dbSeason.plot = season.overview;
-                            break;
-                    }
+                    dbSeason.name = season.name;
+                    dbSeason.poster = season.poster_path;
+                    dbSeason.plot = season.overview;
+                    dbSeason.source=api;
                     seasonList.add(dbSeason);
                 }
             }

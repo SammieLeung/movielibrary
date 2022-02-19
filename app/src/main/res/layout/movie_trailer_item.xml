@@ -60,7 +60,7 @@
                 android:layout_height="20dp"
                 android:ellipsize="end"
                 android:lines="1"
-                android:textColor="@color/tx_fff"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
 
 
@@ -70,7 +70,7 @@
                 android:layout_height="20dip"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
-                android:textColor="@color/tx_fff"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
         </RelativeLayout>
 

@@ -1,20 +1,15 @@
 package com.hphtv.movielibrary.ui.homepage;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewVideoFileItemListAdapter;
-import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
-import com.hphtv.movielibrary.adapter.UnrecognizedFileListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
@@ -22,9 +17,6 @@ import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * author: Sam Leung

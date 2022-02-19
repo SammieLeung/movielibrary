@@ -8,15 +8,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutMovieBinding;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
-import com.hphtv.movielibrary.effect.SpacingItemDecoration;
-import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
-import com.hphtv.movielibrary.adapter.MovieAdapter;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.BaseFragment;
+import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;

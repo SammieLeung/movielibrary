@@ -32,7 +32,7 @@
                 android:layout_toEndOf="@id/img_device_setting"
                 android:gravity="center"
                 android:text="@string/title_file_manager"
-                android:textColor="@color/tx_fff"
+                android:textColor="@color/white"
                 android:textSize="28sp"
                 />
         </RelativeLayout>
@@ -63,7 +63,7 @@
                 android:layout_toEndOf="@id/img_change_password"
                 android:gravity="center"
                 android:text="@string/title_change_password"
-                android:textColor="@color/tx_fff"
+                android:textColor="@color/white"
                 android:textSize="28sp"
                 />
         </RelativeLayout>
@@ -85,7 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:textColor="@color/tx_fff"
+                android:textColor="@color/white"
                 android:text="@string/tx_version"
                 android:textSize="28sp"
                 android:src="@drawable/ic_private_folder" />
@@ -97,7 +97,7 @@
                 android:layout_toEndOf="@id/tv_label"
                 android:gravity="center"
                 android:textSize="20sp"
-                android:textColor="@color/tx_fff"
+                android:textColor="@color/white"
 
                 />
         </RelativeLayout>

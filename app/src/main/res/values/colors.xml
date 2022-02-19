@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="cddd">#dddddd</color>
-    <color name="default_foucs_withoutpress">#ff6cba66</color>
     <color name="default_focus">#ffff9f00</color>
-    <color name="cffffff">#ffffffff</color>
+    <color name="white">#ffffffff</color>
     <color name="c002131">#ff002131</color>
     <color name="white_light">#ffeeeeee</color>
     <color name="c_ccc">#ffcccccc</color>
@@ -16,7 +15,6 @@
     <color name="c2e3032">#ff2e3032</color>
     <color name="episode_btn">#aa000000</color>
     <color name="title_blue">#5793bb</color>
-    <color name="detail_bg">#7F000000</color>
     <color name="c27bbfa">#27bbfa</color>
     <color name="c66d1fa">#66D1FA</color>
     <color name="colormask">#21000000</color>
@@ -24,7 +22,6 @@
     <color name="divider_line">#4cffffff</color>
     <color name="c808080">#ff808080</color>
     <color name="mask">#aa000000</color>
-    <color name="color_primary">#004350</color>
     <color name="et_bg_box">#6628bbfb</color>
     <color name="usb_bg">#14edf9ff</color>
     <color name="c3028bbfb">#4d28bbfb</color>
@@ -57,22 +54,8 @@
     <color name="tx_E0E0E0">#E0E0E0</color>
     <color name="tx_CCCCCC">#cccccc</color>
     <color name="tx_999999">#999999</color>
-    <color name="tx_fff">#fff</color>
     <color name="tx_ff6633">#ff6633</color>
-    <!--白色-->
-    <color name="c0fffffff">#00ffffff</color>
-    <color name="c10ffffff">#1affffff</color>
-    <color name="c15ffffff">#26ffffff</color>
-    <color name="c20ffffff">#33ffffff</color>
-    <color name="c30ffffff">#4dffffff</color>
-    <color name="c40ffffff">#66ffffff</color>
-    <color name="c50ffffff">#80ffffff</color>
-    <color name="c60ffffff">#99ffffff</color>
-    <color name="c70ffffff">#b3ffffff</color>
-    <color name="c75ffffff">#bfffffff</color>
 
-    <color name="c80ffffff">#ccffffff</color>
-    <color name="c90ffffff">#e6ffffff</color>
 
     <color name="cdfdfdf">#dfdfdf</color>
     <!--字体颜色2-->

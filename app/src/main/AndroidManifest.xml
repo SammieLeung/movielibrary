@@ -29,7 +29,7 @@
 
         <activity-alias
             android:name=".activity.HomePageActivity"
-            android:targetActivity=".ui.homepage.HomePageActivity">
+            android:targetActivity=".ui.homepage.NewHomePageActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -45,11 +45,9 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".ui.homepage.NewHomePageActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+        <activity android:name=".ui.homepage.NewHomePageActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden">
         </activity>
         <activity android:name=".ui.shortcutmanager.ShortcutManagerActivity"></activity>
 

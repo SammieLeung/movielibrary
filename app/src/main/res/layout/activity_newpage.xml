@@ -37,6 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="153dp"/>
             <TextView
+                android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="47dp"
                 style="@style/homepage_head_title"
                 android:id="@+id/tv_recently_added"
@@ -44,12 +45,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView
+                android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_recently_added"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/recently_added_container_h"/>
 
             <TextView
+                android:visibility="@{favorite?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_title_margin_top"
                 style="@style/homepage_head_title"
                 android:id="@+id/tv_favorite"
@@ -57,12 +60,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView
+                android:visibility="@{favorite?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_favorite"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/recently_added_container_h"/>
 
             <TextView
+                android:visibility="@{recommand?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_title_margin_top"
                 style="@style/homepage_head_title"
                 android:id="@+id/tv_recommand"
@@ -70,6 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <androidx.recyclerview.widget.RecyclerView
+                android:visibility="@{recommand?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_recommand"
                 android:layout_width="match_parent"
@@ -78,6 +84,15 @@
 
 
     <data>
-
+        <import type="android.view.View"/>
+        <variable
+            name="recentAdd"
+            type="boolean" />
+        <variable
+            name="favorite"
+            type="boolean" />
+        <variable
+            name="recommand"
+            type="boolean" />
     </data>
 </layout>

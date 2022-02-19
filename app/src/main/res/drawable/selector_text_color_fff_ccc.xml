@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!-- selector_category_bg.xml 置于res/drawable 目录下  -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/tx_fff" android:state_selected="true" />
+    <item android:color="@color/white" android:state_selected="true" />
     <item android:color="@color/tx_CCCCCC" />
 </selector>

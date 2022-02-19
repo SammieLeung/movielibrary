@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "26e10b3f8ddffde7da3489cb9784fb73",
+    "identityHash": "d6b392bf3e97f7dde22edffb2f5aece8",
     "entities": [
       {
         "tableName": "actor",
@@ -883,7 +883,7 @@
       },
       {
         "tableName": "season",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`season_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` INTEGER NOT NULL, `season_number` INTEGER NOT NULL, `episode_count` INTEGER NOT NULL, `name` TEXT, `name_en` TEXT, `plot` TEXT, `plot_en` TEXT, `poster` TEXT, `poster_en` TEXT, `air_date` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`season_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` INTEGER NOT NULL, `season_number` INTEGER NOT NULL, `episode_count` INTEGER NOT NULL, `name` TEXT, `plot` TEXT, `poster` TEXT, `air_date` TEXT, `source` TEXT)",
         "fields": [
           {
             "fieldPath": "seasonId",
@@ -916,20 +916,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "nameEN",
-            "columnName": "name_en",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "plot",
             "columnName": "plot",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "plotEN",
-            "columnName": "plot_en",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -940,14 +928,14 @@
             "notNull": false
           },
           {
-            "fieldPath": "posterEN",
-            "columnName": "poster_en",
+            "fieldPath": "airDate",
+            "columnName": "air_date",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "airDate",
-            "columnName": "air_date",
+            "fieldPath": "source",
+            "columnName": "source",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -958,7 +946,18 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_season_movie_id_season_number_source",
+            "unique": true,
+            "columnNames": [
+              "movie_id",
+              "season_number",
+              "source"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_season_movie_id_season_number_source` ON `${TABLE_NAME}` (`movie_id`, `season_number`, `source`)"
+          }
+        ],
         "foreignKeys": []
       }
     ],
@@ -973,12 +972,12 @@
       },
       {
         "viewName": "history_movie_dataview",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,v.poster,v.source,v.title,st.img_url as stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS v ON u.path=v.file_uri LEFT OUTER JOIN stagephoto AS st ON st.movie_id=v.id WHERE u.last_playtime!=0 GROUP BY u.path,v.source ORDER BY u.last_playtime DESC;"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,m.poster,m.source,m.title,st.img_url as stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS m ON u.path=m.file_uri LEFT OUTER JOIN stagephoto AS st ON st.movie_id=m.id WHERE u.last_playtime!=0 GROUP BY u.path,m.source ORDER BY u.last_playtime DESC;"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '26e10b3f8ddffde7da3489cb9784fb73')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6b392bf3e97f7dde22edffb2f5aece8')"
     ]
   }
 }

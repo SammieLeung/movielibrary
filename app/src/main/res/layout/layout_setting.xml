@@ -20,7 +20,7 @@
             android:layout_alignParentBottom="true"
             android:gravity="center"
             android:text="@string/title_file_manager"
-            android:textColor="@color/tx_fff"
+            android:textColor="@color/white"
             android:textSize="22sp" />
 
         <ImageButton
@@ -126,7 +126,7 @@
                         android:ellipsize="marquee"
                         android:layout_marginBottom="26dp"
                         android:singleLine="true"
-                        android:textColor="@color/tx_fff"
+                        android:textColor="@color/white"
                         android:textSize="16sp" />
                 </RelativeLayout>
 
@@ -147,7 +147,7 @@
                         android:layout_marginBottom="26dp"
                         android:ellipsize="marquee"
                         android:singleLine="true"
-                        android:textColor="@color/tx_fff"
+                        android:textColor="@color/white"
                         android:textSize="14sp" />
                 </RelativeLayout>
 

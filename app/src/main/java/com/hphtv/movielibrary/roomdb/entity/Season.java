@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.roomdb.entity;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
@@ -12,7 +13,7 @@ import java.io.Serializable;
  * author: Sam Leung
  * date:  2022/1/13
  */
-@Entity(tableName = TABLE.SEASON)
+@Entity(tableName = TABLE.SEASON,indices = @Index(value = {"movie_id","season_number","source"},unique = true))
 public class Season implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
@@ -25,16 +26,11 @@ public class Season implements Serializable {
     @ColumnInfo(name = "episode_count")
     public int episodeCount;
     public String name;
-    @ColumnInfo(name = "name_en")
-    public String nameEN;
     public String plot;
-    @ColumnInfo(name = "plot_en")
-    public String plotEN;
     public String poster;
-    @ColumnInfo(name = "poster_en")
-    public String posterEN;
     @ColumnInfo(name = "air_date")
     public String airDate;
+    public String source;
 
 
 }

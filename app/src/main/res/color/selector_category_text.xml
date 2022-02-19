@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>  
 <!-- selector_category_text.xml 置于res/color 目录下  -->  
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_focused="true" android:color="@color/cffffff"/>
-    <item android:state_checked="true" android:color="@color/cffffff"/>
-    <item android:state_hovered="true" android:color="@color/cffffff"/>
+    <item android:state_focused="true" android:color="@color/white"/>
+    <item android:state_checked="true" android:color="@color/white"/>
+    <item android:state_hovered="true" android:color="@color/white"/>
     <item android:color="@color/c929292"/>
 </selector>  
