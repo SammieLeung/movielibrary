@@ -98,7 +98,7 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
         if (result.getResultCode() == RESULT_OK) {
             final Uri uri = result.getData().getData();
             mViewModel.addShortcut(uri, mCallback);
-            setResult(Activity.RESULT_OK);
+            setResult(RESULT_OK);
         }
     }
 

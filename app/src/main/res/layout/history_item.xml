@@ -6,6 +6,9 @@
         <variable
             name="title"
             type="String" />
+        <variable
+            name="ratings"
+            type="String" />
     </data>
 
     <LinearLayout
@@ -29,12 +32,23 @@
                 app:border_width="4dp"
                 app:border_color="@android:color/transparent"
                 app:corner_radius="@dimen/poster_item_1_radius"/>
+            <TextView
+                android:text="@{ratings}"
+                android:textSize="18sp"
+                android:layout_alignBottom="@id/iv_img"
+                android:layout_marginLeft="18dp"
+                android:layout_marginBottom="13dp"
+                android:textColor="#FFE56B45"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
             <View
-                android:duplicateParentState="true"
-                android:background="@drawable/shadowline"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/history_h"/>
+                android:layout_height="@dimen/history_h"
+                android:background="@drawable/shadowline"
+                android:duplicateParentState="true" />
+
+
 
             <TextView
                 android:id="@id/tv_title"

@@ -1,12 +1,14 @@
 package com.hphtv.movielibrary.ui.homepage;
 
 import android.app.Application;
-import android.text.TextUtils;
+import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -15,6 +17,8 @@ import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -78,9 +82,18 @@ public class NewpageViewModel extends BaseAndroidViewModel {
                     }
                 });
     }
+    
+    public void startDetailActivity(AppBaseActivity appBaseActivity, MovieDataView movieDataView){
+        Intent intent=new Intent(appBaseActivity, MovieDetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putLong(Constants.Extras.MOVIE_ID, movieDataView.id);
+        bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+        intent.putExtras(bundle);
+        appBaseActivity.startActivityForResult(intent);
+    }
 
     public void prepareGenreList(Callback callback) {
-        Observable.just(4)
+        Observable.just(3)
                 .subscribeOn(Schedulers.io())
                 .map(defalut_count -> {
                     //优先顺序 自定义>已有电影>固定排序

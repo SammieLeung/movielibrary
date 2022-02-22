@@ -87,4 +87,7 @@
     <string name="soap">Soap</string>
     <string name="talk">Talk</string>
     <string name="war_and_politics">War &amp; Politics</string>
+
+    <string name="genre_add">Custom</string>
+    <string name="genre_all">All</string>
 </resources>

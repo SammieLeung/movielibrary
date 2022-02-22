@@ -1,15 +1,15 @@
 package com.hphtv.movielibrary.ui.homepage;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResult;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
@@ -17,7 +17,7 @@ import com.hphtv.movielibrary.databinding.ActivityNewpageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.station.kit.util.DensityUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,8 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel, ActivityNewpageBinding> {
+public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel, ActivityNewpageBinding> implements IActivityResult {
+    public static final String TAG = NewPageFragment.class.getSimpleName();
     private HistoryListAdapter mHistoryListAdapter;
     private GenreTagAdapter mGenreTagAdapter;
     private NewMovieItemListAdapter mRecentlyAddListAdapter;
@@ -42,13 +43,13 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
 
-    public NewPageFragment(IAutofitHeight autofitHeight,int postion) {
+    public NewPageFragment(IAutofitHeight autofitHeight, int postion) {
         super(autofitHeight, postion);
     }
 
     public static NewPageFragment newInstance(IAutofitHeight autofitHeight, int positon) {
         Bundle args = new Bundle();
-        NewPageFragment fragment = new NewPageFragment(autofitHeight,positon);
+        NewPageFragment fragment = new NewPageFragment(autofitHeight, positon);
         fragment.setArguments(args);
         return fragment;
     }
@@ -57,21 +58,19 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews();
+        prepareAll();
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden)
+            Log.e(TAG, "onHiddenChanged: " + this.toString());
     }
 
     @Override
     protected boolean createViewModel() {
         return false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        prepareHistoryData();
-        prepareMovieGenreTagData();
-        prepareRecentlyAddedMovie();
-        prepareFavorite();
-        prepareRecommand();
     }
 
     private void initViews() {
@@ -80,6 +79,14 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         initRecentlyAddedList();
         initFavoriteList();
         initRecommandList();
+    }
+
+    public void prepareAll() {
+        prepareHistoryData();
+        prepareMovieGenreTagData();
+        prepareRecentlyAddedMovie();
+        prepareFavorite();
+        prepareRecommand();
     }
 
     /**
@@ -91,14 +98,10 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
-        mHistoryListAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
-            @Override
-            public void onItemClick(View view, int postion, HistoryMovieDataView data) {
-                mViewModel.playingVideo(data.path, data.filename, list -> {
-
-                });
-            }
-        });
+        mHistoryListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.playingVideo(data.path, data.filename, list -> {
+            mHistoryListAdapter.addAll(list);
+            mHistoryListAdapter.notifyDataSetChanged();
+        }));
     }
 
     /**
@@ -115,6 +118,11 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
             public void addGenre() {
 
             }
+
+            @Override
+            public void browseAll() {
+
+            }
         });
         mGenreTagAdapter.setOnItemClickListener((view, postion, data) -> {
 
@@ -129,22 +137,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
         mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecentlyAddListAdapter = new NewMovieItemListAdapter(getContext(), mRecentlyAddedList);
-//        mRecentlyAddListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
-//
-//            @Override
-//            public void onItemClick(View view, int postion, MovieDataView data) {
-//
-//            }
-//
-//            @Override
-//            public void onItemFocus(View view, boolean hasFocus) {
-//                if (hasFocus) {
-//                    mBinding.scrollView.smoothScrollTo(0, 600);
-//                }
-//            }
-//        });
+        mRecentlyAddListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data));
         mBinding.rvRecentlyAdded.setAdapter(mRecentlyAddListAdapter);
-
     }
 
     /**
@@ -156,6 +150,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mFavoriteListAdapter = new NewMovieItemListAdapter(getContext(), mFavoriteList);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
+        mFavoriteListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data));
     }
 
     private void initRecommandList() {
@@ -164,6 +159,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecommandListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
         mBinding.rvRecommand.setAdapter(mRecommandListAdapter);
+        mRecommandListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data));
     }
 
 
@@ -200,7 +196,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         });
     }
 
-    private void prepareFavorite() {
+    public void prepareFavorite() {
         mViewModel.prepareFavorite(list -> {
             if (list.size() > 0) {
                 mFavoriteListAdapter.addAll(list);
@@ -222,4 +218,9 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         });
     }
 
+    @Override
+    public void onActivityResult(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK)
+            prepareAll();
+    }
 }

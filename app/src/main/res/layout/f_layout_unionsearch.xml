@@ -74,8 +74,7 @@
                     android:layout_height="match_parent"
                     android:layout_below="@id/et_box_name"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="21dp"
-                     />
+                    android:layout_marginTop="21dp" />
 
             </RelativeLayout>
             <ImageView

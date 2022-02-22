@@ -11,8 +11,10 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
+import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
@@ -47,8 +49,8 @@ public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, A
 
     private void initTab() {
         mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
-        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
-        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_movie)));
+//        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
+//        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
 
         for (int i = 0; i < mBinding.tablayout.getTabCount(); i++) {
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mBinding.tablayout.getTabAt(i).view.getLayoutParams();//
@@ -64,14 +66,24 @@ public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, A
                     }
                     //实现焦点从一个TabView移动到其他TabView时，选中其他TabView。
                     if (oldFocus != null && oldFocus instanceof TabLayout.TabView && newFocus != null && newFocus instanceof TabLayout.TabView) {
-                        TabLayout.TabView view= (TabLayout.TabView) newFocus;
+                        TabLayout.TabView view = (TabLayout.TabView) newFocus;
                         view.getTab().select();
                     }
                 });
     }
 
+    @Override
+    protected void onActivityResultCallback(ActivityResult result) {
+        for(Fragment fragment:mNewHomePageTabAdapter.mList){
+            if(fragment instanceof IActivityResult){
+                IActivityResult activityResult= (IActivityResult) fragment;
+                activityResult.onActivityResult(result);
+            }
+        }
+    }
+
     /**
-     * Viewpager+Scrollview自适应
+     * 获取NoScrollAutofitHeightViewPager
      *
      * @return
      */
@@ -90,6 +102,11 @@ public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, A
         startActivityForResult(intent);
     }
 
+    /**
+     * 打开设备管理页
+     *
+     * @param v
+     */
     private void startShortcutManager(View v) {
         Intent intent = new Intent(this, ShortcutManagerActivity.class);
         startActivityForResult(intent);

@@ -21,7 +21,6 @@ import java.util.List;
  * date:  2022/1/14
  */
 public class NewHomePageTabAdapter extends FragmentStatePagerAdapter {
-    private NewPageFragment mNewPageFragment;
     protected List<Fragment> mList=new ArrayList<>();
     public NewHomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
         super(fm);
@@ -29,8 +28,8 @@ public class NewHomePageTabAdapter extends FragmentStatePagerAdapter {
 //        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,1);
 
         mList.add(NewPageFragment.newInstance(autofitHeight,0));
-        mList.add(NewPageFragment.newInstance(autofitHeight,1));
-        mList.add(NewPageFragment.newInstance(autofitHeight,2));
+//        mList.add(NewPageFragment.newInstance(autofitHeight,1));
+//        mList.add(NewPageFragment.newInstance(autofitHeight,2));
 
     }
 

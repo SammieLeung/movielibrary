@@ -13,6 +13,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -30,6 +31,7 @@ import com.station.kit.view.mvvm.activity.BaseInflateActivity;
  * @date 19-3-26
  */
 public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseInflateActivity<VM, VDB> {
+
     private static Handler mHanlder=new Handler(Looper.getMainLooper());
     public final String TAG = this.getClass().getSimpleName();
     LoadingDialogFragment mLoadingDialogFragment;
@@ -91,7 +93,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
             mLoadingDialogFragment = null;
         }
     }
-
 
     @Override
     public void onBackPressed() {

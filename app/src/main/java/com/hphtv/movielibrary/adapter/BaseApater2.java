@@ -37,7 +37,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        VDB binding = ViewDataBindingHelper.inflateVDB(mContext,this.getClass());
+        VDB binding = ViewDataBindingHelper.inflateVDB(mContext, this.getClass());
         VH viewHolder = null;
         try {
             Type superclass = getClass().getGenericSuperclass();
@@ -106,13 +106,13 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         notifyItemInserted(position); // Attention!
     }
 
-    public void add(T data){
+    public void add(T data) {
         mList.add(data);
-        notifyItemInserted(mList.size()-1);
+        notifyItemInserted(mList.size() - 1);
     }
 
 
-    private OnRecyclerViewItemActionListener<T> mOnItemClickListener = null;
+    protected OnRecyclerViewItemActionListener<T> mOnItemClickListener = null;
 
     public void setOnItemClickListener(OnRecyclerViewItemActionListener<T> listener) {
         this.mOnItemClickListener = listener;
@@ -122,7 +122,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         void onItemClick(View view, int postion, T data);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         public ViewDataBinding mBinding;
 
         public ViewHolder(ViewDataBinding binding) {

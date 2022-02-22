@@ -3,18 +3,13 @@ package com.hphtv.movielibrary.ui.homepage;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
-import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
-import com.station.kit.util.SharePreferencesTools;
 
 import org.jetbrains.annotations.NotNull;
 

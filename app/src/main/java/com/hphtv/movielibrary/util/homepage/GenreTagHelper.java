@@ -20,21 +20,23 @@ import java.util.List;
 public class GenreTagHelper {
     public static GenreTagHelper sGenreTagHelper;
 
-    public static GenreTagHelper getInstance(){
-        if(sGenreTagHelper==null){
-            synchronized (GenreTagHelper.class){
-                if(sGenreTagHelper==null)
-                    sGenreTagHelper=new GenreTagHelper();
+    public static GenreTagHelper getInstance() {
+        if (sGenreTagHelper == null) {
+            synchronized (GenreTagHelper.class) {
+                if (sGenreTagHelper == null)
+                    sGenreTagHelper = new GenreTagHelper();
             }
         }
         return sGenreTagHelper;
     }
 
     @BindingAdapter("bindingBackground")
-    public static void bindingBackground(ImageView v,String tag){
-        if(!TextUtils.isEmpty(tag)) {
+    public static void bindingBackground(ImageView v, String tag) {
+        if (!TextUtils.isEmpty(tag)) {
             if (tag.equals(v.getContext().getResources().getString(R.string.genre_add))) {
                 Glide.with(v.getContext()).load(R.drawable.bg_add).into(v);
+            } else if (tag.equals(v.getContext().getResources().getString(R.string.genre_all))) {
+                Glide.with(v.getContext()).load(R.drawable.bg_documentary).into(v);
             } else {
                 String[] tagArr = v.getContext().getResources().getStringArray(R.array.genre_tags);
                 TypedArray ta = v.getContext().getResources().obtainTypedArray(R.array.genre_bg);

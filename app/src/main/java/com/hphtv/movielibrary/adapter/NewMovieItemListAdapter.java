@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -34,6 +35,7 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
         binding.setTitle(movieDataView.title);
         binding.setRating(movieDataView.ratings);
     }
+
 }
 
 

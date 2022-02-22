@@ -29,6 +29,7 @@
     <string name="talk">脱口秀</string>
     <string name="war_and_politics">War &amp; Politics</string>
 
-
+    <string name="genre_add">自定义</string>
+    <string name="genre_all">全部</string>
 
 </resources>
