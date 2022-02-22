@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d6b392bf3e97f7dde22edffb2f5aece8",
+    "identityHash": "ccd307f6113115b2d7fce8803afd690a",
     "entities": [
       {
         "tableName": "actor",
@@ -972,12 +972,12 @@
       },
       {
         "viewName": "history_movie_dataview",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,m.poster,m.source,m.title,st.img_url as stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS m ON u.path=m.file_uri LEFT OUTER JOIN stagephoto AS st ON st.movie_id=m.id WHERE u.last_playtime!=0 GROUP BY u.path,m.source ORDER BY u.last_playtime DESC;"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,m.poster,m.source,m.title,m.ratings,st.img_url as stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS m ON u.path=m.file_uri LEFT OUTER JOIN stagephoto AS st ON st.movie_id=m.id WHERE u.last_playtime!=0 GROUP BY u.path,m.source ORDER BY u.last_playtime DESC"
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6b392bf3e97f7dde22edffb2f5aece8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ccd307f6113115b2d7fce8803afd690a')"
     ]
   }
 }

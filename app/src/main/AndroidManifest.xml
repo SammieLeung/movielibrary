@@ -51,7 +51,7 @@
         </activity>
         <activity android:name=".ui.shortcutmanager.ShortcutManagerActivity"></activity>
 
-
+        <activity android:name=".ui.filterpage.FilterPageAcitvity"></activity>
         <service android:name=".service.MovieScanService"></service>
 
         <service android:name=".service.DeviceMonitorService"></service>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="empty_type"
+            type="Integer" />
+    </data>
+
+    <RelativeLayout
+        android:background="@drawable/new_main_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btn_filter"
+            style="@style/homepage_circle_btn_style"
+            android:layout_width="wrap_content"
+            android:layout_toStartOf="@id/btn_home"
+            android:drawableLeft="@drawable/icon_circle_filter"
+            android:text="@string/filter" />
+
+        <Button
+            android:id="@+id/btn_home"
+            style="@style/homepage_circle_btn_style"
+            android:layout_width="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="72dp"
+            android:drawableLeft="@drawable/icon_circle_home"
+            android:text="@string/homepage" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/title_style"
+            android:layout_marginLeft="@dimen/shortcut_container_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter" />
+        <TextView
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="@{empty_type==1?View.VISIBLE:View.GONE}"
+            android:id="@+id/tv_nomovie"
+            android:layout_centerInParent="true"
+            android:text="@string/filterpage_no_movie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="@{empty_type==2?View.VISIBLE:View.GONE}"
+            android:id="@+id/tv_nomatched"
+            android:layout_centerInParent="true"
+            android:text="@string/filterpage_no_result_matched"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tv_title"
+            android:visibility="@{empty_type==0?View.VISIBLE:View.GONE}" />
+    </RelativeLayout>
+</layout>

@@ -242,15 +242,15 @@
                 />
 
             <TextView
-                android:visibility="@{isEmpty?View.VISIBLE:View.GONE}"
                 android:id="@+id/tv_empty_tips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="@string/local_search_empty_tips"
                 android:textColor="@color/white"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                android:textSize="24sp" />
+                android:visibility="@{isEmpty?View.VISIBLE:View.GONE}" />
         </RelativeLayout>
 
     </RelativeLayout>

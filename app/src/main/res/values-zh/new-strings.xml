@@ -26,6 +26,8 @@
     <string name="filter_box_dlna_device">DLNA设备</string>
     <string name="filter_box_smb_device">SMB设备</string>
 
+    <string name="filterpage_no_result_matched">没有符合条件的影片</string>
+    <string name="filterpage_no_movie">影库中还未添加电影</string>
     <!--    索引管理-->
     <string name="add_shortcut">添加文件夹</string>
     <string name="shortcut_manager">设备管理</string>

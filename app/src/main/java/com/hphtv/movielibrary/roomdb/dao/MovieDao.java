@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.roomdb.dao;
 
+
 import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -10,7 +11,6 @@ import androidx.room.Transaction;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 
@@ -185,7 +185,6 @@ public interface MovieDao {
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);
 
-
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
     public List<MovieDataView> queryFavoriteMovieDataView(String source);
 
@@ -200,3 +199,4 @@ public interface MovieDao {
     @Query("SELECT year FROM " + VIEW.MOVIE_DATAVIEW + " GROUP BY year ORDER BY year DESC")
     public List<String> qureyYearsGroup();
 }
+

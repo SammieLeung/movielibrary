@@ -68,6 +68,9 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
                 mAddGenreListener.addGenre();
             }
         } else if (getItemViewType(postion) == TYPE_HOME) {
+            if (mAddGenreListener != null) {
+                mAddGenreListener.browseAll();
+            }
         }
     }
 

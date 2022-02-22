@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.homepage;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,11 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
-import com.hphtv.movielibrary.databinding.ActivityNewpageBinding;
+import com.hphtv.movielibrary.databinding.FragmentHomepageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.filterpage.FilterPageAcitvity;
 import com.station.kit.util.DensityUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel, ActivityNewpageBinding> implements IActivityResult {
+public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel, FragmentHomepageBinding> implements IActivityResult {
     public static final String TAG = NewPageFragment.class.getSimpleName();
     private HistoryListAdapter mHistoryListAdapter;
     private GenreTagAdapter mGenreTagAdapter;
@@ -121,7 +123,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
 
             @Override
             public void browseAll() {
-
+                Intent intent=new Intent(getContext(), FilterPageAcitvity.class);
+                startActivity(intent);
             }
         });
         mGenreTagAdapter.setOnItemClickListener((view, postion, data) -> {

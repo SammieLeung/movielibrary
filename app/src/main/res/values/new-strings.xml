@@ -26,6 +26,8 @@
     <string name="filter_box_dlna_device">DLNA</string>
     <string name="filter_box_smb_device">SMB</string>
 
+    <string name="filterpage_no_result_matched">No results matching your filter criteria.</string>
+    <string name="filterpage_no_movie">No movies have been added to the library.</string>
     <!--    索引管理-->
     <string name="add_shortcut">Add</string>
     <string name="shortcut_manager">Device</string>
