@@ -124,6 +124,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
+        this.onNewIntent(getIntent());
     }
 
 
@@ -283,7 +284,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
         super.onResume();
-        this.onNewIntent(getIntent());
     }
 
     @Override
