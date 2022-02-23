@@ -202,7 +202,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 getResources().getDimensionPixelOffset(R.dimen.poster_item_large_w),
                 DensityUtil.dip2px(this, 21),
                 DensityUtil.dip2px(this, 35),
-                DensityUtil.dip2px(this, 15),
+                DensityUtil.dip2px(this, 30),
                 DensityUtil.dip2px(this, 30),
                 3));
         TabLayout.Tab tab1 = mBinding.tablayout.newTab();

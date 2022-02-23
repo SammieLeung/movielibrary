@@ -188,6 +188,9 @@ public interface MovieDao {
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id LIMIT :offset,:limit")
     public List<MovieDataView> queryAllMovieDataView(String source,int offset,int limit);
 
+    @Query("SELECT COUNT(*) FROM (SELECT id FROM "+ VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id)")
+    public int countAllMovieDataView(String source);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
     public List<MovieDataView> queryFavoriteMovieDataView(String source);
 

@@ -12,11 +12,12 @@ import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -24,18 +25,38 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2022/2/22
  */
 public class FilterPageViewModel extends BaseAndroidViewModel {
-    public static final int LIMIT=15;
-    private int mOffset=0;
+    public static final int LIMIT = 15;
+    private AtomicInteger mPage = new AtomicInteger();
+    private int mTotal = 0;
     private MovieDao mMovieDao;
+
     public FilterPageViewModel(@NonNull @NotNull Application application) {
         super(application);
-        mMovieDao= MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
+        mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
     }
 
-    public Observable<List<MovieDataView>> prepareMovieDataView(int offset){
-       return Observable.just(offset)
+    public Observable<List<MovieDataView>> reloadMoiveDataViews() {
+        return Observable.just("")
                 .map(_offset -> {
-                  return mMovieDao.queryAllMovieDataView(ScraperSourceTools.getSource(),_offset,LIMIT);
+                    mPage.set(0);
+                    mTotal = mMovieDao.countAllMovieDataView(ScraperSourceTools.getSource());
+                    return mMovieDao.queryAllMovieDataView(ScraperSourceTools.getSource(), mPage.get(), LIMIT);
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    public Observable<List<MovieDataView>> loadMoiveDataViews() {
+        return Observable.just("")
+                .map(_offset -> {
+                    if((mPage.get()+1)*LIMIT<mTotal) {
+                       int offset=mPage.incrementAndGet()*LIMIT;
+                        return mMovieDao.queryAllMovieDataView(ScraperSourceTools.getSource(), offset, LIMIT);
+                    }else{
+                        List<MovieDataView> emptyList=new ArrayList();
+                        return emptyList;
+                    }
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

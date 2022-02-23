@@ -83,6 +83,13 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         notifyDataSetChanged();
     }
 
+    public void appendAll(List data) {
+        int oldSize = mList.size();
+        mList.addAll(data);
+        int newSize = mList.size();
+        notifyItemRangeInserted(oldSize,newSize);
+    }
+
     public void clearAll() {
         mList.clear();
         notifyDataSetChanged();

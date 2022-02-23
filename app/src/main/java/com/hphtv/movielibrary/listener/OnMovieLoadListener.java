@@ -26,7 +26,7 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
 
     @Override
     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-        //* 测试这三个参数的作用
+        /* 测试这三个参数的作用
         if (newState == RecyclerView.SCROLL_STATE_IDLE) {
             Log.d("test", "SCROLL_STATE_IDLE,空闲");
         } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {

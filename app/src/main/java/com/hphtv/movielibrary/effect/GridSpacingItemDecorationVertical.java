@@ -44,6 +44,13 @@ public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecorati
             int tmpPos = pos % mSpanCount;
             int lastLeftColumn = 0;
             int lastRightColumn = 0;
+            /*计算实际间隔
+                sample:
+                指定边距35(最左和最右列距)
+                item固定宽度307
+                相邻item列距30
+                |35 264 8|22 264 21|9 264 35|
+            */
             for (int i = 0; i < mSpanCount; i++) {
                 if(mEdageSpacing!=-1) {
                     if (i == 0) {
@@ -61,36 +68,13 @@ public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecorati
                     }
                 }
             }
-            //设置第一行顶部间隙+第一行item
+            //首行
             if (mFirstRowSpacing != -1 && pos / mSpanCount == 0) {
                     outRect.set(lastLeftColumn, mFirstRowSpacing, lastRightColumn, mRowSpacing / 2);
             } else {
                 outRect.set(lastLeftColumn, mRowSpacing / 2, lastRightColumn, mRowSpacing / 2);
             }
-
-
-//            //设置第一行顶部间隙+第一行item
-//            if (mFirstRowSpacing != -1 && pos / mSpanCount == 0) {
-//                if (pos % mSpanCount == 0) {
-//                    outRect.set(mEdageSpacing, mFirstRowSpacing, mColumnSpacing / 2, mRowSpacing / 2);
-//                } else if (pos % mSpanCount == (mSpanCount - 1)) {
-//                    outRect.set(mColumnSpacing / 2, mFirstRowSpacing, mEdageSpacing, mRowSpacing / 2);
-//                }
-//                else {
-//                    outRect.set(mColumnSpacing / 2, mFirstRowSpacing, mColumnSpacing / 2, mRowSpacing / 2);
-//                }
-//            } else {
-//                if (pos % mSpanCount == 0) {
-//                    outRect.set(mEdageSpacing, mRowSpacing/2, mColumnSpacing / 2, mRowSpacing / 2);
-//                } else if (pos % mSpanCount == (mSpanCount - 1)) {
-//                    outRect.set(mColumnSpacing / 2, mRowSpacing / 2, mEdageSpacing , mRowSpacing / 2);
-//                }
-//                else {
-//                    outRect.set(mColumnSpacing / 2, mRowSpacing / 2, mColumnSpacing / 2,mRowSpacing / 2);
-//                }
-//            }
-
-
         }
     }
+
 }
