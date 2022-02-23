@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.Filter;
 import android.widget.Filterable;
 
@@ -40,6 +41,15 @@ public class NewMovieLargeItemListAdapter extends BaseScaleApater<PosterItemLarg
                 .placeholder(R.mipmap.default_poster)
                 .into(binding.rvPoster);
         binding.setTitle(movieDataView.title);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (mOnItemClickListener != null) {
+            int postion = (int) v.getTag();
+            //注意这里使用getTag方法获取数据
+            mOnItemClickListener.onItemClick(v, postion, mFilterMovieDataViewList.get(postion));
+        }
     }
 
     @Override
