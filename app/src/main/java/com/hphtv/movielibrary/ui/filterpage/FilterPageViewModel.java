@@ -8,6 +8,7 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +24,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2022/2/22
  */
 public class FilterPageViewModel extends BaseAndroidViewModel {
-    public static final int sLimit=15;
+    public static final int LIMIT=15;
     private int mOffset=0;
     private MovieDao mMovieDao;
     public FilterPageViewModel(@NonNull @NotNull Application application) {
@@ -33,11 +34,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
 
     public Observable<List<MovieDataView>> prepareMovieDataView(int offset){
        return Observable.just(offset)
-                .map(new Function<Integer, List<MovieDataView>>() {
-                    @Override
-                    public List<MovieDataView> apply(Integer integer) throws Throwable {
-                        return null;
-                    }
+                .map(_offset -> {
+                  return mMovieDao.queryAllMovieDataView(ScraperSourceTools.getSource(),_offset,LIMIT);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

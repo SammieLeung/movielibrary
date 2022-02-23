@@ -4,9 +4,11 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.databinding.ActivityFilterpageBinding;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 
 import java.util.ArrayList;
@@ -25,9 +27,10 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     }
 
     private void initView(){
-        GridLayoutManager gridLayoutManager=new GridLayoutManager(this,5);
+        GridLayoutManager gridLayoutManager=new GridLayoutManager(this,5, LinearLayoutManager.VERTICAL,false);
         mBinding.recyclerview.setLayoutManager(gridLayoutManager);
         mMovieItemListAdapter=new NewMovieItemListAdapter(this,new ArrayList<>());
+        mBinding.recyclerview.setAdapter(mMovieItemListAdapter);
 
     }
 }

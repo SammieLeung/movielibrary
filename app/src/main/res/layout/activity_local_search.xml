@@ -22,11 +22,12 @@
             android:layout_marginLeft="@dimen/shortcut_container_padding"
             android:text="@string/search"
             />
+
         <FrameLayout
-            android:layout_below="@id/btn_exit"
             android:id="@+id/view_t9_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/btn_exit"
             android:layout_marginTop="53dp">
 
 
@@ -41,14 +42,14 @@
                     android:id="@+id/et_search"
                     android:layout_width="match_parent"
                     android:layout_height="62dp"
-                    android:focusable="false"
-                    android:enabled="false"
                     android:background="@drawable/new_shortcut_item_bg"
+                    android:drawableLeft="@drawable/icon_circle_search"
+                    android:drawablePadding="14dp"
+                    android:enabled="false"
+                    android:focusable="false"
                     android:hint="@string/tx_search_input_hint"
                     android:paddingLeft="25dp"
-                    android:drawableLeft="@drawable/icon_circle_search"
                     android:paddingRight="25dp"
-                    android:drawablePadding="14dp"
                     android:textSize="23sp" />
 
 
@@ -59,139 +60,146 @@
                     android:layout_below="@id/et_search"
                     android:layout_marginTop="30dp">
 
-                    <include
-                        android:id="@+id/k1"
-                        android:background="@drawable/t9_keybtn_bg_tl"
-                        layout="@layout/layout_t9_keyboard_1_tl"
-                        app:text="@{@string/k1}"/>
                     <View
-                        android:layout_toEndOf="@id/k1"
                         android:id="@+id/divider_1"
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
-                        android:background="@color/divier_line"
-                        />
+                        android:layout_toEndOf="@id/k1"
+                        android:background="@color/divier_line" />
 
-                    <include
-                        android:id="@+id/k2"
-                        android:layout_width="@dimen/keybtn_item_w"
-                        android:layout_height="@dimen/keybtn_item_h"
-                        android:layout_toEndOf="@id/divider_1"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k2}"
-                        app:subtext="@{@string/ks2}">
-                    </include>
                     <View
                         android:id="@+id/divider_2"
                         android:layout_width="1dp"
-                        android:layout_toEndOf="@id/k2"
                         android:layout_height="match_parent"
-                        android:background="@color/divier_line"
-                        />
-                    <include
-                        android:id="@+id/k3"
-                        android:layout_width="@dimen/keybtn_item_w"
-                        android:layout_height="@dimen/keybtn_item_h"
-                        android:layout_toEndOf="@id/divider_2"
-                        layout="@layout/layout_t9_keyboard_2_tr"
-                        app:text="@{@string/k3}"
-                        app:subtext="@{@string/ks3}"/>
+                        android:layout_toEndOf="@id/k2"
+                        android:background="@color/divier_line" />
+
                     <View
                         android:id="@+id/divider_3"
                         android:layout_width="match_parent"
-                        android:layout_below="@id/k1"
                         android:layout_height="1dp"
-                        android:background="@color/divier_line"
-                        />
-                    <include
-                        android:id="@+id/k4"
-                        android:layout_width="@dimen/keybtn_item_w"
-                        android:layout_height="@dimen/keybtn_item_h"
-                        android:layout_below="@id/divider_3"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k4}"
-                        app:subtext="@{@string/ks4}"/>
+                        android:layout_below="@id/k1"
+                        android:background="@color/divier_line" />
+
                     <View
                         android:id="@+id/divider_4"
                         android:layout_width="match_parent"
-                        android:layout_below="@id/k4"
                         android:layout_height="1dp"
-                        android:background="@color/divier_line"
-                        />
-                    <include
-                        android:id="@+id/k7"
-                        android:layout_width="@dimen/keybtn_item_w"
-                        android:layout_height="@dimen/keybtn_item_h"
-                        android:layout_below="@id/divider_4"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k7}"
-                        app:subtext="@{@string/ks7}"/>
+                        android:layout_below="@id/k4"
+                        android:background="@color/divier_line" />
+
                     <View
                         android:id="@+id/divider_5"
                         android:layout_width="match_parent"
-                        android:layout_below="@id/k7"
                         android:layout_height="1dp"
-                        android:background="@color/divier_line"
-                        />
+                        android:layout_below="@id/k7"
+                        android:background="@color/divier_line" />
+
+                    <include
+                        android:id="@+id/k1"
+                        layout="@layout/layout_t9_keyboard_1_tl"
+                        android:background="@drawable/t9_keybtn_bg_tl"
+                        app:text="@{@string/k1}" />
+
+                    <include
+                        android:id="@+id/k2"
+                        layout="@layout/layout_t9_keyboard_2"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_toEndOf="@id/divider_1"
+                        app:subtext="@{@string/ks2}"
+                        app:text="@{@string/k2}"></include>
+
+                    <include
+                        android:id="@+id/k3"
+                        layout="@layout/layout_t9_keyboard_2_tr"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_toEndOf="@id/divider_2"
+                        app:subtext="@{@string/ks3}"
+                        app:text="@{@string/k3}" />
+
+                    <include
+                        android:id="@+id/k4"
+                        layout="@layout/layout_t9_keyboard_2"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_3"
+                        app:subtext="@{@string/ks4}"
+                        app:text="@{@string/k4}" />
+
+                    <include
+                        android:id="@+id/k7"
+                        layout="@layout/layout_t9_keyboard_2"
+                        android:layout_width="@dimen/keybtn_item_w"
+                        android:layout_height="@dimen/keybtn_item_h"
+                        android:layout_below="@id/divider_4"
+                        app:subtext="@{@string/ks7}"
+                        app:text="@{@string/k7}" />
+
                     <include
                         android:id="@+id/k5"
+                        layout="@layout/layout_t9_keyboard_2"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
                         android:layout_below="@id/divider_3"
                         android:layout_toEndOf="@id/divider_1"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k5}"
-                        app:subtext="@{@string/ks5}"/>
+                        app:subtext="@{@string/ks5}"
+                        app:text="@{@string/k5}" />
+
                     <include
                         android:id="@+id/k6"
+                        layout="@layout/layout_t9_keyboard_2"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
                         android:layout_below="@id/divider_3"
                         android:layout_toEndOf="@id/divider_2"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k6}"
-                        app:subtext="@{@string/ks6}"/>
+                        app:subtext="@{@string/ks6}"
+                        app:text="@{@string/k6}" />
+
                     <include
                         android:id="@+id/k8"
+                        layout="@layout/layout_t9_keyboard_2"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
                         android:layout_below="@id/divider_4"
                         android:layout_toEndOf="@id/divider_1"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k8}"
-                        app:subtext="@{@string/ks8}"/>
+                        app:subtext="@{@string/ks8}"
+                        app:text="@{@string/k8}" />
+
                     <include
                         android:id="@+id/k9"
+                        layout="@layout/layout_t9_keyboard_2"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
                         android:layout_below="@id/divider_4"
                         android:layout_toEndOf="@id/divider_2"
-                        layout="@layout/layout_t9_keyboard_2"
-                        app:text="@{@string/k9}"
-                        app:subtext="@{@string/ks9}"/>
+                        app:subtext="@{@string/ks9}"
+                        app:text="@{@string/k9}" />
+
                     <include
                         android:id="@+id/kdel"
+                        layout="@layout/layout_t9_keyboard_3_bl"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
-                        android:layout_below="@id/divider_5"
-                        layout="@layout/layout_t9_keyboard_3_bl"
-                       />
+                        android:layout_below="@id/divider_5" />
+
                     <include
                         android:id="@+id/k0"
+                        layout="@layout/layout_t9_keyboard_1"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
                         android:layout_below="@id/divider_5"
                         android:layout_toEndOf="@id/divider_1"
-                        layout="@layout/layout_t9_keyboard_1"
-                        app:text="@{@string/k0}"/>
+                        app:text="@{@string/k0}" />
+
                     <include
                         android:id="@+id/kclear"
+                        layout="@layout/layout_t9_keyboard_3_br"
                         android:layout_width="@dimen/keybtn_item_w"
                         android:layout_height="@dimen/keybtn_item_h"
                         android:layout_below="@id/divider_5"
-                        android:layout_toEndOf="@id/divider_2"
-                        layout="@layout/layout_t9_keyboard_3_br"
-                        />
+                        android:layout_toEndOf="@id/divider_2" />
                 </RelativeLayout>
 
             </RelativeLayout>
@@ -201,8 +209,8 @@
                 android:id="@+id/floatkeyboard"
                 android:layout_width="@dimen/fkeyboard_width"
                 android:layout_height="@dimen/fkeyboard_width"
-                android:visibility="gone"
                 android:background="@drawable/t9_floatkey_bg"
+                android:visibility="gone"
                 app:offsetDis="@dimen/fkeyboard_width">
 
             </com.hphtv.movielibrary.ui.view.FloatKeyboard>
@@ -219,6 +227,7 @@
                 android:visibility="@{showTab?View.VISIBLE:View.GONE}"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="61dp"
+                android:layout_marginLeft="35dp"
                 android:layout_height="wrap_content"
                 app:tabTextAppearance="@style/localsearch_tabTextAppearance"
                 app:tabIndicatorHeight="5dp"
@@ -234,12 +243,13 @@
 
 
             <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
-                android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}"
                 android:id="@+id/rv_search_movies"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tablayout"
-                />
+                android:layout_marginRight="37dp"
+                android:paddingBottom="20dp"
+                android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />
 
             <TextView
                 android:id="@+id/tv_empty_tips"

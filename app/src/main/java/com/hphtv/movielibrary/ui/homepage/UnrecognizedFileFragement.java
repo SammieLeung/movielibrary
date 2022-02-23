@@ -49,7 +49,7 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mBinding.rvMovies.setAdapter(mAdapter);
-        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
+//        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
 
         mAdapter.setOnItemClickListener((view,postion, data) -> {
 //

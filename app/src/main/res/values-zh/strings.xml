@@ -114,7 +114,7 @@
 
     <string name="tx_search_input_hint">输入影片关键字</string>
     <string name="tx_under_t9_hints">* 输入关键字,如:电影-> DY</string>
-    <string name="local_search_empty_tips">搜索你想要的电影</string>
+    <string name="local_search_empty_tips">搜索结果为空，请检查您的输入</string>
     <string name="tx_movie_for_lib">全部电影</string>
     <string name="tx_tv_for_lib">全部剧集</string>
     <string name="tx_others_for_lib">全部视频</string>

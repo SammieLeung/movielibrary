@@ -39,7 +39,7 @@ public class FavoriteFragment extends BaseFragment<FavoriteFragmentViewModel, FL
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mMovieAdapter = new NewMovieItemListAdapter(getContext(), mMovieDataViewList);
-        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
+//        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
         mMovieAdapter.setOnItemClickListener((view, postion,data) -> {
             Intent intent = new Intent(getContext(),
                     MovieDetailActivity.class);

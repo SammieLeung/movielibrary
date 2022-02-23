@@ -42,7 +42,7 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(), 3, GridLayoutManager.VERTICAL, false);
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mUnrecognizedFileDataViewList);
-        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),3));
+//        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),3));
 
         mHistoryListAdapter.setOnItemClickListener(new BaseScaleApater.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
             @Override

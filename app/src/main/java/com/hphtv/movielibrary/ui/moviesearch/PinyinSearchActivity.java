@@ -166,6 +166,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
 
     private void initView() {
         mMovieAdapter = new NewMovieLargeItemListAdapter(this, new ArrayList());
+        mMovieAdapter.setZoomRatio(1.08f);
         mMovieAdapter.setOnItemClickListener((view, postion, data) -> {
             Intent intent = new Intent(PinyinSearchActivity.this,
                     MovieDetailActivity.class);
@@ -197,7 +198,13 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         });
         mBinding.rvSearchMovies.setAdapter(mMovieAdapter);
         mBinding.rvSearchMovies.setLayoutManager(gridLayoutManager);
-        mBinding.rvSearchMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(this, 30), DensityUtil.dip2px(this, 30), 3));
+        mBinding.rvSearchMovies.addItemDecoration(new GridSpacingItemDecorationVertical(
+                getResources().getDimensionPixelOffset(R.dimen.poster_item_large_w),
+                DensityUtil.dip2px(this, 21),
+                DensityUtil.dip2px(this, 35),
+                DensityUtil.dip2px(this, 15),
+                DensityUtil.dip2px(this, 30),
+                3));
         TabLayout.Tab tab1 = mBinding.tablayout.newTab();
         TabLayout.Tab tab2 = mBinding.tablayout.newTab();
         TabLayout.Tab tab3 = mBinding.tablayout.newTab();

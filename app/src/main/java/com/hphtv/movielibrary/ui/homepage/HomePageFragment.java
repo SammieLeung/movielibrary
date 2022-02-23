@@ -64,7 +64,7 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
 //        GridLayoutManager mGridLayoutManager = new GridLayoutManager(getContext(),5);
 
         mBinding.rvMovies.setLayoutManager(mGridLayoutManager);
-        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
+//        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
 
         mMovieAdapter = new NewMovieItemListAdapter(getContext(), mMovieDataViewList);
         mMovieAdapter.setOnItemClickListener((view, postion, data) -> {

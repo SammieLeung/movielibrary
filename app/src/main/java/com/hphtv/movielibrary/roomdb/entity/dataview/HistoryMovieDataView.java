@@ -10,7 +10,6 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  * date:  2022/2/22
  */
 @DatabaseView(
-        viewName = VIEW.HISTORY_MOVIE_DATAVIEW,
         value = "SELECT u.filename,u.keyword,u.path,u.last_playtime,m.poster,m.source,m.title,m.ratings,st.img_url as stage_photo " +
                 "FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" AS u " +
                 "LEFT OUTER JOIN "+VIEW.MOVIE_DATAVIEW+" AS m " +
@@ -20,6 +19,8 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "WHERE u.last_playtime!=0 " +
                 "GROUP BY u.path,m.source " +
                 "ORDER BY u.last_playtime DESC"
+        ,
+        viewName = VIEW.HISTORY_MOVIE_DATAVIEW
 )
 public class HistoryMovieDataView {
     public String poster;
