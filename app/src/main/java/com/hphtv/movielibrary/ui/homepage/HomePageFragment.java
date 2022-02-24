@@ -67,15 +67,15 @@ public class HomePageFragment extends BaseFragment<HomePageFragementViewModel, F
 //        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
 
         mMovieAdapter = new NewMovieItemListAdapter(getContext(), mMovieDataViewList);
-        mMovieAdapter.setOnItemClickListener((view, postion, data) -> {
-            Intent intent = new Intent(HomePageFragment.this.getContext(),
-                    MovieDetailActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
-            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
-            intent.putExtras(bundle);
-            startActivityForResultFromParent(intent);
-        });
+//        mMovieAdapter.setOnItemClickListener((view, postion, data) -> {
+//            Intent intent = new Intent(HomePageFragment.this.getContext(),
+//                    MovieDetailActivity.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
+//            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+//            intent.putExtras(bundle);
+//            startActivityForResultFromParent(intent);
+//        });
         mBinding.rvMovies.setAdapter(mMovieAdapter);
 
     }

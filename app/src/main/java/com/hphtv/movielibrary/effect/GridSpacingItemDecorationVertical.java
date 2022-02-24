@@ -37,8 +37,8 @@ public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecorati
                                RecyclerView.State state) {
         if (mItemWidth != 0 && mSpanCount != -1) {
             int width = parent.getWidth();
-            int eachWidth=Math.round(1.0f * width / mSpanCount);
-            int eachColumnSpacing =eachWidth - mItemWidth;
+            int eachWidth = Math.round(1.0f * width / mSpanCount);
+            int eachColumnSpacing = eachWidth - mItemWidth;
             int pos = parent.getChildAdapterPosition(view);
 
             int tmpPos = pos % mSpanCount;
@@ -52,27 +52,27 @@ public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecorati
                 |35 264 8|22 264 21|9 264 35|
             */
             for (int i = 0; i < mSpanCount; i++) {
-                if(mEdageSpacing!=-1) {
+                if (mEdageSpacing != -1) {
                     if (i == 0) {
                         lastLeftColumn = mEdageSpacing;
-                        lastRightColumn= eachWidth-mEdageSpacing-mItemWidth;
+                        lastRightColumn = eachWidth - mEdageSpacing - mItemWidth;
                     } else if (i == mSpanCount - 1) {
-                        lastLeftColumn= eachColumnSpacing-lastRightColumn;
-                        lastRightColumn=mEdageSpacing;
+                        lastLeftColumn = eachColumnSpacing - lastRightColumn;
+                        lastRightColumn = mEdageSpacing;
                     } else {
-                        lastLeftColumn=mColumnSpacing-lastRightColumn;
-                        lastRightColumn=eachColumnSpacing-lastLeftColumn;
+                        lastLeftColumn = mColumnSpacing - lastRightColumn;
+                        lastRightColumn = eachColumnSpacing - lastLeftColumn;
                     }
-                    if(i==tmpPos){
+                    if (i == tmpPos) {
                         break;
                     }
                 }
             }
             //首行
             if (mFirstRowSpacing != -1 && pos / mSpanCount == 0) {
-                    outRect.set(lastLeftColumn, mFirstRowSpacing, lastRightColumn, mRowSpacing / 2);
+                outRect.set(lastLeftColumn, mFirstRowSpacing, lastRightColumn, mRowSpacing);
             } else {
-                outRect.set(lastLeftColumn, mRowSpacing / 2, lastRightColumn, mRowSpacing / 2);
+                outRect.set(lastLeftColumn, 0, lastRightColumn, mRowSpacing);
             }
         }
     }

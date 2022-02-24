@@ -53,6 +53,11 @@ public class HistoryFragment extends BaseFragment<HistoryFragmentViewModel, FLay
                 });
             }
 
+            @Override
+            public void onItemFocus(View view, int postion, HistoryMovieDataView data) {
+
+            }
+
         });
         mBinding.rvMovies.setAdapter(mHistoryListAdapter);
     }

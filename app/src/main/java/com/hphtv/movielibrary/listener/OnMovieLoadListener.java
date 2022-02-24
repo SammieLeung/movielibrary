@@ -1,9 +1,6 @@
 package com.hphtv.movielibrary.listener;
 
-import android.util.Log;
-
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -52,7 +49,8 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
 
             countItem = layoutManager.getItemCount();
             lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
-
+            if(layoutManager instanceof VisibleItemListener)
+                ((VisibleItemListener)layoutManager).getFirstVisibleItem(layoutManager.findViewByPosition(layoutManager.findFirstVisibleItemPosition()));
         }
         if (isScolled && countItem != lastItem && lastItem == countItem - 1) {
             onLoading(countItem, lastItem);

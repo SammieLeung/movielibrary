@@ -7,6 +7,9 @@ import android.view.View;
 import androidx.core.view.ViewCompat;
 import androidx.databinding.ViewDataBinding;
 
+import com.hphtv.movielibrary.data.Constants;
+import com.station.kit.util.LogUtil;
+
 import java.util.List;
 
 /**
@@ -25,18 +28,26 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
-            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(200).start();
+            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
+            if(mOnItemClickListener!=null) {
+                int pos= (int) v.getTag();
+                mOnItemClickListener.onItemFocus(v, pos, mList.get(pos));
+            }
         } else {
-            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(200).start();
+            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
         }
     }
 
     @Override
     public boolean onHover(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(200).start();
+            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
+            if(mOnItemClickListener!=null) {
+                int pos= (int) v.getTag();
+                mOnItemClickListener.onItemFocus(v, pos, mList.get(pos));
+            }
         } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(200).start();
+            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
         }
         return false;
     }

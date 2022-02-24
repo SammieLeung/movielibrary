@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.HistoryItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
+import com.hphtv.movielibrary.util.GlideTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public class HistoryListAdapter extends BaseScaleApater<HistoryItemBinding, Base
         HistoryMovieDataView dataView = mList.get(position);
         HistoryItemBinding binding = (HistoryItemBinding) holder.mBinding;
         binding.setRatings(dataView.ratings);
-        Glide.with(mContext).load(!TextUtils.isEmpty(dataView.stage_photo)?dataView.stage_photo:dataView.poster).placeholder(R.mipmap.default_poster)
+        GlideTools.GlideWrapper(mContext,!TextUtils.isEmpty(dataView.stage_photo)?dataView.stage_photo:dataView.poster)
                 .into(binding.ivImg);
         binding.setTitle(!TextUtils.isEmpty(dataView.source)?dataView.title:!TextUtils.isEmpty(dataView.keyword)?dataView.keyword:dataView.filename);
     }

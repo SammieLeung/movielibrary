@@ -46,6 +46,10 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public int getTotal(){
+        return mTotal;
+    }
+
 
     public Observable<List<MovieDataView>> loadMoiveDataViews() {
         return Observable.just("")

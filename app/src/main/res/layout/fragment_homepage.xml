@@ -30,13 +30,13 @@
                     android:textSize="28sp"
                     android:text="@string/history_list_empty"/>
 
-                <androidx.recyclerview.widget.RecyclerView
+                <com.hphtv.movielibrary.ui.view.TvRecyclerView
                     android:id="@+id/rv_history_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:layout_marginTop="37dp"
                 android:id="@+id/rv_genre_list"
                 android:layout_width="match_parent"
@@ -49,7 +49,7 @@
                 android:text="@string/recently_added_list_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_recently_added"
@@ -64,7 +64,7 @@
                 android:text="@string/my_favorite_list_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:visibility="@{favorite?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_favorite"
@@ -79,7 +79,7 @@
                 android:text="@string/recommand_list_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:visibility="@{recommand?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_recommand"

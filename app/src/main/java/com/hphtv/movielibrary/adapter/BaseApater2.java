@@ -127,6 +127,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     public interface OnRecyclerViewItemActionListener<T> {
         void onItemClick(View view, int postion, T data);
+        void onItemFocus(View view,int postion,T data);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

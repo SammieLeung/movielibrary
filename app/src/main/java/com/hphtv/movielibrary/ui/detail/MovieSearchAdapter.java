@@ -69,8 +69,6 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             Movie movie = mMovieList.get(position);
             vh.mDataBinding.setMovie(movie);
             GlideTools.GlideWrapper(mContext, movie.poster)
-                    .placeholder(R.mipmap.default_poster)
-                    .error(R.mipmap.default_poster)
                     .into(vh.mDataBinding.ivCover);
         }
     }

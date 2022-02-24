@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.ui.BaseFragment;
-import com.station.kit.util.DensityUtil;
 
 /**
  * author: Sam Leung
@@ -25,7 +24,6 @@ import com.station.kit.util.DensityUtil;
  */
 public class TvRecyclerView extends RecyclerView {
     private static final String TAG = "TvRecyclerView";
-
     private int mPosition;
     private BaseFragment mBindFragment;
 
@@ -53,17 +51,17 @@ public class TvRecyclerView extends RecyclerView {
 
     private void initView() {
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);//设置RecyclerView和他的后代的
-//        setHasFixedSize(true);
-//        setWillNotDraw(true);
-//        setOverScrollMode(View.OVER_SCROLL_NEVER);
-//        setChildrenDrawingOrderEnabled(true);
-//
-//        setClipChildren(false);
-//        setClipToPadding(false);
-//
-//        setClickable(false);
-//        setFocusable(true);
-//        setFocusableInTouchMode(true);
+        setHasFixedSize(true);
+        setWillNotDraw(true);
+        setOverScrollMode(View.OVER_SCROLL_NEVER);
+        setChildrenDrawingOrderEnabled(true);
+
+        setClipChildren(false);
+        setClipToPadding(false);
+
+        setClickable(false);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
         /**
          防止RecyclerView刷新时焦点不错乱bug的步骤如下:
          (1)adapter执行setHasStableIds(true)方法
@@ -253,40 +251,53 @@ public class TvRecyclerView extends RecyclerView {
             } else {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        if (!isVertical()&&isVisBottom(this)) {
+                            this.smoothScrollToPosition(getLastVisiblePosition());
+                            return result;
+                        }
                         View rightView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_RIGHT);
                         if (rightView != null) {
                             rightView.requestFocus();
-                            int rightOffset = rightView.getWidth() + DensityUtil.dip2px(getContext(),30);
-                            this.smoothScrollBy(rightOffset, 0);
+                            int rightOffset = rightView.getLeft() - getWidth() / 2 + rightView.getWidth() / 2;
+                            this.customSmoothScrollBy(rightOffset, 0);
                             return true;
                         } else {
-                            return false;
+                            if (isVertical())
+                                return false;
+                            else
+                                return true;
                         }
                     case KeyEvent.KEYCODE_DPAD_LEFT:
                         View leftView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_LEFT);
                         Log.i(TAG, "leftView is null:" + (leftView == null));
                         if (leftView != null) {
                             leftView.requestFocus();
-                            int rightOffset = leftView.getRight() + leftView.getWidth() / 2 - getWidth() / 2;
-                            this.smoothScrollBy(rightOffset,0 );
+                            int leftOffset = leftView.getWidth() / 2 + getWidth() / 2 - leftView.getRight();
+                            this.customSmoothScrollBy(-leftOffset, 0);
                             return true;
                         } else {
                             return false;
                         }
                     case KeyEvent.KEYCODE_DPAD_DOWN:
-                        if (isVisBottom(this)) {
+                        if (isVertical()&&isVisBottom(this)) {
                             this.smoothScrollToPosition(getLastVisiblePosition());
                             return result;
                         }
                         View downView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_DOWN);
-                        Log.i(TAG, " downView is null:" + (downView == null));
                         if (downView != null) {
-                            downView.requestFocus();
-                            int downOffset = downView.getTop() + downView.getHeight() / 2 - getHeight() / 2;
-                            this.smoothScrollBy(0, downOffset);
-                            return true;
+                            if(!isVertical()) {
+                                downView.requestFocus();
+                                int downOffset = downView.getTop() + downView.getHeight() / 2 - getHeight() / 2;
+                                this.customSmoothScrollBy(0, downOffset);
+                                return true;
+                            }
+                            return false;
                         } else {
-                            return true;
+                            //防止长按向下键丢失焦点
+                            if (isVertical())
+                                return true;
+                            else
+                                return false;
                         }
                     case KeyEvent.KEYCODE_DPAD_UP:
                         View upView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_UP);
@@ -294,7 +305,7 @@ public class TvRecyclerView extends RecyclerView {
                         if (upView != null) {
                             upView.requestFocus();
                             int upOffset = getHeight() / 2 - (upView.getBottom() - upView.getHeight() / 2);
-                            this.smoothScrollBy(0, -upOffset);
+                            this.customSmoothScrollBy(0, -upOffset);
                             return true;
                         } else {
                             Log.i(TAG, "tab cache view");
@@ -512,6 +523,10 @@ public class TvRecyclerView extends RecyclerView {
         } else {
             return false;
         }
+    }
+
+    private void customSmoothScrollBy(int dx,int dy){
+        this.smoothScrollBy(dx,dy,null,100);
     }
 
 }

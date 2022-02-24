@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
@@ -44,6 +45,17 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
+    private BaseApater2.OnRecyclerViewItemActionListener<MovieDataView> mDetialOnListener=new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+        @Override
+        public void onItemClick(View view, int postion, MovieDataView data) {
+            mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
+        }
+
+        @Override
+        public void onItemFocus(View view, int postion, MovieDataView data) {
+
+        }
+    };
 
     public NewPageFragment(IAutofitHeight autofitHeight, int postion) {
         super(autofitHeight, postion);
@@ -100,10 +112,20 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
-        mHistoryListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.playingVideo(data.path, data.filename, list -> {
-            mHistoryListAdapter.addAll(list);
-            mHistoryListAdapter.notifyDataSetChanged();
-        }));
+        mHistoryListAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
+            @Override
+            public void onItemClick(View view, int postion, HistoryMovieDataView data) {
+                mViewModel.playingVideo(data.path, data.filename, list -> {
+                    mHistoryListAdapter.addAll(list);
+                    mHistoryListAdapter.notifyDataSetChanged();
+                });
+            }
+
+            @Override
+            public void onItemFocus(View view, int postion, HistoryMovieDataView data) {
+
+            }
+        });
     }
 
     /**
@@ -127,8 +149,16 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
                 startActivity(intent);
             }
         });
-        mGenreTagAdapter.setOnItemClickListener((view, postion, data) -> {
+        mGenreTagAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<String>() {
+            @Override
+            public void onItemClick(View view, int postion, String data) {
 
+            }
+
+            @Override
+            public void onItemFocus(View view, int postion, String data) {
+
+            }
         });
     }
 
@@ -140,7 +170,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
         mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecentlyAddListAdapter = new NewMovieItemListAdapter(getContext(), mRecentlyAddedList);
-        mRecentlyAddListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data));
+        mRecentlyAddListAdapter.setOnItemClickListener(mDetialOnListener);
         mBinding.rvRecentlyAdded.setAdapter(mRecentlyAddListAdapter);
     }
 
@@ -153,7 +183,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mFavoriteListAdapter = new NewMovieItemListAdapter(getContext(), mFavoriteList);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
-        mFavoriteListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data));
+        mFavoriteListAdapter.setOnItemClickListener(mDetialOnListener);
     }
 
     private void initRecommandList() {
@@ -162,9 +192,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecommandListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
         mBinding.rvRecommand.setAdapter(mRecommandListAdapter);
-        mRecommandListAdapter.setOnItemClickListener((view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data));
+        mRecommandListAdapter.setOnItemClickListener(mDetialOnListener);
     }
-
 
     /**
      * 读取历史记录数据

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.databinding.DialogSelectVideosourceBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
@@ -64,16 +65,24 @@ public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel,
         mVideoSelectListAdapter = new VideoSelectListAdapter(getContext(), new ArrayList<>());
         mBinding.rvSource.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         mBinding.rvSource.setAdapter(mVideoSelectListAdapter);
-        mVideoSelectListAdapter.setOnItemClickListener((view, postion, data) -> {
-            if (mPlayVideoListener != null) {
-                mPlayVideoListener.playVideo(mViewModel.playVideo(data.path, data.filename));
-            } else {
-                mViewModel.playVideo(data.path, data.filename).subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                        dismiss();
+        mVideoSelectListAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<VideoFile>() {
+            @Override
+            public void onItemClick(View view, int postion, VideoFile data) {
+                    if (mPlayVideoListener != null) {
+                        mPlayVideoListener.playVideo(mViewModel.playVideo(data.path, data.filename));
+                    } else {
+                        mViewModel.playVideo(data.path, data.filename).subscribe(new SimpleObserver<String>() {
+                            @Override
+                            public void onAction(String s) {
+                                dismiss();
+                            }
+                        });
                     }
-                });
+            }
+
+            @Override
+            public void onItemFocus(View view, int postion, VideoFile data) {
+
             }
         });
 

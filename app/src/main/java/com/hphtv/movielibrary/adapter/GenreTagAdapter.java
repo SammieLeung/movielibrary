@@ -3,14 +3,17 @@ package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
 
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.RoundRectItemBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -76,9 +79,21 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        super.onFocusChange(v, hasFocus);
         if (hasFocus) {
+            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
+        } else {
+            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
         }
+    }
+
+    @Override
+    public boolean onHover(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
+            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
+        } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
+            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
+        }
+        return false;
     }
 
     @Override

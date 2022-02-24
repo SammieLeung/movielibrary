@@ -16,10 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.adapter.NewMovieLargeItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityLocalSearchBinding;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.station.kit.util.DensityUtil;
@@ -167,15 +169,22 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     private void initView() {
         mMovieAdapter = new NewMovieLargeItemListAdapter(this, new ArrayList());
         mMovieAdapter.setZoomRatio(1.08f);
-        mMovieAdapter.setOnItemClickListener((view, postion, data) -> {
-            Intent intent = new Intent(PinyinSearchActivity.this,
-                    MovieDetailActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
-            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
-            intent.putExtras(bundle);
-            startActivityForResult(intent);
+        mMovieAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+            @Override
+            public void onItemClick(View view, int postion, MovieDataView data) {
+                Intent intent = new Intent(PinyinSearchActivity.this,
+                        MovieDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
+                bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+                intent.putExtras(bundle);
+                startActivityForResult(intent);
+            }
 
+            @Override
+            public void onItemFocus(View view, int postion, MovieDataView data) {
+
+            }
         });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mBinding.btnExit.setOnClickListener(v -> finish());

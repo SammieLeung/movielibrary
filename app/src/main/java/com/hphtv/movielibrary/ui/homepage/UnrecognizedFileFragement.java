@@ -51,28 +51,28 @@ public class UnrecognizedFileFragement extends BaseFragment<UnrecognizeFileFragm
         mBinding.rvMovies.setAdapter(mAdapter);
 //        mBinding.rvMovies.addItemDecoration(new GridSpacingItemDecorationVertical(DensityUtil.dip2px(getContext(),40),DensityUtil.dip2px(getContext(),30),5));
 
-        mAdapter.setOnItemClickListener((view,postion, data) -> {
+//        mAdapter.setOnItemClickListener((view,postion, data) -> {
+////
+////            Intent intent = new Intent(getContext(),
+////                    MovieDetailActivity.class);
+////            Bundle bundle = new Bundle();
+////            bundle.putString(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD, data.keyword);
+////            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE);
+////            intent.putExtras(bundle);
+////            startActivityForResultFromParent(intent);
+//            mViewModel.playingVideo(data)
+//                    .subscribe(videoFileList -> {
+//                        if(videoFileList.size()==1){
+//                            mViewModel.getApplication().playingMovie(videoFileList.get(0).path,videoFileList.get(0).filename)
+//                            .subscribe(s -> {
 //
-//            Intent intent = new Intent(getContext(),
-//                    MovieDetailActivity.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putString(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD, data.keyword);
-//            bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE);
-//            intent.putExtras(bundle);
-//            startActivityForResultFromParent(intent);
-            mViewModel.playingVideo(data)
-                    .subscribe(videoFileList -> {
-                        if(videoFileList.size()==1){
-                            mViewModel.getApplication().playingMovie(videoFileList.get(0).path,videoFileList.get(0).filename)
-                            .subscribe(s -> {
-
-                            });
-                        }else if(videoFileList.size()>1){
-                            VideoSelectDialog videoSelectDialog=VideoSelectDialog.newInstance(data);
-                            videoSelectDialog.show(getChildFragmentManager(),"");
-                        }
-                    });
-        });
+//                            });
+//                        }else if(videoFileList.size()>1){
+//                            VideoSelectDialog videoSelectDialog=VideoSelectDialog.newInstance(data);
+//                            videoSelectDialog.show(getChildFragmentManager(),"");
+//                        }
+//                    });
+//        });
     }
 
     /**

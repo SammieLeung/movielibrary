@@ -42,11 +42,11 @@ public class GlideTools {
         } else {
             return Glide.with(context)
                     .load(buildGlideUrl(path))
-//                    .thumbnail(0.3f);
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION));
-//                    .placeholder(R.mipmap.ic_poster_default)
-//                    .error(R.mipmap.ic_poster_default);
+                    .thumbnail(0.3f)
+//                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+//                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
+//                    .placeholder(R.mipmap.default_poster)
+                    .error(R.mipmap.default_poster);
         }
     }
 
