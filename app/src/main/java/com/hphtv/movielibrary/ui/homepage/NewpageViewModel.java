@@ -38,6 +38,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2021/6/1
  */
 public class NewpageViewModel extends BaseAndroidViewModel {
+    public static final int LIMIT=10;
     private GenreDao mGenreDao;
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
@@ -62,7 +63,7 @@ public class NewpageViewModel extends BaseAndroidViewModel {
     public void prepareHistory(Callback callback) {
         Observable.just("")
                 .map(s -> {
-                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource());
+                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(),0,LIMIT);
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -135,7 +136,7 @@ public class NewpageViewModel extends BaseAndroidViewModel {
 
     public void prepareRecentlyAddedMovie(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource());
+            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(),0,LIMIT);
             emitter.onNext(movieDataViewList);
             emitter.onComplete();
         })
@@ -153,7 +154,7 @@ public class NewpageViewModel extends BaseAndroidViewModel {
 
     public void prepareFavorite(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource());
+            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),0,LIMIT);
             emitter.onNext(movieDataViewList);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
@@ -170,7 +171,7 @@ public class NewpageViewModel extends BaseAndroidViewModel {
     public void prepareRecommand(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
             String source = ScraperSourceTools.getSource();
-            List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source);
+            List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source,0,LIMIT);
             List<String> genreList = new ArrayList<>();
             List<Long> idList = new ArrayList<>();
             for (int i = 0; i < 3 && i < history.size(); i++) {
@@ -182,7 +183,7 @@ public class NewpageViewModel extends BaseAndroidViewModel {
                 }
                 idList.add(wrapper.movie.id);
             }
-            emitter.onNext(mMovieDao.queryRecommand(source, genreList, idList));
+            emitter.onNext(mMovieDao.queryRecommand(source, genreList, idList,0,LIMIT));
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

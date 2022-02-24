@@ -71,6 +71,9 @@ public interface VideoFileDao {
     @Query("SELECT * FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" WHERE source=:source or source=''")
     public List<HistoryMovieDataView> queryHistoryMovieDataView(String source);
 
+    @Query("SELECT * FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" WHERE source=:source or source='' LIMIT :offset,:limit")
+    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source,int offset,int limit);
+
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
     public void deleteByDevice(String devicePath, List<String> paths);
 

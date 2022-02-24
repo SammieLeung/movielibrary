@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.ui.BaseFragment;
 
 /**
@@ -309,6 +310,15 @@ public class TvRecyclerView extends RecyclerView {
                             else
                                 return false;
                         }
+                    case KeyEvent.KEYCODE_BACK:
+                        if( getLayoutManager().getChildAt(0) == getFocusedChild()){
+                            if(mOnKeyPressListener!=null)
+                                mOnKeyPressListener.processKeyEvent(event.getKeyCode());
+                        }else{
+                            smoothScrollToPosition(0);
+                            getLayoutManager().getChildAt(0).requestFocus();
+                            return true;
+                        }
                 }
             }
         }
@@ -524,4 +534,13 @@ public class TvRecyclerView extends RecyclerView {
         this.smoothScrollBy(dx, dy, null, 100);
     }
 
+    public interface OnKeyPressListener{
+        void processKeyEvent(int keyCode);
+    }
+
+    private OnKeyPressListener mOnKeyPressListener;
+
+    public void setOnKeyPressListener(OnKeyPressListener onKeyPressListener) {
+        mOnKeyPressListener = onKeyPressListener;
+    }
 }

@@ -21,6 +21,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageAcitvity;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.station.kit.util.DensityUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +61,13 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     public NewPageFragment(IAutofitHeight autofitHeight, int postion) {
         super(autofitHeight, postion);
     }
+
+    private TvRecyclerView.OnKeyPressListener mOnKeyPressListener=new TvRecyclerView.OnKeyPressListener() {
+        @Override
+        public void processKeyEvent(int keyCode) {
+            getActivity().finish();
+        }
+    };
 
     public static NewPageFragment newInstance(IAutofitHeight autofitHeight, int positon) {
         Bundle args = new Bundle();
@@ -109,6 +117,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initRecentlyPlayedList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvHistoryList.setLayoutManager(mLayoutManager);
+        mBinding.rvHistoryList.setOnKeyPressListener(mOnKeyPressListener);
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
@@ -134,6 +143,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initGenreList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvGenreList.setLayoutManager(mLayoutManager);
+        mBinding.rvGenreList.setOnKeyPressListener(mOnKeyPressListener);
         mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
         mGenreTagAdapter = new GenreTagAdapter(getContext(), mGenreTagList);
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
@@ -168,6 +178,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initRecentlyAddedList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
+        mBinding.rvRecentlyAdded.setOnKeyPressListener(mOnKeyPressListener);
         mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecentlyAddListAdapter = new NewMovieItemListAdapter(getContext(), mRecentlyAddedList);
         mRecentlyAddListAdapter.setOnItemClickListener(mDetialOnListener);
@@ -180,6 +191,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initFavoriteList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvFavorite.setLayoutManager(mLayoutManager);
+        mBinding.rvFavorite.setOnKeyPressListener(mOnKeyPressListener);
         mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mFavoriteListAdapter = new NewMovieItemListAdapter(getContext(), mFavoriteList);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
@@ -189,6 +201,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private void initRecommandList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecommand.setLayoutManager(mLayoutManager);
+        mBinding.rvRecommand.setOnKeyPressListener(mOnKeyPressListener);
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecommandListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
         mBinding.rvRecommand.setAdapter(mRecommandListAdapter);

@@ -166,6 +166,16 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
+            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+            " GROUP BY id " +
+            " ORDER BY add_time DESC" +
+            " LIMIT :offset,:limit"
+    )
+    public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source,int offset,int limit);
+
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
             "AND genre_name in (:genre_name) "+
             "AND id!=:id "+
             " GROUP BY id " +
@@ -173,14 +183,17 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryRecommand(String source,List<String> genre_name,long id);
 
+
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
             "AND genre_name in (:genre_name) "+
             "AND id NOT IN (:ids) "+
             " GROUP BY id " +
-            " ORDER BY add_time DESC "
+            " ORDER BY add_time DESC " +
+            " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source,List<String> genre_name,List<Long> ids);
+    public List<MovieDataView> queryRecommand(String source,List<String> genre_name,List<Long> ids,int offset,int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);
@@ -193,6 +206,10 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
     public List<MovieDataView> queryFavoriteMovieDataView(String source);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC" +
+            " LIMIT :offset,:limit")
+    public List<MovieDataView> queryFavoriteMovieDataView(String source,int offset,int limit);
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);
