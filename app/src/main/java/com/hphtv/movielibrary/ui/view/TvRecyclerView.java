@@ -251,9 +251,8 @@ public class TvRecyclerView extends RecyclerView {
             } else {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
-                        if (!isVertical()&&isVisBottom(this)) {
+                        if (!isVertical() && isVisBottom(this)) {
                             this.smoothScrollToPosition(getLastVisiblePosition());
-                            return result;
                         }
                         View rightView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_RIGHT);
                         if (rightView != null) {
@@ -269,29 +268,27 @@ public class TvRecyclerView extends RecyclerView {
                         }
                     case KeyEvent.KEYCODE_DPAD_LEFT:
                         View leftView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_LEFT);
-                        Log.i(TAG, "leftView is null:" + (leftView == null));
                         if (leftView != null) {
                             leftView.requestFocus();
                             int leftOffset = leftView.getWidth() / 2 + getWidth() / 2 - leftView.getRight();
                             this.customSmoothScrollBy(-leftOffset, 0);
                             return true;
                         } else {
-                            return false;
+                            if (isVertical())
+                                return false;
+                            else
+                                return true;
                         }
                     case KeyEvent.KEYCODE_DPAD_DOWN:
-                        if (isVertical()&&isVisBottom(this)) {
+                        if (isVertical() && isVisBottom(this)) {
                             this.smoothScrollToPosition(getLastVisiblePosition());
-                            return result;
                         }
                         View downView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_DOWN);
                         if (downView != null) {
-                            if(!isVertical()) {
-                                downView.requestFocus();
-                                int downOffset = downView.getTop() + downView.getHeight() / 2 - getHeight() / 2;
-                                this.customSmoothScrollBy(0, downOffset);
-                                return true;
-                            }
-                            return false;
+                            downView.requestFocus();
+                            int downOffset = downView.getTop() + downView.getHeight() / 2 - getHeight() / 2;
+                            this.customSmoothScrollBy(0, downOffset);
+                            return true;
                         } else {
                             //防止长按向下键丢失焦点
                             if (isVertical())
@@ -301,18 +298,16 @@ public class TvRecyclerView extends RecyclerView {
                         }
                     case KeyEvent.KEYCODE_DPAD_UP:
                         View upView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_UP);
-                        Log.i(TAG, "upView is null:" + (upView == null));
                         if (upView != null) {
                             upView.requestFocus();
                             int upOffset = getHeight() / 2 - (upView.getBottom() - upView.getHeight() / 2);
                             this.customSmoothScrollBy(0, -upOffset);
                             return true;
                         } else {
-                            Log.i(TAG, "tab cache view");
-                            if (mBindFragment != null) {
-//                                mBindFragment.setmCacheViewFromTab(focusView);
-                            }
-                            return result;//返回false,否则第一行按上键回不到导航栏
+                            if (isVertical())
+                                return true;
+                            else
+                                return false;
                         }
                 }
             }
@@ -525,8 +520,8 @@ public class TvRecyclerView extends RecyclerView {
         }
     }
 
-    private void customSmoothScrollBy(int dx,int dy){
-        this.smoothScrollBy(dx,dy,null,100);
+    private void customSmoothScrollBy(int dx, int dy) {
+        this.smoothScrollBy(dx, dy, null, 100);
     }
 
 }
