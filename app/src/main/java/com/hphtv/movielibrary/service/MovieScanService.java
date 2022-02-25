@@ -20,6 +20,7 @@ import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.hphtv.movielibrary.util.BroadcastHelper;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
@@ -50,6 +51,9 @@ import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.StringUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -183,30 +187,28 @@ public class MovieScanService extends Service {
     private void startSearch(Shortcut shortcut, List<VideoFile> videoFileList, Constants.SearchType searchType) {
         Log.e(TAG, "startSearch: " + searchType.name() + "模式");
         //combineLatest 将前面Observable的最新数据与最后的Observable发送的每个数据结合
+        HashSet<String> tmpMoviesSet=new HashSet<>();
         Object lock = new Object();
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger indexAtom = new AtomicInteger();
         AtomicInteger currentTaskCount = new AtomicInteger();
         int total = videoFileList.size();
-        Observable.combineLatest(Observable.just(shortcut), Observable.just(searchType), Observable.just(videoFileList).concatMap(new Function<List<VideoFile>, ObservableSource<List<VideoFile>>>() {
-                    @Override
-                    public ObservableSource<List<VideoFile>> apply(List<VideoFile> videoFileList) throws Throwable {
-                        Log.e(Thread.currentThread().getName(), "combineLatest->分割videolist");
-                        //为了支持4线程搜索,将数据分成大于4份,并行数量取决于mNetworkExecutor
-                        //[1,2,3,4,11,12,13,14,21,22,23,24,31,32]
-                        //                  ↓
-                        //[1,11,21,31],[2,12,22,32],[3,13,23],[4,14,24]
-                        int thredCount = 4;
-                        List<List<VideoFile>> dataSet = new ArrayList<>();
-                        for (int i = 0; i < thredCount; i++) {
-                            dataSet.add(new ArrayList<>());
-                        }
-                        for (int i = 0; i < videoFileList.size(); i++) {
-                            dataSet.get(i % thredCount).add(videoFileList.get(i));
-                        }
-                        return Observable.fromIterable(dataSet);
-                    }
-                }),
+        Observable.combineLatest(Observable.just(shortcut), Observable.just(searchType), Observable.just(videoFileList).concatMap((Function<List<VideoFile>, ObservableSource<List<VideoFile>>>) videoFileList1 -> {
+            Log.e(Thread.currentThread().getName(), "combineLatest->分割videolist");
+            //为了支持4线程搜索,将数据分成大于4份,并行数量取决于mNetworkExecutor
+            //[1,2,3,4,11,12,13,14,21,22,23,24,31,32]
+            //                  ↓
+            //[1,11,21,31],[2,12,22,32],[3,13,23],[4,14,24]
+            int thredCount = 4;
+            List<List<VideoFile>> dataSet = new ArrayList<>();
+            for (int i = 0; i < thredCount; i++) {
+                dataSet.add(new ArrayList<>());
+            }
+            for (int i = 0; i < videoFileList1.size(); i++) {
+                dataSet.get(i % thredCount).add(videoFileList1.get(i));
+            }
+            return Observable.fromIterable(dataSet);
+        }),
                 new Function3<Shortcut, Constants.SearchType, List<VideoFile>, Object[]>() {
                     @Override
                     public Object[] apply(Shortcut shortcut1, Constants.SearchType searchType1, List<VideoFile> videoFileList) throws Throwable {
@@ -238,7 +240,7 @@ public class MovieScanService extends Service {
                                     //keyword不能为空
                                     if (!TextUtils.isEmpty(keyword)) {
                                         Observable<MovieSearchRespone> tmdbSearchRespone;
-                                        //搜索模式
+                                        //搜索模式 TODO 需要添加本地匹配
                                         switch (searchType1) {
                                             case movie:
                                                 tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api);
@@ -316,7 +318,7 @@ public class MovieScanService extends Service {
                                     data[0] = shortcut1;
                                     return data;
                                 })
-                                .doOnNext(data -> {//TODO 文件夹扫描结束后保存信息.
+                                .doOnNext(data -> {
                                     if (data.length == 2) {
                                         String movieId = (String) data[0];
                                         Shortcut st = (Shortcut) data[1];
@@ -324,6 +326,7 @@ public class MovieScanService extends Service {
                                             st.posterCount = st.posterCount + 1;
                                         }
                                         st.fileCount = total;
+                                        tmpMoviesSet.add(movieId);
                                         mShortcutDao.updateShortcut(st);
                                     }else{
                                         Shortcut st = (Shortcut) data[0];
@@ -361,7 +364,7 @@ public class MovieScanService extends Service {
                                             if (!movieId.equals("-1")) {
                                                 int success = successCount.incrementAndGet();
                                                 sendMatchMovieSuccess(st, movieId, success, scannedCount, total);
-                                                BroadcastHelper.sendBroadcastMovieAddSync(getBaseContext(),movieId);
+//                                                BroadcastHelper.sendBroadcastMovieAddSync(getBaseContext(),movieId);
                                                 LogUtil.w(TAG, "onAction(" + scannedCount + ") movieId:" + movieId);
                                             } else {
                                                 sendMatchMovieFailed(st, scannedCount, total);
@@ -388,6 +391,8 @@ public class MovieScanService extends Service {
                                                 intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
                                                 intent.putExtra(Constants.Extras.SHORTCUT, shortcut1);
                                                 LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                                                ArrayList<String> movieIds=new ArrayList<>(tmpMoviesSet);
+                                                BroadcastHelper.sendBroadcastSearchMoviesSync(getBaseContext(),movieIds);
                                             }
                                             if (mGlobalTaskCount.decrementAndGet() == 0) {
                                                 //扫描程序结束
@@ -541,5 +546,6 @@ public class MovieScanService extends Service {
         LogUtil.v(Thread.currentThread().getName(), "saveMovie=>: " + movie_id + ":" + videoFile.filename);
 
     }
+
 
 }
