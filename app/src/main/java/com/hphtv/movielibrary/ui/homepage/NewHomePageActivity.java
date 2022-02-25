@@ -31,12 +31,16 @@ import com.station.kit.util.LogUtil;
  * author: Sam Leung
  * date:  2022/1/13
  */
-public class NewHomePageActivity extends AppBaseActivity<NewHomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight {
+public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight {
     private NewHomePageTabAdapter mNewHomePageTabAdapter;
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void permissionGranted() {
         mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
         mBinding.viewpager.setOffscreenPageLimit(2);
