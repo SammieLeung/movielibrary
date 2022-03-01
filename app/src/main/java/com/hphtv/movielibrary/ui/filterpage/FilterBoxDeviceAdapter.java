@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage.filterbox;
+package com.hphtv.movielibrary.ui.filterpage;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -115,7 +115,7 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
         public CommonFilterBoxViewHolder(@NonNull @NotNull FilterBoxItemLayoutBinding filterBoxItemLayoutBinding) {
             super(filterBoxItemLayoutBinding.getRoot());
             mViewDataBinding = filterBoxItemLayoutBinding;
-            mViewDataBinding.cbtvTitle.setOnClickListener(v -> {
+            mViewDataBinding.viewGroup.setOnClickListener(v -> {
                 setCurrentPos(mViewDataBinding.getPos());
                 if(mOnFilterBoxItemClickListener!=null)
                     mOnFilterBoxItemClickListener.OnFilterChange();

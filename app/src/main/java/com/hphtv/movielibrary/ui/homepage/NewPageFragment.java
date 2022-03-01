@@ -65,6 +65,10 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private TvRecyclerView.OnKeyPressListener mOnKeyPressListener=new TvRecyclerView.OnKeyPressListener() {
         @Override
         public void processKeyEvent(int keyCode) {
+        }
+
+        @Override
+        public void onBackPress() {
             getActivity().finish();
         }
     };

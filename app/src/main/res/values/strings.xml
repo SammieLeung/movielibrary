@@ -28,7 +28,9 @@
     <string name="lb_sort_region">Region</string>
     <string name="lb_sort_directory">Directory</string>
     <string name="lb_sort_year">Year</string>
-    <string name="lb_sort_type">Genres</string>
+    <string name="lb_sort_type">Type</string>
+    <string name="lb_sort_genres">Genres</string>
+
     <string name="lb_sort_order">Filiter</string>
     <string name="test">TestText</string>
     <string name="pages">%1$d&#047;%2$d</string>

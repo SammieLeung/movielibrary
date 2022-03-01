@@ -3,84 +3,100 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_height="wrap_content">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/filter_box_title_box_h"
-            android:layout_margin="@dimen/filter_box_common_margin"
+            android:layout_height="@dimen/filter_box_main_h"
             android:background="@drawable/filter_box_main_bg"
-            android:minHeight="@dimen/filter_box_title_box_h">
+            android:minHeight="@dimen/filter_box_main_h">
 
             <TextView
+                android:id="@+id/tv_device"
                 style="@style/filter_box_title_text_style"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@id/view_sortby_device"
+                android:layout_alignEnd="@id/view_sortby_device"
                 android:text="@string/lb_sort_device" />
-
             <TextView
+                android:id="@+id/tv_year"
+                android:layout_alignStart="@id/view_sortby_year"
+                android:layout_alignEnd="@id/view_sortby_year"
                 style="@style/filter_box_title_text_style"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/lb_sort_year" />
 
             <TextView
+                android:id="@+id/tv_type"
+                android:layout_alignStart="@id/view_sortby_type"
+                android:layout_alignEnd="@id/view_sortby_type"
                 style="@style/filter_box_title_text_style"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/lb_sort_type" />
 
+
+
             <TextView
+                android:id="@+id/tv_genres"
+                android:layout_alignStart="@id/view_sortby_genres"
+                android:layout_alignEnd="@id/view_sortby_genres"
                 style="@style/filter_box_title_text_style"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/lb_sort_genres" />
+            <TextView
+                android:layout_alignStart="@id/view_order"
+                android:layout_alignEnd="@id/view_order"
+                style="@style/filter_box_title_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="@string/lb_sort_order" />
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/filter_box_main_h"
-            android:layout_marginLeft="@dimen/filter_box_common_margin"
-            android:layout_marginRight="@dimen/filter_box_common_margin"
-            android:minHeight="@dimen/filter_box_main_h">
-
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/view_sortby_device"
                 style="@style/filter_box_recyclerview_style"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_below="@id/tv_device"
+                android:layout_marginLeft="@dimen/homepage_main_margin" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
+                android:id="@+id/view_sortby_type"
+                android:layout_below="@id/tv_device"
+                style="@style/filter_box_recyclerview_style"
+                android:layout_width="@dimen/filter_box_recyclerview_width"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/view_sortby_device" />
+
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
+                android:background="@drawable/filter_box_main_bg"
+                android:id="@+id/view_sortby_genres"
+                android:layout_below="@id/tv_device"
+                style="@style/filter_box_recyclerview_style"
+                android:layout_width="@dimen/filter_box_recyclerview_width"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/view_sortby_type" />
+
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
+                android:layout_below="@id/tv_device"
                 android:id="@+id/view_sortby_year"
                 style="@style/filter_box_recyclerview_style"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:layout_toRightOf="@id/view_sortby_genres" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/view_sortby_genres"
-                style="@style/filter_box_recyclerview_style"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <androidx.recyclerview.widget.RecyclerView
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/view_order"
+                android:layout_below="@id/tv_device"
                 style="@style/filter_box_recyclerview_style"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
-                android:layout_marginRight="0dp"
-                android:layout_weight="1" />
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                android:layout_marginRight="@dimen/homepage_main_margin"
+                android:layout_toRightOf="@id/view_sortby_year" />
+        </RelativeLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
-
     <data>
 
     </data>

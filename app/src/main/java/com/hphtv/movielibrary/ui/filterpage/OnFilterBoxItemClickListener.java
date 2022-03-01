@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage.filterbox;
+package com.hphtv.movielibrary.ui.filterpage;
 
 /**
  * author: Sam Leung

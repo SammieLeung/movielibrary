@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage.filterbox;
+package com.hphtv.movielibrary.ui.filterpage;
 
 import android.app.Application;
 
@@ -21,6 +21,7 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -44,9 +45,10 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private List<String> mGenresList;
     private List<String> mYearsList;
     private List<String> mOrderList;
+    private List<String> mTypeList;
 
-    private ObservableInt mDevicePos = new ObservableInt(), mGenresPos = new ObservableInt(),mYearPos=new ObservableInt(),mFilterOrderPos=new ObservableInt();
-    private ObservableBoolean mDesFlag=new ObservableBoolean();
+    private ObservableInt mDevicePos = new ObservableInt(), mTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt();
+    private ObservableBoolean mDesFlag = new ObservableBoolean();
 
     public FilterBoxViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -63,8 +65,8 @@ public class FilterBoxViewModel extends AndroidViewModel {
                     mLocalShortcutList = mShortcutDao.queryAllLocalShortcuts();
                     mDLNAShortcutList = mShortcutDao.queryAllShortcutsByDevcietype(Constants.DeviceType.DEVICE_TYPE_DLNA);
                     mSMBShortcutList = mShortcutDao.queryAllShortcutsByDevcietype(Constants.DeviceType.DEVICE_TYPE_SMB);
-                    if(mDeviceDataList==null)
-                        mDeviceDataList=new ArrayList<>();
+                    if (mDeviceDataList == null)
+                        mDeviceDataList = new ArrayList<>();
                     mDeviceDataList.clear();
                     if (mLocalShortcutList != null && mLocalShortcutList.size() > 0) {
                         mDeviceDataList.add(getApplication().getString(R.string.filter_box_local_device));
@@ -85,6 +87,22 @@ public class FilterBoxViewModel extends AndroidViewModel {
                     @Override
                     public void onAction(List<Object> dataList) {
                         adapter.addAll(dataList);
+                    }
+                });
+    }
+
+    public void prepareTypes(FilterBoxAdapter adapter){
+        Observable.just("")
+                .subscribeOn(Schedulers.io())
+                .map(s->{
+                    mTypeList= Arrays.asList(getApplication().getResources().getStringArray(R.array.filterpage_fitlertype).clone());
+                    return mTypeList;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<String>>() {
+                    @Override
+                    public void onAction(List<String> list) {
+                        adapter.addAll(list);
                     }
                 });
     }
@@ -119,11 +137,11 @@ public class FilterBoxViewModel extends AndroidViewModel {
                 });
     }
 
-    public void prepareOrders(FilterBoxOrderAdapter adapter){
+    public void prepareOrders(FilterBoxOrderAdapter adapter) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mOrderList=new ArrayList<>();
+                    mOrderList = new ArrayList<>();
                     mOrderList.add(getString(R.string.order_name));
                     mOrderList.add(getString(R.string.order_score));
                     mOrderList.add(getString(R.string.order_year));
@@ -147,6 +165,10 @@ public class FilterBoxViewModel extends AndroidViewModel {
         return mGenresPos;
     }
 
+    public ObservableInt getTypePos() {
+        return mTypePos;
+    }
+
     public ObservableInt getYearPos() {
         return mYearPos;
     }
@@ -159,25 +181,32 @@ public class FilterBoxViewModel extends AndroidViewModel {
         return mDesFlag;
     }
 
-    public Object getRealShortCut(){
-        if(mDevicePos.get()==0)
+    public Object getRealShortCut() {
+        if (mDevicePos.get() == 0)
             return null;
-        return mDeviceDataList.get(mDevicePos.get()-1);
+        return mDeviceDataList.get(mDevicePos.get() - 1);
     }
 
-    public String getRealGenre(){
-        if(mGenresPos.get()==0)
+    public String getRealType(){
+        if(mTypePos.get()==0)
             return null;
-        return mGenresList.get(mGenresPos.get()-1);
+        return mTypeList.get(mTypePos.get()-1);
     }
 
-    public String getRealYear(){
-        if(mYearPos.get()==0)
+    public String getRealGenre() {
+        if (mGenresPos.get() == 0)
             return null;
-        return mYearsList.get(mYearPos.get()-1);
+        return mGenresList.get(mGenresPos.get() - 1);
     }
 
-    private String getString(int resId){
+    public String getRealYear() {
+        if (mYearPos.get() == 0)
+            return null;
+        return mYearsList.get(mYearPos.get() - 1);
+    }
+
+
+    private String getString(int resId) {
         return getApplication().getString(resId);
     }
 

@@ -252,6 +252,8 @@ public class TvRecyclerView extends RecyclerView {
             } else {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
+                        if (mOnKeyPressListener != null)
+                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
                         if (!isVertical() && isVisBottom(this)) {
                             this.smoothScrollToPosition(getLastVisiblePosition());
                         }
@@ -268,6 +270,8 @@ public class TvRecyclerView extends RecyclerView {
                                 return true;
                         }
                     case KeyEvent.KEYCODE_DPAD_LEFT:
+                        if (mOnKeyPressListener != null)
+                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
                         View leftView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_LEFT);
                         if (leftView != null) {
                             leftView.requestFocus();
@@ -281,6 +285,8 @@ public class TvRecyclerView extends RecyclerView {
                                 return true;
                         }
                     case KeyEvent.KEYCODE_DPAD_DOWN:
+                        if (mOnKeyPressListener != null)
+                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
                         if (isVertical() && isVisBottom(this)) {
                             this.smoothScrollToPosition(getLastVisiblePosition());
                         }
@@ -298,6 +304,8 @@ public class TvRecyclerView extends RecyclerView {
                                 return false;
                         }
                     case KeyEvent.KEYCODE_DPAD_UP:
+                        if (mOnKeyPressListener != null)
+                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
                         View upView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_UP);
                         if (upView != null) {
                             upView.requestFocus();
@@ -311,10 +319,12 @@ public class TvRecyclerView extends RecyclerView {
                                 return false;
                         }
                     case KeyEvent.KEYCODE_BACK:
-                        if( getLayoutManager().getChildAt(0) == getFocusedChild()){
-                            if(mOnKeyPressListener!=null)
-                                mOnKeyPressListener.processKeyEvent(event.getKeyCode());
-                        }else{
+                        if (mOnKeyPressListener != null)
+                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
+                        if (getLayoutManager().getChildAt(0) == getFocusedChild()) {
+                            if (mOnKeyPressListener != null)
+                                mOnKeyPressListener.onBackPress();
+                        } else {
                             smoothScrollToPosition(0);
                             getLayoutManager().getChildAt(0).requestFocus();
                             return true;
@@ -534,8 +544,9 @@ public class TvRecyclerView extends RecyclerView {
         this.smoothScrollBy(dx, dy, null, 100);
     }
 
-    public interface OnKeyPressListener{
+    public interface OnKeyPressListener {
         void processKeyEvent(int keyCode);
+        void onBackPress();
     }
 
     private OnKeyPressListener mOnKeyPressListener;

@@ -1,15 +1,15 @@
-package com.hphtv.movielibrary.ui.homepage.filterbox;
+package com.hphtv.movielibrary.ui.filterpage;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.databinding.FilterBoxItemLayoutBinding;
+import com.hphtv.movielibrary.databinding.FilterBoxOrderItemLayoutBinding;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,57 +20,43 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/12/7
  */
-public class FilterBoxAdapter extends RecyclerView.Adapter<FilterBoxAdapter.CommonFilterBoxViewHolder> {
-    public static final int VIEWTYPE_ALL = 1;
-    public static final int VIEWTYPE_NORMAL = 2;
+public class FilterBoxOrderAdapter extends RecyclerView.Adapter<FilterBoxOrderAdapter.CommonFilterBoxViewHolder> {
+    public static final String TAG = FilterBoxOrderAdapter.class.getSimpleName();
     private Context mContext;
     private List<String> mDataList = new ArrayList<>();
     private ObservableInt mCheckPos;
+    private ObservableBoolean mDescFlag;
     private OnFilterBoxItemClickListener mOnFilterBoxItemClickListener;
 
-    public FilterBoxAdapter(Context context, ObservableInt checkPos) {
+    public FilterBoxOrderAdapter(Context context, ObservableInt checkPos, ObservableBoolean descFlag) {
         mContext = context;
         mCheckPos = checkPos;
+        mDescFlag = descFlag;
     }
-
 
     @NonNull
     @NotNull
     @Override
     public CommonFilterBoxViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        FilterBoxItemLayoutBinding itemLayoutBinding = FilterBoxItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        FilterBoxOrderItemLayoutBinding itemLayoutBinding = FilterBoxOrderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         itemLayoutBinding.setCheckPos(mCheckPos);
+        itemLayoutBinding.setIsDesc(mDescFlag);
         CommonFilterBoxViewHolder commonFilterBoxViewHolder = new CommonFilterBoxViewHolder(itemLayoutBinding);
         return commonFilterBoxViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommonFilterBoxViewHolder holder, int position) {
-        int viewType = getItemViewType(position);
-        if (viewType == VIEWTYPE_ALL) {
-            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.tx_all));
-            holder.mViewDataBinding.setPos(position);
-        } else {
-            int realPos = position - 1;
-            String name = mDataList.get(realPos);
-            holder.mViewDataBinding.setName(name);
-            holder.mViewDataBinding.setPos(position);
-        }
+        String name = mDataList.get(position);
+        holder.mViewDataBinding.setName(name);
+        holder.mViewDataBinding.setPos(position);
     }
 
 
     @Override
     public int getItemCount() {
-        return mDataList.size() + 1;
+        return mDataList.size();
     }
-
-    @Override
-    public int getItemViewType(int position) {
-        if (position == 0)
-            return VIEWTYPE_ALL;
-        return VIEWTYPE_NORMAL;
-    }
-
 
     public void addAll(List<String> dataList) {
         mDataList.clear();
@@ -83,20 +69,28 @@ public class FilterBoxAdapter extends RecyclerView.Adapter<FilterBoxAdapter.Comm
             mCheckPos.set(pos);
     }
 
+    public void setIsDesc(boolean isDesc) {
+        if (mDescFlag != null)
+            mDescFlag.set(isDesc);
+    }
+
     public void setOnFilterBoxItemClickListener(OnFilterBoxItemClickListener onFilterBoxItemClickListener) {
         mOnFilterBoxItemClickListener = onFilterBoxItemClickListener;
     }
 
     public class CommonFilterBoxViewHolder extends RecyclerView.ViewHolder {
-        public FilterBoxItemLayoutBinding mViewDataBinding;
+        public FilterBoxOrderItemLayoutBinding mViewDataBinding;
 
-        public CommonFilterBoxViewHolder(@NonNull @NotNull FilterBoxItemLayoutBinding filterBoxItemLayoutBinding) {
+        public CommonFilterBoxViewHolder(@NonNull @NotNull FilterBoxOrderItemLayoutBinding filterBoxItemLayoutBinding) {
             super(filterBoxItemLayoutBinding.getRoot());
             mViewDataBinding = filterBoxItemLayoutBinding;
-            mViewDataBinding.cbtvTitle.setOnClickListener(v -> {
+            mViewDataBinding.viewGroup.setOnClickListener(v -> {
+                if (mCheckPos.get() == mViewDataBinding.getPos()) {
+                    setIsDesc(!mDescFlag.get());
+                }
                 setCurrentPos(mViewDataBinding.getPos());
                 if (mOnFilterBoxItemClickListener != null)
-                    mOnFilterBoxItemClickListener.OnFilterChange();
+                    mOnFilterBoxItemClickListener.OnOrderChange();
             });
         }
     }

@@ -1,8 +1,9 @@
-package com.hphtv.movielibrary.ui.homepage.filterbox;
+package com.hphtv.movielibrary.ui.filterpage;
 
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.ViewGroup;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -14,21 +15,20 @@ import com.hphtv.movielibrary.ui.homepage.HomePageActivity;
 import com.hphtv.movielibrary.databinding.LayoutMovieClassifyFilterBoxBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment;
 import com.hphtv.movielibrary.ui.homepage.HomePageFragementViewModel;
-
-import java.util.List;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 
 /**
  * author: Sam Leung
  * date:  2021/12/6
  */
-public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener {
+public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener, TvRecyclerView.OnKeyPressListener {
     private static final String TAG = FilterBoxDialogFragment.class.getSimpleName();
     public static final String KEY_DEVICE_POS = "device_pos";
     public static final String KEY_YEAR_POS = "year_pos";
     public static final String KEY_GENRES_POS = "genre_pos";
     public static final String KEY_FILTER_ORDER_POS = "filter_order_pos";
 
-    private FilterBoxAdapter mGenreAdapter, mYearsApdater;
+    private FilterBoxAdapter mGenreAdapter, mYearsApdater,mTypeAdapter;
     private FilterBoxDeviceAdapter mDeviceAdapter;
     private FilterBoxOrderAdapter mOrderAdapter;
     private HomePageFragementViewModel mHomePageFragementViewModel;
@@ -73,29 +73,34 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         super.onResume();
         prepareDevices();
         prepareGenres();
+        prepareTypes();
         prepareYears();
         prepareOrders();
-
     }
 
     private void init() {
         mDeviceAdapter = new FilterBoxDeviceAdapter(getContext(),mViewModel.getDevicePos());
         mGenreAdapter = new FilterBoxAdapter(getContext(),mViewModel.getGenresPos());
+        mTypeAdapter=new FilterBoxAdapter(getContext(),mViewModel.getTypePos());
         mYearsApdater = new FilterBoxAdapter(getContext(),mViewModel.getYearPos());
         mOrderAdapter=new   FilterBoxOrderAdapter(getContext(),mViewModel.getFilterOrderPos(),mViewModel.getDesFlag());
         mDeviceAdapter.setOnFilterBoxItemClickListener(this);
         mGenreAdapter.setOnFilterBoxItemClickListener(this);
         mYearsApdater.setOnFilterBoxItemClickListener(this);
         mOrderAdapter.setOnFilterBoxItemClickListener(this);
+        mTypeAdapter.setOnFilterBoxItemClickListener(this);
+
         prepareRecyclerView(mBinding.viewSortbyDevice, mDeviceAdapter);
         prepareRecyclerView(mBinding.viewSortbyGenres, mGenreAdapter);
         prepareRecyclerView(mBinding.viewSortbyYear, mYearsApdater);
         prepareRecyclerView(mBinding.viewOrder,mOrderAdapter);
+        prepareRecyclerView(mBinding.viewSortbyType,mTypeAdapter);
     }
 
-    private void prepareRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter) {
+    private void prepareRecyclerView(TvRecyclerView recyclerView, RecyclerView.Adapter adapter) {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
+        recyclerView.setOnKeyPressListener(this);
     }
 
     private void prepareDevices() {
@@ -114,6 +119,8 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         mViewModel.prepareOrders(mOrderAdapter);
     }
 
+    private void prepareTypes(){mViewModel.prepareTypes(mTypeAdapter);}
+
     @Override
     public void OnFilterChange() {
         if(mHomePageFragementViewModel!=null){
@@ -131,5 +138,17 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         if(getActivity() instanceof HomePageActivity){
             Log.e(TAG, "OnOrderChange: OnOrderChange");
         }
+    }
+
+    @Override
+    public void processKeyEvent(int keyCode) {
+        if(keyCode== KeyEvent.KEYCODE_BACK){
+            dismiss();
+        }
+    }
+
+    @Override
+    public void onBackPress() {
+
     }
 }

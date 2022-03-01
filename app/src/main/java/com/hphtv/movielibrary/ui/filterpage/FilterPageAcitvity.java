@@ -41,6 +41,8 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
                 ActivityHelper.startHomePageActivity(FilterPageAcitvity.this);
                 break;
             case R.id.btn_filter:
+                FilterBoxDialogFragment filterBoxDialogFragment=FilterBoxDialogFragment.newInstance();
+                filterBoxDialogFragment.show(getSupportFragmentManager(),"");
                 break;
         }
     };

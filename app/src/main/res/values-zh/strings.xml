@@ -31,6 +31,7 @@
     <string name="lb_sort_year">年份</string>
     <string name="lb_sort_type">类型</string>
     <string name="lb_sort_order">排序</string>
+    <string name="lb_sort_genres">主题</string>
 
     <string name="mediacontroller_play_pause">播放/暂停</string>
     <string name="test">测试长度字符串测试长度字符串</string>
