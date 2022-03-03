@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.ui.homepage.HomePageActivity;
 import com.hphtv.movielibrary.databinding.LayoutMovieClassifyFilterBoxBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment;
-import com.hphtv.movielibrary.ui.homepage.HomePageFragementViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
+import com.station.kit.util.LogUtil;
 
 /**
  * author: Sam Leung
@@ -28,10 +30,11 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
     public static final String KEY_GENRES_POS = "genre_pos";
     public static final String KEY_FILTER_ORDER_POS = "filter_order_pos";
 
-    private FilterBoxAdapter mGenreAdapter, mYearsApdater,mTypeAdapter;
+    private FilterBoxAdapter mGenreAdapter, mYearsApdater;
+    private FilterBoxVideoTagAdapter mVideoTagAdapter;
     private FilterBoxDeviceAdapter mDeviceAdapter;
     private FilterBoxOrderAdapter mOrderAdapter;
-    private HomePageFragementViewModel mHomePageFragementViewModel;
+    private FilterPageViewModel mFilterPageViewModel;
 
 
     public static FilterBoxDialogFragment newInstance() {
@@ -43,11 +46,11 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
 
     @Override
     protected void createAndroidViewModel() {
-        if(mViewModel==null){
-            mViewModel=new ViewModelProvider(getActivity()).get(FilterBoxViewModel.class);
+        if (mViewModel == null) {
+            mViewModel = new ViewModelProvider(getActivity()).get(FilterBoxViewModel.class);
         }
-        if(mHomePageFragementViewModel==null){
-            mHomePageFragementViewModel=new ViewModelProvider(getActivity()).get(HomePageFragementViewModel.class);
+        if (mFilterPageViewModel == null) {
+            mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
         }
     }
 
@@ -79,22 +82,22 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
     }
 
     private void init() {
-        mDeviceAdapter = new FilterBoxDeviceAdapter(getContext(),mViewModel.getDevicePos());
-        mGenreAdapter = new FilterBoxAdapter(getContext(),mViewModel.getGenresPos());
-        mTypeAdapter=new FilterBoxAdapter(getContext(),mViewModel.getTypePos());
-        mYearsApdater = new FilterBoxAdapter(getContext(),mViewModel.getYearPos());
-        mOrderAdapter=new   FilterBoxOrderAdapter(getContext(),mViewModel.getFilterOrderPos(),mViewModel.getDesFlag());
+        mDeviceAdapter = new FilterBoxDeviceAdapter(getContext(), mViewModel.getDevicePos());
+        mGenreAdapter = new FilterBoxAdapter(getContext(), mViewModel.getGenresPos());
+        mVideoTagAdapter = new FilterBoxVideoTagAdapter(getContext(), mViewModel.getVideoTypePos());
+        mYearsApdater = new FilterBoxAdapter(getContext(), mViewModel.getYearPos());
+        mOrderAdapter = new FilterBoxOrderAdapter(getContext(), mViewModel.getFilterOrderPos(), mViewModel.getDesFlag());
         mDeviceAdapter.setOnFilterBoxItemClickListener(this);
         mGenreAdapter.setOnFilterBoxItemClickListener(this);
         mYearsApdater.setOnFilterBoxItemClickListener(this);
         mOrderAdapter.setOnFilterBoxItemClickListener(this);
-        mTypeAdapter.setOnFilterBoxItemClickListener(this);
+        mVideoTagAdapter.setOnFilterBoxItemClickListener(this);
 
         prepareRecyclerView(mBinding.viewSortbyDevice, mDeviceAdapter);
         prepareRecyclerView(mBinding.viewSortbyGenres, mGenreAdapter);
         prepareRecyclerView(mBinding.viewSortbyYear, mYearsApdater);
-        prepareRecyclerView(mBinding.viewOrder,mOrderAdapter);
-        prepareRecyclerView(mBinding.viewSortbyType,mTypeAdapter);
+        prepareRecyclerView(mBinding.viewOrder, mOrderAdapter);
+        prepareRecyclerView(mBinding.viewSortbyType, mVideoTagAdapter);
     }
 
     private void prepareRecyclerView(TvRecyclerView recyclerView, RecyclerView.Adapter adapter) {
@@ -115,34 +118,35 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         mViewModel.prepareYears(mYearsApdater);
     }
 
-    private void prepareOrders(){
+    private void prepareOrders() {
         mViewModel.prepareOrders(mOrderAdapter);
     }
 
-    private void prepareTypes(){mViewModel.prepareTypes(mTypeAdapter);}
+    private void prepareTypes() {
+        mViewModel.prepareTypes(mVideoTagAdapter);
+    }
 
     @Override
     public void OnFilterChange() {
-        if(mHomePageFragementViewModel!=null){
-//            mHomePageFragementViewModel.prepareMovies(mViewModel.getRealShortCut(), mViewModel.getRealYear(), mViewModel.getRealGenre(), mViewModel.getFilterOrderPos().get(), mViewModel.getDesFlag().get(), new HomePageFragementViewModel.Callback() {
-//                @Override
-//                public void runOnUIThread(Object... args) {
-//
-//                }
-//            });
-        }
+        Shortcut shortcut = (Shortcut) mViewModel.getRealShortCut();
+        VideoTag videoTag = mViewModel.getRealVideoTag();
+        String genre = mViewModel.getRealGenre();
+        String year = mViewModel.getRealYear();
+        mFilterPageViewModel.onFilterChange(shortcut,videoTag,genre,year);
+        mFilterPageViewModel.reloadMoiveDataViews();
     }
 
     @Override
     public void OnOrderChange() {
-        if(getActivity() instanceof HomePageActivity){
-            Log.e(TAG, "OnOrderChange: OnOrderChange");
-        }
+        int order=mViewModel.getFilterOrderPos().get();
+        boolean isDesc=mViewModel.getDesFlag().get();
+        mFilterPageViewModel.onSortByChange(order,isDesc);
+        mFilterPageViewModel.reOrderMovieDataViews();
     }
 
     @Override
     public void processKeyEvent(int keyCode) {
-        if(keyCode== KeyEvent.KEYCODE_BACK){
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             dismiss();
         }
     }

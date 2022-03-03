@@ -50,9 +50,10 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mViewModel.setOnRefresh(mOnRefresh);
         mNewpageViewModel = new ViewModelProvider(this).get(NewpageViewModel.class);
         initView();
-        prepareMovies();
+        prepareAllMovies();
     }
 
     private void initView() {
@@ -74,8 +75,10 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
         });
 
         gridLayoutManager.setVisibleItemListener(v -> {
-            mBinding.btnFilter.setNextFocusDownId(v.getId());
-            mBinding.btnHome.setNextFocusDownId(v.getId());
+            if(v!=null) {
+                mBinding.btnFilter.setNextFocusDownId(v.getId());
+                mBinding.btnHome.setNextFocusDownId(v.getId());
+            }
         });
 
         mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical(
@@ -90,7 +93,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
         mBinding.recyclerview.addOnScrollListener(new OnMovieLoadListener() {
             @Override
             protected void onLoading(int countItem, int lastItem) {
-                loadMoreMovies();
+                loadAMoreAllMovies();
             }
         });
     }
@@ -104,40 +107,28 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
         if (result.getResultCode() == RESULT_OK) {
-            prepareMovies();//TODO 优化方向:按照详情页的具体操作加载内容
+            prepareAllMovies();//TODO 优化方向:按照详情页的具体操作加载内容
         }
     }
 
-    private void prepareMovies() {
-        mViewModel.reloadMoiveDataViews()
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViews) {
-                        mMovieItemListAdapter.addAll(movieDataViews);
-                    }
-                });
+    private void prepareAllMovies() {
+        mViewModel.reloadMoiveDataViews();
     }
 
-    private void loadMoreMovies() {
-        mViewModel.loadMoiveDataViews()
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViews) {
-                        if (movieDataViews.size() > 0)
-                            mMovieItemListAdapter.appendAll(movieDataViews);
-                    }
-
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        startLoading();
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        stopLoading();
-                    }
-                });
+    private void loadAMoreAllMovies() {
+        mViewModel.loadMoiveDataViews();
     }
+
+    FilterPageViewModel.OnRefresh mOnRefresh=new FilterPageViewModel.OnRefresh() {
+        @Override
+        public void newSearch(List<MovieDataView> newMovieDataView) {
+            mMovieItemListAdapter.addAll(newMovieDataView);
+        }
+
+        @Override
+        public void appendMovieDataViews(List<MovieDataView> movieDataViews) {
+            if (movieDataViews.size() > 0)
+                mMovieItemListAdapter.appendAll(movieDataViews);
+        }
+    };
 }

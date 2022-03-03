@@ -11,16 +11,21 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieVideoTagCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.SeasonDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
 import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.VideoTag;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
+import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.BroadcastHelper;
-import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
@@ -51,9 +56,6 @@ import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.StringUtils;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -99,6 +101,8 @@ public class MovieScanService extends Service {
     private TrailerDao mTrailerDao;
     private StagePhotoDao mStagePhotoDao;
     private SeasonDao mSeasonDao;
+    private VideoTagDao mVideoTagDao;
+    private MovieVideoTagCrossRefDao mMovieVideoTagCrossRefDao;
 
     private HashSet<Shortcut> mShortcutHashSet=new HashSet<>();
 
@@ -133,6 +137,8 @@ public class MovieScanService extends Service {
         mStagePhotoDao = movieLibraryRoomDatabase.getStagePhotoDao();
         mShortcutDao = movieLibraryRoomDatabase.getShortcutDao();
         mSeasonDao = movieLibraryRoomDatabase.getSeasonDao();
+        mVideoTagDao=movieLibraryRoomDatabase.getVideoTagDao();
+        mMovieVideoTagCrossRefDao=movieLibraryRoomDatabase.getMovieVideoTagCrossRefDao();
     }
 
     private void initThreadPools() {
@@ -290,7 +296,7 @@ public class MovieScanService extends Service {
                                                         if (respone != null) {
                                                             MovieWrapper wrapper = respone.toEntity();
                                                             if (wrapper != null) {
-                                                                MovieScanService.this.saveMovieWrapper(wrapper, videoFile, Constants.Scraper.TMDB);
+                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile,Constants.Scraper.TMDB);
                                                             }
                                                         }
                                                         MovieDetailRespone respone_en = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB_EN, type)
@@ -302,7 +308,7 @@ public class MovieScanService extends Service {
                                                         if (respone_en != null) {
                                                             MovieWrapper wrapper = respone_en.toEntity();
                                                             if (wrapper != null) {
-                                                                MovieScanService.this.saveMovieWrapper(wrapper, videoFile, Constants.Scraper.TMDB_EN);
+                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile,Constants.Scraper.TMDB_EN);
                                                             }
                                                         }
                                                     }
@@ -312,6 +318,12 @@ public class MovieScanService extends Service {
                                                     return data;
                                                 })
                                                 .observeOn(Schedulers.from(mNetwork2Executor))
+                                                .onErrorReturn(throwable -> {
+                                                    LogUtil.e(throwable.getMessage());
+                                                    Object[] data = new Object[1];
+                                                    data[0] = shortcut1;
+                                                    return data;
+                                                })
                                                 .blockingFirst();
                                     }
                                     Object[] data = new Object[1];
@@ -449,103 +461,5 @@ public class MovieScanService extends Service {
     public boolean isRunning() {
         return mGlobalTaskCount.get() == 0 ? false : true;
     }
-
-    /**
-     * 保存MovieWrapper实体
-     *
-     * @param movieWrapper
-     */
-    private void saveMovieWrapper(MovieWrapper movieWrapper, VideoFile videoFile, String source) {
-        //获取各个实体类
-        Movie movie = movieWrapper.movie;
-        if (movie == null)
-            return;
-        List<Genre> genreList = movieWrapper.genres;
-        List<Director> directorList = movieWrapper.directors;
-        List<Actor> actorList = movieWrapper.actors;
-        List<Trailer> trailerList = movieWrapper.trailers;
-        List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
-        List<Season> seasonList = movieWrapper.seasons;
-        //插入电影到数据库
-        movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
-        movie.addTime = System.currentTimeMillis();
-        long id = mMovieDao.insertOrIgnoreMovie(movie);
-        //多对多可以先插入数据库
-        mGenreDao.insertGenres(genreList);
-        mActorDao.insertActors(actorList);
-        mDirectorDao.insertDirectors(directorList);
-
-        List<String> querySelectionGenreNames = new ArrayList<>();
-        for (Genre genre : genreList) {
-            querySelectionGenreNames.add(genre.name);
-        }
-
-        //查询影片ID
-        long movie_id = mMovieDao.queryByMovieId(movie.movieId, source).id;
-        long[] genre_ids = mGenreDao.queryByName(querySelectionGenreNames);
-
-        movieWrapper.movie.id = movie_id;
-
-        for (long genre_id : genre_ids) {
-            if (genre_id != -1) {
-                MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
-                movieGenreCrossRef.genreId = genre_id;
-                movieGenreCrossRef.id = movie_id;
-                mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
-            }
-        }
-
-        for (Actor actor : actorList) {
-            if (actor != null) {
-                MovieActorCrossRef movieActorCrossRef = new MovieActorCrossRef();
-                movieActorCrossRef.actorId = actor.actorId;
-                movieActorCrossRef.id = movie_id;
-                mMovieActorCrossRefDao.insertMovieActorCrossRef(movieActorCrossRef);
-            }
-        }
-
-        for (Director director : directorList) {
-            if (director != null) {
-                MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
-                movieDirectorCrossRef.directorId = director.director_id;
-                movieDirectorCrossRef.id = movie_id;
-                mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
-            }
-        }
-
-        for (Trailer trailer : trailerList) {
-            if (trailer != null) {
-                trailer.movieId = movie_id;
-                mTrailerDao.insertOrIgnore(trailer);
-            }
-        }
-
-        for (StagePhoto stagePhoto : stagePhotoList) {
-            if (stagePhoto != null) {
-                stagePhoto.movieId = movie_id;
-                mStagePhotoDao.insertOrIgnore(stagePhoto);
-            }
-        }
-
-        for (Season season : seasonList) {
-            if (season != null) {
-                season.movieId = movie_id;
-                mSeasonDao.insertOrIgnore(season);
-            }
-        }
-
-        MovieVideoFileCrossRef movieVideoFileCrossRef = new MovieVideoFileCrossRef();
-        movieVideoFileCrossRef.id = movie_id;
-        movieVideoFileCrossRef.path = videoFile.path;
-        movieVideoFileCrossRef.source = source;
-        mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
-
-        videoFile.isScanned = 1;
-        mVideoFileDao.update(videoFile);
-
-        LogUtil.v(Thread.currentThread().getName(), "saveMovie=>: " + movie_id + ":" + videoFile.filename);
-
-    }
-
 
 }

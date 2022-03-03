@@ -85,6 +85,17 @@ public class Constants {
 //        OTHER,//其他
     }
 
+    public enum VideoType{
+        movie,
+        tv,
+        unknow,
+        child,
+        animate,
+        variety_show,
+        other,
+        custom
+    }
+
     public enum AccessPermission{
         ALL_AGE,
         ADULT

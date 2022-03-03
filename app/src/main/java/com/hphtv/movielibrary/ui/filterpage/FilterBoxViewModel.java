@@ -14,14 +14,15 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -37,6 +38,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private ShortcutDao mShortcutDao;
     private GenreDao mGenreDao;
     private MovieDao mMovieDao;
+    private VideoTagDao mVideoTagDao;
 
     private List<Shortcut> mLocalShortcutList;
     private List<Shortcut> mDLNAShortcutList;
@@ -45,9 +47,9 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private List<String> mGenresList;
     private List<String> mYearsList;
     private List<String> mOrderList;
-    private List<String> mTypeList;
+    private List<VideoTag> mVideoTagsList;
 
-    private ObservableInt mDevicePos = new ObservableInt(), mTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt();
+    private ObservableInt mDevicePos = new ObservableInt(), mVideoTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt();
     private ObservableBoolean mDesFlag = new ObservableBoolean();
 
     public FilterBoxViewModel(@NonNull @NotNull Application application) {
@@ -56,6 +58,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         mShortcutDao = MovieLibraryRoomDatabase.getDatabase(application).getShortcutDao();
         mGenreDao = MovieLibraryRoomDatabase.getDatabase(application).getGenreDao();
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
+        mVideoTagDao=MovieLibraryRoomDatabase.getDatabase(application).getVideoTagDao();
     }
 
     public void prepareDevices(FilterBoxDeviceAdapter adapter) {
@@ -91,17 +94,17 @@ public class FilterBoxViewModel extends AndroidViewModel {
                 });
     }
 
-    public void prepareTypes(FilterBoxAdapter adapter){
+    public void prepareTypes(FilterBoxVideoTagAdapter adapter) {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
-                .map(s->{
-                    mTypeList= Arrays.asList(getApplication().getResources().getStringArray(R.array.filterpage_fitlertype).clone());
-                    return mTypeList;
+                .map(s -> {
+                    mVideoTagsList = mVideoTagDao.queryAllVideoTags(ScraperSourceTools.getSource());
+                    return mVideoTagsList;
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<String>>() {
+                .subscribe(new SimpleObserver<List<VideoTag>>() {
                     @Override
-                    public void onAction(List<String> list) {
+                    public void onAction(List<VideoTag> list) {
                         adapter.addAll(list);
                     }
                 });
@@ -165,8 +168,8 @@ public class FilterBoxViewModel extends AndroidViewModel {
         return mGenresPos;
     }
 
-    public ObservableInt getTypePos() {
-        return mTypePos;
+    public ObservableInt getVideoTypePos() {
+        return mVideoTypePos;
     }
 
     public ObservableInt getYearPos() {
@@ -187,10 +190,10 @@ public class FilterBoxViewModel extends AndroidViewModel {
         return mDeviceDataList.get(mDevicePos.get() - 1);
     }
 
-    public String getRealType(){
-        if(mTypePos.get()==0)
+    public VideoTag getRealVideoTag() {
+        if (mVideoTypePos.get() == 0)
             return null;
-        return mTypeList.get(mTypePos.get()-1);
+        return mVideoTagsList.get(mVideoTypePos.get() - 1);
     }
 
     public String getRealGenre() {

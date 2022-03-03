@@ -28,6 +28,7 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
+import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.StringTools;
@@ -248,7 +249,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     }
                     List<VideoFile> videoFiles = mVideoFileDao.queryByPaths(paths);
                     wrapper.videoFiles = videoFiles;
-                    saveMovieWrapper(wrapper, videoFiles, source);
+                    ActivityHelper.saveMatchedMovieWrapper(getApplication(),wrapper,videoFiles,source);
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<MovieWrapper>() {
@@ -275,102 +276,6 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread());
-    }
-
-
-    /**
-     * 保存MovieWrapper实体
-     *
-     * @param movieWrapper
-     */
-    private void saveMovieWrapper(MovieWrapper movieWrapper, List<VideoFile> videoFileList, String source) {
-        //获取各个实体类
-        Movie movie = movieWrapper.movie;
-        List<Genre> genreList = movieWrapper.genres;
-        List<Director> directorList = movieWrapper.directors;
-        List<Actor> actorList = movieWrapper.actors;
-        List<Trailer> trailerList = movieWrapper.trailers;
-        List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
-        List<Season> seasonList = movieWrapper.seasons;
-
-        //插入电影到数据库
-        movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
-        movie.addTime = System.currentTimeMillis();
-        mMovieDao.insertOrIgnoreMovie(movie);
-        mGenreDao.insertGenres(genreList);
-        mActorDao.insertActors(actorList);
-        mDirectorDao.insertDirectors(directorList);
-
-        List<String> querySelectionGenreNames = new ArrayList<>();
-        for (Genre genre : genreList) {
-            querySelectionGenreNames.add(genre.name);
-        }
-
-        //查询影片ID
-        long movie_id = mMovieDao.queryByMovieId(movie.movieId, source).id;
-        long[] genre_ids = mGenreDao.queryByName(querySelectionGenreNames);
-
-        movieWrapper.movie.id = movie_id;
-
-        for (long genre_id : genre_ids) {
-            if (genre_id != -1) {
-                MovieGenreCrossRef movieGenreCrossRef = new MovieGenreCrossRef();
-                movieGenreCrossRef.genreId = genre_id;
-                movieGenreCrossRef.id = movie_id;
-                mMovieGenreCrossRefDao.insertMovieGenreCrossRef(movieGenreCrossRef);
-            }
-        }
-
-        for (Actor actor : actorList) {
-            if (actor != null) {
-                MovieActorCrossRef movieActorCrossRef = new MovieActorCrossRef();
-                movieActorCrossRef.actorId = actor.actorId;
-                movieActorCrossRef.id = movie_id;
-                mMovieActorCrossRefDao.insertMovieActorCrossRef(movieActorCrossRef);
-            }
-        }
-
-        for (Director director : directorList) {
-            if (director != null) {
-                MovieDirectorCrossRef movieDirectorCrossRef = new MovieDirectorCrossRef();
-                movieDirectorCrossRef.directorId = director.director_id;
-                movieDirectorCrossRef.id = movie_id;
-                mMovieDirectorCrossRefDao.insertMovieDirectorCrossRef(movieDirectorCrossRef);
-            }
-        }
-
-        for (Trailer trailer : trailerList) {
-            if (trailer != null) {
-                trailer.movieId = movie_id;
-                mTrailerDao.insertOrIgnore(trailer);
-            }
-        }
-
-        for (StagePhoto stagePhoto : stagePhotoList) {
-            if (stagePhoto != null) {
-                stagePhoto.movieId = movie_id;
-                mStagePhotoDao.insertOrIgnore(stagePhoto);
-            }
-        }
-
-        for (Season season : seasonList) {
-            if (season != null) {
-                season.movieId = movie_id;
-                mSeasonDao.insertOrIgnore(season);
-            }
-        }
-
-        for (VideoFile videoFile : videoFileList) {
-            MovieVideoFileCrossRef movieVideoFileCrossRef = new MovieVideoFileCrossRef();
-            movieVideoFileCrossRef.id = movie_id;
-            movieVideoFileCrossRef.path = videoFile.path;
-            movieVideoFileCrossRef.source = source;
-            mMovieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
-            videoFile.isScanned = 1;
-            videoFile.keyword = movie.title;
-            mVideoFileDao.update(videoFile);
-        }
-
     }
 
     public MovieWrapper getMovieWrapper() {

@@ -48,6 +48,7 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
         private List<SearchMovie> list;
         private int total;
         private String source;
+        private boolean cache;
 
         private class SearchMovie implements ResponeEntity<Movie> {
             private String movie_id;

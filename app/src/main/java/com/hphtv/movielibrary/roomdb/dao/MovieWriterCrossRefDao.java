@@ -14,6 +14,6 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieWriterCrossRef;
 @Dao
 public interface MovieWriterCrossRefDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertMovieWriterCrossRef(MovieWriterCrossRef movieWriterCrossRef);
 }

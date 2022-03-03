@@ -66,12 +66,4 @@
         <item>@string/shortcut_type_tv</item>
     </string-array>
 
-
-    <string-array name="filterpage_fitlertype">
-        <item>@string/category_all</item>
-        <item>@string/tab_movie</item>
-        <item>@string/tab_tv</item>
-        <item>@string/tab_child</item>
-        <item>@string/tab_undefine</item>
-    </string-array>
 </resources>

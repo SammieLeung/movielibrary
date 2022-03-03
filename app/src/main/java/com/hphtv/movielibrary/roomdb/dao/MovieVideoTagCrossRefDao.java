@@ -4,14 +4,14 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 
 /**
  * author: Sam Leung
- * date:  2021/5/29
+ * date:  2022/3/2
  */
 @Dao
-public interface MovieActorCrossRefDao {
+public interface MovieVideoTagCrossRefDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long insertMovieActorCrossRef(MovieActorCrossRef movieActorCrossRef);
+    public long insert(MovieVideoTagCrossRef crossRef);
 }

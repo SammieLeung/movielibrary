@@ -4,6 +4,7 @@ import com.hphtv.movielibrary.scraper.api.tmdb.TmdbURL;
 import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -22,10 +23,10 @@ public class RetrofiTools {
 
 
     public static TmdbApiRequest createTmdbApiRequest() {
-            return TmdbRetrofitBuilder().create(TmdbApiRequest.class);
+        return TmdbRetrofitBuilder().create(TmdbApiRequest.class);
     }
 
-    public static TmdbApiRequest createTmdbApiRequest_EN(){
+    public static TmdbApiRequest createTmdbApiRequest_EN() {
         return TmdbRetrofitBuilder_EN().create(TmdbApiRequest.class);
     }
 
@@ -49,7 +50,10 @@ public class RetrofiTools {
 
     private static OkHttpClient getOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        return builder.build();
+        return builder.readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build();
     }
 
 

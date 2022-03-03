@@ -13,6 +13,6 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 @Dao
 public interface MovieDirectorCrossRefDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertMovieDirectorCrossRef(MovieDirectorCrossRef movieDirectorCrossRef);
 }

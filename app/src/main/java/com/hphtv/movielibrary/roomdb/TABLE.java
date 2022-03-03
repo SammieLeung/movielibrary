@@ -17,6 +17,7 @@ public interface TABLE {
     String STAGEPHOTO ="stagephoto";
     String SHORTCUT="shortcut";
     String SEASON="season";
+    String VIDEO_TAG="videotag";
 
     String MOVIE_ACTOR_CROSS_REF = "movie_actor_cross_ref";
     String MOVIE_DIRECTOR_CROSS_REF = "movie_director_cross_ref";
@@ -24,6 +25,7 @@ public interface TABLE {
 
     String MOVIE_GENRE_CROSS_REF = "movie_genre_cross_ref";
     String MOVIE_VIDEOFILE_CROSS_REF = "movie_videofile_cross_ref";
+    String MOVIE_VIDEOTAG_CROSS_REF = "movie_videotag_cross_ref";
 
     String SCAN_DIRECTORY = "scan_directory";
     String VIDEOFILE = "videofile";

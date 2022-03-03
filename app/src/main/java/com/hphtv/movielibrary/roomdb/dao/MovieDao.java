@@ -156,6 +156,58 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryMovieDataView(@Nullable String device_uri, @Nullable String year, @Nullable String genre_name, int order, String source, @Nullable boolean isDesc);
 
+    /**
+     * 根据条件返回符合条件电影数量。
+     * @param dir_uri
+     * @param vtid
+     * @param genre_name
+     * @param year
+     * @param source
+     * @return
+     */
+    @Query("SELECT COUNT(*) FROM ("+
+            "SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source" +
+            " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
+            " AND (:year IS NULL OR year=:year)" +
+            " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
+            " AND (:vtid IS -1 OR id IN (SELECT id FROM "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" WHERE vtid=:vtid))"+
+            " GROUP BY id " +
+            ")")
+    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year,String source);
+
+    /**
+     * 根据条件返回符合条件电影
+     * @param dir_uri 设备id
+     * @param year       年份
+     * @param genre_name 类型
+     * @param order      排序方式
+     * @param isDesc     是否倒序
+     * @return
+     */
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source" +
+            " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
+            " AND (:year IS NULL OR year=:year)" +
+            " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
+            " AND (:vtid IS -1 OR id IN (SELECT id FROM "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" WHERE vtid=:vtid))"+
+            " GROUP BY id " +
+            " ORDER BY " +
+            "CASE WHEN :order =0 AND :isDesc=0 THEN pinyin END ASC," +
+            "CASE WHEN :order =1 AND :isDesc=0 THEN ratings END ASC," +
+            "CASE WHEN :order =2 AND :isDesc=0 THEN year END ASC," +
+            "CASE WHEN :order =3 AND :isDesc=0 THEN add_time END ASC," +
+            "CASE WHEN :order =4 AND :isDesc=0 THEN last_playtime END ASC," +
+            "CASE WHEN :order =0 AND :isDesc=1 THEN pinyin END DESC," +
+            "CASE WHEN :order =1 AND :isDesc=1 THEN ratings END DESC," +
+            "CASE WHEN :order =2 AND :isDesc=1 THEN year END DESC," +
+            "CASE WHEN :order =3 AND :isDesc=1 THEN add_time END DESC," +
+            "CASE WHEN :order =4 AND :isDesc=1 THEN last_playtime END DESC," +
+            "CASE WHEN :order =5 THEN is_favorite END ASC " +
+            "LIMIT :offset,:limit "
+    )
+    public List<MovieDataView> queryMovieDataView2(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year, int order, @Nullable boolean isDesc, String source,int offset,int limit);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
             " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
