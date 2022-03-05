@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.FocusFinder;
+import android.view.InputDevice;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -235,6 +236,36 @@ public class TvRecyclerView extends RecyclerView {
 
     protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
         return 0;
+    }
+
+    private float mVerticalScrollFactor = 20.f;
+
+    @Override
+    public boolean onGenericMotionEvent(MotionEvent event) {// 鼠标滑轮滑动事件
+        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+            if (event.getAction() == MotionEvent.ACTION_SCROLL
+                    && getScrollState() == SCROLL_STATE_IDLE) {// 鼠标滑轮事件执行&&RecyclerView不是真正滑动
+                final float vscroll = event
+                        .getAxisValue(MotionEvent.AXIS_VSCROLL);// 获取轴线距离
+                if (vscroll != 0) {
+                    final int delta = -1
+                            * (int) (vscroll * mVerticalScrollFactor);
+//                    Log.v(TAG, "onGenericMotionEvent()==>");
+
+                    if (canScrollVertically(delta > 0 ? 1 : -1)) {
+                        smoothScrollBy(0, delta);
+                        Log.v(TAG, "canScrollVertically");
+                        return true;
+
+                    } else if (canScrollHorizontally(delta > 0 ? 1 : -1)) {
+                        Log.v(TAG, "canScrollHorizontally");
+                        smoothScrollBy(delta * 2, 0);
+                        return true;
+                    }
+                }
+            }
+        }
+        return super.onGenericMotionEvent(event);
     }
 
     @Override
@@ -546,6 +577,7 @@ public class TvRecyclerView extends RecyclerView {
 
     public interface OnKeyPressListener {
         void processKeyEvent(int keyCode);
+
         void onBackPress();
     }
 

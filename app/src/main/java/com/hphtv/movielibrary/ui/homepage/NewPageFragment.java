@@ -58,6 +58,34 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         }
     };
 
+    private GenreTagAdapter.GenreListener mGenreListener=new GenreTagAdapter.GenreListener() {
+        @Override
+        public void addGenre() {
+
+        }
+
+        @Override
+        public void browseAll() {
+            Intent intent=new Intent(getContext(), FilterPageAcitvity.class);
+            startActivity(intent);
+        }
+    };
+
+
+    private BaseApater2.OnRecyclerViewItemActionListener mGenreItemClickListener=new BaseApater2.OnRecyclerViewItemActionListener() {
+        @Override
+        public void onItemClick(View view, int postion, Object data) {
+            Intent intent=new Intent(getContext(), FilterPageAcitvity.class);
+            intent.putExtra(FilterPageAcitvity.EXTRA_GENRE,data.toString());
+            startActivity(intent);
+        }
+
+        @Override
+        public void onItemFocus(View view, int postion, Object data) {
+
+        }
+    };
+
     public NewPageFragment(IAutofitHeight autofitHeight, int postion) {
         super(autofitHeight, postion);
     }
@@ -151,29 +179,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
         mGenreTagAdapter = new GenreTagAdapter(getContext(), mGenreTagList);
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
-        mGenreTagAdapter.setOnGenreListener(new GenreTagAdapter.GenreListener() {
-            @Override
-            public void addGenre() {
-
-            }
-
-            @Override
-            public void browseAll() {
-                Intent intent=new Intent(getContext(), FilterPageAcitvity.class);
-                startActivity(intent);
-            }
-        });
-        mGenreTagAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<String>() {
-            @Override
-            public void onItemClick(View view, int postion, String data) {
-
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, String data) {
-
-            }
-        });
+        mGenreTagAdapter.setOnGenreListener(mGenreListener);
+        mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
     }
 
     /**

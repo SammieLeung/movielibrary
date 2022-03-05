@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.app.Application;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
@@ -48,6 +49,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private List<String> mYearsList;
     private List<String> mOrderList;
     private List<VideoTag> mVideoTagsList;
+    private String mPresetGenreName;
 
     private ObservableInt mDevicePos = new ObservableInt(), mVideoTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt();
     private ObservableBoolean mDesFlag = new ObservableBoolean();
@@ -121,6 +123,10 @@ public class FilterBoxViewModel extends AndroidViewModel {
                     @Override
                     public void onAction(List<String> genresList) {
                         adapter.addAll(genresList);
+                        if(!TextUtils.isEmpty(mPresetGenreName)) {
+                            adapter.setCheckValue(mPresetGenreName);
+                            mPresetGenreName=null;
+                        }
                     }
                 });
     }
@@ -208,6 +214,9 @@ public class FilterBoxViewModel extends AndroidViewModel {
         return mYearsList.get(mYearPos.get() - 1);
     }
 
+    public void setPresetGenreName(String presetGenreName) {
+        mPresetGenreName = presetGenreName;
+    }
 
     private String getString(int resId) {
         return getApplication().getString(resId);

@@ -148,4 +148,12 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     public void setOnRefresh(OnRefresh onRefresh) {
         mOnRefresh = onRefresh;
     }
+
+    public void setGenre(String genre){
+        mGenre=genre;
+    }
+
+    public String getGenre(){
+        return mGenre;
+    }
 }

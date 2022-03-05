@@ -1,6 +1,8 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -18,34 +20,59 @@ import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.homepage.NewpageViewModel;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * author: Sam Leung
  * date:  2022/2/22
  */
 public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, ActivityFilterpageBinding> {
+    public static final String EXTRA_GENRE = "extra_genre";
+
     private NewMovieItemListAdapter mMovieItemListAdapter;
     private NewpageViewModel mNewpageViewModel;
 
-    private View.OnClickListener mOnClickListener = v -> {
+    View.OnClickListener mOnClickListener = v -> {
         switch (v.getId()) {
             case R.id.btn_home:
                 ActivityHelper.startHomePageActivity(FilterPageAcitvity.this);
                 break;
             case R.id.btn_filter:
-                FilterBoxDialogFragment filterBoxDialogFragment=FilterBoxDialogFragment.newInstance();
-                filterBoxDialogFragment.show(getSupportFragmentManager(),"");
+                FilterBoxDialogFragment filterBoxDialogFragment = FilterBoxDialogFragment.newInstance();
+                filterBoxDialogFragment.show(getSupportFragmentManager(), "");
                 break;
         }
     };
+
+    BaseApater2.OnRecyclerViewItemActionListener mActionListener=new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+        @Override
+        public void onItemClick(View view, int postion, MovieDataView data) {
+            mNewpageViewModel.startDetailActivity(FilterPageAcitvity.this, data);
+        }
+
+        @Override
+        public void onItemFocus(View view, int postion, MovieDataView data) {
+            mBinding.setCount(getString(R.string.genre_all) + " " + (postion + 1) + "/" + mViewModel.getTotal());
+        }
+    };
+
+    TvRecyclerView.OnKeyPressListener mOnKeyPressListener=new TvRecyclerView.OnKeyPressListener() {
+        @Override
+        public void processKeyEvent(int keyCode) {
+
+        }
+
+        @Override
+        public void onBackPress() {
+            finish();
+        }
+    };
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,33 +80,34 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
         mViewModel.setOnRefresh(mOnRefresh);
         mNewpageViewModel = new ViewModelProvider(this).get(NewpageViewModel.class);
         initView();
-        prepareAllMovies();
+        onNewIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        String genreName = getIntent().getStringExtra(EXTRA_GENRE);
+        if (!TextUtils.isEmpty(genreName)) {
+            mViewModel.setGenre(genreName);
+        }
+        reloadMoiveDataViews();
+
     }
 
     private void initView() {
         mBinding.btnHome.setOnClickListener(mOnClickListener);
         mBinding.btnFilter.setOnClickListener(mOnClickListener);
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
-        mBinding.recyclerview.setLayoutManager(gridLayoutManager);
-        mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
-        mMovieItemListAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
-            @Override
-            public void onItemClick(View view, int postion, MovieDataView data) {
-                mNewpageViewModel.startDetailActivity(FilterPageAcitvity.this, data);
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, MovieDataView data) {
-                mBinding.setCount(getString(R.string.genre_all) + " " + (postion + 1) + "/" + mViewModel.getTotal());
-            }
-        });
-
         gridLayoutManager.setVisibleItemListener(v -> {
-            if(v!=null) {
+            if (v != null) {
                 mBinding.btnFilter.setNextFocusDownId(v.getId());
                 mBinding.btnHome.setNextFocusDownId(v.getId());
             }
         });
+        mBinding.recyclerview.setLayoutManager(gridLayoutManager);
+
+        mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
+        mMovieItemListAdapter.setOnItemClickListener(mActionListener);
 
         mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical(
                 getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),
@@ -96,6 +124,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
                 loadAMoreAllMovies();
             }
         });
+        mBinding.recyclerview.setOnKeyPressListener(mOnKeyPressListener);
     }
 
     @Override
@@ -107,11 +136,11 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
         if (result.getResultCode() == RESULT_OK) {
-            prepareAllMovies();//TODO 优化方向:按照详情页的具体操作加载内容
+            reloadMoiveDataViews();//TODO 优化方向:按照详情页的具体操作加载内容
         }
     }
 
-    private void prepareAllMovies() {
+    private void reloadMoiveDataViews() {
         mViewModel.reloadMoiveDataViews();
     }
 
@@ -119,7 +148,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
         mViewModel.loadMoiveDataViews();
     }
 
-    FilterPageViewModel.OnRefresh mOnRefresh=new FilterPageViewModel.OnRefresh() {
+    FilterPageViewModel.OnRefresh mOnRefresh = new FilterPageViewModel.OnRefresh() {
         @Override
         public void newSearch(List<MovieDataView> newMovieDataView) {
             mMovieItemListAdapter.addAll(newMovieDataView);

@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -51,6 +52,8 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         }
         if (mFilterPageViewModel == null) {
             mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
+            String genre= mFilterPageViewModel.getGenre();
+            mViewModel.setPresetGenreName(genre);
         }
     }
 
@@ -93,6 +96,7 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         mOrderAdapter.setOnFilterBoxItemClickListener(this);
         mVideoTagAdapter.setOnFilterBoxItemClickListener(this);
 
+
         prepareRecyclerView(mBinding.viewSortbyDevice, mDeviceAdapter);
         prepareRecyclerView(mBinding.viewSortbyGenres, mGenreAdapter);
         prepareRecyclerView(mBinding.viewSortbyYear, mYearsApdater);
@@ -125,6 +129,7 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
     private void prepareTypes() {
         mViewModel.prepareTypes(mVideoTagAdapter);
     }
+
 
     @Override
     public void OnFilterChange() {
