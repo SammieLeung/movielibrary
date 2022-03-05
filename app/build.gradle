@@ -122,7 +122,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     //
-    implementation project(':CircleRecyclerView')
     implementation project(':service')
     implementation project(':dlna')
     implementation project(':VideoNameParser')
