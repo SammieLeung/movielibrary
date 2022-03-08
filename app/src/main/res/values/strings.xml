@@ -24,14 +24,7 @@
     <string name="ratingsCounts">( %1$s people )</string>
     <string name="sortby">%1$s|%2$s %3$s</string>
     <string name="lb_title" translatable="false">MediaStation</string>
-    <string name="lb_sort_device">Device</string>
-    <string name="lb_sort_region">Region</string>
-    <string name="lb_sort_directory">Directory</string>
-    <string name="lb_sort_year">Year</string>
-    <string name="lb_sort_type">Type</string>
-    <string name="lb_sort_genres">Genres</string>
 
-    <string name="lb_sort_order">Filiter</string>
     <string name="test">TestText</string>
     <string name="pages">%1$d&#047;%2$d</string>
     <string name="usb_totalspace">Total: %1$s GB</string>

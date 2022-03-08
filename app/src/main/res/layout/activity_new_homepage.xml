@@ -46,7 +46,7 @@
                 android:layout_height="56dp"
                 android:layout_below="@id/btn_pinyin_search"
                 app:tabIndicatorHeight="0dp"
-                app:tabBackground="@drawable/new_common_tab_bg"
+                app:tabBackground="@drawable/new_common_tab_bg_2"
                 android:layout_marginLeft="72dp"
                 app:tabRippleColor="@android:color/transparent"
                 android:layout_marginTop="5dp" />

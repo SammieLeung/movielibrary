@@ -29,5 +29,5 @@ public interface TABLE {
 
     String SCAN_DIRECTORY = "scan_directory";
     String VIDEOFILE = "videofile";
-    String GENRE_TAG="genre_tag";
+    String GENRE_TAG="genretag";
 }

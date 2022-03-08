@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ea06cec19f5376476dacbc63b66c022b",
+    "identityHash": "86b39465a674afb0e06390cd7733a59f",
     "entities": [
       {
         "tableName": "actor",
@@ -855,8 +855,8 @@
         "foreignKeys": []
       },
       {
-        "tableName": "genre_tag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `source` TEXT NOT NULL, PRIMARY KEY(`name`, `source`))",
+        "tableName": "genretag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `source` TEXT NOT NULL, `weight` INTEGER NOT NULL, PRIMARY KEY(`name`, `source`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -868,6 +868,12 @@
             "fieldPath": "source",
             "columnName": "source",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -962,7 +968,7 @@
       },
       {
         "tableName": "videotag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vtid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag` TEXT, `flag` INTEGER NOT NULL, `source` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vtid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag` TEXT, `flag` INTEGER NOT NULL, `source` TEXT, `weight` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "vtid",
@@ -987,6 +993,12 @@
             "columnName": "source",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -1051,7 +1063,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ea06cec19f5376476dacbc63b66c022b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '86b39465a674afb0e06390cd7733a59f')"
     ]
   }
 }

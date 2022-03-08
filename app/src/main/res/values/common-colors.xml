@@ -7,4 +7,5 @@
     <color name="main_focus">#FF634EB7</color>
     <color name="main_press">#FF4C389B</color>
     <color name="divier_line">#FF343E5A</color>
+    <color name="scroller_bar_color">#FF4F5160</color>
 </resources>

@@ -14,11 +14,13 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
+import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
+import com.hphtv.movielibrary.ui.homepage.genretag.GenreTagItem;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -37,13 +39,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/6/1
  */
-public class NewpageViewModel extends BaseAndroidViewModel {
+public class NewPageFragmentViewModel extends BaseAndroidViewModel {
     public static final int LIMIT=10;
     private GenreDao mGenreDao;
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
+    private Callback mGenreCallback;
 
-    public NewpageViewModel(@NonNull @NotNull Application application) {
+    public NewPageFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
 
         initDao();
@@ -93,13 +96,13 @@ public class NewpageViewModel extends BaseAndroidViewModel {
         appBaseActivity.startActivityForResult(intent);
     }
 
-    public void prepareGenreList(Callback callback) {
+    public void prepareGenreList() {
         Observable.just(3)
                 .subscribeOn(Schedulers.io())
                 .map(defalut_count -> {
                     //优先顺序 自定义>已有电影>固定排序
                     List<String> newCustomTags = new ArrayList<>();
-                    List<String> customGenreTags = mGenreDao.queryGenreTagBySource(ScraperSourceTools.getSource());
+                    List<String> customGenreTags = mGenreDao.queryGenreTagNameBySource(ScraperSourceTools.getSource());
                     if (customGenreTags.size() == 0) {
                         List<String> allMovieGenres = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource());
                         //已有电影分类数量不足
@@ -128,10 +131,18 @@ public class NewpageViewModel extends BaseAndroidViewModel {
                 .subscribe(new SimpleObserver<List<String>>() {
                     @Override
                     public void onAction(List<String> genreTags) {
-                        if (callback != null)
-                            callback.runOnUIThread(genreTags);
+                        if (mGenreCallback != null)
+                            mGenreCallback.runOnUIThread(genreTags);
                     }
                 });
+    }
+
+    public void updateGenreTagList(List<GenreTag> genreTagItems){
+        new Thread(() -> {
+            mGenreDao.deleteAllGenreTags();
+            mGenreDao.insertGenreTags(genreTagItems);
+            prepareGenreList();
+        }).start();
     }
 
     public void prepareRecentlyAddedMovie(Callback callback) {
@@ -194,6 +205,10 @@ public class NewpageViewModel extends BaseAndroidViewModel {
                             callback.runOnUIThread(movieDataViewList);
                     }
                 });
+    }
+
+    public void setGenreCallback(Callback genreCallback) {
+        mGenreCallback = genreCallback;
     }
 
     public interface Callback {

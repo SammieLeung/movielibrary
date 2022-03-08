@@ -17,5 +17,6 @@ public class VideoTag {
     public String tag;
     public int flag;//0-不能删除，1-可以删除
     public String source;
+    public int weight=0;
 
 }

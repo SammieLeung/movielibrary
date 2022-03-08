@@ -29,7 +29,8 @@ public abstract class BaseFragment2<VM extends AndroidViewModel, VDB extends Vie
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!createViewModel())
+        mViewModel=createViewModel();
+        if (mViewModel==null)
             mViewModel = ViewModelHelper.createAndroidViewModel(this, this.getClass());
     }
 
@@ -46,6 +47,6 @@ public abstract class BaseFragment2<VM extends AndroidViewModel, VDB extends Vie
         mBinding.setLifecycleOwner(this);
     }
 
-    protected abstract boolean createViewModel();
+    protected abstract VM createViewModel();
 
 }

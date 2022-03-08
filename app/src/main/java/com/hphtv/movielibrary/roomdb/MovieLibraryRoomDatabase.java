@@ -2,9 +2,12 @@ package com.hphtv.movielibrary.roomdb;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -48,6 +51,8 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieWriterCrossRef;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * author: Sam Leung
@@ -109,7 +114,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
 //                            .createFromAsset("database/movielibrary_db_v2_version_1.db")
-                            .fallbackToDestructiveMigration()
+//                            .addMigrations(MIGRATION_1_2)
+//                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
@@ -117,5 +123,10 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         return sInstance;
     }
 
-
+    public static final Migration MIGRATION_1_2=new Migration(1,2) {
+        @Override
+        public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE genre_tag ADD COLUMN weight INTEGER NOT NULL DEFAULT 0;");
+        }
+    };
 }

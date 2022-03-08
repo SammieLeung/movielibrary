@@ -21,6 +21,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageAcitvity;
+import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.station.kit.util.DensityUtil;
 
@@ -33,7 +34,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel, FragmentHomepageBinding> implements IActivityResult {
+public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentViewModel, FragmentHomepageBinding> implements IActivityResult {
     public static final String TAG = NewPageFragment.class.getSimpleName();
     private HistoryListAdapter mHistoryListAdapter;
     private GenreTagAdapter mGenreTagAdapter;
@@ -61,7 +62,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     private GenreTagAdapter.GenreListener mGenreListener=new GenreTagAdapter.GenreListener() {
         @Override
         public void addGenre() {
-
+            AddGenreDialogFragment fragment=AddGenreDialogFragment.newInstance();
+            fragment.show(getChildFragmentManager(),"Add Genres");
         }
 
         @Override
@@ -116,16 +118,18 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     }
 
     @Override
+    protected NewPageFragmentViewModel createViewModel() {
+        return null;
+    }
+
+    @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (hidden)
             Log.e(TAG, "onHiddenChanged: " + this.toString());
     }
 
-    @Override
-    protected boolean createViewModel() {
-        return false;
-    }
+
 
     private void initViews() {
         initRecentlyPlayedList();
@@ -181,6 +185,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
         mGenreTagAdapter.setOnGenreListener(mGenreListener);
         mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
+        mViewModel.setGenreCallback(list -> mGenreTagAdapter.addAll(list));
     }
 
     /**
@@ -238,7 +243,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewpageViewModel,
     }
 
     private void prepareMovieGenreTagData() {
-        mViewModel.prepareGenreList(list -> mGenreTagAdapter.addAll(list));
+        mViewModel.prepareGenreList();
     }
 
     private void prepareRecentlyAddedMovie() {

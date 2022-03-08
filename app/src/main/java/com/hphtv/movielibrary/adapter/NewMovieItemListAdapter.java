@@ -40,6 +40,7 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
         MovieDataView movieDataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
         GlideTools.GlideWrapper(mContext,movieDataView.poster)
+                .placeholder(R.mipmap.default_poster)
                 .into(binding.rvPoster);
         binding.setTitle(movieDataView.title);
         binding.setRating(movieDataView.ratings);

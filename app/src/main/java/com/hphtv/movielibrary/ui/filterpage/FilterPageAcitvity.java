@@ -19,7 +19,7 @@ import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
-import com.hphtv.movielibrary.ui.homepage.NewpageViewModel;
+import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.station.kit.util.DensityUtil;
@@ -35,7 +35,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     public static final String EXTRA_GENRE = "extra_genre";
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
-    private NewpageViewModel mNewpageViewModel;
+    private NewPageFragmentViewModel mNewpageViewModel;
 
     View.OnClickListener mOnClickListener = v -> {
         switch (v.getId()) {
@@ -78,7 +78,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel.setOnRefresh(mOnRefresh);
-        mNewpageViewModel = new ViewModelProvider(this).get(NewpageViewModel.class);
+        mNewpageViewModel = new ViewModelProvider(this).get(NewPageFragmentViewModel.class);
         initView();
         onNewIntent(getIntent());
     }

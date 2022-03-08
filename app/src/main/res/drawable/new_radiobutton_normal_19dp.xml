@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:width="19dp"
-        android:height="19dp"
-        android:drawable="@mipmap/icon_new_radiobutton_normal"></item>
-</layer-list>

@@ -37,11 +37,6 @@ public class ShortcutScanItemSelectFragment extends BaseFragment2<ShortcutOption
         return fragment;
     }
 
-    @Override
-    protected boolean createViewModel() {
-        mViewModel = new ViewModelProvider(mContext).get(ShortcutOptionsViewModel.class);
-        return true;
-    }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -55,6 +50,11 @@ public class ShortcutScanItemSelectFragment extends BaseFragment2<ShortcutOption
             mShortcutOptionsItem.setPos(pos);
         });
         updateRadioButtons();
+    }
+
+    @Override
+    protected ShortcutOptionsViewModel createViewModel() {
+        return new ViewModelProvider(mContext).get(ShortcutOptionsViewModel.class);
     }
 
     public void setItem(ShortcutOptionsItem item) {

@@ -36,7 +36,8 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB exten
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (createViewModel()==null)
+        mViewModel = createViewModel();
+        if (mViewModel == null)
             mViewModel = ViewModelHelper.createAndroidViewModel(this, this.getClass());
     }
 
@@ -58,8 +59,8 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB exten
     public void onStart() {
         super.onStart();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        getDialog().getWindow().getAttributes().windowAnimations= R.style.DialogAnimation;
-        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        getDialog().getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     protected abstract VM createViewModel();

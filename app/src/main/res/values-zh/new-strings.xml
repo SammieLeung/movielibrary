@@ -3,7 +3,8 @@
     <string name="unknow">未知</string>
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
-
+    <!--    主页-->
+    <string name="homepage_custom_genre_tag_title">编辑主题</string>
 
     <!--    历史播放-->
     <string name="history_list_title">最近播放</string>
@@ -21,6 +22,14 @@
     <string name="category_favorite">收藏</string>
 
     <string name="genre_edit_dialog_title">分类管理</string>
+
+    <string name="lb_sort_device">设备</string>
+    <string name="lb_sort_region">地区</string>
+    <string name="lb_sort_directory">目录</string>
+    <string name="lb_sort_year">年份</string>
+    <string name="lb_sort_type">类型</string>
+    <string name="lb_sort_by">排序</string>
+    <string name="lb_sort_genres">主题</string>
 
     <string name="filter_box_local_device">本地设备</string>
     <string name="filter_box_dlna_device">DLNA设备</string>

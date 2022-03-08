@@ -13,7 +13,7 @@
         android:background="@drawable/new_list_item_bg"
         android:button="@null"
         android:drawableTint="@drawable/new_radiobutton_tint"
-        android:drawableRight="@drawable/new_radiobutton_selector_19dp"
+        android:drawableRight="@drawable/new_radiobutton_selector"
         android:layout_height="@dimen/shortcut_scan_diaolg_item_height"></RadioButton>
 
     <data>

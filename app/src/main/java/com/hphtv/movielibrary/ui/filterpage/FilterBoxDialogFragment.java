@@ -5,8 +5,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,17 +17,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
+import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.homepage.HomePageActivity;
 import com.hphtv.movielibrary.databinding.LayoutMovieClassifyFilterBoxBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.station.kit.util.LogUtil;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * author: Sam Leung
  * date:  2021/12/6
  */
-public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener, TvRecyclerView.OnKeyPressListener {
+public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener, TvRecyclerView.OnKeyPressListener {
     private static final String TAG = FilterBoxDialogFragment.class.getSimpleName();
     public static final String KEY_DEVICE_POS = "device_pos";
     public static final String KEY_YEAR_POS = "year_pos";
@@ -45,25 +51,10 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         return fragment;
     }
 
-    @Override
-    protected void createAndroidViewModel() {
-        if (mViewModel == null) {
-            mViewModel = new ViewModelProvider(getActivity()).get(FilterBoxViewModel.class);
-        }
-        if (mFilterPageViewModel == null) {
-            mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
-            String genre= mFilterPageViewModel.getGenre();
-            mViewModel.setPresetGenreName(genre);
-        }
-    }
 
     @Override
-    protected int getLayoutId() {
-        return R.layout.layout_movie_classify_filter_box;
-    }
-
-    @Override
-    protected void onViewCreated() {
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         init();
     }
 
@@ -72,6 +63,19 @@ public class FilterBoxDialogFragment extends BaseDialogFragment<FilterBoxViewMod
         super.onStart();
         getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         getDialog().getWindow().setGravity(Gravity.BOTTOM);
+    }
+
+    @Override
+    protected FilterBoxViewModel createViewModel() {
+        if (mViewModel == null) {
+            mViewModel = new ViewModelProvider(getActivity()).get(FilterBoxViewModel.class);
+        }
+        if (mFilterPageViewModel == null) {
+            mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
+            String genre= mFilterPageViewModel.getGenre();
+            mViewModel.setPresetGenreName(genre);
+        }
+        return mViewModel;
     }
 
     @Override

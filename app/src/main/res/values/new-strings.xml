@@ -3,7 +3,8 @@
     <string name="unknow">unknow</string>
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
-
+    <!--    主页-->
+    <string name="homepage_custom_genre_tag_title">Eidt Genre Tag</string>
 
     <!--    历史播放-->
     <string name="history_list_title">Recently Played</string>
@@ -21,6 +22,15 @@
     <string name="category_favorite">Favorite</string>
 
     <string name="genre_edit_dialog_title">Category</string>
+
+    <string name="lb_sort_device">Device</string>
+    <string name="lb_sort_region">Region</string>
+    <string name="lb_sort_directory">Directory</string>
+    <string name="lb_sort_year">Year</string>
+    <string name="lb_sort_type">Type</string>
+    <string name="lb_sort_by">Sort by</string>
+    <string name="lb_sort_genres">Genres</string>
+
 
     <string name="filter_box_local_device">LOCAL</string>
     <string name="filter_box_dlna_device">DLNA</string>

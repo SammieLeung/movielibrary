@@ -34,7 +34,7 @@
     <dimen name="poster_item_large_h">367dp</dimen>
     <dimen name="genre_edit_dialog_w">305dp</dimen>
     <dimen name="genre_edit_dialog_h">434dp</dimen>
-    <dimen name="genre_item_h">38dp</dimen>
+    <dimen name="genre_item_h">57dp</dimen>
 
     <dimen name="textsize_medium">24sp</dimen>
     <dimen name="textsize_small">18sp</dimen>

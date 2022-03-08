@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.roomdb.entity;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 
@@ -16,4 +17,5 @@ public class GenreTag {
     public String name;
     @NonNull
     public String source;
+    public int weight=0;
 }

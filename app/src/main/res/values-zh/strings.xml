@@ -25,13 +25,6 @@
     <string name="hint">请输入关键字</string>
     <string name="ratingsCounts">( %1$s人评价 )</string>
     <string name="sortby">%1$s|%2$s %3$s</string>
-    <string name="lb_sort_device">设备</string>
-    <string name="lb_sort_region">地区</string>
-    <string name="lb_sort_directory">目录</string>
-    <string name="lb_sort_year">年份</string>
-    <string name="lb_sort_type">类型</string>
-    <string name="lb_sort_order">排序</string>
-    <string name="lb_sort_genres">主题</string>
 
     <string name="mediacontroller_play_pause">播放/暂停</string>
     <string name="test">测试长度字符串测试长度字符串</string>

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "0e868e1475e7cbdb6219712f412e2865",
+    "identityHash": "bfce23706ba331dafe778429c2d200f7",
     "entities": [
       {
         "tableName": "actor",
@@ -760,33 +760,6 @@
         "foreignKeys": []
       },
       {
-        "tableName": "genre_tag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `source` TEXT NOT NULL, PRIMARY KEY(`name`, `source`))",
-        "fields": [
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "source",
-            "columnName": "source",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "columnNames": [
-            "name",
-            "source"
-          ],
-          "autoGenerate": false
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
         "tableName": "shortcut",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shortcut_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `device_path` TEXT, `friendly_name` TEXT, `uri` TEXT, `device_type` INTEGER NOT NULL, `file_count` INTEGER NOT NULL, `poster_count` INTEGER NOT NULL, `folder_type` TEXT, `access` TEXT, `query_uri` TEXT, `is_scanned` INTEGER NOT NULL)",
         "fields": [
@@ -882,6 +855,39 @@
         "foreignKeys": []
       },
       {
+        "tableName": "genre_tag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `source` TEXT NOT NULL, `weight` INTEGER NOT NULL, PRIMARY KEY(`name`, `source`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name",
+            "source"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
         "tableName": "season",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`season_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` INTEGER NOT NULL, `season_number` INTEGER NOT NULL, `episode_count` INTEGER NOT NULL, `name` TEXT, `plot` TEXT, `poster` TEXT, `air_date` TEXT, `source` TEXT)",
         "fields": [
@@ -962,7 +968,7 @@
       },
       {
         "tableName": "videotag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vtid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag` TEXT, `flag` INTEGER NOT NULL, `source` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vtid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag` TEXT, `flag` INTEGER NOT NULL, `source` TEXT, `weight` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "vtid",
@@ -985,6 +991,12 @@
           {
             "fieldPath": "source",
             "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -1009,18 +1021,12 @@
       },
       {
         "tableName": "movie_videotag_cross_ref",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vtid` TEXT NOT NULL, `source` TEXT NOT NULL, `id` INTEGER NOT NULL, PRIMARY KEY(`vtid`, `source`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`vtid` INTEGER NOT NULL, `id` INTEGER NOT NULL, PRIMARY KEY(`vtid`, `id`))",
         "fields": [
           {
             "fieldPath": "vtid",
             "columnName": "vtid",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "source",
-            "columnName": "source",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -1033,20 +1039,11 @@
         "primaryKey": {
           "columnNames": [
             "vtid",
-            "source"
+            "id"
           ],
           "autoGenerate": false
         },
-        "indices": [
-          {
-            "name": "index_movie_videotag_cross_ref_id",
-            "unique": false,
-            "columnNames": [
-              "id"
-            ],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_movie_videotag_cross_ref_id` ON `${TABLE_NAME}` (`id`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       }
     ],
@@ -1066,7 +1063,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0e868e1475e7cbdb6219712f412e2865')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bfce23706ba331dafe778429c2d200f7')"
     ]
   }
 }

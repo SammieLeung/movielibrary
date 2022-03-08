@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.roomdb.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -10,6 +11,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.GenreTag;
+import com.hphtv.movielibrary.ui.homepage.genretag.GenreTagItem;
 
 import java.util.List;
 
@@ -33,8 +35,11 @@ public interface GenreDao {
     public List<String> queryGenresBySource(String source);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public long insertGenreTag(GenreTag genreTag);
+    public long[] insertGenreTags(List<GenreTag> genreTagItemList);
+
+    @Query("DELETE FROM "+TABLE.GENRE_TAG)
+    public int deleteAllGenreTags();
 
     @Query("SELECT name FROM "+TABLE.GENRE_TAG +" WHERE source=:source")
-    public List<String> queryGenreTagBySource(String source);
+    public List<String> queryGenreTagNameBySource(String source);
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="androidx.databinding.ObservableInt"/>
+        <variable
+            name="checkPos"
+            type="ObservableInt" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="583dp"
+            android:layout_height="411dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/new_common_dialog_bg"
+            android:paddingStart="45dp">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:text="@string/homepage_custom_genre_tag_title"
+                android:textColor="@color/white"
+                android:textSize="23sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cbtv_genre"
+                android:layout_width="120dp"
+                android:layout_height="57dp"
+                android:layout_below="@id/tv_title"
+                android:layout_marginTop="40dp"
+                android:gravity="center_vertical"
+                android:paddingStart="23dp"
+                app:selectState="@{checkPos==0?true:false}"
+                android:text="@string/lb_sort_genres"
+                android:textColor="@color/white"
+                android:background="@drawable/new_common_tab_bg_2"
+                android:textSize="23sp" />
+
+            <TextView
+                android:id="@+id/cbtv_sort"
+                android:layout_width="120dp"
+                android:layout_height="57dp"
+                android:layout_below="@id/cbtv_genre"
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:paddingStart="23dp"
+                android:text="@string/lb_sort_by"
+                android:background="@drawable/new_common_tab_bg_2"
+                app:selectState="@{checkPos==1?true:false}"
+                android:textColor="@color/white"
+                android:textSize="23sp"
+                 />
+
+            <View
+                android:id="@+id/view_divider"
+                android:layout_width="1dp"
+                android:layout_height="258dp"
+                android:layout_alignTop="@id/cbtv_genre"
+                android:layout_marginStart="35dp"
+                android:layout_toEndOf="@id/cbtv_genre"
+                android:background="#1AFFFFFF" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_theme"
+                android:scrollbars="vertical"
+                android:scrollbarThumbVertical="@color/scroller_bar_color"
+                android:scrollbarSize="5dp"
+                android:layout_width="match_parent"
+                android:layout_marginRight="8dp"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/cbtv_genre"
+                android:layout_alignBottom="@id/view_divider"
+                android:layout_toEndOf="@id/view_divider" />
+        </RelativeLayout>
+    </RelativeLayout>
+</layout>

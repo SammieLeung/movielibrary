@@ -52,7 +52,7 @@
                 style="@style/filter_box_title_text_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/lb_sort_order" />
+                android:text="@string/lb_sort_by" />
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/view_sortby_device"

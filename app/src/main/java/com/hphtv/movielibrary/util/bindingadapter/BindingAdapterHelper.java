@@ -1,7 +1,6 @@
-package com.hphtv.movielibrary.util.homepage;
+package com.hphtv.movielibrary.util.bindingadapter;
 
 import android.content.res.TypedArray;
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
@@ -56,18 +55,18 @@ public class BindingAdapterHelper {
         }
     }
 
-    @BindingAdapter("onSelect")
-    public static void selectBackground(View view, boolean selected){
-        if(view instanceof TextView){
-            TextView textView= (TextView) view;
-            if(selected==true){
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,textView.getContext().getDrawable(R.drawable.ic_icon_filter_check),null);
+    @BindingAdapter("filterSelect")
+    public static void selectBackground(View view, boolean selected) {
+        if (view instanceof TextView) {
+            TextView textView = (TextView) view;
+            if (selected == true) {
+                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, textView.getContext().getDrawable(R.drawable.ic_icon_filter_check), null);
                 textView.getPaint().setFakeBoldText(true);
-            }else{
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,null,null);
+            } else {
+                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
                 textView.getPaint().setFakeBoldText(false);
             }
-        }else {
+        } else {
             if (selected == true) {
                 view.setSelected(true);
             } else {
@@ -77,25 +76,30 @@ public class BindingAdapterHelper {
     }
 
 
-    @BindingAdapter(value = {"orderSelect","orderDesc"},requireAll = false)
-    public static void setOrderSelect(View view, boolean selected, ObservableBoolean isDesc){
-        if(view instanceof TextView){
-            TextView textView= (TextView) view;
-            if(selected==true){
-                Drawable drawable=view.getContext().getDrawable(isDesc.get()?R.drawable.desc_order:R.drawable.asc_order);
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null);
+    @BindingAdapter(value = {"orderSelect", "orderDesc"}, requireAll = false)
+    public static void setOrderSelect(View view, boolean selected, ObservableBoolean isDesc) {
+        if (view instanceof TextView) {
+            TextView textView = (TextView) view;
+            if (selected == true) {
+                Drawable drawable = view.getContext().getDrawable(isDesc.get() ? R.drawable.desc_order : R.drawable.asc_order);
+                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
                 textView.getPaint().setFakeBoldText(true);
-            }else{
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,null,null);
+            } else {
+                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
                 textView.getPaint().setFakeBoldText(false);
             }
-        }else {
+        } else {
             if (selected == true) {
                 view.setSelected(true);
             } else {
                 view.setSelected(false);
             }
         }
+    }
+
+    @BindingAdapter(value = "selectState")
+    public static void setSelected(TextView view, boolean selected) {
+        view.setSelected(selected);
     }
 
 
