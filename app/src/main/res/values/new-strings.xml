@@ -4,7 +4,8 @@
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
     <!--    主页-->
-    <string name="homepage_custom_genre_tag_title">Eidt Genre Tag</string>
+    <string name="homepage_custom_genre_tag_title">Custom Genre</string>
+    <string name="homepage_custom_genre_tag_title_2">Genre Sort</string>
 
     <!--    历史播放-->
     <string name="history_list_title">Recently Played</string>

@@ -22,18 +22,6 @@ import java.util.List;
  * date:  2022/2/17
  */
 public class BindingAdapterHelper {
-    public static BindingAdapterHelper sGenreTagHelper;
-
-    public static BindingAdapterHelper getInstance() {
-        if (sGenreTagHelper == null) {
-            synchronized (BindingAdapterHelper.class) {
-                if (sGenreTagHelper == null)
-                    sGenreTagHelper = new BindingAdapterHelper();
-            }
-        }
-        return sGenreTagHelper;
-    }
-
     @BindingAdapter("bindingBackground")
     public static void bindingBackground(ImageView v, String tag) {
         if (!TextUtils.isEmpty(tag)) {
@@ -100,6 +88,7 @@ public class BindingAdapterHelper {
     @BindingAdapter(value = "selectState")
     public static void setSelected(TextView view, boolean selected) {
         view.setSelected(selected);
+        view.getPaint().setFakeBoldText(selected);
     }
 
 

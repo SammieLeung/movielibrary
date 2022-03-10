@@ -40,6 +40,10 @@ public interface GenreDao {
     @Query("DELETE FROM "+TABLE.GENRE_TAG)
     public int deleteAllGenreTags();
 
-    @Query("SELECT name FROM "+TABLE.GENRE_TAG +" WHERE source=:source")
+    @Query("SELECT name FROM "+TABLE.GENRE_TAG +" WHERE source=:source ORDER BY weight")
     public List<String> queryGenreTagNameBySource(String source);
+
+    @Query("SELECT * FROM "+TABLE.GENRE_TAG +" WHERE source=:source ORDER BY weight")
+    public List<GenreTag> queryGenreTagBySource(String source);
+
 }

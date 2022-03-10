@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
         <import type="androidx.databinding.ObservableInt"/>
         <variable
             name="checkPos"
@@ -28,7 +29,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="40dp"
                 android:gravity="center"
-                android:text="@string/homepage_custom_genre_tag_title"
+                android:text="@{checkPos==0?@string/homepage_custom_genre_tag_title:@string/homepage_custom_genre_tag_title_2}"
                 android:textColor="@color/white"
                 android:textSize="23sp"
                 android:textStyle="bold" />
@@ -58,7 +59,7 @@
                 android:text="@string/lb_sort_by"
                 android:background="@drawable/new_common_tab_bg_2"
                 app:selectState="@{checkPos==1?true:false}"
-                android:textColor="@color/white"
+                android:textColor="@drawable/textcolor_homepage_genre_sort_title"
                 android:textSize="23sp"
                  />
 
@@ -72,16 +73,30 @@
                 android:background="#1AFFFFFF" />
 
             <androidx.recyclerview.widget.RecyclerView
+                android:visibility="@{checkPos==0?View.VISIBLE:View.GONE}"
                 android:id="@+id/rv_theme"
-                android:scrollbars="vertical"
-                android:scrollbarThumbVertical="@color/scroller_bar_color"
-                android:scrollbarSize="5dp"
                 android:layout_width="match_parent"
-                android:layout_marginRight="8dp"
                 android:layout_height="match_parent"
                 android:layout_alignTop="@id/cbtv_genre"
                 android:layout_alignBottom="@id/view_divider"
-                android:layout_toEndOf="@id/view_divider" />
+                android:layout_marginRight="8dp"
+                android:layout_toEndOf="@id/view_divider"
+                android:scrollbarSize="5dp"
+                android:scrollbarThumbVertical="@color/scroller_bar_color"
+                android:scrollbars="vertical" />
+
+            <com.hphtv.movielibrary.ui.view.DraggableRecyclerView
+                android:visibility="@{checkPos==1?View.VISIBLE:View.GONE}"
+                android:id="@+id/rv_theme_sort"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/cbtv_genre"
+                android:layout_alignBottom="@id/view_divider"
+                android:layout_marginRight="8dp"
+                android:layout_toEndOf="@id/view_divider"
+                android:scrollbarSize="5dp"
+                android:scrollbarThumbVertical="@color/scroller_bar_color"
+                android:scrollbars="vertical" />
         </RelativeLayout>
     </RelativeLayout>
 </layout>

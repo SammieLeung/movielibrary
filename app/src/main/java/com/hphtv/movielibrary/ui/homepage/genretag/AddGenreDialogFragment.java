@@ -2,29 +2,22 @@ package com.hphtv.movielibrary.ui.homepage.genretag;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.ui.homepage.NewHomePageViewModel;
-import com.hphtv.movielibrary.ui.homepage.NewPageFragment;
 import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * author: Sam Leung
@@ -32,6 +25,7 @@ import io.reactivex.rxjava3.functions.Consumer;
  */
 public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogViewModel, DialogCustomGenreTagLayoutBinding> implements View.OnClickListener {
     private GenreListApter mGenreListApter;
+    private GenreListApter mGenreSortListApter;
     private NewPageFragmentViewModel mNewPageFragmentViewModel;
 
     public static AddGenreDialogFragment newInstance() {
@@ -67,7 +61,7 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         mBinding.cbtvGenre.setOnClickListener(this);
         mBinding.cbtvSort.setOnClickListener(this);
         mBinding.rvTheme.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
-        mGenreListApter=new GenreListApter(getContext(),new ArrayList<>());
+        mGenreListApter=new GenreListApter(getContext(),new ArrayList<>(),GenreListApter.TYPE_EDIT);
         mBinding.rvTheme.setAdapter(mGenreListApter);
         mGenreListApter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<GenreTagItem>() {
             @Override
@@ -75,9 +69,15 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
                 boolean isChecked=data.isChecked().get();
                 data.setChecked(!isChecked);
                 if(!isChecked){
-                    mViewModel.getGenreTagItemList().add(data);
+                    mGenreSortListApter.getDatas().add(data);
+                    mGenreSortListApter.notifyDataSetChanged();
+                    mBinding.cbtvSort.setEnabled(true);
                 }else{
-                    mViewModel.getGenreTagItemList().remove(data);
+                    mGenreSortListApter.getDatas().remove(data);
+                    mGenreSortListApter.notifyDataSetChanged();
+                    if(mGenreSortListApter.getItemCount()==0){
+                        mBinding.cbtvSort.setEnabled(false);
+                    }
                 }
             }
 
@@ -86,12 +86,18 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
 
             }
         });
+
+        mBinding.rvThemeSort.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        mGenreSortListApter=new GenreListApter(getContext(),mViewModel.getGenreTagItemSortList(),GenreListApter.TYPE_SORT);
+        mGenreSortListApter.setSortPos(mBinding.rvThemeSort.getSelectPos());
+        mBinding.rvThemeSort.setAdapter(mGenreSortListApter);
     }
 
     public void prepare(){
         mViewModel.prepareGenreList()
                 .subscribe(genreTagItems -> {
                     mGenreListApter.addAll(genreTagItems);
+                    mGenreSortListApter.notifyDataSetChanged();
                 });
     }
 

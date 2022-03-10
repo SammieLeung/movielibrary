@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-     <import type="com.hphtv.movielibrary.ui.homepage.genretag.GenreTagItem"/>
         <variable
-            name="genreItemTag"
-            type="GenreTagItem" />
+            name="name"
+            type="String" />
+        <variable
+            name="sortPos"
+            type="androidx.databinding.ObservableInt" />
+        <variable
+            name="pos"
+            type="int" />
     </data>
 
 
-    <CheckedTextView
+    <TextView
         android:id="@+id/checkbox"
         android:layout_marginLeft="38dp"
         android:layout_marginRight="38dp"
         android:paddingStart="23dp"
         android:paddingEnd="23dp"
-        android:text="@{genreItemTag.name}"
-        android:checked="@{genreItemTag.checked}"
+        android:text="@{name}"
         android:layout_width="match_parent"
         android:gravity="center"
         android:textSize="23sp"
         android:background="@drawable/new_common_tab_bg"
         android:textColor="@color/white"
         android:layout_height="@dimen/genre_item_h"
-        android:checkMark="@drawable/new_radiobutton_selector_26"
-        android:checkMarkTint="@drawable/new_radiobutton_tint"
+        android:drawableRight="@drawable/ic_genre_sortby"
+        app:selectState="@{sortPos==pos?true:false}"
         />
 
 </layout>

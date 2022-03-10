@@ -102,6 +102,10 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         }
     }
 
+    public List<T> getDatas(){
+        return mList;
+    }
+
     /**
      * 添加数据
      *
