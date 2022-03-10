@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hphtv.movielibrary.R;
@@ -14,6 +15,7 @@ import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
+import com.hphtv.movielibrary.ui.view.recyclerview.ItemDragCallback;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -91,6 +93,9 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         mGenreSortListApter=new GenreListApter(getContext(),mViewModel.getGenreTagItemSortList(),GenreListApter.TYPE_SORT);
         mGenreSortListApter.setSortPos(mBinding.rvThemeSort.getSelectPos());
         mBinding.rvThemeSort.setAdapter(mGenreSortListApter);
+        ItemDragCallback callback=new ItemDragCallback();
+        ItemTouchHelper helper=new ItemTouchHelper(callback);
+        helper.attachToRecyclerView(mBinding.rvThemeSort);
     }
 
     public void prepare(){

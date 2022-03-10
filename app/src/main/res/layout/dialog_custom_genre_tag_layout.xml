@@ -85,7 +85,7 @@
                 android:scrollbarThumbVertical="@color/scroller_bar_color"
                 android:scrollbars="vertical" />
 
-            <com.hphtv.movielibrary.ui.view.DraggableRecyclerView
+            <com.hphtv.movielibrary.ui.view.recyclerview.DraggableRecyclerView
                 android:visibility="@{checkPos==1?View.VISIBLE:View.GONE}"
                 android:id="@+id/rv_theme_sort"
                 android:layout_width="match_parent"

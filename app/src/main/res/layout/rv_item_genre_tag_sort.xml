@@ -23,7 +23,7 @@
         android:paddingEnd="23dp"
         android:text="@{name}"
         android:layout_width="match_parent"
-        android:gravity="center"
+        android:gravity="left|center_vertical"
         android:textSize="23sp"
         android:background="@drawable/new_common_tab_bg"
         android:textColor="@color/white"

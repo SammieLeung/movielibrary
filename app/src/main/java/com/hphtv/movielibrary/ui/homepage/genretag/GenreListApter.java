@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.ui.homepage.genretag;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -67,6 +68,5 @@ public class GenreListApter extends BaseApater2<RvItemGenreTagCheckableBinding, 
     public int getItemViewType(int position) {
         return mType;
     }
-
 
 }

@@ -5,7 +5,7 @@
     <string name="cancel">取消</string>
     <!--    主页-->
     <string name="homepage_custom_genre_tag_title">自定义主题</string>
-    <string name="homepage_custom_genre_tag_title_2">排序主题</string>
+    <string name="homepage_custom_genre_tag_title_2">主题排序</string>
 
     <!--    历史播放-->
     <string name="history_list_title">最近播放</string>
