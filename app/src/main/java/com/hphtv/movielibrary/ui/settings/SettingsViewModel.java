@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.databinding.Observable;
 import androidx.databinding.ObservableBoolean;
+import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
@@ -30,7 +31,8 @@ public class SettingsViewModel extends BaseAndroidViewModel {
     private ObservableInt mSelectPos =new ObservableInt();
     private ObservableBoolean mChildModeState=new ObservableBoolean(Config.isChildMode());
 
-
+    private ObservableBoolean mAutoSearchState=new ObservableBoolean(Config.isAutoSearch());
+    private ObservableField<String> mDefaultSearchMode=new ObservableField<>(Config.getDefaultSearchMode());
 
     public SettingsViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -86,8 +88,6 @@ public class SettingsViewModel extends BaseAndroidViewModel {
     }
 
     //  海报设置
-
-
     public void toggleTitle(View v) {
         Config.setShowTitle(!Config.getShowTitle().get());
         mFlagRefresh.set(true);
@@ -112,4 +112,7 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         Config.setShowCornerMark(!Config.getShowCornerMark().get());
         mFlagRefresh.set(true);
     }
+
+    //
+
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/view_autosearch"
+                layout="@layout/settings_switch_item"
+                style="@style/setting_item_size"
+                android:layout_marginLeft="75dp"
+                android:layout_marginTop="170dp"
+                app:title="@{@string/settings_preference_autosearch_title}"
+                tools:ignore="IncludeLayoutParam" />
+            <include
+                android:layout_marginTop="15dp"
+                android:id="@+id/view_default_search_mode"
+                android:layout_below="@id/view_autosearch"
+                layout="@layout/settings_options_item"
+                style="@style/setting_item_size"
+                android:layout_marginLeft="75dp"
+                tools:ignore="IncludeLayoutParam" />
+    </RelativeLayout>
+</layout>

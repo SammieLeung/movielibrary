@@ -34,7 +34,7 @@ public class ChildModeFragment extends BaseFragment2<SettingsViewModel, Fragment
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mBinding.setChildmode(mViewModel.getChildModeState());
-        mBinding.viewChildmode.setOnClickListener(mViewModel::toggleChildMode);
+        mBinding.viewChildmode.view.setOnClickListener(mViewModel::toggleChildMode);
         mBinding.tvChangepsw.setOnClickListener(this::showChangePassword);
     }
 

@@ -155,4 +155,7 @@
     <string name="sample_tag" translatable="false">HD</string>
     <string name="sample_rating" translatable="false">10.0</string>
 
+    <!--设置-偏好-->
+    <string name="settings_preference_autosearch_title">Auto Scan Local Folders</string>
+    <string name="settings_preference_default_searchmode">Default search mode</string>
 </resources>

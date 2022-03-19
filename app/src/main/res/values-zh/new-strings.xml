@@ -151,4 +151,8 @@
     <string name="settings_poster_show_cornermark">显示角标</string>
     <string name="settings_poster_preview">预览</string>
 
+    <!--设置-偏好-->
+    <string name="settings_preference_autosearch_title">自动扫描本地文件夹</string>
+    <string name="settings_preference_default_searchmode">默认搜索模式</string>
+
 </resources>

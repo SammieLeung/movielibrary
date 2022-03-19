@@ -13,6 +13,7 @@ import com.hphtv.movielibrary.databinding.ActivitySettingsBinding;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.settings.fragment.childmode.ChildModeFragment;
 import com.hphtv.movielibrary.ui.settings.fragment.poster.PosterFragment;
+import com.hphtv.movielibrary.ui.settings.fragment.preference.PreferenceFragment;
 
 /**
  * author: Sam Leung
@@ -21,6 +22,7 @@ import com.hphtv.movielibrary.ui.settings.fragment.poster.PosterFragment;
 public class SettingsActivity extends AppBaseActivity<SettingsViewModel, ActivitySettingsBinding> implements View.OnHoverListener {
     private ChildModeFragment mChildModeFragment;
     private PosterFragment mPosterFragment;
+    private PreferenceFragment mPreferenceFragment;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +33,7 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
     private void initFragments(){
         mChildModeFragment=ChildModeFragment.newInstance();
         mPosterFragment=PosterFragment.newInstance();
+        mPreferenceFragment=PreferenceFragment.newInstance();
     }
 
     private void initView() {
@@ -70,6 +73,7 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
 
     private void preference(View view){
         mViewModel.getSelectPos().set(2);
+        getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mPreferenceFragment).commit();
     }
 
     private void about(View view){

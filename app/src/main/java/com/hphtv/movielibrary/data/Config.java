@@ -6,8 +6,6 @@ import androidx.databinding.ObservableBoolean;
 import com.hphtv.movielibrary.MovieApplication;
 import com.station.kit.util.SharePreferencesTools;
 
-import java.util.Observable;
-
 /**
  * author: Sam Leung
  * date:  2022/3/11
@@ -21,6 +19,9 @@ public class Config {
     public static final String SHOW_RATING="show_rating";
     public static final String SHOW_LIKE="show_like";
 
+    public static final String AUTO_SEARCH="auto_search";
+    public static final String DEFAULT_SEARCH_MODE="default_search_mode";
+
     //默认密码
     private static final String DEAULT_PASSWORD="1111";
 
@@ -32,6 +33,9 @@ public class Config {
     private static ObservableBoolean sShowRating;//显示评分
     private static ObservableBoolean sShowLike;//显示收藏
 
+    private static boolean sAutoSearch;
+    private static String sDefaultSearchMode;
+
     static {
         SharePreferencesTools tools=SharePreferencesTools.getInstance(MovieApplication.getInstance());
         sChildMode =tools.readProperty(CHILD_MODE,false);
@@ -42,6 +46,9 @@ public class Config {
         sShowCornerMark=new ObservableBoolean(tools.readProperty(SHOW_CORNER_MARK,true));
         sShowRating=new ObservableBoolean(tools.readProperty(SHOW_RATING,true));
         sShowLike=new ObservableBoolean(tools.readProperty(SHOW_LIKE,true));
+
+        sAutoSearch=tools.readProperty(AUTO_SEARCH,false);
+        sDefaultSearchMode =tools.readProperty(DEFAULT_SEARCH_MODE, Constants.SearchType.auto.name());
     }
 
     /**
@@ -84,7 +91,7 @@ public class Config {
     }
 
     /**
-     * 设置儿童模式密码
+     * 设置儿童模式密码>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
      * @param childModePassword
      */
     public static void setChildModePassword(String childModePassword) {
@@ -92,7 +99,7 @@ public class Config {
         SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(CHILD_MODE_PSW, sChildModePassword);
     }
 
-    // 海报设置相关属性
+    // 海报设置相关属性>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public static ObservableBoolean getShowTitle() {
         return sShowTitle;
     }
@@ -136,5 +143,23 @@ public class Config {
     public static void setShowLike(boolean showLike) {
         sShowLike.set(showLike);
         SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(SHOW_LIKE, showLike);
+    }
+
+    //偏好设置>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    public static boolean isAutoSearch() {
+        return sAutoSearch;
+    }
+
+    public static void setAutoSearch(boolean autoSearch) {
+        sAutoSearch = autoSearch;
+    }
+
+    public static String getDefaultSearchMode() {
+        return sDefaultSearchMode;
+    }
+
+    public static void setDefaultSearchMode(String defaultSearchMode) {
+        sDefaultSearchMode = defaultSearchMode;
     }
 }

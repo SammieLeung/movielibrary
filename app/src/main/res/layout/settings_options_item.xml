@@ -19,6 +19,7 @@
         android:background="@drawable/new_common_tab_bg"
         android:gravity="center_vertical">
         <TextView
+            android:textStyle="bold"
             android:id="@+id/text_1"
             android:layout_marginLeft="21dp"
             style="@style/common_content_text_style"

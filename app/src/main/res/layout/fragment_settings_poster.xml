@@ -21,7 +21,7 @@
         <include
             android:id="@+id/option_poster"
             style="@style/settings_poster_options_item_size"
-            layout="@layout/settings_poster_options_item"
+            layout="@layout/settings_options_item"
             android:layout_below="@id/option_title"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
@@ -32,7 +32,7 @@
         <include
             android:id="@+id/option_rating"
             style="@style/settings_poster_options_item_size"
-            layout="@layout/settings_poster_options_item"
+            layout="@layout/settings_options_item"
             android:layout_below="@id/option_poster"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
@@ -43,7 +43,7 @@
         <include
             android:id="@+id/option_cornermark"
             style="@style/settings_poster_options_item_size"
-            layout="@layout/settings_poster_options_item"
+            layout="@layout/settings_options_item"
             android:layout_below="@id/option_rating"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
@@ -54,7 +54,7 @@
         <include
             android:id="@+id/option_like"
             style="@style/settings_poster_options_item_size"
-            layout="@layout/settings_poster_options_item"
+            layout="@layout/settings_options_item"
             android:layout_below="@id/option_cornermark"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
@@ -65,7 +65,7 @@
         <include
             android:id="@+id/option_title"
             style="@style/settings_poster_options_item_size"
-            layout="@layout/settings_poster_options_item"
+            layout="@layout/settings_options_item"
             android:layout_marginLeft="84dp"
             android:layout_marginTop="170dp"
             android:layout_marginBottom="15dp"

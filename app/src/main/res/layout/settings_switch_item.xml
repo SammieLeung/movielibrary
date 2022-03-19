@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="androidx.databinding.ObservableBoolean"/>
+        <variable
+            name="title"
+            type="String" />
+        <variable
+            name="checkstate"
+            type="ObservableBoolean" />
+        <variable
+            name="hints"
+            type="String" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/view"
+        style="@style/setting_item_size"
+        android:background="@drawable/new_common_tab_bg">
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/common_content_text_style"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="26dp"
+            android:text="@{title}" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="23dp"
+            android:layout_marginRight="23dp"
+            android:layout_toStartOf="@id/switchcompat"
+            android:layout_toEndOf="@id/tv_title"
+            android:autoSizeTextType="uniform"
+            android:autoSizeMaxTextSize="20sp"
+            android:gravity="right"
+            android:lines="1"
+            android:text="@{hints}"
+            android:textColor="#AAAAAA"
+            android:textSize="20sp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchcompat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="23dp"
+            android:checked="@={checkstate}"
+            android:clickable="false"
+            android:focusable="false"
+            app:thumbTint="@color/white"
+            app:track="@drawable/common_switch_track" />
+    </RelativeLayout>
+</layout>
