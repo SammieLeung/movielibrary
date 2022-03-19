@@ -29,7 +29,7 @@
         android:textColor="@color/white"
         android:layout_height="@dimen/genre_item_h"
         android:drawableRight="@drawable/ic_genre_sortby"
-        app:selectState="@{sortPos==pos?true:false}"
+        app:textViewSelect="@{sortPos==pos?true:false}"
         />
 
 </layout>

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "86b39465a674afb0e06390cd7733a59f",
+    "identityHash": "40d8dc9154601589aa397d9df3d93201",
     "entities": [
       {
         "tableName": "actor",
@@ -215,7 +215,7 @@
       },
       {
         "tableName": "movie",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` TEXT, `title` TEXT, `title_other` TEXT, `plot` TEXT, `ratings` TEXT, `source` TEXT, `type` TEXT, `acccess_permission` TEXT, `poster` TEXT, `region` TEXT, `release_date` TEXT, `release_area` TEXT, `year` TEXT, `duration` TEXT, `language` TEXT, `pinyin` TEXT, `add_time` INTEGER NOT NULL, `update_time` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `movie_id` TEXT, `title` TEXT, `title_other` TEXT, `plot` TEXT, `ratings` TEXT, `source` TEXT, `type` TEXT, `ap` TEXT, `poster` TEXT, `region` TEXT, `release_date` TEXT, `release_area` TEXT, `year` TEXT, `duration` TEXT, `language` TEXT, `pinyin` TEXT, `add_time` INTEGER NOT NULL, `update_time` INTEGER NOT NULL, `is_favorite` INTEGER NOT NULL, `last_playtime` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -267,7 +267,7 @@
           },
           {
             "fieldPath": "accessPermission",
-            "columnName": "acccess_permission",
+            "columnName": "ap",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1050,7 +1050,7 @@
     "views": [
       {
         "viewName": "movie_dataview",
-        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,VF.path AS file_uri,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite FROM videofile AS VF JOIN shortcut AS ST  ON VF.dir_path=ST.uri JOIN device AS DEV ON DEV.path=ST.device_path OR ST.device_type > 5 JOIN movie_videofile_cross_ref AS MVCF ON MVCF.path=VF.path JOIN movie AS M ON MVCF.id=M.id LEFT OUTER JOIN movie_genre_cross_ref AS MGCF  ON M.id=MGCF.id LEFT OUTER JOIN genre AS G ON MGCF.genre_id = G.genre_id"
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,VF.path AS file_uri,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite FROM videofile AS VF JOIN shortcut AS ST  ON VF.dir_path=ST.uri JOIN device AS DEV ON DEV.path=ST.device_path OR ST.device_type > 5 JOIN movie_videofile_cross_ref AS MVCF ON MVCF.path=VF.path JOIN movie AS M ON MVCF.id=M.id LEFT OUTER JOIN movie_genre_cross_ref AS MGCF  ON M.id=MGCF.id LEFT OUTER JOIN genre AS G ON MGCF.genre_id = G.genre_id"
       },
       {
         "viewName": "unrecognizedfile_dataview",
@@ -1063,7 +1063,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '86b39465a674afb0e06390cd7733a59f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '40d8dc9154601589aa397d9df3d93201')"
     ]
   }
 }

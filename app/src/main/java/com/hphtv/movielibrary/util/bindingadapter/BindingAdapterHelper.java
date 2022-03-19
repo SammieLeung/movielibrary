@@ -44,9 +44,7 @@ public class BindingAdapterHelper {
     }
 
     @BindingAdapter("filterSelect")
-    public static void selectBackground(View view, boolean selected) {
-        if (view instanceof TextView) {
-            TextView textView = (TextView) view;
+    public static void selectBackground(TextView textView, boolean selected) {
             if (selected == true) {
                 textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, textView.getContext().getDrawable(R.drawable.ic_icon_filter_check), null);
                 textView.getPaint().setFakeBoldText(true);
@@ -54,42 +52,32 @@ public class BindingAdapterHelper {
                 textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
                 textView.getPaint().setFakeBoldText(false);
             }
-        } else {
-            if (selected == true) {
-                view.setSelected(true);
-            } else {
-                view.setSelected(false);
-            }
-        }
     }
 
 
     @BindingAdapter(value = {"orderSelect", "orderDesc"}, requireAll = false)
-    public static void setOrderSelect(View view, boolean selected, ObservableBoolean isDesc) {
-        if (view instanceof TextView) {
-            TextView textView = (TextView) view;
+    public static void setOrderSelect(TextView textView, boolean selected, ObservableBoolean isDesc) {
             if (selected == true) {
-                Drawable drawable = view.getContext().getDrawable(isDesc.get() ? R.drawable.desc_order : R.drawable.asc_order);
+                Drawable drawable = textView.getContext().getDrawable(isDesc.get() ? R.drawable.desc_order : R.drawable.asc_order);
                 textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
                 textView.getPaint().setFakeBoldText(true);
             } else {
                 textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
                 textView.getPaint().setFakeBoldText(false);
             }
-        } else {
-            if (selected == true) {
-                view.setSelected(true);
-            } else {
-                view.setSelected(false);
-            }
-        }
     }
 
-    @BindingAdapter(value = "selectState")
-    public static void setSelected(TextView view, boolean selected) {
+    @BindingAdapter(value = "textViewSelect")
+    public static void setTextViewSelected(TextView view, boolean selected) {
         view.setSelected(selected);
         view.getPaint().setFakeBoldText(selected);
     }
+
+    @BindingAdapter(value = "viewSelect")
+    public static void setViewSelected(View view, boolean selected) {
+        view.setSelected(selected);
+    }
+
 
 
 }

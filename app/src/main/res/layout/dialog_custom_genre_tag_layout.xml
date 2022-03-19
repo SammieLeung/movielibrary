@@ -42,7 +42,7 @@
                 android:layout_marginTop="40dp"
                 android:gravity="center_vertical"
                 android:paddingStart="23dp"
-                app:selectState="@{checkPos==0?true:false}"
+                app:textViewSelect="@{checkPos==0?true:false}"
                 android:text="@string/lb_sort_genres"
                 android:textColor="@color/white"
                 android:background="@drawable/new_common_tab_bg_2"
@@ -58,7 +58,7 @@
                 android:paddingStart="23dp"
                 android:text="@string/lb_sort_by"
                 android:background="@drawable/new_common_tab_bg_2"
-                app:selectState="@{checkPos==1?true:false}"
+                app:textViewSelect="@{checkPos==1?true:false}"
                 android:textColor="@drawable/textcolor_homepage_genre_sort_title"
                 android:textSize="23sp"
                  />

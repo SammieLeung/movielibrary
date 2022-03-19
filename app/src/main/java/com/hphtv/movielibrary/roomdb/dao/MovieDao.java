@@ -8,6 +8,8 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
+import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
@@ -168,13 +170,14 @@ public interface MovieDao {
     @Query("SELECT COUNT(*) FROM ("+
             "SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
             " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
             " AND (:year IS NULL OR year=:year)" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
             " AND (:vtid IS -1 OR id IN (SELECT id FROM "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" WHERE vtid=:vtid))"+
             " GROUP BY id " +
             ")")
-    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year,String source);
+    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year,String ap,String source);
 
     /**
      * 根据条件返回符合条件电影
@@ -187,6 +190,7 @@ public interface MovieDao {
      */
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
             " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
             " AND (:year IS NULL OR year=:year)" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
@@ -206,7 +210,7 @@ public interface MovieDao {
             "CASE WHEN :order =5 THEN is_favorite END ASC " +
             "LIMIT :offset,:limit "
     )
-    public List<MovieDataView> queryMovieDataView2(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year, int order, @Nullable boolean isDesc, String source,int offset,int limit);
+    public List<MovieDataView> queryMovieDataView2(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year, int order,String ap, @Nullable boolean isDesc,String source,int offset,int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +

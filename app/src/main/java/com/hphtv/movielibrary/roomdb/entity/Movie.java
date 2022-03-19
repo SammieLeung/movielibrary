@@ -32,9 +32,9 @@ public class Movie implements Serializable {
     public String plot;//剧情
     public String ratings;//评分
     public String source;//来源
-    public Constants.SearchType type;//电影？电视剧  movie/tv
-    @ColumnInfo(name = "acccess_permission")
-    public Constants.AccessPermission accessPermission;//分级 ALL_AGE,ADAULT
+    public Constants.SearchType type;//电影？电视剧  movie/tv  搜索接口自动分配不用管
+    @ColumnInfo(name = "ap")
+    public Constants.AccessPermission ap;//分级 ALL_AGE,ADAULT
     public String poster;//海报
     public String region;//制片国家/地区
     @ColumnInfo(name = "release_date")

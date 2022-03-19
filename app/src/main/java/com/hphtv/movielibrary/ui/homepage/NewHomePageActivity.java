@@ -1,27 +1,21 @@
 package com.hphtv.movielibrary.ui.homepage;
 
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
-import com.hphtv.movielibrary.databinding.LayoutHomepageTabBinding;
-import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
+import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.station.kit.util.DensityUtil;
@@ -47,6 +41,7 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
         mBinding.btnPinyinSearch.setOnClickListener(this::startPinyinSearchPage);
         mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
+        mBinding.btnSettings.setOnClickListener(this::startSettings);
         initTab();
         autoScrollListener(mBinding.nsv);
     }
@@ -116,8 +111,13 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         startActivityForResult(intent);
     }
 
+    private void startSettings(View view){
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivityForResult(intent);
+    }
+
     private View buildTabView(String text) {
-        LayoutHomepageTabBinding homepageTabBinding = LayoutHomepageTabBinding.inflate(getLayoutInflater());
+        TabitemHomepageMenuBinding homepageTabBinding = TabitemHomepageMenuBinding.inflate(getLayoutInflater());
         homepageTabBinding.setText(text);
         return homepageTabBinding.getRoot();
     }

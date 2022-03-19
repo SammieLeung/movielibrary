@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="108dp"
+            android:layout_marginTop="175dp"
+            android:layout_toRightOf="@id/option_title"
+            android:text="@string/settings_poster_preview"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+
+        <include
+            android:id="@+id/option_poster"
+            style="@style/settings_poster_options_item_size"
+            layout="@layout/settings_poster_options_item"
+            android:layout_below="@id/option_title"
+            android:layout_marginLeft="84dp"
+            android:layout_marginBottom="15dp"
+            app:state="@{posterState}"
+            app:title="@{@string/settings_poster_show_poster}"
+            tools:ignore="IncludeLayoutParam" />
+
+        <include
+            android:id="@+id/option_rating"
+            style="@style/settings_poster_options_item_size"
+            layout="@layout/settings_poster_options_item"
+            android:layout_below="@id/option_poster"
+            android:layout_marginLeft="84dp"
+            android:layout_marginBottom="15dp"
+            app:state="@{ratingState}"
+            app:title="@{@string/settings_poster_show_ratings}"
+            tools:ignore="IncludeLayoutParam" />
+
+        <include
+            android:id="@+id/option_cornermark"
+            style="@style/settings_poster_options_item_size"
+            layout="@layout/settings_poster_options_item"
+            android:layout_below="@id/option_rating"
+            android:layout_marginLeft="84dp"
+            android:layout_marginBottom="15dp"
+            app:state="@{cornerMarkState}"
+            app:title="@{@string/settings_poster_show_cornermark}"
+            tools:ignore="IncludeLayoutParam" />
+
+        <include
+            android:id="@+id/option_like"
+            style="@style/settings_poster_options_item_size"
+            layout="@layout/settings_poster_options_item"
+            android:layout_below="@id/option_cornermark"
+            android:layout_marginLeft="84dp"
+            android:layout_marginBottom="15dp"
+            app:state="@{likeState}"
+            app:title="@{@string/settings_poster_show_like}"
+            tools:ignore="IncludeLayoutParam" />
+
+        <include
+            android:id="@+id/option_title"
+            style="@style/settings_poster_options_item_size"
+            layout="@layout/settings_poster_options_item"
+            android:layout_marginLeft="84dp"
+            android:layout_marginTop="170dp"
+            android:layout_marginBottom="15dp"
+            app:state="@{titleState}"
+            app:title="@{@string/settings_poster_show_title}"
+            tools:ignore="IncludeLayoutParam" />
+
+        <include
+            android:id="@+id/preview_poster"
+            layout="@layout/poster_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_preview"
+            android:layout_alignStart="@id/tv_preview"
+            android:layout_marginTop="26dp"
+            app:like="@{true}"
+            app:rating="@{@string/sample_rating}"
+            app:showConrerMark="@{cornerMarkState}"
+            app:showLike="@{likeState}"
+            app:showRating="@{ratingState}"
+            app:showTitle="@{titleState}"
+            app:tag="@{@string/sample_tag}"
+            app:title="@{@string/sample_title}" />
+    </RelativeLayout>
+
+    <data>
+
+        <import type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="titleState"
+            type="ObservableBoolean" />
+
+        <variable
+            name="posterState"
+            type="ObservableBoolean" />
+
+        <variable
+            name="likeState"
+            type="ObservableBoolean" />
+
+        <variable
+            name="cornerMarkState"
+            type="ObservableBoolean" />
+
+        <variable
+            name="ratingState"
+            type="ObservableBoolean" />
+    </data>
+</layout>

@@ -138,7 +138,7 @@ public class PasswordDialogFragment extends BaseDialogFragment<PasswordDialogFra
             case SET_INITAL_PASSWORD:
                 setTitle(R.string.title_set_initial_psw)
                         .addHint(R.string.hint_input4digit_psw)
-                        .addHint(R.string.hint_confirm_psw);
+                        .addHint(R.string.hint_confirm_new_psw);
                 break;
             case CHANGE_PASSWORD:
                 if(mViewModel.isPasswordEmpty()){
@@ -146,9 +146,9 @@ public class PasswordDialogFragment extends BaseDialogFragment<PasswordDialogFra
                     prepareTitleAndHints();
                 }else{
                     setTitle(R.string.title_change_psw)
-                            .addHint(R.string.hint_old_psw)
-                            .addHint(R.string.hint_new_psw)
-                            .addHint(R.string.hint_confirm_psw);
+                            .addHint(R.string.hint_enter_psw)
+                            .addHint(R.string.hint_input4digit_psw)
+                            .addHint(R.string.hint_confirm_new_psw);
                 }
                 break;
         }

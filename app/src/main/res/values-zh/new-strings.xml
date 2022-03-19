@@ -115,4 +115,40 @@
     <string name="tab_local_search_movie">电影 (%d)</string>
     <string name="tab_local_search_tv">电视剧 (%d)</string>
 
+    <!--设置-->
+    <string name="settings_childmode">儿童模式</string>
+    <string name="settings_poster">影片海报</string>
+    <string name="settings_preference">偏好设置</string>
+    <string name="settings_about">关于</string>
+
+    <!--设置-儿童模式-->
+    <string name="childmode_switch_tips">开启儿童模式，将会隐藏不适合儿童观看内容</string>
+    <string name="childmode_changepsw_subtitle">儿童模式 > 修改密码</string>
+    <!--设置-儿童模式-修改密码-->
+    <string name="label_confirm_psw">确认密码:</string>
+    <string name="label_old_psw">旧密码:</string>
+    <string name="label_new_psw">新密码:</string>
+
+    <string name="errtips_psw_invaild">* 密码必须由4位数字组成</string>
+    <string name="errtips_psw_error">* 密码错误</string>
+    <string name="errtips_psw_not_new">* 新密码不能与原密码相同</string>
+    <string name="errtips_psw_inconsistent">* 两次输入的密码不一致</string>
+
+    <string name="hint_enter_psw">请输入密码 (默认密码为1111)</string>
+    <string name="hint_input4digit_psw">请输入一个4位新密码</string>
+    <string name="hint_confirm_new_psw">请再次输入新密码</string>
+
+    <string name="psw_set_success">新密码设置成功!</string>
+
+    <!--设置-海报-->
+    <string name="state_on">显示</string>
+    <string name="state_off">隐藏</string>
+
+    <string name="settings_poster_show_title">显示标题</string>
+    <string name="settings_poster_show_poster">显示海报</string>
+    <string name="settings_poster_show_ratings">显示评分</string>
+    <string name="settings_poster_show_like">显示收藏</string>
+    <string name="settings_poster_show_cornermark">显示角标</string>
+    <string name="settings_poster_preview">预览</string>
+
 </resources>

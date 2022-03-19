@@ -5,6 +5,7 @@
     <data>
         <import type="android.view.View"/>
         <import type="android.text.TextUtils"/>
+        <import type="androidx.databinding.ObservableBoolean"/>
         <import type="com.hphtv.movielibrary.data.Constants.SearchType"/>
         <variable
             name="title"
@@ -18,6 +19,21 @@
         <variable
             name="type"
             type="SearchType" />
+        <variable
+            name="like"
+            type="boolean" />
+        <variable
+            name="showConrerMark"
+            type="ObservableBoolean" />
+        <variable
+            name="showLike"
+            type="ObservableBoolean" />
+        <variable
+            name="showTitle"
+            type="ObservableBoolean" />
+        <variable
+            name="showRating"
+            type="ObservableBoolean" />
     </data>
 
     <RelativeLayout
@@ -29,25 +45,28 @@
             android:layout_width="@dimen/poster_item_1_w"
             android:layout_height="@dimen/poster_item_1_h"
             android:background="@drawable/poster_item_bg"
+            android:src="@mipmap/default_poster"
             android:duplicateParentState="true"
             app:border_color="@android:color/transparent"
             app:border_width="@dimen/poster_border_width"
             app:corner_radius="@dimen/poster_item_1_radius" />
-        <TextView
-            android:id="@+id/tv_title"
-            android:text="@{title}"
-            android:textSize="23sp"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:singleLine="true"
-            android:ellipsize="middle"
-            android:layout_below="@id/rv_poster"
-            android:layout_marginTop="14dp"
-            android:layout_width="@dimen/poster_item_1_w"
-            android:layout_height="wrap_content"/>
 
         <TextView
-            android:visibility="@{!TextUtils.isEmpty(tag)&amp;&amp;type==SearchType.tv?View.VISIBLE:View.GONE}"
+            android:id="@+id/tv_title"
+            android:layout_width="@dimen/poster_item_1_w"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_poster"
+            android:layout_marginTop="14dp"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@{title}"
+            android:textColor="@color/white"
+            android:textSize="23sp"
+            android:visibility="@{showTitle?View.VISIBLE:View.INVISIBLE}" />
+
+        <TextView
+            android:visibility="@{showConrerMark&amp;&amp;!TextUtils.isEmpty(tag)&amp;&amp;type!=SearchType.tv?View.VISIBLE:View.GONE}"
             android:textSize="17sp"
             android:text="@{tag}"
             android:gravity="center"
@@ -62,20 +81,21 @@
             android:layout_height="29dp"/>
 
         <TextView
-            android:visibility="@{!TextUtils.isEmpty(tag)&amp;&amp;type==SearchType.tv?View.VISIBLE:View.GONE}"
-            android:textSize="17sp"
-            android:text="@{tag}"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="29dp"
+            android:layout_alignEnd="@id/rv_poster"
             android:layout_marginTop="11dp"
             android:layout_marginRight="11dp"
+            android:background="@drawable/poster_item_ep_bg"
+            android:gravity="center"
             android:paddingLeft="11dp"
             android:paddingRight="11dp"
+            android:text="@{tag}"
             android:textColor="@color/white"
-            android:background="@drawable/poster_item_ep_bg"
-            android:layout_alignEnd="@id/rv_poster"
-            android:layout_width="wrap_content"
-            android:layout_height="29dp"/>
+            android:textSize="17sp"
+            android:visibility="@{showConrerMark&amp;&amp;!TextUtils.isEmpty(tag)&amp;&amp;type==SearchType.tv?View.VISIBLE:View.GONE}" />
         <TextView
+            android:visibility="@{showRating&amp;&amp;!TextUtils.isEmpty(rating)?View.VISIBLE:View.GONE}"
             android:text="@{rating}"
             android:textSize="18sp"
             android:layout_alignBottom="@id/rv_poster"
@@ -84,5 +104,15 @@
             android:textColor="#FFE56B45"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:visibility="@{showLike&amp;&amp;like?View.VISIBLE:View.GONE}"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignBottom="@id/rv_poster"
+            android:layout_alignRight="@id/rv_poster"
+            android:layout_marginRight="11dp"
+            android:layout_marginBottom="11dp"
+            android:src="@drawable/ic_btn_like" />
     </RelativeLayout>
 </layout>

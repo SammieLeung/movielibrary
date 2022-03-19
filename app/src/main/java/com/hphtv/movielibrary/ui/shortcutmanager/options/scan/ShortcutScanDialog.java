@@ -66,9 +66,9 @@ public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewM
     @Override
     public void onStart() {
         super.onStart();
-        mTypeFragment = ShortcutScanItemSelectFragment.newInstance(this);
+        mTypeFragment = ShortcutScanItemSelectFragment.newInstance(getActivity());
         mTypeFragment.setItem(mViewModel.getTypeItem());
-        mAccessFragment = ShortcutScanItemSelectFragment.newInstance(this);
+        mAccessFragment = ShortcutScanItemSelectFragment.newInstance(getActivity());
         mAccessFragment.setItem(mViewModel.getAccessItem());
     }
 
@@ -116,7 +116,7 @@ public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewM
             getChildFragmentManager().beginTransaction().remove(mAccessFragment).commit();
         }
         if (getChildFragmentManager().findFragmentByTag("type") != null) {
-            getChildFragmentManager().beginTransaction().remove(mAccessFragment).commit();
+            getChildFragmentManager().beginTransaction().remove(mTypeFragment).commit();
         }
         ShortcutNameEditDialog.newInstance(this).show(getChildFragmentManager(), ShortcutNameEditDialog.class.getSimpleName());
         hide();

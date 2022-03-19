@@ -16,8 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.MovieApplication;
-import com.hphtv.movielibrary.ui.BaseFragment;
+import com.hphtv.movielibrary.ui.BaseFragment2;
 
 /**
  * author: Sam Leung
@@ -27,7 +26,7 @@ import com.hphtv.movielibrary.ui.BaseFragment;
 public class TvRecyclerView extends RecyclerView {
     private static final String TAG = "TvRecyclerView";
     private int mPosition;
-    private BaseFragment mBindFragment;
+    private BaseFragment2 mBindFragment;
 
     public TvRecyclerView(Context context) {
         this(context, null);
@@ -47,7 +46,7 @@ public class TvRecyclerView extends RecyclerView {
         //initAttr(context, attrs);
     }
 
-    public void setBindFragment(BaseFragment fragment) {
+    public void setBindFragment(BaseFragment2 fragment) {
         this.mBindFragment = fragment;
     }
 

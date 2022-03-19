@@ -115,4 +115,44 @@
     <string name="tab_local_search_movie">Movie (%d)</string>
     <string name="tab_local_search_tv">TV Series (%d)</string>
 
+    <!--设置-->
+    <string name="settings_childmode">Child Mode</string>
+    <string name="settings_poster">Poster</string>
+    <string name="settings_preference">Preference</string>
+    <string name="settings_about">About</string>
+
+    <!--设置-儿童模式-->
+    <string name="childmode_switch_tips">Turn on Child Mode will hide content that is not suitable for children</string>
+    <string name="childmode_changepsw_subtitle">Child Mode > Change Password</string>
+    <!--设置-儿童模式-修改密码-->
+    <string name="label_confirm_psw">Confirm Password:</string>
+    <string name="label_old_psw">Old Password:</string>
+    <string name="label_new_psw">New Password:</string>
+
+    <string name="errtips_psw_invaild">* Password must be 4 digits</string>
+    <string name="errtips_psw_error">* Password error</string>
+    <string name="errtips_psw_not_new">* The new password cannot be the same as the original password</string>
+    <string name="errtips_psw_inconsistent">* The two passwords do not match</string>
+
+    <string name="hint_enter_psw">Please enter your password (default password is 1111)</string>
+    <string name="hint_input4digit_psw">Please enter a new 4-digit password</string>
+    <string name="hint_confirm_new_psw">Please enter new password again</string>
+
+    <string name="psw_set_success">New password set successfully!</string>
+    <!--设置-海报-->
+    <string name="state_on">ON</string>
+    <string name="state_off">OFF</string>
+
+
+    <string name="settings_poster_show_title">Title</string>
+    <string name="settings_poster_show_poster">Poster</string>
+    <string name="settings_poster_show_ratings">Ratings</string>
+    <string name="settings_poster_show_like">Like</string>
+    <string name="settings_poster_show_cornermark">Corner Mark</string>
+    <string name="settings_poster_preview">Preview</string>
+
+    <string name="sample_title" translatable="false">*****</string>
+    <string name="sample_tag" translatable="false">HD</string>
+    <string name="sample_rating" translatable="false">10.0</string>
+
 </resources>

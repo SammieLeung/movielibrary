@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.databinding.PosterItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.util.GlideTools;
@@ -29,8 +30,14 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
     @NonNull
     @Override
     public BaseScaleApater.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        BaseScaleApater.ViewHolder viewHolder= super.onCreateViewHolder(parent, viewType);
-        viewHolder.mBinding.getRoot().setId(View.generateViewId());
+        BaseScaleApater.ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
+        PosterItemBinding itemBinding= (PosterItemBinding) viewHolder.mBinding;
+        itemBinding.setShowConrerMark(Config.getShowCornerMark());
+        itemBinding.setShowLike(Config.getShowLike());
+        itemBinding.setShowRating(Config.getShowRating());
+        itemBinding.setShowTitle(Config.getShowTitle());
+        itemBinding.getRoot().setId(View.generateViewId());
+
         return viewHolder;
     }
 
@@ -39,9 +46,12 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
-        GlideTools.GlideWrapper(mContext,movieDataView.poster)
-                .placeholder(R.mipmap.default_poster)
-                .into(binding.rvPoster);
+        if (Config.getShowPoster().get())
+            GlideTools.GlideWrapper(mContext, movieDataView.poster)
+                    .placeholder(R.mipmap.default_poster)
+                    .into(binding.rvPoster);
+        else
+            Glide.with(mContext).load(R.mipmap.default_poster).into(binding.rvPoster);
         binding.setTitle(movieDataView.title);
         binding.setRating(movieDataView.ratings);
     }

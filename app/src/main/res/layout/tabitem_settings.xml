@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.graphics.drawable.Drawable"/>
+        <import type="androidx.databinding.ObservableInt"/>
+
+        <variable
+            name="title"
+            type="String" />
+        <variable
+            name="drawable"
+            type="Drawable" />
+        <variable
+            name="pos"
+            type="int" />
+        <variable
+            name="selectPos"
+            type="ObservableInt" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        app:viewSelect="@{selectPos==pos}"
+        android:gravity="left"
+        android:background="@drawable/new_common_tab_bg_2"
+        android:layout_height="wrap_content">
+        <TextView
+            android:duplicateParentState="true"
+            android:layout_width="wrap_content"
+            android:text="@{title}"
+            android:layout_marginLeft="64dp"
+            android:textSize="24sp"
+            app:textViewSelect="@{selectPos==pos}"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:drawablePadding="16dp"
+            android:drawableLeft="@{drawable}"
+            android:textColor="@color/white"
+            android:layout_height="wrap_content">
+        </TextView>
+    </RelativeLayout>
+
+</layout>

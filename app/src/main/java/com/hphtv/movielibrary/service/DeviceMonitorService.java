@@ -355,7 +355,7 @@ public class DeviceMonitorService extends Service {
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
                     return new Object[0];
-                })
+                })//TODO 切换成主线程?
                 .subscribe(new SimpleObserver<Object[]>() {
                     @Override
                     public void onAction(Object[] data) {

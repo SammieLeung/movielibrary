@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tv_subtitle"
+            android:textColor="#666666"
+            android:text="@string/childmode_changepsw_subtitle"
+            android:layout_marginLeft="91dp"
+            android:layout_marginTop="71dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <include
+            android:id="@+id/include_pwd"
+            layout="@layout/settings_childmode_changepwd_edittext_item"
+            android:layout_width="878dp"
+            android:layout_height="65dp"
+            android:layout_below="@id/tv_subtitle"
+            android:layout_marginLeft="103dp"
+            android:layout_marginTop="79dp"
+            android:layout_marginBottom="38dp"
+            app:hint="@{@string/hint_enter_psw}"
+            app:label="@{@string/label_old_psw}" />
+        <include
+            app:label="@{@string/label_new_psw}"
+            app:hint="@{@string/hint_input4digit_psw}"
+            android:layout_below="@id/include_pwd"
+            android:id="@+id/include_new_pwd"
+            android:layout_marginLeft="103dp"
+            android:layout_marginBottom="38dp"
+            layout="@layout/settings_childmode_changepwd_edittext_item"
+            android:layout_width="878dp"
+            android:layout_height="65dp" />
+
+        <include
+            android:id="@+id/include_confirm_pwd"
+            layout="@layout/settings_childmode_changepwd_edittext_item"
+            android:layout_width="878dp"
+            android:layout_height="65dp"
+            android:layout_below="@id/include_new_pwd"
+            android:layout_marginLeft="103dp"
+            android:layout_marginBottom="68dp"
+            app:hint="@{@string/hint_confirm_new_psw}"
+            app:label="@{@string/label_confirm_psw}" />
+
+        <Button
+            android:id="@+id/btn_confirm"
+            style="@style/common_btn_style"
+            android:layout_width="195dp"
+            android:layout_height="65dp"
+            android:layout_marginLeft="103dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:autoSizeTextType="uniform"
+            android:layout_below="@id/include_confirm_pwd"
+            android:text="@string/title_change_password"
+            android:textSize="23sp" />
+
+
+        <Button
+            style="@style/common_btn_style"
+            android:id="@+id/btn_cancel"
+            android:layout_width="195dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_height="65dp"
+            android:layout_marginLeft="63dp"
+            android:layout_toEndOf="@id/btn_confirm"
+            android:layout_below="@id/include_confirm_pwd"
+            android:text="@string/cancel"
+            android:textSize="23sp" />
+    </RelativeLayout>
+</layout>

@@ -35,43 +35,41 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
+
         <activity
             android:name=".ui.detail.MovieDetailActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateUnchanged"></activity>
-        <activity
-            android:name=".ui.homepage.HomePageActivity"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:windowSoftInputMode="stateUnchanged" />
         <activity android:name=".ui.homepage.NewHomePageActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".ui.shortcutmanager.ShortcutManagerActivity"></activity>
+        <activity android:name=".ui.shortcutmanager.ShortcutManagerActivity" />
 
-        <activity android:name=".ui.filterpage.FilterPageAcitvity"></activity>
-        <service android:name=".service.MovieScanService"></service>
+        <activity android:name=".ui.filterpage.FilterPageActivity" />
 
-        <service android:name=".service.DeviceMonitorService"></service>
-        <service android:name=".service.DlnaControlService"></service>
+        <service android:name=".service.MovieScanService" />
+
+        <service android:name=".service.DeviceMonitorService" />
+        <service android:name=".service.DlnaControlService" />
         <service android:name=".service.DeviceControlService"
             android:exported="true"
             android:enabled="true">
             <intent-filter>
-                <action android:name="com.hphtv.movielibrary.DEVICE_CONTROL"></action>
+                <action android:name="com.hphtv.movielibrary.DEVICE_CONTROL" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
         <receiver android:name=".BootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-                <category android:name="android.intent.category.LAUNCHER"></category>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.moviesearch.PinyinSearchActivity"></activity>
+        <activity android:name=".ui.moviesearch.PinyinSearchActivity" />
+        <activity android:name=".ui.settings.SettingsActivity" />
 
         <meta-data
             android:name="UMENG_APPKEY"
@@ -84,11 +82,11 @@
         <provider
             android:name=".provider.PosterContentProvider"
             android:authorities="com.hphtv.movielibrary"
-            android:exported="true"></provider>
+            android:exported="true" />
         <provider
             android:name=".provider.MovieLibraryProvider"
             android:authorities="com.hphtv.movielibrary.movieprovider"
-            android:exported="true"></provider>
+            android:exported="true" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.hphtv.movielibrary.fileprovider"

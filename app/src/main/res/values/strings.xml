@@ -138,18 +138,9 @@
     <string name="title_change_psw">Change Password</string>
     <string name="title_input_psw">Enter Password</string>
 
-    <string name="errtips_psw_invaild">* Use 8 digits as your password</string>
-    <string name="errtips_psw_error">* Wrong password</string>
-    <string name="errtips_psw_not_new">* New password can\'t be the same as the original</string>
-    <string name="errtips_psw_inconsistent">* Passwords didn\'t match</string>
 
-    <string name="hint_enter_psw">Enter your password</string>
-    <string name="hint_input4digit_psw">Enter a 4-digit password</string>
-    <string name="hint_confirm_psw">Confirm new password</string>
-    <string name="hint_old_psw">Old password</string>
-    <string name="hint_new_psw">New password</string>
 
-    <string name="psw_set_success">New password has been set up successfully!</string>
+
     <string name="tx_private_for_lib">Private Videos</string>
     <string name="tips_for_private_folder">Cannot make non-local folder private</string>
     <string name="checkbox_del_video_file">Clear file information (do not delete files)?</string>

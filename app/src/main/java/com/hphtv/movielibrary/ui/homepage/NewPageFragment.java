@@ -20,7 +20,7 @@ import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
-import com.hphtv.movielibrary.ui.filterpage.FilterPageAcitvity;
+import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.station.kit.util.DensityUtil;
@@ -68,7 +68,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
 
         @Override
         public void browseAll() {
-            Intent intent=new Intent(getContext(), FilterPageAcitvity.class);
+            Intent intent=new Intent(getContext(), FilterPageActivity.class);
             startActivity(intent);
         }
     };
@@ -77,8 +77,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
     private BaseApater2.OnRecyclerViewItemActionListener mGenreItemClickListener=new BaseApater2.OnRecyclerViewItemActionListener() {
         @Override
         public void onItemClick(View view, int postion, Object data) {
-            Intent intent=new Intent(getContext(), FilterPageAcitvity.class);
-            intent.putExtra(FilterPageAcitvity.EXTRA_GENRE,data.toString());
+            Intent intent=new Intent(getContext(), FilterPageActivity.class);
+            intent.putExtra(FilterPageActivity.EXTRA_GENRE,data.toString());
             startActivity(intent);
         }
 

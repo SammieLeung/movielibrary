@@ -1,8 +1,6 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -14,15 +12,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.databinding.LayoutMovieClassifyFilterBoxBinding;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.ui.homepage.HomePageActivity;
-import com.hphtv.movielibrary.databinding.LayoutMovieClassifyFilterBoxBinding;
-import com.hphtv.movielibrary.ui.BaseDialogFragment;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 

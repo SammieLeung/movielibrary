@@ -31,7 +31,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/2/22
  */
-public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, ActivityFilterpageBinding> {
+public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, ActivityFilterpageBinding> {
     public static final String EXTRA_GENRE = "extra_genre";
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
@@ -40,7 +40,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     View.OnClickListener mOnClickListener = v -> {
         switch (v.getId()) {
             case R.id.btn_home:
-                ActivityHelper.startHomePageActivity(FilterPageAcitvity.this);
+                ActivityHelper.startHomePageActivity(FilterPageActivity.this);
                 break;
             case R.id.btn_filter:
                 FilterBoxDialogFragment filterBoxDialogFragment = FilterBoxDialogFragment.newInstance();
@@ -52,7 +52,7 @@ public class FilterPageAcitvity extends AppBaseActivity<FilterPageViewModel, Act
     BaseApater2.OnRecyclerViewItemActionListener mActionListener=new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
-            mNewpageViewModel.startDetailActivity(FilterPageAcitvity.this, data);
+            mNewpageViewModel.startDetailActivity(FilterPageActivity.this, data);
         }
 
         @Override

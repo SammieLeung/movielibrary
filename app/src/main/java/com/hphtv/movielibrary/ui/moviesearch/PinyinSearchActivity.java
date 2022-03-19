@@ -265,12 +265,15 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 hideEmptyTips();
                 mBinding.setShowTab(true);
                 mMovieAdapter.addAll(data);
-                int count = 0;
+                int movie_count = 0;
+                int tv_count=0;
                 for (int i = 0; i < mMovieAdapter.getRealCount(); i++) {
                     if (data.get(i).type == Constants.SearchType.movie)
-                        count++;
+                        movie_count++;
+                    if (data.get(i).type == Constants.SearchType.tv)
+                        tv_count++;
                 }
-                setTabs(mMovieAdapter.getRealCount(), count, mMovieAdapter.getRealCount() - count);
+                setTabs(mMovieAdapter.getRealCount(), movie_count, tv_count);
             } else {
                 mMovieAdapter.clearAll();
                 mBinding.setShowTab(false);

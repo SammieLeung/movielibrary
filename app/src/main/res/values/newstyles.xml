@@ -56,6 +56,11 @@
         <item name="android:textSize">23sp</item>
         <item name="android:textColor">#FFFFFF</item>
     </style>
+
+    <style name="common_content_s_text_style" parent="common_content_text_style">
+        <item name="android:textSize">21sp</item>
+    </style>
+
     <style name="detail_btn_style" parent="common_btn_style">
         <item name="android:paddingStart">40dp</item>
         <item name="android:paddingEnd">40dp</item>
@@ -132,4 +137,37 @@
     <style name="localsearch_tabTextAppearance">
         <item name="android:textSize">23sp</item>
     </style>
+
+    <style name="setting_menu_item">
+        <item name="android:layout_height">75dp</item>
+        <item name="android:layout_width">275dp</item>
+        <item name="android:layout_marginLeft">36dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+    </style>
+
+    <style name="setting_item_size">
+        <item name="android:layout_height">75dp</item>
+        <item name="android:layout_width">834dp</item>
+    </style>
+
+    <style name="settings_poster_options_item_size">
+        <item name="android:layout_height">75dp</item>
+        <item name="android:layout_width">580dp</item>
+    </style>
+
+    <style name="setting_item_with_drawable" parent="setting_item_size">
+        <item name="android:paddingLeft">23dp</item>
+        <item name="android:paddingRight">23dp</item>
+        <item name="android:drawableRight">@drawable/icon_new_more</item>
+        <item name="android:drawableTint">@color/white</item>
+    </style>
+
+    <style name="setting_item_clickable" parent="setting_item_with_drawable">
+        <item name="android:textSize">23sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@drawable/new_common_tab_bg</item>
+    </style>
+
 </resources>
