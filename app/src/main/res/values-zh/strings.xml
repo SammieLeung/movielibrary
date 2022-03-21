@@ -164,7 +164,6 @@
     <string name="main_actors">主要演员:</string>
     <string name="main_file_list">文件列表:</string>
     <string name="tx_genres">类型:</string>
-    <string name="tx_version">版本:</string>
     <string name="tips2">暂无影片</string>
     <string name="tx_search_result">成功:%1$d 失败:%2$d</string>
     <string name="tx_favorite">收藏</string>

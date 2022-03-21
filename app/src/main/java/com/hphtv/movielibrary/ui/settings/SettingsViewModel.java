@@ -1,6 +1,8 @@
 package com.hphtv.movielibrary.ui.settings;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -13,6 +15,7 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
+import com.station.kit.util.AppUtils;
 import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -151,6 +154,10 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         } else if (type == Constants.SearchType.tv) {
             mDefaultSearchMode.set(getString(R.string.shortcut_type_tv));
         }
+    }
+
+    public String getVersionName(){
+        return AppUtils.getVersionName(getApplication());
     }
 
 }

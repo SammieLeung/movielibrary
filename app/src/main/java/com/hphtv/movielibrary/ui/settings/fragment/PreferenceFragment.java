@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.settings.fragment.preference;
+package com.hphtv.movielibrary.ui.settings.fragment;
 
 import android.os.Bundle;
 import android.view.View;
@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.FragmentSettingsPreferenceBinding;
 import com.hphtv.movielibrary.ui.BaseFragment2;
 import com.hphtv.movielibrary.ui.settings.SettingsViewModel;

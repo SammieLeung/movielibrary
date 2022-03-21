@@ -11,9 +11,10 @@ import androidx.databinding.Observable;
 
 import com.hphtv.movielibrary.databinding.ActivitySettingsBinding;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.settings.fragment.AboutFragment;
 import com.hphtv.movielibrary.ui.settings.fragment.childmode.ChildModeFragment;
-import com.hphtv.movielibrary.ui.settings.fragment.poster.PosterFragment;
-import com.hphtv.movielibrary.ui.settings.fragment.preference.PreferenceFragment;
+import com.hphtv.movielibrary.ui.settings.fragment.PosterFragment;
+import com.hphtv.movielibrary.ui.settings.fragment.PreferenceFragment;
 
 /**
  * author: Sam Leung
@@ -23,6 +24,7 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
     private ChildModeFragment mChildModeFragment;
     private PosterFragment mPosterFragment;
     private PreferenceFragment mPreferenceFragment;
+    private AboutFragment mAboutFragment;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +36,7 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
         mChildModeFragment=ChildModeFragment.newInstance();
         mPosterFragment=PosterFragment.newInstance();
         mPreferenceFragment=PreferenceFragment.newInstance();
+        mAboutFragment=AboutFragment.newInstance();
     }
 
     private void initView() {
@@ -78,6 +81,7 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
 
     private void about(View view){
         mViewModel.getSelectPos().set(3);
+        getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mAboutFragment).commit();
     }
 
     private void requestFocusOnHover(View... views) {

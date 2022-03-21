@@ -29,16 +29,17 @@
             android:layout_marginBottom="38dp"
             app:hint="@{@string/hint_enter_psw}"
             app:label="@{@string/label_old_psw}" />
+
         <include
-            app:label="@{@string/label_new_psw}"
-            app:hint="@{@string/hint_input4digit_psw}"
-            android:layout_below="@id/include_pwd"
             android:id="@+id/include_new_pwd"
-            android:layout_marginLeft="103dp"
-            android:layout_marginBottom="38dp"
             layout="@layout/settings_childmode_changepwd_edittext_item"
             android:layout_width="878dp"
-            android:layout_height="65dp" />
+            android:layout_height="65dp"
+            android:layout_below="@id/include_pwd"
+            android:layout_marginLeft="103dp"
+            android:layout_marginBottom="38dp"
+            app:hint="@{@string/hint_input4digit_psw}"
+            app:label="@{@string/label_new_psw}" />
 
         <include
             android:id="@+id/include_confirm_pwd"

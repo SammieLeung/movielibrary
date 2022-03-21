@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.settings.fragment.poster;
+package com.hphtv.movielibrary.ui.settings.fragment;
 
 import android.os.Bundle;
 import android.view.View;

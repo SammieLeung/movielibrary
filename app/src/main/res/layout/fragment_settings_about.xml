@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="ver"
+            type="String" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/view_poster_source"
+            android:layout_marginTop="170dp"
+            android:layout_marginStart="75dp"
+            android:layout_width="834dp"
+            android:minHeight="75dp"
+            android:paddingLeft="@dimen/setting_item_padding_lr"
+            android:paddingRight="@dimen/setting_item_padding_lr"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="23sp"
+                android:text="@string/settings_about_source"
+                android:textStyle="bold"/>
+            <ImageView
+                android:padding="10dp"
+                android:src="@drawable/source_tmdb"
+                android:layout_alignParentEnd="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+        <View
+            android:layout_width="786dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="101dp"
+            android:layout_marginTop="9dp"
+            android:layout_marginBottom="9dp"
+            android:background="#1AFFFFFF" />
+        <RelativeLayout
+            android:layout_width="834dp"
+            android:layout_height="75dp"
+            android:layout_marginStart="75dp"
+            android:paddingLeft="@dimen/setting_item_padding_lr"
+            android:paddingRight="@dimen/setting_item_padding_lr">
+
+            <TextView
+                style="@style/common_content_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/settings_about_version"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/common_content_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="@{ver}" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</layout>
