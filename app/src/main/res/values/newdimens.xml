@@ -84,5 +84,7 @@
 
     <dimen name="shortcut_scan_subdiaolg_btn_w">320dp</dimen>
 
+    <!--设置项通用填充距离-->
+    <dimen name="setting_item_padding_lr">20dp</dimen>
 
 </resources>

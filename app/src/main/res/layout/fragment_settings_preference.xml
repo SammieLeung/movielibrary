@@ -4,28 +4,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <import type="androidx.databinding.ObservableField"/>
+        <import type="com.hphtv.movielibrary.data.Config"/>
+        <variable
+            name="stateName"
+            type="ObservableField" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-            <include
-                android:id="@+id/view_autosearch"
-                layout="@layout/settings_switch_item"
-                style="@style/setting_item_size"
-                android:layout_marginLeft="75dp"
-                android:layout_marginTop="170dp"
-                app:title="@{@string/settings_preference_autosearch_title}"
-                tools:ignore="IncludeLayoutParam" />
-            <include
-                android:layout_marginTop="15dp"
-                android:id="@+id/view_default_search_mode"
-                android:layout_below="@id/view_autosearch"
-                layout="@layout/settings_options_item"
-                style="@style/setting_item_size"
-                android:layout_marginLeft="75dp"
-                tools:ignore="IncludeLayoutParam" />
+        <include
+            android:id="@+id/view_autosearch"
+            style="@style/setting_item_size"
+            layout="@layout/settings_switch_item"
+            android:layout_marginLeft="75dp"
+            android:layout_marginTop="170dp"
+            app:checkstate="@{Config.isAutoSearch()}"
+            app:title="@{@string/settings_preference_autosearch_title}"
+            tools:ignore="IncludeLayoutParam" />
+
+        <include
+            android:id="@+id/view_default_search_mode"
+            style="@style/setting_item_size"
+            layout="@layout/settings_options_item"
+            app:stateText="@{stateName}"
+            app:title="@{@string/settings_preference_default_searchmode}"
+            android:layout_below="@id/view_autosearch"
+            android:layout_marginLeft="75dp"
+            android:layout_marginTop="15dp"
+            tools:ignore="IncludeLayoutParam" />
     </RelativeLayout>
 </layout>

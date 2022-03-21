@@ -18,6 +18,8 @@
     <RelativeLayout
         android:id="@+id/view"
         style="@style/setting_item_size"
+        android:paddingLeft="@dimen/setting_item_padding_lr"
+        android:paddingRight="@dimen/setting_item_padding_lr"
         android:background="@drawable/new_common_tab_bg">
 
         <TextView
@@ -27,7 +29,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="26dp"
             android:text="@{title}" />
 
         <TextView
@@ -52,7 +53,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="23dp"
             android:checked="@={checkstate}"
             android:clickable="false"
             android:focusable="false"

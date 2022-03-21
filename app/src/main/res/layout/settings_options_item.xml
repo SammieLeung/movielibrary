@@ -4,12 +4,18 @@
     <data>
 
         <import type="androidx.databinding.ObservableBoolean"/>
+        <import type="androidx.databinding.ObservableField"/>
+
+        <import type="android.text.TextUtils"/>
         <variable
             name="title"
             type="String" />
         <variable
             name="state"
             type="ObservableBoolean" />
+        <variable
+            name="stateText"
+            type="ObservableField" />
     </data>
 
     <RelativeLayout
@@ -17,11 +23,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/new_common_tab_bg"
+        android:paddingLeft="@dimen/setting_item_padding_lr"
+        android:paddingRight="@dimen/setting_item_padding_lr"
         android:gravity="center_vertical">
         <TextView
             android:textStyle="bold"
             android:id="@+id/text_1"
-            android:layout_marginLeft="21dp"
             style="@style/common_content_text_style"
             android:text="@{title}"
          />
@@ -29,9 +36,8 @@
         <TextView
             android:layout_alignParentEnd="true"
             android:id="@+id/text_2"
-            android:layout_marginEnd="23dp"
             style="@style/common_content_s_text_style"
-            android:text="@{state?@string/state_on:@string/state_off}"
+            android:text="@{stateText==null?(state?@string/state_on:@string/state_off):stateText}"
             android:drawablePadding="32dp"
             android:drawableTint="@color/white"
             android:drawableRight="@drawable/icon_new_more"

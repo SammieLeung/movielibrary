@@ -33,12 +33,19 @@ public class PreferenceFragment extends BaseFragment2<SettingsViewModel, Fragmen
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        bindDatas();
         initView();
     }
 
-    private void initView(){
-        mBinding.viewAutosearch.view.setOnClickListener();
-        mBinding.viewDefaultSearchMode.view.setOnClickListener();
+    private void bindDatas(){
+        mViewModel.getDeafutSearchModeString();
+        mBinding.setStateName(mViewModel.getDefaultSearchMode());
     }
+    private void initView(){
+
+        mBinding.viewAutosearch.view.setOnClickListener(mViewModel::toggleAutoSearchState);
+        mBinding.viewDefaultSearchMode.view.setOnClickListener(mViewModel::changeDefaultSearchState);
+    }
+
 
 }

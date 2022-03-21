@@ -33,7 +33,7 @@ public class Config {
     private static ObservableBoolean sShowRating;//显示评分
     private static ObservableBoolean sShowLike;//显示收藏
 
-    private static boolean sAutoSearch;
+    private static ObservableBoolean sAutoSearch;
     private static String sDefaultSearchMode;
 
     static {
@@ -47,7 +47,7 @@ public class Config {
         sShowRating=new ObservableBoolean(tools.readProperty(SHOW_RATING,true));
         sShowLike=new ObservableBoolean(tools.readProperty(SHOW_LIKE,true));
 
-        sAutoSearch=tools.readProperty(AUTO_SEARCH,false);
+        sAutoSearch=new ObservableBoolean(tools.readProperty(AUTO_SEARCH,false));
         sDefaultSearchMode =tools.readProperty(DEFAULT_SEARCH_MODE, Constants.SearchType.auto.name());
     }
 
@@ -147,19 +147,21 @@ public class Config {
 
     //偏好设置>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-    public static boolean isAutoSearch() {
+    public static ObservableBoolean isAutoSearch() {
         return sAutoSearch;
     }
 
     public static void setAutoSearch(boolean autoSearch) {
-        sAutoSearch = autoSearch;
+        sAutoSearch.set(autoSearch);
+        SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(AUTO_SEARCH,autoSearch);
     }
 
     public static String getDefaultSearchMode() {
         return sDefaultSearchMode;
     }
 
-    public static void setDefaultSearchMode(String defaultSearchMode) {
-        sDefaultSearchMode = defaultSearchMode;
+    public static void setDefaultSearchMode(Constants.SearchType type) {
+        sDefaultSearchMode = type.name();
+        SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(DEFAULT_SEARCH_MODE,type.name());
     }
 }
