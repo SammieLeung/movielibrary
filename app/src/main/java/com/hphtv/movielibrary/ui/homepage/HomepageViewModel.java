@@ -106,7 +106,7 @@ public class HomepageViewModel extends AndroidViewModel {
                 .doOnNext(s -> {
                     mConditionDevices = mDeviceDao.qureyAll();
                     mConditionGenres = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource());
-                    mConditionYears = mMovieDao.qureyYearsGroup();
+                    mConditionYears = mMovieDao.queryYearsGroup();
                 })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<String>() {

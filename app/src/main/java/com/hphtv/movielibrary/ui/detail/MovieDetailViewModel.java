@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
 import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
@@ -60,6 +61,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2021/6/15
  */
 public class MovieDetailViewModel extends BaseAndroidViewModel {
+    public static final int LIMIT=10;
+
     public static final String FROM_DB = "from_db";
     public static final String FROM_NETWORK = "from_network";
 
@@ -145,7 +148,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             genreName.add(genre.name);
                         }
                         List<MovieDataView> dataViewList = new ArrayList<>();
-                        dataViewList.addAll(mMovieDao.queryRecommand(ScraperSourceTools.getSource(), genreName, mMovieWrapper.movie.id));
+                        dataViewList.addAll(mMovieDao.queryRecommand(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), genreName, mMovieWrapper.movie.id,0,10));
                         return dataViewList;
                     }
                 })

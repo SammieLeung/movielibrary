@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
@@ -40,7 +41,7 @@ public class MovieSearchViewModel extends AndroidViewModel {
     public void init() {
         Observable.just("")
                 .observeOn(Schedulers.io())
-                .subscribe(s -> mMovieDataViewList = mMovieDao.queryAllMovieDataView(mSource));
+                .subscribe(s -> mMovieDataViewList = mMovieDao.queryAllMovieDataView(mSource, Config.getSqlConditionOfChildMode()));
     }
 
     public void search(String keyword, Callback<MovieDataView> callback) {

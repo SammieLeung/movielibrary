@@ -233,12 +233,14 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            "AND genre_name in (:genre_name) "+
-            "AND id!=:id "+
+            " AND genre_name in (:genre_name) "+
+            " AND id!=:id "+
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
             " GROUP BY id " +
-            " ORDER BY add_time DESC "
+            " ORDER BY add_time DESC "+
+            " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source,List<String> genre_name,long id);
+    public List<MovieDataView> queryRecommand(String source,String ap,List<String> genre_name,long id,int offset,int limit);
 
 
 
@@ -253,11 +255,15 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryRecommand(String source,String ap,List<String> genre_name,List<Long> ids,int offset,int limit);
 
-    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
-    public List<MovieDataView> queryAllMovieDataView(String source);
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
+            " GROUP BY id ")
+    public List<MovieDataView> queryAllMovieDataView(String source,String ap);
 
-    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id LIMIT :offset,:limit")
-    public List<MovieDataView> queryAllMovieDataView(String source,int offset,int limit);
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
+            "GROUP BY id LIMIT :offset,:limit")
+    public List<MovieDataView> queryAllMovieDataView(String source,String ap,int offset,int limit);
 
     @Query("SELECT COUNT(*) FROM (SELECT id FROM "+ VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id)")
     public int countAllMovieDataView(String source);
@@ -278,6 +284,6 @@ public interface MovieDao {
      * @return
      */
     @Query("SELECT year FROM " + VIEW.MOVIE_DATAVIEW + " GROUP BY year ORDER BY year DESC")
-    public List<String> qureyYearsGroup();
+    public List<String> queryYearsGroup();
 }
 

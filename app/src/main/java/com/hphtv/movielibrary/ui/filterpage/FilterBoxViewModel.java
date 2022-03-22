@@ -135,7 +135,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mYearsList = mMovieDao.qureyYearsGroup();
+                    mYearsList = mMovieDao.queryYearsGroup();
                     return mYearsList;
                 }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<String>>() {
