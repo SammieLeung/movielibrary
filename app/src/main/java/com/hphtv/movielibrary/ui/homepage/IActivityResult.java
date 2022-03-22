@@ -10,4 +10,5 @@ import androidx.activity.result.ActivityResult;
  */
 public interface IActivityResult {
     void onActivityResult(ActivityResult result);
+    void forceRefresh();
 }

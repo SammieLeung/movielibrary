@@ -284,4 +284,9 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         if (result.getResultCode() == Activity.RESULT_OK)
             prepareAll();
     }
+
+    @Override
+    public void forceRefresh() {
+        prepareAll();
+    }
 }

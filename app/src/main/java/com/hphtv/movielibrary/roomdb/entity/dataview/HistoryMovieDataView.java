@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.roomdb.entity.dataview;
 
 import androidx.room.DatabaseView;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 
@@ -10,7 +11,9 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  * date:  2022/2/22
  */
 @DatabaseView(
-        value = "SELECT u.filename,u.keyword,u.path,u.last_playtime,m.poster,m.source,m.title,m.ratings,st.img_url as stage_photo " +
+        value = "SELECT u.filename,u.keyword,u.path,u.last_playtime," +
+                "m.poster,m.source,m.title,m.ratings,m.ap,m.s_ap," +
+                "st.img_url as stage_photo " +
                 "FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" AS u " +
                 "LEFT OUTER JOIN "+VIEW.MOVIE_DATAVIEW+" AS m " +
                 "ON u.path=m.file_uri " +
@@ -28,6 +31,8 @@ public class HistoryMovieDataView {
     public String title;
     public String filename;
     public String ratings;
+    public Constants.AccessPermission ap;
+    public Constants.AccessPermission s_ap;
     public String path;
     public String source;
     public String stage_photo;

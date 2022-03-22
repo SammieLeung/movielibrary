@@ -30,6 +30,7 @@
                 android:text="@string/shortcut_manager" />
 
             <CheckBox
+                android:visibility="@{showChildMode?View.VISIBLE:View.GONE}"
                 android:id="@+id/btn_childmode"
                 style="@style/homepage_circle_btn_style"
                 android:layout_width="wrap_content"
@@ -78,9 +79,13 @@
         </RelativeLayout>
 </androidx.core.widget.NestedScrollView>
     <data>
+        <import type="android.view.View"/>
         <import type="androidx.databinding.ObservableBoolean"/>
         <variable
             name="childmode"
+            type="ObservableBoolean" />
+        <variable
+            name="showChildMode"
             type="ObservableBoolean" />
     </data>
 </layout>

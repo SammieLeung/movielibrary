@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
@@ -38,6 +39,8 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
 
     @Override
     public void permissionGranted() {
+        mBinding.setChildmode(mViewModel.mChildMode);
+        mBinding.setShowChildMode(mViewModel.mShowChildMode);
 
         mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
@@ -52,7 +55,7 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
     }
 
     private void initTab() {
-        mBinding.setChildmode(mViewModel.mChildMode);
+
         mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
 //        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
 //        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
@@ -79,9 +82,11 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
 
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
-        for(Fragment fragment:mNewHomePageTabAdapter.mList){
-            if(fragment instanceof IActivityResult){
-                IActivityResult activityResult= (IActivityResult) fragment;
+        mViewModel.getShowChildMode().set(Config.isChildMode());//刷新是否显示儿童模式模式
+        mViewModel.getChildMode().set(!Config.isTempCloseChildMode()&&Config.isChildMode());
+        for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+            if (fragment instanceof IActivityResult) {
+                IActivityResult activityResult = (IActivityResult) fragment;
                 activityResult.onActivityResult(result);
             }
         }
@@ -119,31 +124,39 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
 
     /**
      * 打开设置页面
+     *
      * @param view
      */
-    private void startSettings(View view){
+    private void startSettings(View view) {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivityForResult(intent);
     }
 
-    private void toggleChildmode(View v){
-            if (mViewModel.getChildMode().get()) {
-                mViewModel.getChildMode().notifyChange();
-                showPasswordDialog();
-            } else {
-                mViewModel.toggleChildMode();
-            }
+    private void toggleChildmode(View v) {
+        if (mViewModel.getChildMode().get()) {
+            mViewModel.getChildMode().notifyChange();
+            showPasswordDialog();
+        } else {
+            mViewModel.toggleChildMode();
+            mNewHomePageTabAdapter.refreshFragments();
+        }
     }
 
     private void showPasswordDialog() {
         PasswordDialogFragmentViewModel viewModel = new ViewModelProvider(this).get(PasswordDialogFragmentViewModel.class);
-        PasswordDialogFragment passwordDialogFragment=PasswordDialogFragment.newInstance();
-        passwordDialogFragment.setOnConfirmListener(() -> mViewModel.toggleChildMode());
+        PasswordDialogFragment passwordDialogFragment = PasswordDialogFragment.newInstance();
+        passwordDialogFragment.setDialogTitle(getString(R.string.childmode_temp_close));
+        passwordDialogFragment.setOnConfirmListener(() -> {
+            mViewModel.toggleChildMode();
+            mNewHomePageTabAdapter.refreshFragments();
+        });
         passwordDialogFragment.setViewModel(viewModel);
-        passwordDialogFragment.show(getSupportFragmentManager(),"");
+        passwordDialogFragment.show(getSupportFragmentManager(), "");
     }
+
     /**
      * 创建Tabview
+     *
      * @param text
      * @return
      */

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
@@ -66,7 +67,7 @@ public class NewPageFragmentViewModel extends BaseAndroidViewModel {
     public void prepareHistory(Callback callback) {
         Observable.just("")
                 .map(s -> {
-                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(),0,LIMIT);
+                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(),0,LIMIT);
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -147,7 +148,7 @@ public class NewPageFragmentViewModel extends BaseAndroidViewModel {
 
     public void prepareRecentlyAddedMovie(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(),0,LIMIT);
+            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(),Config.getSqlConditionOfChildMode(),0,LIMIT);
             emitter.onNext(movieDataViewList);
             emitter.onComplete();
         })
@@ -182,7 +183,7 @@ public class NewPageFragmentViewModel extends BaseAndroidViewModel {
     public void prepareRecommand(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
             String source = ScraperSourceTools.getSource();
-            List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source,0,LIMIT);
+            List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source,Config.getSqlConditionOfChildMode(),0,LIMIT);
             List<String> genreList = new ArrayList<>();
             List<Long> idList = new ArrayList<>();
             for (int i = 0; i < 3 && i < history.size(); i++) {
@@ -194,7 +195,7 @@ public class NewPageFragmentViewModel extends BaseAndroidViewModel {
                 }
                 idList.add(wrapper.movie.id);
             }
-            emitter.onNext(mMovieDao.queryRecommand(source, genreList, idList,0,LIMIT));
+            emitter.onNext(mMovieDao.queryRecommand(source,Config.getSqlConditionOfChildMode(), genreList, idList,0,LIMIT));
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

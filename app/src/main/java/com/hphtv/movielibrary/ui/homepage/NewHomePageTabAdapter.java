@@ -44,4 +44,13 @@ public class NewHomePageTabAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return mList.size();
     }
+
+    public void refreshFragments(){
+        for(Fragment fragment:mList){
+            if(fragment instanceof IActivityResult){
+                IActivityResult activityResult= (IActivityResult) fragment;
+                activityResult.forceRefresh();
+            }
+        }
+    }
 }

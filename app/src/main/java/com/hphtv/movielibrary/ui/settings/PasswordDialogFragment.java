@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.settings;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  */
 
 public class PasswordDialogFragment extends BaseDialogFragment2<PasswordDialogFragmentViewModel, CommonPasswordDialogLayoutBinding> {
-
+    public String mDialogTitle;
     public static PasswordDialogFragment newInstance() {
         PasswordDialogFragment fragment = new PasswordDialogFragment();
         return fragment;
@@ -42,11 +43,15 @@ public class PasswordDialogFragment extends BaseDialogFragment2<PasswordDialogFr
 
     private void bindDatas() {
         mBinding.setInputHint(getString(R.string.hint_enter_psw));
-        mBinding.setDialogTitle(getString(R.string.title_input_psw));
+        mBinding.setDialogTitle(TextUtils.isEmpty(mDialogTitle)?getString(R.string.title_input_psw):mDialogTitle);
         mBinding.setViewmodel(mViewModel);
     }
 
-    public CommonPasswordDialogLayoutBinding getBinding(){
+    public void setDialogTitle(String dialogTitle) {
+        mDialogTitle = dialogTitle;
+    }
+
+    public CommonPasswordDialogLayoutBinding getBinding() {
         return mBinding;
     }
 
@@ -60,10 +65,10 @@ public class PasswordDialogFragment extends BaseDialogFragment2<PasswordDialogFr
 
     public void confirm(View v) {
         if (mViewModel.checkPassword()) {
-            if(mOnConfirmListener!=null)
+            if (mOnConfirmListener != null)
                 mOnConfirmListener.onConfirm();
             dismiss();
-        }else{
+        } else {
             errorTips();
         }
     }
@@ -73,11 +78,12 @@ public class PasswordDialogFragment extends BaseDialogFragment2<PasswordDialogFr
     }
 
     private OnConfirmListener mOnConfirmListener;
-    public interface OnConfirmListener{
+
+    public interface OnConfirmListener {
         void onConfirm();
     }
 
-    public void setOnConfirmListener(OnConfirmListener confirmListener){
-        mOnConfirmListener=confirmListener;
+    public void setOnConfirmListener(OnConfirmListener confirmListener) {
+        mOnConfirmListener = confirmListener;
     }
 }

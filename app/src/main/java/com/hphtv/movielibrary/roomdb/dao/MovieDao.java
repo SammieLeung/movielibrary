@@ -210,7 +210,7 @@ public interface MovieDao {
             "CASE WHEN :order =5 THEN is_favorite END ASC " +
             "LIMIT :offset,:limit "
     )
-    public List<MovieDataView> queryMovieDataView2(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year, int order,String ap, @Nullable boolean isDesc,String source,int offset,int limit);
+    public List<MovieDataView> queryMovieDataView2(@Nullable String dir_uri, @Nullable long vtid,@Nullable String genre_name, @Nullable String year, int order,@Nullable String ap, @Nullable boolean isDesc,String source,int offset,int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
@@ -223,11 +223,12 @@ public interface MovieDao {
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
             " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
             " GROUP BY id " +
             " ORDER BY add_time DESC" +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source,int offset,int limit);
+    public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source,String ap,int offset,int limit);
 
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
@@ -243,13 +244,14 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            "AND genre_name in (:genre_name) "+
-            "AND id NOT IN (:ids) "+
+            " AND genre_name in (:genre_name) "+
+            " AND id NOT IN (:ids) "+
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
             " GROUP BY id " +
             " ORDER BY add_time DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source,List<String> genre_name,List<Long> ids,int offset,int limit);
+    public List<MovieDataView> queryRecommand(String source,String ap,List<String> genre_name,List<Long> ids,int offset,int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source);

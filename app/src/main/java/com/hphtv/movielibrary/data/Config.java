@@ -27,6 +27,7 @@ public class Config {
 
     private static boolean sChildMode;
     private static String sChildModePassword;
+    private static boolean sTempCloseChildMode;
     private static ObservableBoolean sShowTitle;//显示标题
     private static ObservableBoolean sShowPoster;//显示海报
     private static ObservableBoolean sShowCornerMark;//显示角标
@@ -39,6 +40,7 @@ public class Config {
     static {
         SharePreferencesTools tools=SharePreferencesTools.getInstance(MovieApplication.getInstance());
         sChildMode =tools.readProperty(CHILD_MODE,false);
+        sTempCloseChildMode=false;
         sChildModePassword =tools.readProperty(CHILD_MODE_PSW,DEAULT_PASSWORD);
 
         sShowTitle=new ObservableBoolean(tools.readProperty(SHOW_TITLE,true));
@@ -68,6 +70,14 @@ public class Config {
         return sChildMode;
     }
 
+    public static boolean isTempCloseChildMode() {
+        return sTempCloseChildMode;
+    }
+
+    public static void setTempCloseChildMode(boolean tempCloseChildMode) {
+        sTempCloseChildMode = tempCloseChildMode;
+    }
+
     /**
      * 获取用于数据库查询的儿童模式相关语句
      * @return
@@ -77,7 +87,7 @@ public class Config {
             儿童模式即需要筛选出有ALL_AGE的影片
             否则返回ALL_AGE+ADULT类型影片。
          */
-        if(sChildMode)
+        if(!sTempCloseChildMode&&sChildMode)
             return Constants.AccessPermission.ALL_AGE.name();
         return null;
     }

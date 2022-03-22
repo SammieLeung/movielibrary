@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.roomdb.dao;
 
+import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -71,8 +72,10 @@ public interface VideoFileDao {
     @Query("SELECT * FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" WHERE source=:source or source=''")
     public List<HistoryMovieDataView> queryHistoryMovieDataView(String source);
 
-    @Query("SELECT * FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" WHERE source=:source or source='' LIMIT :offset,:limit")
-    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source,int offset,int limit);
+    @Query("SELECT * FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" WHERE (source=:source or source='')" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))"+
+            " LIMIT :offset,:limit")
+    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source, @Nullable String ap, int offset, int limit);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
     public void deleteByDevice(String devicePath, List<String> paths);

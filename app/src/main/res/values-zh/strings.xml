@@ -129,7 +129,6 @@
     <string name="title_folder_add">添加文件夹到库</string>
     <string name="btn_show_hidden_folder">显示私密文件</string>
     <string name="title_change_password">修改密码</string>
-    <string name="title_input_psw">输入密码</string>
     <string name="title_change_psw">修改密码</string>
     <string name="title_set_initial_psw">设置初始密码</string>
 
