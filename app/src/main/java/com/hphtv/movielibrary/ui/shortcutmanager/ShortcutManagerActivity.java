@@ -138,26 +138,6 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
         unbindService(mServiceConnection);
     }
 
-    private void showEnterPasswordDialog() {
-        PasswordDialogFragment passwordDialogFragment = PasswordDialogFragment.newInstance().newEnterPassword();
-        passwordDialogFragment.setOnClickListener(new PasswordDialogFragment.OnClickListener() {
-            @Override
-            public void isVaildPassword() {
-            }
-
-            @Override
-            public void updatePassword(String text) {
-                showEnterPasswordDialog();
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-        passwordDialogFragment.show(getSupportFragmentManager(), "");
-    }
-
     public void loadShortcuts() {
         mViewModel.loadShortcuts(mCallback);
     }

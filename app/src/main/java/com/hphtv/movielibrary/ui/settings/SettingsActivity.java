@@ -8,6 +8,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.Observable;
+import androidx.fragment.app.FragmentManager;
 
 import com.hphtv.movielibrary.databinding.ActivitySettingsBinding;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
@@ -66,21 +67,25 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
 
     private void childMode(View view) {
         mViewModel.getSelectPos().set(0);
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mChildModeFragment).commit();
     }
 
     private void poster(View view){
         mViewModel.getSelectPos().set(1);
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mPosterFragment).commit();
     }
 
     private void preference(View view){
         mViewModel.getSelectPos().set(2);
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mPreferenceFragment).commit();
     }
 
     private void about(View view){
         mViewModel.getSelectPos().set(3);
+        getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mAboutFragment).commit();
     }
 

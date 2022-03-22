@@ -9,12 +9,15 @@ import android.widget.LinearLayout;
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
+import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
+import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
@@ -35,6 +38,7 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
 
     @Override
     public void permissionGranted() {
+
         mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
         mBinding.viewpager.setOffscreenPageLimit(2);
@@ -42,11 +46,13 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         mBinding.btnPinyinSearch.setOnClickListener(this::startPinyinSearchPage);
         mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
         mBinding.btnSettings.setOnClickListener(this::startSettings);
+        mBinding.btnChildmode.setOnClickListener(this::toggleChildmode);
         initTab();
         autoScrollListener(mBinding.nsv);
     }
 
     private void initTab() {
+        mBinding.setChildmode(mViewModel.mChildMode);
         mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
 //        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
 //        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
@@ -111,11 +117,36 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         startActivityForResult(intent);
     }
 
+    /**
+     * 打开设置页面
+     * @param view
+     */
     private void startSettings(View view){
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivityForResult(intent);
     }
 
+    private void toggleChildmode(View v){
+            if (mViewModel.getChildMode().get()) {
+                mViewModel.getChildMode().notifyChange();
+                showPasswordDialog();
+            } else {
+                mViewModel.toggleChildMode();
+            }
+    }
+
+    private void showPasswordDialog() {
+        PasswordDialogFragmentViewModel viewModel = new ViewModelProvider(this).get(PasswordDialogFragmentViewModel.class);
+        PasswordDialogFragment passwordDialogFragment=PasswordDialogFragment.newInstance();
+        passwordDialogFragment.setOnConfirmListener(() -> mViewModel.toggleChildMode());
+        passwordDialogFragment.setViewModel(viewModel);
+        passwordDialogFragment.show(getSupportFragmentManager(),"");
+    }
+    /**
+     * 创建Tabview
+     * @param text
+     * @return
+     */
     private View buildTabView(String text) {
         TabitemHomepageMenuBinding homepageTabBinding = TabitemHomepageMenuBinding.inflate(getLayoutInflater());
         homepageTabBinding.setText(text);
