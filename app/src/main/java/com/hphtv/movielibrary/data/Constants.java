@@ -200,8 +200,10 @@ public class Constants {
 
         String MOVIE_SCRAP_START= "action.movie.scrap.start";
         String MOVIE_SCRAP_STOP = "action.movie.scrap.stop";
-        String SHORTCUT_SCRAP_START="action.short.scrap.start";
-        String SHORTCUT_SCRAP_STOP="action.short.scrap.finish";
+        String SHORTCUT_SCRAP_START="action.shortcut.scrap.start";
+        String SHORTCUT_SCRAP_STOP="action.shortcut.scrap.finish";
+        String SHORTCUT_INFO_UPDATE="action.shortcut.info_update";
+        String SHORTCUT_REMOVE="action.shortcut.remove";
 
         String MATCHED_MOVIE="action.movie.matched";
         String MATCHED_MOVIE_FAILED="action.movie.matched.failed";

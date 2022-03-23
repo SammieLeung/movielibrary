@@ -31,56 +31,58 @@
             android:layout_height="wrap_content"/>
 
         <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_toEndOf="@id/img_icon"
-            android:layout_toStartOf="@id/tv_shorcut_status"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_toStartOf="@id/tv_shorcut_status"
+            android:layout_toEndOf="@id/img_icon"
             android:orientation="vertical">
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginBottom="7dp"
                 android:orientation="horizontal">
+
                 <TextView
-                    style="@style/folder_item_text"
                     android:id="@+id/tv_shorcut_name"
-                    android:text="@{item.title}"
+                    style="@style/folder_item_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_alignParentStart="true"
                     android:ellipsize="middle"
                     android:gravity="bottom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"/>
+                    android:text="@{item.title}" />
+
                 <TextView
                     android:id="@+id/tv_spilt"
-                    android:layout_toEndOf="@+id/tv_shorcut_name"
                     style="@style/folder_item_small_text"
-                    android:gravity="bottom"
-                    android:singleLine="true"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:text='@{TextUtils.isEmpty(item.title)?"":"|"}'
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-              />
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_toEndOf="@+id/tv_shorcut_name"
+                    android:gravity="bottom"
+                    android:singleLine="true"
+                    android:text='@{TextUtils.isEmpty(item.title)?"":"|"}' />
+
                 <TextView
-                    android:layout_toEndOf="@+id/tv_spilt"
-                    android:layout_alignParentEnd="true"
                     style="@style/folder_item_small_text"
-                    android:gravity="bottom|left"
-                    android:text="@{String.valueOf(item.poster_count)+'/'+String.valueOf(item.file_count)}"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_toEndOf="@+id/tv_spilt"
+                    android:gravity="bottom|left"
+                    android:text="@{String.valueOf(item.poster_count)+'/'+String.valueOf(item.file_count)}" />
 
             </RelativeLayout>
 
             <TextView
                 android:id="@+id/tv_shorcut_uri"
-                android:text="@{item.sub_title}"
                 style="@style/folder_item_small_text"
-                android:gravity="top"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-               />
+                android:gravity="top"
+                android:text="@{item.sub_title}" />
         </androidx.appcompat.widget.LinearLayoutCompat>
         <TextView
             android:layout_alignParentEnd="true"

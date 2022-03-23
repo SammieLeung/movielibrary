@@ -39,7 +39,6 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
     private List<String> mFolderTypeList = new ArrayList<>(), mAccessList = new ArrayList<>();
     private ObservableBoolean mShowSubDialogFlag = new ObservableBoolean();
     private WeakReference<ShortcutManagerViewModel> mShortcutManagerViewModelWeakReference;
-    private ShortcutManagerViewModel.Callback mCallback;
 
     public ShortcutOptionsViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -169,25 +168,21 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                             intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                         }
-                        if(mShortcutManagerViewModelWeakReference.get()!=null){
-                            mShortcutManagerViewModelWeakReference.get().loadShortcuts(mCallback);
-                        }
+                        Intent intent=new Intent();
+                        intent.setAction(Constants.BroadCastMsg.SHORTCUT_INFO_UPDATE);
+                        intent.putExtra(Constants.Extras.SHORTCUT,mShortcut);
+                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                     }
                 });
 
     }
 
-    public void removeShortcut(Shortcut shortcut){
-        if(mShortcutManagerViewModelWeakReference.get()!=null){
-            mShortcutManagerViewModelWeakReference.get().removeShortcut(shortcut,mCallback);
-        }
+    public void removeShortcut(){
+        Intent intent=new Intent();
+        intent.setAction(Constants.BroadCastMsg.SHORTCUT_REMOVE);
+        intent.putExtra(Constants.Extras.SHORTCUT,mShortcut);
+        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
     }
 
-    public void setShortcutManagerViewModel(ShortcutManagerViewModel viewModel) {
-        mShortcutManagerViewModelWeakReference = new WeakReference<>(viewModel);
-    }
 
-    public void setUICallback( ShortcutManagerViewModel.Callback callback){
-        mCallback=callback;
-    }
 }

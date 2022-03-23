@@ -39,23 +39,41 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
 
     @Override
     public void permissionGranted() {
+        bindDatas();
+        initView();
+        autoScrollListener(mBinding.nsv);
+        if(Config.isAutoSearch().get()){
+            autoSearch();
+        }
+    }
+
+    /**
+     * 绑定数据
+     */
+    private void bindDatas(){
         mBinding.setChildmode(mViewModel.mChildMode);
         mBinding.setShowChildMode(mViewModel.mShowChildMode);
+    }
 
-        mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
-        mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
-        mBinding.viewpager.setOffscreenPageLimit(2);
-        mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
+    /**
+     * 初始化UI
+     */
+    private void initView(){
         mBinding.btnPinyinSearch.setOnClickListener(this::startPinyinSearchPage);
         mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
         mBinding.btnSettings.setOnClickListener(this::startSettings);
         mBinding.btnChildmode.setOnClickListener(this::toggleChildmode);
         initTab();
-        autoScrollListener(mBinding.nsv);
     }
 
+    /**
+     * 初始化TAB
+     */
     private void initTab() {
-
+        mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
+        mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
+        mBinding.viewpager.setOffscreenPageLimit(2);
+        mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
         mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
 //        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
 //        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
@@ -80,10 +98,19 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
                 });
     }
 
+    /**
+     * 自动搜索本地设备
+     */
+    private void autoSearch(){
+
+    }
+
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
-        mViewModel.getShowChildMode().set(Config.isChildMode());//刷新是否显示儿童模式模式
+        //刷新显示儿童模式状态
+        mViewModel.getShowChildMode().set(Config.isChildMode());
         mViewModel.getChildMode().set(!Config.isTempCloseChildMode()&&Config.isChildMode());
+        //刷新各个子Fragment状态
         for (Fragment fragment : mNewHomePageTabAdapter.mList) {
             if (fragment instanceof IActivityResult) {
                 IActivityResult activityResult = (IActivityResult) fragment;
@@ -132,6 +159,10 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         startActivityForResult(intent);
     }
 
+    /**
+     * 开关儿童，模式
+     * @param v
+     */
     private void toggleChildmode(View v) {
         if (mViewModel.getChildMode().get()) {
             mViewModel.getChildMode().notifyChange();
@@ -142,6 +173,9 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         }
     }
 
+    /**
+     * 显示密码输入框
+     */
     private void showPasswordDialog() {
         PasswordDialogFragmentViewModel viewModel = new ViewModelProvider(this).get(PasswordDialogFragmentViewModel.class);
         PasswordDialogFragment passwordDialogFragment = PasswordDialogFragment.newInstance();

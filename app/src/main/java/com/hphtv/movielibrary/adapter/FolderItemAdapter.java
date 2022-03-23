@@ -161,6 +161,17 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         }
     }
 
+    public void removeShortcut(Shortcut shortcut){
+        for (int i = 0; i < mFolderItemList.size(); i++) {
+            FolderItem folderItem = mFolderItemList.get(i);
+            String uri=shortcut.uri;
+            if (folderItem.uri.equals(uri)) {
+                mFolderItemList.remove(folderItem);
+                notifyItemRemoved(i);
+            }
+        }
+    }
+
     public void pickerClose() {
         if (mEventHandler != null)
             mEventHandler.pickerClose();

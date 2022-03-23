@@ -14,8 +14,6 @@ import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
-import com.hphtv.movielibrary.ui.AppBaseActivity;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
@@ -35,52 +33,39 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class ShortcutManagerViewModel extends AndroidViewModel {
     public static final String TAG = ShortcutManagerViewModel.class.getSimpleName();
-    private ScanDirectoryDao mScanDirectoryDao;
     private DeviceDao mDeviceDao;
     private ShortcutDao mShortcutDao;
-    private boolean passwordhasBeenSet = false;
     private List<Shortcut> mShortcutList;
 
 
     public ShortcutManagerViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase roomDatabase = MovieLibraryRoomDatabase.getDatabase(application);
-        mScanDirectoryDao = roomDatabase.getScanDirectoryDao();
         mDeviceDao = roomDatabase.getDeviceDao();
         mShortcutDao = roomDatabase.getShortcutDao();
-        String password = SharePreferencesTools.getInstance(application).readProperty(Constants.SharePreferenceKeys.PASSWORD, "");
-        passwordhasBeenSet = TextUtils.isEmpty(password) ? false : true;
     }
 
     /**
      * 读取所有索引
-     * @param callback
      */
-    public void loadShortcuts(Callback callback) {
-        Observable.just("")
+    public Observable<List<Shortcut>> loadShortcuts() {
+        return Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mShortcutList= mShortcutDao.queryAllShortcuts();
+                    mShortcutList = mShortcutDao.queryAllShortcuts();
                     return mShortcutList;
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<Shortcut>>() {
-                    @Override
-                    public void onAction(List<Shortcut> shortcutList) {
-                        if (callback != null)
-                            callback.refreshShortcutList(shortcutList);
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 
     /**
      * 添加索引
+     *
      * @param uri
-     * @param callback
      */
-    public void addShortcut(Uri uri, Callback callback) {
-        Observable.just(uri)
+    public Observable<Shortcut> addShortcut(Uri uri) {
+        return Observable.just(uri)
                 .subscribeOn(Schedulers.io())
                 .map(queryUri -> {
                     String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
@@ -98,10 +83,10 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                                 LogUtil.v("id " + device.id + " localpath:" + device.path);
                                 Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                                 if (shortcut == null) {
-                                    shortcut = new Shortcut(path, device.type, null, null,path);
-                                    shortcut.devicePath=device.path;
-                                    long id=mShortcutDao.insertShortcut(shortcut);
-                                    shortcut.shortcutId=id;
+                                    shortcut = new Shortcut(path, device.type, null, null, path);
+                                    shortcut.devicePath = device.path;
+                                    long id = mShortcutDao.insertShortcut(shortcut);
+                                    shortcut.shortcutId = id;
                                 }
                                 return shortcut;
                             }
@@ -111,50 +96,35 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                         Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                         if (shortcut == null) {
                             if (deviceTypeStr.equals("samba")) {
-                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, null, null,queryUri.toString());
-                                long id=mShortcutDao.insertShortcut(shortcut);
-                                shortcut.shortcutId=id;
+                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_SMB, null, null, queryUri.toString());
+                                long id = mShortcutDao.insertShortcut(shortcut);
+                                shortcut.shortcutId = id;
                             } else {
-                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_DLNA, null, null,queryUri.toString());
-                                long id=mShortcutDao.insertShortcut(shortcut);
-                                shortcut.shortcutId=id;
+                                shortcut = new Shortcut(path, Constants.DeviceType.DEVICE_TYPE_DLNA, null, null, queryUri.toString());
+                                long id = mShortcutDao.insertShortcut(shortcut);
+                                shortcut.shortcutId = id;
                             }
                         }
                         return shortcut;
                     }
-                    return new Shortcut("", 0, null, null,"");
+                    return new Shortcut("", 0, null, null, "");
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(shortcut -> {
-                    if (callback != null)
-                        callback.addShortcut(shortcut);
-                });
-
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     /**
      * 移除索引
+     *
      * @param shortcut
-     * @param callback
      */
-    public void removeShortcut(Shortcut shortcut, Callback callback) {
-        Observable.just(shortcut)
+    public Observable<Shortcut> removeShortcut(Shortcut shortcut) {
+        return Observable.just(shortcut)
                 .subscribeOn(Schedulers.io())
-                .doOnNext(_shortcut -> {
+                .map(_shortcut -> {
                     mShortcutDao.delete(_shortcut);
+                    return _shortcut;
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    loadShortcuts(callback);
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-
-    /**
-     * 用于更新UI
-     */
-    public interface Callback {
-        void refreshShortcutList(List<Shortcut> shortcutList);
-        void addShortcut(Shortcut shortcut);
-    }
 }

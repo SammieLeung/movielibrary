@@ -20,5 +20,8 @@ public class MovieVideoFileCrossRef {
     @NonNull
     public String source;
     public long id;
+    @NonNull
+    @ColumnInfo(name = "timestamp")
+    public long timeStamp;
 
 }

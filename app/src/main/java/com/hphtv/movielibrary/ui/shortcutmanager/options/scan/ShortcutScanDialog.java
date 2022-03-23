@@ -78,7 +78,6 @@ public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewM
      * @param v
      */
     public void showShortcutType(View v) {
-        Log.d(TAG, "showShortcutType: ");
         if (getChildFragmentManager().findFragmentByTag("type") == null) {
             mViewModel.getShowSubDialogFlag().set(true);
             getChildFragmentManager().beginTransaction().replace(R.id.view_sub_dialog, mTypeFragment, "type").commit();

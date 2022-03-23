@@ -15,5 +15,6 @@ public class BootReceiver extends BroadcastReceiver {
 
 //        Intent dlnaService=new Intent(context, DlnaControlService.class);
 //        context.startService(dlnaService);
+        //  从Application 启动可以搜索，但是无法使用DMC
     }
 }

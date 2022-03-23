@@ -194,6 +194,7 @@ public class ActivityHelper {
         movieVideoFileCrossRef.id = movie_id;
         movieVideoFileCrossRef.path = videoFile.path;
         movieVideoFileCrossRef.source = source;
+        movieVideoFileCrossRef.timeStamp= System.currentTimeMillis();
         movieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
 
         videoFile.isScanned = 1;
@@ -217,6 +218,7 @@ public class ActivityHelper {
             movieVideoFileCrossRef.id = movie_id;
             movieVideoFileCrossRef.path = videoFile.path;
             movieVideoFileCrossRef.source = source;
+            movieVideoFileCrossRef.timeStamp=System.currentTimeMillis();
             movieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
             videoFile.isScanned = 1;
 //            videoFile.keyword = movie.title;

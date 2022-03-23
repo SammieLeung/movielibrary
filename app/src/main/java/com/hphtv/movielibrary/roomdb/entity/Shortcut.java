@@ -42,6 +42,8 @@ public class Shortcut implements Serializable {
     public String queryUri;
     @ColumnInfo(name = "is_scanned")
     public int isScanned = 0;
+    @ColumnInfo(name="autoscan")
+    public int autoScan=0;
 
     public Shortcut(String uri, int devcieType, String name, String firendlyName, String queryUri) {
         this.folderType = Constants.SearchType.auto;
@@ -97,6 +99,7 @@ public class Shortcut implements Serializable {
                 ", access=" + access +
                 ", queryUri='" + queryUri + '\'' +
                 ", isScanned=" + isScanned +
+                ", autoScan=" + autoScan +
                 '}';
     }
 }
