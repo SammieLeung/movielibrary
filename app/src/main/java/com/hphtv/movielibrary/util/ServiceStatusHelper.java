@@ -30,7 +30,7 @@ public class ServiceStatusHelper {
             WindowManager wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
             WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
             layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            layoutParams.format = PixelFormat.RGBX_8888;
+            layoutParams.format = PixelFormat.RGBA_8888;
             layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                     WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;

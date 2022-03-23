@@ -124,7 +124,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
     /**
      * 保存索引修改
      */
-    public void saveShortcut() {
+    public void saveAndNotifyScan() {
         Observable.create((ObservableOnSubscribe<Shortcut>) emitter -> {
             mShortcut.firendlyName = mNameItem.getSubTitle();
             switch (mTypeItem.getPos()) {

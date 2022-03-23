@@ -2,7 +2,6 @@ package com.hphtv.movielibrary.ui.shortcutmanager.options.scan;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -125,7 +124,7 @@ public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewM
         if(confirmFlag==false) {
             synchronized (this) {
                 confirmFlag=true;
-                mViewModel.saveShortcut();
+                mViewModel.saveAndNotifyScan();
                 dismiss();
             }
         }
