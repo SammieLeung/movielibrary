@@ -130,7 +130,7 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
     private void addShortcut(Shortcut shortcut) {
         mFolderItemAdapter.add(shortcut);
         mOptionsViewModel.setShortcut(shortcut);
-        ShortcutScanDialog dialog = ShortcutScanDialog.newInstance();
+        ShortcutScanDialog dialog = ShortcutScanDialog.newInstance(true);
         dialog.show(getSupportFragmentManager(), "");
     }
 

@@ -26,20 +26,28 @@ import org.jetbrains.annotations.NotNull;
  * date:  2021/12/30
  */
 public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewModel, ShortcutScanDialogLayoutBinding> implements DialogAction {
+    public static final String IS_NEW_ADD="isNewAdd";
     public static final String TAG = ShortcutScanDialog.class.getSimpleName();
     public static final String KEY_SHORTCUT = "shortcut";
     private ShortcutScanItemSelectFragment mTypeFragment, mAccessFragment;
     private volatile boolean confirmFlag=false;
-    public static ShortcutScanDialog newInstance() {
+
+    public static ShortcutScanDialog newInstance(boolean isNewAdd) {
         Bundle args = new Bundle();
+        args.putBoolean(IS_NEW_ADD,isNewAdd);
         ShortcutScanDialog fragment = new ShortcutScanDialog();
         fragment.setArguments(args);
         return fragment;
     }
 
+    public static ShortcutScanDialog newInstance(){
+        return newInstance(false);
+    }
+
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mViewModel.setNewAdded(getArguments().getBoolean(IS_NEW_ADD));
         mViewModel.loadShortcutData();
     }
 

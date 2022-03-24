@@ -9,6 +9,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
@@ -38,7 +39,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
     private Shortcut mShortcut;
     private List<String> mFolderTypeList = new ArrayList<>(), mAccessList = new ArrayList<>();
     private ObservableBoolean mShowSubDialogFlag = new ObservableBoolean();
-    private WeakReference<ShortcutManagerViewModel> mShortcutManagerViewModelWeakReference;
+    private boolean isNewAdded;
 
     public ShortcutOptionsViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -107,7 +108,14 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                 mAccessItem.setPos(1);
                 break;
         }
-        switch (mShortcut.folderType) {
+        Constants.SearchType searchType;
+
+        if(isNewAdded){
+            searchType= Constants.SearchType.valueOf(Config.getDefaultSearchMode());
+        }else {
+            searchType=mShortcut.folderType;
+        }
+        switch (searchType) {
             case movie:
                 mTypeItem.setPos(1);
                 break;
@@ -190,5 +198,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
     }
 
-
+    public void setNewAdded(boolean newAdded) {
+        isNewAdded = newAdded;
+    }
 }
