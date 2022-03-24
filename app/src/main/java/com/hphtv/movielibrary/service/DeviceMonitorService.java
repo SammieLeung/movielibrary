@@ -337,7 +337,6 @@ public class DeviceMonitorService extends Service {
                         LocalFileScanHelper.scanAllLocalShortcuts(getBaseContext());
                     }
                 });
-//        mFileScanExecutor.execute(new FileScanThread(this));
     }
 
     public void startScanLocalShortcut(Shortcut shortcut) {
@@ -350,7 +349,6 @@ public class DeviceMonitorService extends Service {
                     data[0] = shortcut1;
                     data[1] = videoFileList;
                     return data;
-
                 })
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
@@ -361,15 +359,25 @@ public class DeviceMonitorService extends Service {
                     public void onAction(Object[] data) {
                         if (data.length == 2) {
                             Shortcut shortcut = (Shortcut) data[0];
+//                            int fileCount=mShortcutDao.queryTotalFiles(shortcut.uri);
+//                            int matchedCount=mShortcutDao.queryMatchedFiles(shortcut.uri);
+//                            shortcut.fileCount=fileCount;
+//                            shortcut.posterCount=matchedCount;
                             List<VideoFile> videoFileList = (List<VideoFile>) data[1];
                             if (videoFileList != null && videoFileList.size() > 0) {
                                 if (mMovieScanService != null)
                                     mMovieScanService.scanVideo(shortcut, videoFileList);
                             } else {    //TODO mPosterPairingDevice处理
-                                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
-                                ServiceStatusHelper.removeView(DeviceMonitorService.this);
-
+                                LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
+                                shortcut.isScanned=1;
+                                mShortcutDao.updateShortcut(shortcut);
+                                Intent intent = new Intent();
+                                intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
+                                intent.putExtra(Constants.Extras.SHORTCUT, shortcut);
+                                LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(intent);
                             }
+                        }else{
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
                         }
                     }
 
@@ -398,7 +406,7 @@ public class DeviceMonitorService extends Service {
                     Set<String> shortcutUris=  map.keySet();
                     Iterator<String> urisIterator=shortcutUris.iterator();
                     List<Object[]> dataList=new ArrayList<>();
-                    if(urisIterator.hasNext()){
+                    while(urisIterator.hasNext()){
                         String uri=urisIterator.next();
                         Shortcut shortcut=mShortcutDao.queryShortcutByUri(uri);
                         if(shortcut!=null){

@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 
 import java.util.List;
@@ -36,6 +37,12 @@ public interface ShortcutDao {
 
     @Query("SELECT * FROM " + TABLE.SHORTCUT + " WHERE uri=:uri")
     public Shortcut queryShortcutByUri(String uri);
+
+    @Query("SELECT COUNT(*) FROM "+TABLE.VIDEOFILE+" WHERE dir_path=:dir_path")
+    public int queryTotalFiles(String dir_path);
+
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM "+ VIEW.MOVIE_DATAVIEW+" WHERE dir_uri=:dir_path GROUP BY file_uri)")
+    public int queryMatchedFiles(String dir_path);
 
     @Update
     public int updateShortcut(Shortcut shortcut);

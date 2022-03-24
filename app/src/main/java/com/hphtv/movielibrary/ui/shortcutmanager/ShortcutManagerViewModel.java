@@ -53,6 +53,13 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
                     mShortcutList = mShortcutDao.queryAllShortcuts();
+                    for(Shortcut shortcut:mShortcutList){
+                        int fileCount=mShortcutDao.queryTotalFiles(shortcut.uri);
+                        int matchedCount=mShortcutDao.queryMatchedFiles(shortcut.uri);
+                        shortcut.fileCount=fileCount;
+                        shortcut.posterCount=matchedCount;
+                        mShortcutDao.updateShortcut(shortcut);
+                    }
                     return mShortcutList;
                 })
                 .observeOn(AndroidSchedulers.mainThread());

@@ -146,11 +146,17 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                     mShortcut.access = Constants.AccessPermission.ADULT;
                     break;
             }
+
+
             emitter.onNext(mShortcut);
             emitter.onComplete();
         })
                 .subscribeOn(Schedulers.newThread())
                 .doOnNext(shortcut -> {
+                    int fileCount=mShortcutDao.queryTotalFiles(mShortcut.uri);
+                    int matchedCount=mShortcutDao.queryMatchedFiles(mShortcut.uri);
+                    mShortcut.fileCount=fileCount;
+                    mShortcut.posterCount=matchedCount;
                     mShortcutDao.updateShortcut(mShortcut);
                 })
                 .observeOn(AndroidSchedulers.mainThread())

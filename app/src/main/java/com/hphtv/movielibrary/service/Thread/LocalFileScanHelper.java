@@ -47,6 +47,11 @@ public class LocalFileScanHelper {
         scanShortcuts(context,shortcutList);
     }
 
+    /**
+     * 搜索索引下的所有文件，保存到数据库
+     * @param context
+     * @param shortcutList
+     */
     private static void scanShortcuts(Context context,List<Shortcut> shortcutList) {
         LinkedList<ScanDirectory> scanDirectoryList = new LinkedList<>();
         LinkedList<ScanDirectory> tmpScanDirectoryList = new LinkedList<>();
@@ -56,6 +61,7 @@ public class LocalFileScanHelper {
         DeviceDao deviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
         VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
         ScanDirectoryDao scanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
+        ShortcutDao shortcutDao=MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
 
         //1 - 获取所有本地文件夹
         for (Shortcut shortcut : shortcutList) {
@@ -129,6 +135,7 @@ public class LocalFileScanHelper {
         }
         //队列结束保存文件信息入库
         saveVideoFileInfotoDB(allVideoFileList, videoFileDao);
+        updateShortcutFileCount(shortcutList,shortcutDao);
 //        clearRedundantVideoFiles();
 //        Intent intent = new Intent();
 //        intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
@@ -193,11 +200,15 @@ public class LocalFileScanHelper {
         }
     }
 
-//    private void clearRedundantVideoFiles() {
-////        List<VideoFile> videoFiles = mVideoFileDao.queryInvalidByPaths(mTmpVideoFilePaths, mDevice.path);
-////        for (VideoFile videoFile : videoFiles) {
-////            LogUtil.e(TAG, "lost file:" + videoFile.filename);
-////        }
-//    }
+    private static void updateShortcutFileCount(List<Shortcut> shortcutList,ShortcutDao shortcutDao){
+        for(Shortcut shortcut:shortcutList) {
+            int fileCount = shortcutDao.queryTotalFiles(shortcut.uri);
+            int matchedCount = shortcutDao.queryMatchedFiles(shortcut.uri);
+            shortcut.fileCount = fileCount;
+            shortcut.posterCount = matchedCount;
+            shortcutDao.updateShortcut(shortcut);
+        }
+    }
+
 
 }

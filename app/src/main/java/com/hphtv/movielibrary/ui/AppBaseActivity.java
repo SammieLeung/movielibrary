@@ -111,8 +111,11 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
                     break;
                 case Constants.BroadCastMsg.MOVIE_SCRAP_STOP:
                     ServiceStatusHelper.removeView(context);
+                    movieScarpFinish();
                     break;
             }
         }
     };
+
+    protected void movieScarpFinish(){};
 }

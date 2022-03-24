@@ -10,10 +10,12 @@ import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
@@ -45,6 +47,12 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         if(Config.isAutoSearch().get()){
             autoSearch();
         }
+    }
+
+    @Override
+    protected void movieScarpFinish() {
+        super.movieScarpFinish();
+        updateFragments();
     }
 
     /**
@@ -102,7 +110,9 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
      * 自动搜索本地设备
      */
     private void autoSearch(){
-
+        Intent intent=new Intent();
+        intent.setAction(Constants.BroadCastMsg.RESCAN_ALL);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override
@@ -115,6 +125,15 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
             if (fragment instanceof IActivityResult) {
                 IActivityResult activityResult = (IActivityResult) fragment;
                 activityResult.onActivityResult(result);
+            }
+        }
+    }
+
+    private void updateFragments(){
+        for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+            if (fragment instanceof IActivityResult) {
+                IActivityResult activityResult = (IActivityResult) fragment;
+                activityResult.forceRefresh();
             }
         }
     }

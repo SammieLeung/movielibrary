@@ -11,50 +11,25 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.roomdb.dao.MovieDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieVideoTagCrossRefDao;
-import com.hphtv.movielibrary.roomdb.dao.SeasonDao;
+import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
-import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
-import com.hphtv.movielibrary.roomdb.entity.Season;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
-import com.hphtv.movielibrary.roomdb.entity.VideoTag;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.BroadcastHelper;
+import com.hphtv.movielibrary.util.FileScanUtil;
+import com.hphtv.movielibrary.util.ServiceStatusHelper;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.AppUtils;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
-import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.ActorDao;
-import com.hphtv.movielibrary.roomdb.dao.DirectorDao;
-import com.hphtv.movielibrary.roomdb.dao.GenreDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieActorCrossRefDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
-import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao;
-import com.hphtv.movielibrary.roomdb.dao.TrailerDao;
-import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
-import com.hphtv.movielibrary.roomdb.entity.Actor;
-import com.hphtv.movielibrary.roomdb.entity.Director;
-import com.hphtv.movielibrary.roomdb.entity.Genre;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
-import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
-import com.hphtv.movielibrary.roomdb.entity.Trailer;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.util.FileScanUtil;
-import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.StringUtils;
 
 import java.util.ArrayList;
@@ -88,21 +63,8 @@ public class MovieScanService extends Service {
     private ExecutorService mNetworkExecutor;
     private ExecutorService mNetwork2Executor;
 
-    private MovieDao mMovieDao;
-    private ActorDao mActorDao;
-    private DirectorDao mDirectorDao;
-    private GenreDao mGenreDao;
     private ShortcutDao mShortcutDao;
-    private MovieActorCrossRefDao mMovieActorCrossRefDao;
-    private MovieDirectorCrossRefDao mMovieDirectorCrossRefDao;
-    private MovieGenreCrossRefDao mMovieGenreCrossRefDao;
-    private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
     private VideoFileDao mVideoFileDao;
-    private TrailerDao mTrailerDao;
-    private StagePhotoDao mStagePhotoDao;
-    private SeasonDao mSeasonDao;
-    private VideoTagDao mVideoTagDao;
-    private MovieVideoTagCrossRefDao mMovieVideoTagCrossRefDao;
 
     private HashSet<Shortcut> mShortcutHashSet=new HashSet<>();
 
@@ -124,21 +86,8 @@ public class MovieScanService extends Service {
      */
     private void initDao() {
         MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(this);
-        mMovieDao = movieLibraryRoomDatabase.getMovieDao();
-        mActorDao = movieLibraryRoomDatabase.getActorDao();
-        mDirectorDao = movieLibraryRoomDatabase.getDirectorDao();
-        mGenreDao = movieLibraryRoomDatabase.getGenreDao();
-        mMovieActorCrossRefDao = movieLibraryRoomDatabase.getMovieActorCrossRefDao();
-        mMovieDirectorCrossRefDao = movieLibraryRoomDatabase.getMovieDirectorCrossRefDao();
-        mMovieGenreCrossRefDao = movieLibraryRoomDatabase.getMovieGenreCrossRefDao();
-        mMovieVideofileCrossRefDao = movieLibraryRoomDatabase.getMovieVideofileCrossRefDao();
         mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
-        mTrailerDao = movieLibraryRoomDatabase.getTrailerDao();
-        mStagePhotoDao = movieLibraryRoomDatabase.getStagePhotoDao();
         mShortcutDao = movieLibraryRoomDatabase.getShortcutDao();
-        mSeasonDao = movieLibraryRoomDatabase.getSeasonDao();
-        mVideoTagDao=movieLibraryRoomDatabase.getVideoTagDao();
-        mMovieVideoTagCrossRefDao=movieLibraryRoomDatabase.getMovieVideoTagCrossRefDao();
     }
 
     private void initThreadPools() {
@@ -186,9 +135,9 @@ public class MovieScanService extends Service {
     /**
      * 扫描
      *
-     * @param shortcut
-     * @param videoFileList
-     * @param searchType
+     * @param shortcut 需要搜索的索引
+     * @param videoFileList 索引下包含的文件列表
+     * @param searchType 搜索模式
      */
     private void startSearch(Shortcut shortcut, List<VideoFile> videoFileList, Constants.SearchType searchType) {
         Log.e(TAG, "startSearch: " + searchType.name() + "模式");
@@ -198,7 +147,6 @@ public class MovieScanService extends Service {
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger indexAtom = new AtomicInteger();
         AtomicInteger currentTaskCount = new AtomicInteger();
-        int total = videoFileList.size();
         Observable.combineLatest(Observable.just(shortcut), Observable.just(searchType), Observable.just(videoFileList).concatMap((Function<List<VideoFile>, ObservableSource<List<VideoFile>>>) videoFileList1 -> {
             Log.e(Thread.currentThread().getName(), "combineLatest->分割videolist");
             //为了支持4线程搜索,将数据分成大于4份,并行数量取决于mNetworkExecutor
@@ -293,10 +241,13 @@ public class MovieScanService extends Service {
                                                                     return null;
                                                                 })
                                                                 .subscribeOn(Schedulers.io()).blockingFirst();
+                                                        MovieWrapper wrapper = null,wrapper_en = null;
                                                         if (respone != null) {
-                                                            MovieWrapper wrapper = respone.toEntity();
+                                                            wrapper= respone.toEntity();
                                                             if (wrapper != null) {
                                                                 ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile,Constants.Scraper.TMDB);
+                                                            }else {
+                                                                LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
                                                             }
                                                         }
                                                         MovieDetailRespone respone_en = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB_EN, type)
@@ -306,10 +257,15 @@ public class MovieScanService extends Service {
                                                                 })
                                                                 .subscribeOn(Schedulers.io()).blockingFirst();
                                                         if (respone_en != null) {
-                                                            MovieWrapper wrapper = respone_en.toEntity();
-                                                            if (wrapper != null) {
-                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile,Constants.Scraper.TMDB_EN);
+                                                            wrapper_en = respone_en.toEntity();
+                                                            if (wrapper_en != null) {
+                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile,Constants.Scraper.TMDB_EN);
+                                                            }else {
+                                                                LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
                                                             }
+                                                        }
+                                                        if(wrapper==null&&wrapper_en==null){
+                                                            throw new Throwable("detail respone.toEntity() faild.");
                                                         }
                                                     }
                                                     Object[] data = new Object[2];
@@ -337,12 +293,10 @@ public class MovieScanService extends Service {
                                         if (!movieId.equals("-1")) {
                                             st.posterCount = st.posterCount + 1;
                                         }
-                                        st.fileCount = total;
                                         tmpMoviesSet.add(movieId);
                                         mShortcutDao.updateShortcut(st);
                                     }else{
                                         Shortcut st = (Shortcut) data[0];
-                                        st.fileCount = total;
                                         mShortcutDao.updateShortcut(st);
                                     }
                                 })
@@ -375,16 +329,16 @@ public class MovieScanService extends Service {
                                             Shortcut st = (Shortcut) data[1];
                                             if (!movieId.equals("-1")) {
                                                 int success = successCount.incrementAndGet();
-                                                sendMatchMovieSuccess(st, movieId, success, scannedCount, total);
+                                                sendMatchMovieSuccess(st, movieId, success, scannedCount, shortcut.fileCount);
 //                                                BroadcastHelper.sendBroadcastMovieAddSync(getBaseContext(),movieId);
                                                 LogUtil.w(TAG, "onAction(" + scannedCount + ") movieId:" + movieId);
                                             } else {
-                                                sendMatchMovieFailed(st, scannedCount, total);
+                                                sendMatchMovieFailed(st, scannedCount, shortcut.fileCount);
                                                 LogUtil.w(TAG, "onAction(" + scannedCount + ") 匹配失败,movieI -1");
                                             }
                                         } else {
                                             Shortcut st = (Shortcut) data[0];
-                                            sendMatchMovieFailed(st, scannedCount, total);
+                                            sendMatchMovieFailed(st, scannedCount, shortcut.fileCount);
                                             LogUtil.w(TAG, "onAction(" + scannedCount + ") 匹配失败");
                                         }
                                     }
@@ -407,10 +361,13 @@ public class MovieScanService extends Service {
                                                 BroadcastHelper.sendBroadcastSearchMoviesSync(getBaseContext(),movieIds);
                                             }
                                             if (mGlobalTaskCount.decrementAndGet() == 0) {
-                                                //扫描程序结束
-                                                Intent intent = new Intent();
-                                                intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
-                                                LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                                                if(!AppUtils.isAppInBackground(MovieScanService.this)) {//扫描程序结束
+                                                    Intent intent = new Intent();
+                                                    intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
+                                                    LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                                                }else{
+                                                    ServiceStatusHelper.removeView(MovieScanService.this);
+                                                }
                                             }
                                         }
                                     }
