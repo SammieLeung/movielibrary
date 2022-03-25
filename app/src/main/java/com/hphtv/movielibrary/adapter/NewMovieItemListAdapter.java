@@ -56,6 +56,8 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
         binding.setRating(movieDataView.ratings);
     }
 
+
+
 }
 
 

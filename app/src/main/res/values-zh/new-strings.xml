@@ -47,7 +47,7 @@
     <string name="scanning_in_background">影片后台扫描中</string>
 
     <string name="shortcut_scan_dialog_item_shortcut_type">影片类型</string>
-    <string name="shortcut_scan_dialog_item_shortcut_access">影片分级</string>
+    <string name="shortcut_scan_dialog_item_shortcut_access">观看权限</string>
     <string name="shortcut_scan_dialog_item_shortcut_name">文件夹名称</string>
     <string name="shortcut_scan_dialog_confirm">确认扫描</string>
     <string name="shortcut_options_dialog_remove">移除文件夹</string>
@@ -160,5 +160,12 @@
     <!--设置-关于-->
     <string name="settings_about_source">海报来源</string>
     <string name="settings_about_version">版本</string>
+
+    <!--海报菜单-->
+    <string name="postermenu_reselect_poster">重新匹配</string>
+    <string name="postermenu_mark_as_watched">标记为已观看</string>
+    <string name="postermenu_mark_as_like">收藏影片</string>
+    <string name="postermenu_clear_poster">清理匹配信息</string>
+    <string name="postermenu_add_to_videotag">添加到分类</string>
 
 </resources>

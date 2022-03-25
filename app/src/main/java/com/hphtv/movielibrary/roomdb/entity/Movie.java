@@ -53,6 +53,8 @@ public class Movie implements Serializable {
     public boolean isFavorite;//收藏
     @ColumnInfo(name = "last_playtime")
     public long lastPlayTime;//上次播放时间
+    @ColumnInfo(name = "is_watched")
+    public boolean isWatched;//标记是否已观看
 
 
 

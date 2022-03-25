@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="androidx.databinding.ObservableBoolean"/>
+
+        <import type="android.text.TextUtils"/>
+        <variable
+            name="title"
+            type="String" />
+        <variable
+            name="checkstate"
+            type="ObservableBoolean" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/new_common_tab_bg"
+        android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
+        android:paddingRight="@dimen/postermenu_subitem_padding_lr"
+        android:gravity="center_vertical">
+
+        <CheckedTextView
+            android:id="@+id/checkbox"
+            style="@style/common_content_text_style"
+            android:layout_width="match_parent"
+            android:drawableRight="@drawable/radiobutton_selector_26"
+            android:drawableTint="@drawable/radiobutton_selector_26_tint"
+            android:text="@{title}"
+            android:checked="@{checkstate}"
+            android:textStyle="bold" />
+
+
+    </RelativeLayout>
+</layout>

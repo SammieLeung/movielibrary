@@ -48,8 +48,8 @@
     <string name="scanning_in_background">Scanning video in Background</string>
 
     <string name="shortcut_scan_dialog_item_shortcut_type">Movie Type</string>
-    <string name="shortcut_scan_dialog_item_shortcut_access">Permission</string>
-    <string name="shortcut_scan_dialog_item_shortcut_name">Name</string>
+    <string name="shortcut_scan_dialog_item_shortcut_access">Access Rights</string>
+    <string name="shortcut_scan_dialog_item_shortcut_name">Friendly Name</string>
     <string name="shortcut_scan_dialog_confirm">Scan</string>
     <string name="shortcut_options_dialog_remove">Remove</string>
     <string name="shortcut_options_dialog_rescan">Rescan</string>
@@ -166,5 +166,12 @@
 
     <string name="settings_about_version">Version</string>
 
+
+    <!--海报菜单-->
+    <string name="postermenu_reselect_poster">Rematch the poster</string>
+    <string name="postermenu_mark_as_watched">Mark as watched</string>
+    <string name="postermenu_mark_as_like">Like</string>
+    <string name="postermenu_clear_poster">Clean up the poster</string>
+    <string name="postermenu_add_to_videotag">Add to tag</string>
 
 </resources>

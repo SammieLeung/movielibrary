@@ -23,6 +23,7 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
+import com.hphtv.movielibrary.util.ActivityHelper;
 import com.station.kit.util.DensityUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -86,6 +87,11 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         public void onItemFocus(View view, int postion, Object data) {
 
         }
+    };
+
+    private BaseApater2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener= (view, postion, data) -> {
+        ActivityHelper.showPosterMenuDialog(getChildFragmentManager(),data);
+        return false;
     };
 
     public NewPageFragment(IAutofitHeight autofitHeight, int postion) {
@@ -199,6 +205,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         mRecentlyAddListAdapter = new NewMovieItemListAdapter(getContext(), mRecentlyAddedList);
         mRecentlyAddListAdapter.setOnItemClickListener(mDetialOnListener);
         mBinding.rvRecentlyAdded.setAdapter(mRecentlyAddListAdapter);
+//        mRecentlyAddListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
+
     }
 
     /**
@@ -212,6 +220,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         mFavoriteListAdapter = new NewMovieItemListAdapter(getContext(), mFavoriteList);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
         mFavoriteListAdapter.setOnItemClickListener(mDetialOnListener);
+//        mFavoriteListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
+
     }
 
     private void initRecommandList() {
@@ -222,6 +232,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         mRecommandListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
         mBinding.rvRecommand.setAdapter(mRecommandListAdapter);
         mRecommandListAdapter.setOnItemClickListener(mDetialOnListener);
+//        mRecommandListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
+
     }
 
     /**

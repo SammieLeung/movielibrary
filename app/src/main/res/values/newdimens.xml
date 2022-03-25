@@ -86,5 +86,6 @@
 
     <!--设置项通用填充距离-->
     <dimen name="setting_item_padding_lr">20dp</dimen>
+    <dimen name="postermenu_subitem_padding_lr">15dp</dimen>
 
 </resources>

@@ -3,6 +3,8 @@ package com.hphtv.movielibrary.util;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.fragment.app.FragmentManager;
+
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
@@ -28,6 +30,7 @@ import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
@@ -35,6 +38,7 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.homepage.NewHomePageActivity;
+import com.hphtv.movielibrary.ui.postermenu.PosterMenuDialog;
 import com.station.kit.util.LogUtil;
 
 import java.util.ArrayList;
@@ -49,6 +53,11 @@ public class ActivityHelper {
     public static void startHomePageActivity(Context context) {
         Intent intent = new Intent(context, NewHomePageActivity.class);
         context.startActivity(intent);
+    }
+
+    public static void showPosterMenuDialog(FragmentManager fragmentManager, MovieDataView movieDataView){
+        PosterMenuDialog dialog=PosterMenuDialog.newInstance(movieDataView);
+        dialog.show(fragmentManager,"");
     }
 
     /**

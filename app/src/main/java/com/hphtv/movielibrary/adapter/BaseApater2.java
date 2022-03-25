@@ -37,7 +37,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        VDB binding = ViewDataBindingHelper.inflateVDB(mContext,parent, this.getClass());
+        VDB binding = ViewDataBindingHelper.inflateVDB(mContext, parent, this.getClass());
         VH viewHolder = null;
         try {
             Type superclass = getClass().getGenericSuperclass();
@@ -77,6 +77,14 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         }
     }
 
+    public boolean onLongClick(View v) {
+        if (mOnItemLongClickListener != null) {
+            int postion = (int) v.getTag();
+            return mOnItemLongClickListener.onItemLongClick(v, postion, mList.get(postion));
+        }
+        return false;
+    }
+
     public void addAll(List data) {
         mList.clear();
         mList.addAll(data);
@@ -87,7 +95,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         int oldSize = mList.size();
         mList.addAll(data);
         int newSize = mList.size();
-        notifyItemRangeInserted(oldSize,newSize);
+        notifyItemRangeInserted(oldSize, newSize);
     }
 
     public void clearAll() {
@@ -102,7 +110,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         }
     }
 
-    public List<T> getDatas(){
+    public List<T> getDatas() {
         return mList;
     }
 
@@ -124,14 +132,24 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
 
     protected OnRecyclerViewItemActionListener<T> mOnItemClickListener = null;
+    protected OnItemLongClickListener<T> mOnItemLongClickListener;
 
     public void setOnItemClickListener(OnRecyclerViewItemActionListener<T> listener) {
         this.mOnItemClickListener = listener;
     }
 
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> onItemLongClickListener) {
+        mOnItemLongClickListener = onItemLongClickListener;
+    }
+
     public interface OnRecyclerViewItemActionListener<T> {
         void onItemClick(View view, int postion, T data);
-        void onItemFocus(View view,int postion,T data);
+
+        void onItemFocus(View view, int postion, T data);
+    }
+
+    public interface OnItemLongClickListener<T> {
+        boolean onItemLongClick(View view, int postion, T data);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -141,6 +159,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
             super(binding.getRoot());
             mBinding = binding;
             mBinding.getRoot().setOnClickListener(BaseApater2.this::onClick);
+            mBinding.getRoot().setOnLongClickListener(BaseApater2.this::onLongClick);
         }
     }
 }

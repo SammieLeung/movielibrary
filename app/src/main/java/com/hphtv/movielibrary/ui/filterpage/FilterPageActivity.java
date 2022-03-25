@@ -20,6 +20,7 @@ import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
+import com.hphtv.movielibrary.ui.postermenu.PosterMenuDialog;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.station.kit.util.DensityUtil;
@@ -49,7 +50,8 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         }
     };
 
-    BaseApater2.OnRecyclerViewItemActionListener mActionListener=new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+
+    BaseApater2.OnRecyclerViewItemActionListener mActionListener = new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(FilterPageActivity.this, data);
@@ -61,7 +63,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         }
     };
 
-    TvRecyclerView.OnKeyPressListener mOnKeyPressListener=new TvRecyclerView.OnKeyPressListener() {
+    TvRecyclerView.OnKeyPressListener mOnKeyPressListener = new TvRecyclerView.OnKeyPressListener() {
         @Override
         public void processKeyEvent(int keyCode) {
 
@@ -108,6 +110,10 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
+        mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
+            ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(),data);
+            return false;
+        });
 
         mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical(
                 getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),

@@ -6,6 +6,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @DatabaseView(
         value =
-                "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap," +
+                "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.is_watched," +
                         "VF.path AS file_uri," +
                         "ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ," +
                         "ST.access AS s_ap,"+
@@ -36,7 +37,7 @@ import java.util.Objects;
                         "ON MGCF.genre_id = G.genre_id",
         viewName = VIEW.MOVIE_DATAVIEW
 )
-public class MovieDataView {
+public class MovieDataView implements Serializable {
     public long id;
     public String movie_id;
     public String title;
@@ -57,6 +58,7 @@ public class MovieDataView {
     public long add_time;
     public long last_playtime;
     public boolean is_favorite;
+    public boolean is_watched;
 
     @Override
     public boolean equals(Object o) {

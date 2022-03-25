@@ -37,9 +37,6 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
-    <style name="MyCheckBoxStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
-        <item name="android:button">@drawable/ic_checkbox_btn</item>
-    </style>
 
     <style name="DrawTopButtonStyle">
         <item name="android:layout_height">110dp</item>

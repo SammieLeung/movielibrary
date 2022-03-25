@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <import type="androidx.databinding.ObservableBoolean"/>
+        <import type="androidx.databinding.ObservableField"/>
+
+        <import type="android.text.TextUtils"/>
+        <variable
+            name="title"
+            type="String" />
+        <variable
+            name="state"
+            type="ObservableBoolean" />
+        <variable
+            name="stateText"
+            type="ObservableField&lt;String>" />
+    </data>
+
+    <RelativeLayout
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/new_common_tab_bg"
+        android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
+        android:paddingRight="@dimen/postermenu_subitem_padding_lr"
+        android:gravity="center_vertical">
+        <TextView
+            android:textStyle="bold"
+            android:id="@+id/text_1"
+            style="@style/common_content_text_style"
+            android:text="@{title}"
+         />
+
+        <TextView
+            android:layout_alignParentEnd="true"
+            android:id="@+id/text_2"
+            style="@style/common_content_s_text_style"
+            android:text="@{stateText}"
+            android:drawablePadding="17dp"
+            android:drawableTint="@color/white"
+            android:drawableRight="@drawable/icon_new_more"
+            android:drawableLeft="@drawable/icon_new_more_left"
+            />
+
+    </RelativeLayout>
+</layout>

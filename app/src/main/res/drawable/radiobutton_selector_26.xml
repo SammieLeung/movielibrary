@@ -2,12 +2,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true" >
         <layer-list>
-            <item android:width="26dp" android:height="26dp" android:drawable="@drawable/ic_new_raidobutton_checked"/>
+            <item android:width="26dp" android:height="26dp" android:drawable="@drawable/ic_raidobutton_checked"/>
         </layer-list>
     </item>
     <item>
         <layer-list>
-            <item android:width="26dp" android:height="26dp" android:drawable="@drawable/ic_new_raidobutton_normal"/>
+            <item android:width="26dp" android:height="26dp" android:drawable="@drawable/ic_raidobutton_normal"/>
         </layer-list>
     </item>
 </selector>
