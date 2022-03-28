@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="api_group" translatable="false">
-        <item>@string/api_douban</item>
-        <item>@string/api_imdb</item>
-        <item>@string/api_mtime</item>
-    </string-array>
 
     <string-array name="category_title_array">
         <item>@string/category_all</item>

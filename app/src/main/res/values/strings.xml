@@ -1,72 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="refresh_text">Loading</string>
     <string name="app_name">Movie Library</string>
-    <string name="action_settings">Settings</string>
-    <string name="unit_year">year</string>
-    <string name="minutes">minutes</string>
-    <string name="actor">Cast:</string>
-    <string name="genres">Genres:</string>
-    <string name="date">Year:</string>
-    <string name="duration">Dura:</string>
-    <string name="episodes">Episodes:</string>
-    <string name="production_companies">Production:</string>
-    <string name="pub_dates">Date:</string>
-    <string name="video_detail_path">Path:</string>
-    <string name="play">Play</string>
-    <string name="remove">Remove</string>
-    <string name="pic_vedio">Trailer</string>
-    <string name="rate_full">( %1$s people )</string>
-    <string name="rate_not">No Score</string>
-    <string name="rate">"%1$s "</string>
-    <string name="edit">Edit</string>
-    <string name="hint">keyword</string>
-    <string name="ratingsCounts">( %1$s people )</string>
-    <string name="sortby">%1$s|%2$s %3$s</string>
-    <string name="lb_title" translatable="false">MediaStation</string>
 
-    <string name="test">TestText</string>
-    <string name="pages">%1$d&#047;%2$d</string>
-    <string name="usb_totalspace">Total: %1$s GB</string>
-    <string name="usb_path">Path: %1$s</string>
-    <string name="usb_state">Status: %1$s</string>
-    <string name="usb_matched">Matched: %1$d</string>
-    <string name="usb_unmatchable">UnMatched: %1$d</string>
-    <string name="usb_totalvideo">Total Video: %1$d</string>
+    <string name="unknow">unknow</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Cancel</string>
+    <!--    主页-->
+    <string name="homepage_custom_genre_tag_title">Custom Genre</string>
+    <string name="homepage_custom_genre_tag_title_2">Genre Sort</string>
 
-    <string name="scan_record">Scanning Record</string>
-    <string name="scan_begin">Start Matching</string>
-    <string name="scan_stop">Stop Matching</string>
-    <string name="scaning">Ready to Scan</string>
-    <string name="tx_scan">Scanning:</string>
-    <string name="tx_scan_p">%1$d</string>
-    <string name="tx_match">Matched :%1$d</string>
-    <string name="tx_match_p">Failed :%1$d</string>
-    <string name="tx_parse">Parsed Success:%1$d</string>
-    <string name="tx_parse_p">Failed :%1$d</string>
+    <!--    历史播放-->
+    <string name="history_list_title">Recently Played</string>
+    <string name="history_list_empty">No watch history</string>
+    <string name="category_list_title">Category Browse</string>
+    <string name="recently_added_list_title">Recently Added</string>
+    <string name="my_favorite_list_title">Favorite</string>
+    <string name="recommand_list_title">Recommand</string>
 
-    <string name="btn_ok">OK</string>
-    <string name="btn_no">Cancel</string>
-    <string name="choose_play">Episodes</string>
-    <string name="language">Lang:</string>
-    <string name="pre_dates">Date:</string>
-    <string name="mediacontroller_play_pause">Play/Pause</string>
-    <string name="usb_usablespace">Available: %1$s GB</string>
-    <string name="tx_all">All</string>
-    <string name="tx_alldevices">All Devices</string>
-    <string name="tx_alldir">All Directories</string>
-    <string name="tx_scanning">Scanning...</string>
-    <string name="tx_p_beging_scan">Start scanning video files...</string>
-    <string name="tx_p_scan_end">"Finished! %1$d video files were found "</string>
-    <string name="tx_p_begin_match">Start matching video information from the Internet:</string>
-    <string name="tx_ready_scan">Ready to Scan</string>
-    <string name="dialog_begin_scan">The scanning time depends on the number of files and the connect_state of the network. Please be patient.</string>
-    <string name="dialog_stop_scan">Are you sure you want to stop the process of scanning video?</string>
-    <string name="dialog_end_scan">The scan is finished! Do you need to check it immediately?</string>
-    <string name="dialog_exit_scan">Are you sure to exit in the process of scanning?</string>
-    <string name="message_match_faild">:search movie faild!</string>
-    <string name="message_success">->Success!</string>
-    <string name="message_faild">->Faild!</string>
+    <!--分类浏览-->
+    <string name="category_all">All</string>
+    <string name="category_movie">Movie</string>
+    <string name="category_tv">TV Series</string>
+    <string name="category_unmatched">Unmatched</string>
+    <string name="category_favorite">Favorite</string>
+
+    <string name="genre_edit_dialog_title">Category</string>
+
+    <string name="lb_sort_device">Device</string>
+    <string name="lb_sort_region">Region</string>
+    <string name="lb_sort_directory">Directory</string>
+    <string name="lb_sort_year">Year</string>
+    <string name="lb_sort_type">Type</string>
+    <string name="lb_sort_by">Sort by</string>
+    <string name="lb_sort_genres">Genres</string>
+
     <string name="order_name">Title</string>
     <string name="order_genre">Genre</string>
     <string name="order_year">Year</string>
@@ -74,114 +41,165 @@
     <string name="order_addtime">Add Time</string>
     <string name="order_recently_played">Recently Played</string>
 
-    <string name="toastmsg_no_trailer_found">No trailer found!</string>
+    <string name="all">All</string>
+
+    <string name="filter_box_local_device">LOCAL</string>
+    <string name="filter_box_dlna_device">DLNA</string>
+    <string name="filter_box_smb_device">SMB</string>
+
+    <string name="filterpage_no_result_matched">No results matching your filter criteria.</string>
+    <string name="filterpage_no_movie">No movies have been added to the library.</string>
+    <!--    索引管理-->
+    <string name="add_shortcut">Add</string>
+    <string name="shortcut_manager">Device</string>
+    <string name="shortcut_state_unscanned">Unscanned</string>
+    <string name="shortcut_state_scanned">Scanned</string>
+    <string name="shortcut_state_scanning">Scanning</string>
+    <string name="scanning_in_background">Scanning video in Background</string>
+
+    <string name="shortcut_scan_dialog_item_shortcut_type">Movie Type</string>
+    <string name="shortcut_scan_dialog_item_shortcut_access">Access Rights</string>
+    <string name="shortcut_scan_dialog_item_shortcut_name">Friendly Name</string>
+    <string name="shortcut_scan_dialog_confirm">Scan</string>
+    <string name="shortcut_options_dialog_remove">Remove</string>
+    <string name="shortcut_options_dialog_rescan">Rescan</string>
+
+    <string name="shortcut_remove_dialog_content">Remove folder %s?</string>
 
 
-    <string name="exit_toast">press the BACK key again  to exit</string>
-    <string name="dm_tx_status">Status</string>
-    <string name="dm_tx_folder">Folder</string>
-    <string name="dm_tx_matched">Poster</string>
-    <string name="dm_btn_clear">Clear Caches</string>
-    <string name="dm_btn_delete">Remove Folders</string>
-    <string name="cb_all">All</string>
-    <string name="cb_private">Private Folder</string>
-    <string name="cb_disconnect">Disconnect</string>
-    <string name="title_file_manager">Folder Manager</string>
-    <string name="lb_setting">Setting</string>
-    <string name="setting_confirm_delete">This operation will not delete your files, but it will clear your device records and movie information records.</string>
-    <string name="setting_status_not_add">not scan</string>
-    <string name="setting_status_added">scanned</string>
-    <string name="setting_confirm_clear">This operation will not delete your files, but it will clear your movie information records.</string>
-    <string name="score">Score:</string>
-    <string name="imdb_id" translatable="false">IMBD ID:</string>
-    <string name="colon" translatable="false">:</string>
-    <string name="update">Update</string>
-    <string name="imdb_id2" translatable="false">IMDB ID</string>
-    <string name="remove_confirm">Are you sure you want to clean up the movie information?</string>
-    <string name="title_search">Local Video Search</string>
-    <string name="local_search_empty_tips">The search results are empty, please check your input</string>
-    <string name="btn_exit">Exit</string>
-    <string name="des_leftmenutips">Selected folder:</string>
-    <string name="des_filechooser_tips">Tips:press → to open the menu</string>
-    <string name="filelist_back">Back</string>
-    <string name="custom_add">Add Custom Folder</string>
-    <string name="dialog_is_scanning">The operation failed because the movie information matching service is in progress.</string>
-    <string name="video_type_TV">TV</string>
-    <string name="video_type_movie">Movie</string>
-    <string name="video_type_others">Others</string>
-    <string name="more">More</string>
-    <string name="triangle" translatable="false">▼</string>
-    <string name="tx_search_input_hint">Please enter a keyword</string>
-    <string name="tx_under_t9_hints">* Enter a keyword(e.g. 电影->DY).</string>
-    <string name="tx_movie_for_lib">Movies</string>
-    <string name="tx_tv_for_lib">Series</string>
-    <string name="tx_others_for_lib">Others</string>
-    <string name="tips">The Movie Library is Empty! Click here to add Media Foler</string>
-    <string name="dm_btn_scan">Re-Scan</string>
-    <string name="setting_status_scanning">Scanning...</string>
-    <string name="device_manager_footer_bar_folder">"folder : "</string>
-    <string name="device_manager_footer_bar_path">"location : "</string>
-    <string name="title_folder_add">Add Folder To Library</string>
-    <string name="title_change_password">Change Password</string>
-    <string name="btn_show_hidden_folder">Show Hidden Folder</string>
+    <!--   文件夹管理->影片分类-->
+    <string name="shortcut_type_auto">Auto</string>
+    <string name="shortcut_type_movie">Movie</string>
+    <string name="shortcut_type_tv">TV Series</string>
+    <string name="shortcut_type_child">Cartoon</string>
+    <string name="shortcut_type_variety_show">Variety Show</string>
+    <string name="shortcut_type_animate">Animate</string>
+    <!--    文件管理->影片分级-->
+    <string name="shortcut_access_adult_only">Adult Only</string>
+    <string name="shortcut_access_all_ages">All Ages</string>
+    <!--    文件管理->索引默认名称-->
+    <string name="shortcut_name_default">Default</string>
+    <string name="shortcut_name_editdialog_title">Eidt Name</string>
+    <string name="shortcut_name_editdialog_hint">Please enter a name</string>
 
-    <string name="title_set_initial_psw">Set Initial Password</string>
-    <string name="title_change_psw">Change Password</string>
+    <!--详情页-->
+    <string name="director">Directors</string>
+    <string name="actors">Characters</string>
+    <string name="plot_s">Overview</string>
+    <string name="plot_expand">View More</string>
+    <string name="plot_fold">Fold</string>
+    <string name="plot_s_empty">No introduction.</string>
+    <string name="btn_play">Play</string>
+    <string name="btn_favorite">Like</string>
+    <string name="btn_expand">More</string>
+    <string name="btn_edit">Update</string>
+    <string name="btn_delete">Remove</string>
+    <string name="label_recommandvideo">Recommendations</string>
+    <string name="recommand_empty">No recommendations.</string>
+    <!--详情 更多详情-->
+    <string name="actor_list">Characters</string>
+    <string name="video_list">Videos</string>
+    <string name="edit_title">Select Poster</string>
+    <!--详情 选择播放源-->
+    <string name="select_videosource">Choose Video to Play</string>
 
-
-
-
-    <string name="tx_private_for_lib">Private Videos</string>
-    <string name="tips_for_private_folder">Cannot make non-local folder private</string>
-    <string name="checkbox_del_video_file">Clear file information (do not delete files)?</string>
     <string name="toast_del_success">Delete Success!</string>
     <string name="toast_UnknownHostException">Network error!</string>
     <string name="toast_newsearh_notfound">Sorry,no results were found.Please check your input or try other keywords</string>
     <string name="toast_loadmore_end">No more results found.</string>
-    <string name="title_hide_private">Hide Pirvate Videos</string>
-    <string name="tips_for_hide_private_videos">Private videos have been hidden</string>
-    <string name="tips_for_show_private_videos">Private videos have been shown</string>
-    <string name="video_type_private">PrivateVideo</string>
-    <string name="tx_scan_completed">Scan Completed</string>
-    <string name="video_type_unmatch">Unclassified</string>
-    <string name="tx_unclassified_for_lib">UnClassified</string>
-    <string name="tx_search">Search</string>
-    <string name="title_encryption_setting">Encryption setting</string>
-    <string name="tx_for_reset_cate">Reset</string>
-    <string name="main_actors">Main Actors:</string>
-    <string name="main_file_list">File List:</string>
-    <string name="tx_genres">Genres:</string>
-    <string name="tips2">No Movie</string>
-    <string name="tag_is_movie" translatable="false">1</string>
-    <string name="tx_search_result">Success :%1$d Failed:%2$d</string>
-    <string name="tx_favorite">Favorite</string>
-    <string name="tx_last_watch">Last Watched</string>
-    <string name="tx_last_watch_title" translatable="false">《%1$s》</string>
-    <string name="network_error">Unable to get movie information due to unknown network problems, please try again later.</string>
-    <string name="tx_choose_video">choose files</string>
-    <string name="tx_choose_confirm">Confirm</string>
-    <string name="api_douban" translatable="false">Douban</string>
-    <string name="api_imdb" translatable="false">Imdb</string>
-    <string name="api_mtime" translatable="false">Mtime</string>
-    <string name="spinner_label">Scraper Source</string>
-    <string name="setting_confirm_hide_encrypted_video">Do you need to hide encrypted video?</string>
+    <string name="toast_selectmovie_faild">Sorry, failed to match this poster!</string>
 
+    <string name="remove_confirm">Are you sure you want to clean up the movie information?</string>
+
+    <!--新主页-->
+    <!--新主页按钮组-->
+    <string name="childmode">Child Mode</string>
+    <string name="search">Search</string>
+    <string name="homepage">Home</string>
+    <string name="settings">Settings</string>
+    <string name="filter">Filter</string>
+
+    <!--主页tab-->
+    <string name="tab_homepage">Home</string>
+    <string name="video_type_movie">Movie</string>
+    <string name="video_type_tv">TV</string>
+    <string name="video_type_undefine">Unknow</string>
+    <string name="video_type_cartoon">Cartoon</string>
+    <!--本地搜索页tab-->
+    <string name="tab_local_search_all">All (%d)</string>
+    <string name="tab_local_search_movie">Movie (%d)</string>
+    <string name="tab_local_search_tv">TV Series (%d)</string>
+
+    <!--设置-->
+    <string name="settings_childmode">Child Mode</string>
+    <string name="settings_poster">Poster</string>
+    <string name="settings_preference">Preference</string>
+    <string name="settings_about">About</string>
+
+    <!--设置-儿童模式-->
+    <string name="childmode_switch_tips">Turn on Child Mode will hide content that is not suitable for children</string>
+    <string name="childmode_changepsw_subtitle">Child Mode > Change Password</string>
+    <string name="childmode_temp_close">Temporarily turn off kid mode</string>
+    <!--设置-儿童模式-修改密码-->
+    <string name="title_change_password">Change Password</string>
+
+    <string name="label_confirm_psw">Confirm Password:</string>
+    <string name="label_old_psw">Old Password:</string>
+    <string name="label_new_psw">New Password:</string>
+
+    <string name="errtips_psw_invaild">* Password must be 4 digits</string>
+    <string name="errtips_psw_error">* Password error</string>
+    <string name="errtips_psw_not_new">* The new password cannot be the same as the original password</string>
+    <string name="errtips_psw_inconsistent">* The two passwords do not match</string>
+
+    <string name="hint_enter_psw">Please enter your password (default password is 1111)</string>
+    <string name="hint_input4digit_psw">Please enter a new 4-digit password</string>
+    <string name="hint_confirm_new_psw">Please enter new password again</string>
+    <string name="title_input_psw">Enter Password</string>
+
+    <string name="psw_set_success">New password set successfully!</string>
+    <!--设置-海报-->
+    <string name="state_on">ON</string>
+    <string name="state_off">OFF</string>
+
+
+    <string name="settings_poster_show_title">Title</string>
+    <string name="settings_poster_show_poster">Poster</string>
+    <string name="settings_poster_show_ratings">Ratings</string>
+    <string name="settings_poster_show_like">Like</string>
+    <string name="settings_poster_show_cornermark">Corner Mark</string>
+    <string name="settings_poster_preview">Preview</string>
+
+    <string name="sample_title" translatable="false">*****</string>
+    <string name="sample_tag" translatable="false">HD</string>
+    <string name="sample_rating" translatable="false">10.0</string>
+
+    <!--设置-偏好-->
+    <string name="settings_preference_autosearch_title">Auto Scan Local Folders</string>
+    <string name="settings_preference_default_searchmode">Default search mode</string>
+
+    <!--设置-关于-->
+    <string name="settings_about_source">Poster Source</string>
+
+    <string name="settings_about_version">Version</string>
+
+
+    <!--海报菜单-->
+    <string name="postermenu_reselect_poster">Rematch the poster</string>
+    <string name="postermenu_mark_as_watched">Mark as watched</string>
+    <string name="postermenu_mark_as_like">Like</string>
+    <string name="postermenu_clear_poster">Clean up the poster</string>
+    <string name="postermenu_add_to_videotag">Add to tag</string>
+
+    <string name="refresh_text">Loading</string>
+    <string name="tx_search_input_hint">Please enter a keyword</string>
+    <string name="local_search_empty_tips">The search results are empty, please check your input</string>
+    <string name="hint">Please input a keyword</string>
+
+    <!--其他-->
     <string name="device_internal_storage">Internal Storage</string>
     <string name="device_udisk_name">U-Disk (%1$s)</string>
     <string name="device_sdcard_name">TFCard (%1$s)</string>
     <string name="device_ssd_name">M.2 SSD (%1$s)</string>
     <string name="device_harddisk_name">HardDisk (%1$s)</string>
-
-    <string name="btn_search">Search</string>
-    <string name="keyword">Keyword</string>
-
-    <string name="folder_dialog_title_added_folder">Added Folder</string>
-    <string name="folder_dialog_title_hidden_folder">Hidden Folder</string>
-
-    <string name="folder_item_delete">Delete</string>
-    <string name="folder_item_add_to_hidden">Add to private</string>
-    <string name="folder_item_move_out">Move out</string>
-    <string name="folder_item_rescan">Rescan</string>
-
-
 </resources>

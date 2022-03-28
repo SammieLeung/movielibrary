@@ -41,6 +41,7 @@ import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -329,8 +330,12 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             }
             //选择新电影逻辑
             mViewModel.selectMovie( movie_id,source,type, is_favoirte, movieWrapper -> {
-                prepareMovieWrapper(movieWrapper.movie.id);
-                refreshParent();
+                if(movieWrapper.movie!=null) {
+                    prepareMovieWrapper(movieWrapper.movie.id);
+                    refreshParent();
+                }else{
+                    ToastUtil.newInstance(this).toast(getString(R.string.toast_selectmovie_faild));
+                }
                 stopLoading();
             });
         });

@@ -49,7 +49,7 @@ public class FilterBoxAdapter extends RecyclerView.Adapter<FilterBoxAdapter.Comm
     public void onBindViewHolder(@NonNull @NotNull CommonFilterBoxViewHolder holder, int position) {
         int viewType = getItemViewType(position);
         if (viewType == VIEWTYPE_ALL) {
-            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.tx_all));
+            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.all));
             holder.mViewDataBinding.setPos(position);
         } else {
             int realPos = position - 1;

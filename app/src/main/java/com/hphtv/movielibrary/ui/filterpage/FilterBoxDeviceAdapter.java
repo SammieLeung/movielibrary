@@ -59,7 +59,7 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
         int viewType = getItemViewType(position);
         int realPos=position-1;
         if (viewType == VIEWTYPE_ALL) {
-            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.tx_all));
+            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.all));
             holder.mViewDataBinding.setPos(position);
         } else if (viewType == VIEWTYPE_DEVICE) {
             Object o = mDataList.get(realPos);

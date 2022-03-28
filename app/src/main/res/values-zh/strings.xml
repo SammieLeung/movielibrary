@@ -1,180 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="refresh_text">正在刷新</string>
     <string name="app_name">影库</string>
-    <string name="action_settings">Settings</string>
-    <string name="unit_year">年</string>
-    <string name="minutes">分钟</string>
-    <string name="actor">主演:</string>
-    <string name="genres">类型:</string>
-    <string name="date">年份:</string>
-    <string name="duration">片长:</string>
-    <string name="episodes">集数:</string>
-    <string name="production_companies">出品:</string>
-    <string name="language">语言:</string>
-    <string name="pub_dates">上映时间:</string>
-    <string name="pre_dates">首播:</string>
-    <string name="video_detail_path">位置:</string>
-    <string name="play">播放</string>
-    <string name="remove">移除</string>
-    <string name="pic_vedio">预告片</string>
-    <string name="rate_full">( %1$s人评价 )</string>
-    <string name="rate_not">暂无评分</string>
-    <string name="rate">%1$s分</string>
-    <string name="edit">编辑</string>
-    <string name="hint">请输入关键字</string>
-    <string name="ratingsCounts">( %1$s人评价 )</string>
-    <string name="sortby">%1$s|%2$s %3$s</string>
 
-    <string name="mediacontroller_play_pause">播放/暂停</string>
-    <string name="test">测试长度字符串测试长度字符串</string>
-    <string name="pages">%1$d&#047;%2$d</string>
-    <string name="usb_totalspace">总共: %1$s GB</string>
-    <string name="usb_usablespace">可用: %1$s GB</string>
-    <string name="usb_path">路径: %1$s</string>
-    <string name="usb_state">状态: %1$s</string>
-    <string name="usb_matched">已匹配: %1$d</string>
-    <string name="usb_unmatchable">未匹配: %1$d</string>
-    <string name="usb_totalvideo">视频总数: %1$d</string>
+    <string name="unknow">未知</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
+    <!--    主页-->
+    <string name="homepage_custom_genre_tag_title">自定义主题</string>
+    <string name="homepage_custom_genre_tag_title_2">主题排序</string>
 
-    <string name="scan_record">扫描记录</string>
-    <string name="scan_begin">开始匹配</string>
-    <string name="scan_stop">停止匹配</string>
-    <string name="scaning">准备扫描</string>
-    <string name="tx_scan">扫描:</string>
-    <string name="tx_scan_p">%1$d</string>
-    <string name="tx_match">匹配成功:%1$d</string>
-    <string name="tx_match_p">失败:%1$d</string>
-    <string name="tx_parse">获取信息成功:%1$d</string>
-    <string name="tx_parse_p">失败:%1$d</string>
+    <!--    历史播放-->
+    <string name="history_list_title">最近播放</string>
+    <string name="history_list_empty">暂无观看记录</string>
+    <string name="category_list_title">分类浏览</string>
+    <string name="recently_added_list_title">最近添加</string>
+    <string name="my_favorite_list_title">我的收藏</string>
+    <string name="recommand_list_title">推荐影片</string>
 
-    <string name="btn_ok">确定</string>
-    <string name="btn_no">取消</string>
-    <string name="choose_play">选集</string>
+    <!--分类浏览-->
+    <string name="category_all">全部</string>
+    <string name="category_movie">电影</string>
+    <string name="category_tv">电视剧</string>
+    <string name="category_unmatched">未匹配</string>
+    <string name="category_favorite">收藏</string>
 
-    <string name="tx_all">全部</string>
-    <string name="tx_alldevices">所有设备</string>
-    <string name="tx_alldir">所有目录</string>
-    <string name="tx_scanning">正在扫描...</string>
-    <string name="tx_p_beging_scan">开始扫描视频文件...</string>
-    <string name="tx_p_scan_end">扫描结束!共发现%1$d个视频</string>
-    <string name="tx_p_begin_match">开始从网络匹配视频信息:</string>
-    <string name="tx_ready_scan">准备扫描</string>
-    <string name="dialog_begin_scan">扫描时间取决于文件数量以及网络状况等因素，请耐心等待！</string>
-    <string name="dialog_stop_scan">确定终止扫描视频?</string>
-    <string name="dialog_end_scan">扫描完毕!需要立即查看吗?</string>
-    <string name="dialog_exit_scan">正在进行扫描，确定退出？</string>
-    <string name="message_match_faild">:匹配电影信息失败！</string>
-    <string name="message_success">->获取成功！</string>
-    <string name="message_faild">->获取失败！</string>
+    <string name="genre_edit_dialog_title">分类管理</string>
+
+    <string name="lb_sort_device">设备</string>
+    <string name="lb_sort_region">地区</string>
+    <string name="lb_sort_directory">目录</string>
+    <string name="lb_sort_year">年份</string>
+    <string name="lb_sort_type">类型</string>
+    <string name="lb_sort_by">排序</string>
+    <string name="lb_sort_genres">主题</string>
+
     <string name="order_name">名称</string>
     <string name="order_genre">类型</string>
     <string name="order_year">年份</string>
     <string name="order_score">评分</string>
     <string name="order_addtime">添加时间</string>
     <string name="order_recently_played">最近播放</string>
+    <string name="all">全部</string>
 
-    <string name="toastmsg_no_trailer_found">找不到预告片</string>
+    <string name="filter_box_local_device">本地设备</string>
+    <string name="filter_box_dlna_device">DLNA设备</string>
+    <string name="filter_box_smb_device">SMB设备</string>
 
-    <string name="exit_toast">再按一次返回键退出程序</string>
-    <string name="dm_tx_status">状态</string>
-    <string name="dm_tx_folder">文件夹</string>
-    <string name="dm_tx_matched">封面</string>
-    <string name="dm_btn_clear">清除缓存</string>
-    <string name="dm_btn_delete">移除文件夹</string>
-    <string name="cb_all">全选</string>
-    <string name="cb_private">私密</string>
-    <string name="cb_disconnect">断开</string>
-    <string name="title_file_manager">文件夹管理</string>
-    <string name="lb_setting">设置</string>
-    <string name="setting_confirm_delete">此操作不会删除你的文件，但会清除你的设备记录和电影信息记录。</string>
-    <string name="setting_status_not_add">未扫描</string>
-    <string name="setting_status_added">已扫描</string>
-    <string name="setting_confirm_clear">此操作不会删除你的文件，但会清除你的电影信息记录。</string>
-    <string name="score">评分:</string>
-    <string name="update">更新信息</string>
-    <string name="remove_confirm">你确定要清除电影信息吗?</string>
-    <string name="title_search">本地视频搜索</string>
-    <string name="btn_exit">退出</string>
-    <string name="des_leftmenutips">选择的文件夹:</string>
-    <string name="des_filechooser_tips">提示：按方向键右打开菜单</string>
-    <string name="filelist_back">返回</string>
-    <string name="custom_add">自定义添加文件夹</string>
-    <string name="dialog_is_scanning">操作失败，因为电影信息匹配服务正在进行。</string>
-    <string name="video_type_TV">剧集</string>
-    <string name="video_type_movie">电影</string>
-    <string name="video_type_others">其他</string>
-    <string name="more">更多</string>
+    <string name="filterpage_no_result_matched">没有符合条件的影片</string>
+    <string name="filterpage_no_movie">影库中还未添加电影</string>
+    <!--    索引管理-->
+    <string name="add_shortcut">添加文件夹</string>
+    <string name="shortcut_manager">设备管理</string>
+    <string name="shortcut_state_unscanned">未扫描</string>
+    <string name="shortcut_state_scanned">已扫描</string>
+    <string name="shortcut_state_scanning">扫描中</string>
+    <string name="scanning_in_background">影片后台扫描中</string>
 
-    <string name="tx_search_input_hint">输入影片关键字</string>
-    <string name="tx_under_t9_hints">* 输入关键字,如:电影-> DY</string>
-    <string name="local_search_empty_tips">搜索结果为空，请检查您的输入</string>
-    <string name="tx_movie_for_lib">全部电影</string>
-    <string name="tx_tv_for_lib">全部剧集</string>
-    <string name="tx_others_for_lib">全部视频</string>
-    <string name="tips">影库为空！点击此处添加媒体文件夹</string>
-    <string name="dm_btn_scan">重新扫描</string>
-    <string name="setting_status_scanning">正在扫描...</string>
-    <string name="device_manager_footer_bar_folder">"文件夹 : "</string>
-    <string name="device_manager_footer_bar_path">"位置 : "</string>
-    <string name="title_folder_add">添加文件夹到库</string>
-    <string name="btn_show_hidden_folder">显示私密文件</string>
-    <string name="title_change_password">修改密码</string>
-    <string name="title_change_psw">修改密码</string>
-    <string name="title_set_initial_psw">设置初始密码</string>
+    <string name="shortcut_scan_dialog_item_shortcut_type">影片类型</string>
+    <string name="shortcut_scan_dialog_item_shortcut_access">观看权限</string>
+    <string name="shortcut_scan_dialog_item_shortcut_name">文件夹名称</string>
+    <string name="shortcut_scan_dialog_confirm">确认扫描</string>
+    <string name="shortcut_options_dialog_remove">移除文件夹</string>
+    <string name="shortcut_options_dialog_rescan">重新扫描</string>
+
+    <string name="shortcut_remove_dialog_content">确认移除文件夹 %s 吗？</string>
 
 
+    <!--   文件夹管理->影片分类-->
+    <string name="shortcut_type_auto">智能</string>
+    <string name="shortcut_type_movie">电影</string>
+    <string name="shortcut_type_tv">电视</string>
+    <string name="shortcut_type_child">儿童</string>
+    <string name="shortcut_type_variety_show">综艺</string>
+    <string name="shortcut_type_animate">动画</string>
+    <!--    文件管理->影片分级-->
+    <string name="shortcut_access_adult_only">不适合儿童</string>
+    <string name="shortcut_access_all_ages">全年龄</string>
+    <!--    文件管理->索引默认名称-->
+    <string name="shortcut_name_default">默认</string>
+
+    <string name="shortcut_name_editdialog_title">修改名称</string>
+    <string name="shortcut_name_editdialog_hint">请输入名称</string>
 
 
-    <string name="tx_private_for_lib">私密视频</string>
-    <string name="tips_for_private_folder">非本地文件夹无法设为私密</string>
-    <string name="checkbox_del_video_file">清除文件信息(不会删除文件)?</string>
-    <string name="toast_del_success">删除成功！</string>
+    <!--详情页-->
+    <string name="director">导演</string>
+    <string name="actors">演员</string>
+    <string name="plot_s">简介</string>
+    <string name="plot_expand">详情</string>
+    <string name="plot_fold">收起</string>
+    <string name="plot_s_empty">暂无简介。</string>
+    <string name="btn_play">播放</string>
+    <string name="btn_favorite">收藏</string>
+    <string name="btn_expand">更多</string>
+    <string name="btn_edit">修正</string>
+    <string name="btn_delete">移除</string>
+    <string name="label_recommandvideo">推荐影片</string>
+    <string name="recommand_empty">暂无推荐影片。</string>
+    <!--详情 更多详情-->
+    <string name="actor_list">演员列表</string>
+    <string name="video_list">视频列表</string>
+    <string name="edit_title">海报匹配</string>
+    <!--详情 选择播放源-->
+    <string name="select_videosource">选择影片</string>
+
+    <string name="toast_del_success">清除成功！</string>
     <string name="toast_UnknownHostException">网络错误！</string>
-    <string name="toast_newsearh_notfound">抱歉，没有找到相关结果。\n请检查您的输入或尝试其他关键字</string>
-    <string name="toast_loadmore_end">搜索不到更多内容</string>
-    <string name="title_hide_private">隐藏私密文件</string>
-    <string name="tips_for_show_private_videos">已经显示私密视频</string>
-    <string name="tips_for_hide_private_videos">已经隐藏私密视频</string>
-    <string name="video_type_private">私密视频</string>
-    <string name="tx_scan_completed">扫描完成</string>
-    <string name="video_type_unmatch">未分类</string>
-    <string name="tx_unclassified_for_lib">未分类</string>
-    <string name="tx_search">搜索</string>
-    <string name="title_encryption_setting">加密设置</string>
-    <string name="tx_for_reset_cate">还原默认</string>
-    <string name="main_actors">主要演员:</string>
-    <string name="main_file_list">文件列表:</string>
-    <string name="tx_genres">类型:</string>
-    <string name="tips2">暂无影片</string>
-    <string name="tx_search_result">成功:%1$d 失败:%2$d</string>
-    <string name="tx_favorite">收藏</string>
+    <string name="toast_newsearh_notfound">抱歉，没有找到结果。请检查您的输入！</string>
+    <string name="toast_loadmore_end">没有更多结果了！</string>
+    <string name="toast_selectmovie_faild">抱歉，匹配海报失败！</string>
+    <string name="remove_confirm">你确定要清除电影信息吗?</string>
 
-    <string name="tx_last_watch">上次观看</string>
-    <string name="network_error">由于未知网络问题，无法获取电影信息，请稍后重试。</string>
-    <string name="tx_choose_video">选择文件</string>
-    <string name="tx_choose_confirm">确定</string>
-    <string name="spinner_label">搜刮器源</string>
-    <string name="setting_confirm_hide_encrypted_video">需要隐藏加密视频吗?</string>
+    <!--新主页-->
+    <!--新主页按钮组-->
+    <string name="childmode">儿童模式</string>
+    <string name="search">搜索</string>
+    <string name="homepage">主页</string>
+    <string name="settings">设置</string>
+    <string name="filter">筛选</string>
 
+    <!--主页tab-->
+    <string name="tab_homepage">主页</string>
+    <string name="video_type_movie">电影</string>
+    <string name="video_type_tv">电视</string>
+    <string name="video_type_undefine">未分类</string>
+    <string name="video_type_cartoon">儿童</string>
+    <!--本地搜索页tab-->
+    <string name="tab_local_search_all">全部 (%d)</string>
+    <string name="tab_local_search_movie">电影 (%d)</string>
+    <string name="tab_local_search_tv">电视剧 (%d)</string>
+
+    <!--设置-->
+    <string name="settings_childmode">儿童模式</string>
+    <string name="settings_poster">影片海报</string>
+    <string name="settings_preference">偏好设置</string>
+    <string name="settings_about">关于</string>
+
+    <!--设置-儿童模式-->
+    <string name="childmode_switch_tips">开启儿童模式，将会隐藏不适合儿童观看内容</string>
+    <string name="childmode_changepsw_subtitle">儿童模式 > 修改密码</string>
+    <string name="childmode_temp_close">暂时关闭儿童模式</string>
+
+    <!--设置-儿童模式-修改密码-->
+    <string name="title_change_password">修改密码</string>
+
+    <string name="label_confirm_psw">确认密码:</string>
+    <string name="label_old_psw">旧密码:</string>
+    <string name="label_new_psw">新密码:</string>
+
+    <string name="errtips_psw_invaild">* 密码必须由4位数字组成</string>
+    <string name="errtips_psw_error">* 密码错误</string>
+    <string name="errtips_psw_not_new">* 新密码不能与原密码相同</string>
+    <string name="errtips_psw_inconsistent">* 两次输入的密码不一致</string>
+
+    <string name="hint_enter_psw">请输入密码 (默认密码为1111)</string>
+    <string name="hint_input4digit_psw">请输入一个4位新密码</string>
+    <string name="hint_confirm_new_psw">请再次输入新密码</string>
+    <string name="title_input_psw">输入密码</string>
+
+    <string name="psw_set_success">新密码设置成功!</string>
+    <!--设置-海报-->
+    <string name="state_on">显示</string>
+    <string name="state_off">隐藏</string>
+
+    <string name="settings_poster_show_title">显示标题</string>
+    <string name="settings_poster_show_poster">显示海报</string>
+    <string name="settings_poster_show_ratings">显示评分</string>
+    <string name="settings_poster_show_like">显示收藏</string>
+    <string name="settings_poster_show_cornermark">显示角标</string>
+    <string name="settings_poster_preview">预览</string>
+
+    <!--设置-偏好-->
+    <string name="settings_preference_autosearch_title">自动扫描本地文件夹</string>
+    <string name="settings_preference_default_searchmode">默认搜索模式</string>
+
+    <!--设置-关于-->
+    <string name="settings_about_source">海报来源</string>
+    <string name="settings_about_version">版本</string>
+
+    <!--海报菜单-->
+    <string name="postermenu_reselect_poster">重新匹配</string>
+    <string name="postermenu_mark_as_watched">标记为已观看</string>
+    <string name="postermenu_mark_as_like">收藏影片</string>
+    <string name="postermenu_clear_poster">清理匹配信息</string>
+    <string name="postermenu_add_to_videotag">添加到分类</string>
+
+    <string name="refresh_text">正在刷新</string>
+    <string name="tx_search_input_hint">输入影片关键字</string>
+    <string name="local_search_empty_tips">搜索结果为空，请检查您的输入</string>
+    <string name="hint">请输入关键字</string>
+
+    <!--其他-->
     <string name="device_internal_storage">内置存储</string>
     <string name="device_udisk_name">U盘 (%1$s)</string>
     <string name="device_sdcard_name">TF卡 (%1$s)</string>
     <string name="device_ssd_name">M.2 SSD (%1$s)</string>
     <string name="device_harddisk_name">硬盘 (%1$s)</string>
-
-    <string name="btn_search">搜索</string>
-    <string name="keyword">关键字</string>
-
-    <string name="folder_dialog_title_added_folder">已添加文件夹</string>
-    <string name="folder_dialog_title_hidden_folder">隐藏文件夹</string>
-
-    <string name="folder_item_delete">删除</string>
-    <string name="folder_item_add_to_hidden">添加到私密</string>
-    <string name="folder_item_move_out">移出私密</string>
-    <string name="folder_item_rescan">重新扫描</string>
-    
-
-
-
 </resources>

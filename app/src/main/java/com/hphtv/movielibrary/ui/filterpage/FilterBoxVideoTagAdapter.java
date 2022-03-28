@@ -9,7 +9,6 @@ import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FilterBoxItemLayoutBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 
@@ -50,24 +49,24 @@ public class FilterBoxVideoTagAdapter extends RecyclerView.Adapter<FilterBoxVide
     public void onBindViewHolder(@NonNull @NotNull CommonFilterBoxViewHolder holder, int position) {
         int viewType = getItemViewType(position);
         if (viewType == VIEWTYPE_ALL) {
-            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.tx_all));
+            holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.all));
             holder.mViewDataBinding.setPos(position);
         } else {
             int realPos = position - 1;
             VideoTag videoTag = mDataList.get(realPos);
-            String name = videoTag.tag;
-            if (videoTag.flag == 0) {
-                switch (Constants.VideoType.valueOf(videoTag.tag)) {
-                    case movie:
-                        name = mContext.getString(R.string.tab_movie);
-                        break;
-                    case tv:
-                        name = mContext.getString(R.string.tab_tv);
-                        break;
-                    case child:
-                        name = mContext.getString(R.string.tab_child);
-                        break;
-                }
+            String name = "";
+            switch (videoTag.tag) {
+                case movie:
+                    name = mContext.getString(R.string.video_type_movie);
+                    break;
+                case tv:
+                    name = mContext.getString(R.string.video_type_tv);
+                    break;
+                case child:
+                    name = mContext.getString(R.string.video_type_cartoon);
+                    break;
+                case custom:
+                    name = videoTag.tagName;
             }
             holder.mViewDataBinding.setName(name);
             holder.mViewDataBinding.setPos(position);

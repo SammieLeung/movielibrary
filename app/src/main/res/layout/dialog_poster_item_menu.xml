@@ -61,6 +61,7 @@
                 android:layout_marginBottom="17dp"
                 tools:ignore="IncludeLayoutParam" />
             <include
+                android:visibility="gone"
                 app:checkstate="@{watchedState}"
                 app:title="@{@string/postermenu_mark_as_watched}"
                 android:id="@+id/include_mark_watched"

@@ -247,14 +247,11 @@ public class ActivityHelper {
         VideoTagDao videoTagDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoTagDao();
         MovieVideoTagCrossRefDao movieVideoTagCrossRefDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieVideoTagCrossRefDao();
 
-        VideoTag typeTag;
         if (movie.type != null) {
-            String type = movie.type.name();
-            typeTag = videoTagDao.queryVtidBySysTag(type);
+            Constants.VideoType type = Constants.VideoType.valueOf(movie.type.name());
+            VideoTag typeTag = videoTagDao.queryVtidBySysTag(type);
             if (typeTag == null) {
-                typeTag = new VideoTag();
-                typeTag.tag = type;
-                typeTag.flag = 0;
+                typeTag = new VideoTag(type);
                 long vtid = videoTagDao.insertOrIgnore(typeTag);
                 if (vtid > -1) {
                     typeTag.vtid = vtid;
@@ -291,10 +288,9 @@ public class ActivityHelper {
         }
 
         if (isKids || (isAnimation && (isFamily || isComedy))) {
-            VideoTag childTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.child.name());
+            VideoTag childTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.child);
             if (childTag == null) {
-                childTag = new VideoTag();
-                childTag.tag = Constants.VideoType.child.name();
+                childTag = new VideoTag(Constants.VideoType.child);
                 childTag.flag = 0;
                 long vtid = videoTagDao.insertOrIgnore(childTag);
                 if (vtid > -1) {

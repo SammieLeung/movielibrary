@@ -100,7 +100,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mVideoTagsList = mVideoTagDao.queryAllVideoTags(ScraperSourceTools.getSource());
+                    mVideoTagsList = mVideoTagDao.queryAllVideoTags();
                     return mVideoTagsList;
                 })
                 .observeOn(AndroidSchedulers.mainThread())

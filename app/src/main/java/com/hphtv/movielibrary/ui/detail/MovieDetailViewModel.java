@@ -226,7 +226,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     @Override
                     public MovieWrapper apply(String _source) throws Throwable {
                         //TODO 增加可选搜索类型
-                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source, type.name()).subscribeOn(Schedulers.io()).blockingFirst().toEntity();
+                        MovieWrapper wrapper = TmdbApiService.getDetials(movie_id, _source, type.name())
+                                .subscribeOn(Schedulers.io())
+                                .blockingFirst()
+                                .toEntity();
                         return wrapper;
                     }
                 })
