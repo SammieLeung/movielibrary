@@ -8,6 +8,7 @@ import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
 
+import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -72,7 +73,7 @@ public class TmdbApiService {
         return searchObservable;
     }
 
-    public static Observable<MovieDetailRespone> getDetials(String movieId, String api,String type) {
+    public static Observable<MovieDetailRespone> getDetail(String movieId, String api, String type) {
         TmdbApiRequest request = RetrofiTools.createTmdbApiRequest();
         switch (api) {
             case Constants.Scraper.TMDB:

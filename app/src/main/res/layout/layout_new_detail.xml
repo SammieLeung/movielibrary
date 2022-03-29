@@ -14,9 +14,6 @@
             name="expand"
             type="boolean" />
         <variable
-            name="unmatch"
-            type="boolean" />
-        <variable
             name="recommand"
             type="boolean" />
         <variable
@@ -150,7 +147,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
-                        android:visibility="@{!unmatch?View.VISIBLE:View.GONE}"
                         android:id="@+id/btn_favorite"
                         android:text="@string/btn_favorite"
                         style="@style/detail_btn_style"
@@ -161,7 +157,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
-                        android:visibility="@{expand||unmatch?View.VISIBLE:View.GONE}"
+                        android:visibility="@{expand?View.VISIBLE:View.GONE}"
                         android:id="@+id/btn_edit"
                         android:text="@string/btn_edit"
                         style="@style/detail_btn_style"
@@ -172,7 +168,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
-                        android:visibility="@{!unmatch&amp;&amp;expand?View.VISIBLE:View.GONE}"
+                        android:visibility="@{expand?View.VISIBLE:View.GONE}"
                         android:id="@+id/btn_remove"
                         android:text="@string/btn_delete"
                         android:drawableLeft="@drawable/ic_remove"
@@ -183,7 +179,6 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <Button
-                        android:visibility="@{unmatch?View.GONE:View.VISIBLE}"
                         android:id="@+id/btn_expand"
                         android:text="@{expand?@string/plot_fold:@string/btn_expand}"
                         style="@style/detail_btn_style"

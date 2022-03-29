@@ -33,8 +33,6 @@ public class Movie implements Serializable {
     public String ratings;//评分
     public String source;//来源
     public Constants.SearchType type;//电影？电视剧  movie/tv  搜索接口自动分配不用管
-    @ColumnInfo(name = "ap")
-    public Constants.AccessPermission ap;//分级 ALL_AGE,ADAULT
     public String poster;//海报
     public String region;//制片国家/地区
     @ColumnInfo(name = "release_date")
@@ -44,6 +42,7 @@ public class Movie implements Serializable {
     public String year;//年份
     public String duration;//时长
     public String language;//语言
+    //用户信息
     public String pinyin;//汉语拼音顺序
     @ColumnInfo(name = "add_time")
     public long addTime;//添加时间
@@ -55,8 +54,8 @@ public class Movie implements Serializable {
     public long lastPlayTime;//上次播放时间
     @ColumnInfo(name = "is_watched")
     public boolean isWatched;//标记是否已观看
-
-
+    @ColumnInfo(name = "ap")
+    public Constants.AccessPermission ap;//分级 ALL_AGE,ADAULT
 
     @Ignore
     public String tag;

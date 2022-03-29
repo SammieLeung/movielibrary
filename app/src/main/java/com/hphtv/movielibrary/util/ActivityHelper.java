@@ -55,52 +55,51 @@ public class ActivityHelper {
         context.startActivity(intent);
     }
 
-    public static void showPosterMenuDialog(FragmentManager fragmentManager, MovieDataView movieDataView){
-        PosterMenuDialog dialog=PosterMenuDialog.newInstance(movieDataView);
-        dialog.show(fragmentManager,"");
+    public static void showPosterMenuDialog(FragmentManager fragmentManager, MovieDataView movieDataView) {
+        PosterMenuDialog dialog = PosterMenuDialog.newInstance(movieDataView);
+        dialog.show(fragmentManager, "");
     }
 
     /**
      * 保存自动匹配到的电影信息，并且与对应文件建立数据库关系
+     *
      * @param context
      * @param movieWrapper
      * @param videoFile
-     * @param source
      */
-    public static void saveMovieWrapper(Context context, MovieWrapper movieWrapper, VideoFile videoFile, String source) {
-        long movie_id = saveCommonInfos(context, movieWrapper, source);
+    public static void saveMovieWrapper(Context context, MovieWrapper movieWrapper, VideoFile videoFile) {
+        long movie_id = saveCommonInfos(context, movieWrapper);
         if (movie_id != -1) {
 
             //VideoFile
-            saveMovieVideoFileCrossRef(context, movie_id, videoFile, source);
-
-            LogUtil.v(Thread.currentThread().getName(), "saveMovie=>: " + movie_id + ":" + videoFile.filename);
+            saveMovieVideoFileCrossRef(context, movie_id, videoFile, movieWrapper.movie.source);
+            LogUtil.v(Thread.currentThread().getName(), "saveMovie: " + movie_id + "<=>" + videoFile.filename);
         }
     }
 
     /**
      * 保存手动选择电影信息，并且与对应文件建立数据库关系，并且更新文件的关键词
+     *
      * @param context
      * @param movieWrapper
      * @param videoFileList
-     * @param source
      */
-    public static void saveMatchedMovieWrapper(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList, String source) {
-        long movie_id = saveCommonInfos(context, movieWrapper, source);
-        if (movie_id != -1&&movieWrapper.movie!=null) {
+    public static void saveMatchedMovieWrapper(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
+        long movie_id = saveCommonInfos(context, movieWrapper);
+        if (movie_id != -1 && movieWrapper.movie != null) {
             //VideoFile
-            saveMovieVideoFileCrossRef(context, movie_id,movieWrapper.movie.title,videoFileList, source);
+            saveMovieVideoFileCrossRef(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
         }
     }
 
     /**
      * 保存电影的基本信息（剧情、演员、评分、剧照等)
+     *
      * @param context
      * @param movieWrapper
-     * @param source
      * @return
      */
-    private static long saveCommonInfos(Context context, MovieWrapper movieWrapper, String source) {
+    private static long saveCommonInfos(Context context, MovieWrapper movieWrapper) {
         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
         GenreDao genreDao = MovieLibraryRoomDatabase.getDatabase(context).getGenreDao();
         ActorDao actorDao = MovieLibraryRoomDatabase.getDatabase(context).getActorDao();
@@ -111,21 +110,37 @@ public class ActivityHelper {
         StagePhotoDao stagePhotoDao = MovieLibraryRoomDatabase.getDatabase(context).getStagePhotoDao();
         SeasonDao seasonDao = MovieLibraryRoomDatabase.getDatabase(context).getSeasonDao();
 
-
-        //获取各个实体类
-        Movie movie = movieWrapper.movie;
-        if (movie == null)
+        if (movieWrapper.movie == null) {
             return -1;
+        }
+
+        Movie new_movie = movieWrapper.movie;
+        Movie old_movie = movieDao.queryByMovieId(new_movie.movieId, new_movie.source);
+        if (old_movie != null) {
+            new_movie.id = old_movie.id;
+            new_movie.addTime = old_movie.addTime;
+            new_movie.updateTime = System.currentTimeMillis();
+            new_movie.ap = old_movie.ap;
+            new_movie.isFavorite = old_movie.isFavorite;
+            new_movie.isWatched = old_movie.isWatched;
+            new_movie.lastPlayTime = old_movie.lastPlayTime;
+            new_movie.pinyin=old_movie.pinyin;
+            movieDao.update(new_movie);
+        } else {
+            new_movie.pinyin = PinyinParseAndMatchTools.parsePinyin(new_movie.title);
+            new_movie.addTime = System.currentTimeMillis();
+            new_movie.updateTime=new_movie.addTime;
+            long id = movieDao.insertOrIgnoreMovie(new_movie);
+            new_movie.id = id;
+        }
+
+
         List<Genre> genreList = movieWrapper.genres;
         List<Director> directorList = movieWrapper.directors;
         List<Actor> actorList = movieWrapper.actors;
-//        List<Trailer> trailerList = movieWrapper.trailers;
         List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
         List<Season> seasonList = movieWrapper.seasons;
-        //插入电影到数据库
-        movie.pinyin = PinyinParseAndMatchTools.parsePinyin(movie.title);
-        movie.addTime = System.currentTimeMillis();
-        movieDao.insertOrIgnoreMovie(movie);
+
         //多对多可以先插入数据库
         genreDao.insertGenres(genreList);
         actorDao.insertActors(actorList);
@@ -137,7 +152,7 @@ public class ActivityHelper {
         }
 
         //查询影片ID
-        long movie_id = movieDao.queryByMovieId(movie.movieId, source).id;
+        long movie_id = new_movie.id;
         long[] genre_ids = genreDao.queryByName(querySelectionGenreNames);
 
         movieWrapper.movie.id = movie_id;
@@ -183,13 +198,14 @@ public class ActivityHelper {
             }
         }
 
-        saveAutoVideoTag(context, movie, genreList);
+        saveAutoVideoTag(context, new_movie, genreList);
 
         return movie_id;
     }
 
     /**
      * 关联电影信息和文件
+     *
      * @param context
      * @param movie_id
      * @param videoFile
@@ -203,7 +219,7 @@ public class ActivityHelper {
         movieVideoFileCrossRef.id = movie_id;
         movieVideoFileCrossRef.path = videoFile.path;
         movieVideoFileCrossRef.source = source;
-        movieVideoFileCrossRef.timeStamp= System.currentTimeMillis();
+        movieVideoFileCrossRef.timeStamp = System.currentTimeMillis();
         movieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
 
         videoFile.isScanned = 1;
@@ -212,6 +228,7 @@ public class ActivityHelper {
 
     /**
      * 关联电影信息和文件,并更新关键词
+     *
      * @param context
      * @param movie_id
      * @param keyword
@@ -227,7 +244,7 @@ public class ActivityHelper {
             movieVideoFileCrossRef.id = movie_id;
             movieVideoFileCrossRef.path = videoFile.path;
             movieVideoFileCrossRef.source = source;
-            movieVideoFileCrossRef.timeStamp=System.currentTimeMillis();
+            movieVideoFileCrossRef.timeStamp = System.currentTimeMillis();
             movieVideofileCrossRefDao.insertOrReplace(movieVideoFileCrossRef);
             videoFile.isScanned = 1;
 //            videoFile.keyword = movie.title;
@@ -239,6 +256,7 @@ public class ActivityHelper {
     /**
      * 自动帮助影片归类
      * 当前自动区分电影、电视、儿童
+     *
      * @param context
      * @param movie
      * @param genreList

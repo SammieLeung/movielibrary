@@ -235,7 +235,7 @@ public class MovieScanService extends Service {
                                                     if (!movie_id.equals("-1")) {
                                                         String type = mostSimilarMovie.type.name();
                                                         LogUtil.w(Thread.currentThread().getName(), "开始获取电影" + movie_id);
-                                                        MovieDetailRespone respone = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB, type)
+                                                        MovieDetailRespone respone = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB, type)
                                                                 .onErrorReturn(throwable -> {
                                                                     LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
                                                                     return null;
@@ -245,12 +245,12 @@ public class MovieScanService extends Service {
                                                         if (respone != null) {
                                                             wrapper= respone.toEntity();
                                                             if (wrapper != null) {
-                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile,Constants.Scraper.TMDB);
+                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile);
                                                             }else {
                                                                 LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
                                                             }
                                                         }
-                                                        MovieDetailRespone respone_en = TmdbApiService.getDetials(movie_id, Constants.Scraper.TMDB_EN, type)
+                                                        MovieDetailRespone respone_en = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB_EN, type)
                                                                 .onErrorReturn(throwable -> {
                                                                     LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
                                                                     return null;
@@ -259,7 +259,7 @@ public class MovieScanService extends Service {
                                                         if (respone_en != null) {
                                                             wrapper_en = respone_en.toEntity();
                                                             if (wrapper_en != null) {
-                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile,Constants.Scraper.TMDB_EN);
+                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile);
                                                             }else {
                                                                 LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
                                                             }

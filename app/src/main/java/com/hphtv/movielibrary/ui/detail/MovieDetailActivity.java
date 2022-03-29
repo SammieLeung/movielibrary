@@ -22,18 +22,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseApater2;
-import com.hphtv.movielibrary.adapter.BaseScaleApater;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
@@ -51,16 +46,14 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutNewDetailBinding> {
-    public static final int REMOVE=1;
+    public static final int REMOVE = 1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
-    private MovieWrapper mCurWrapper;
     private NewMovieItemListAdapter mRecommandMovieAdapter;
-    private Handler mUIHandler =new Handler(Looper.getMainLooper()){
+    private Handler mUIHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void dispatchMessage(@NonNull Message msg) {
             super.dispatchMessage(msg);
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case REMOVE:
                     refreshParent();
                     stopLoading();
@@ -71,16 +64,25 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         }
     };
 
-    private  BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+    //TODO 同步系统状态需要一个后台服务绑定
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Constants.ACTION_FAVORITE_MOVIE_CHANGE)) {
                 String movie_id = intent.getStringExtra("movie_id");
-                String curMovieId = mCurWrapper != null ? mCurWrapper.movie.movieId : "";
+                String curMovieId = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.movieId : "";
                 if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
                     boolean is_favorite = intent.getBooleanExtra("is_favorite", false);
-                    mBinding.btnFavorite.setSelected(is_favorite);
-                    refreshParent();
+                    mViewModel.setLike(is_favorite)
+                            .subscribe(new SimpleObserver<Boolean>() {
+                                @Override
+                                public void onAction(Boolean isFavorite) {
+                                    MovieWrapper wrapper = mViewModel.getMovieWrapper();
+                                    BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
+                                    mBinding.btnFavorite.setSelected(isFavorite);
+                                    refreshParent();
+                                }
+                            });
                 }
             }
         }
@@ -106,10 +108,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 break;
             case R.id.btn_remove:
                 ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mUIHandler);
-                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm)).show(getSupportFragmentManager(),TAG);
+                confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm)).show(getSupportFragmentManager(), TAG);
                 break;
             case R.id.btn_favorite:
-                toggleFavroite();
+                toggleLike();
                 break;
             case R.id.btn_expand:
                 mBinding.setExpand(!mBinding.getExpand());
@@ -119,7 +121,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 break;
         }
     };
-
 
 
     @Override
@@ -138,9 +139,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.btnFavorite.setOnClickListener(mClickListener);
         mBinding.btnExpand.setOnClickListener(mClickListener);
         mBinding.tvMore.setOnClickListener(mClickListener);
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this, RecyclerView.HORIZONTAL,false);
-        mRecommandMovieAdapter=new NewMovieItemListAdapter(this,new ArrayList<>());
-        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this,72),DensityUtil.dip2px(this,15),DensityUtil.dip2px(this,30)));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+        mRecommandMovieAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
+        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 15), DensityUtil.dip2px(this, 30)));
         mBinding.rvRecommand.setLayoutManager(linearLayoutManager);
         mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
         mRecommandMovieAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
@@ -160,20 +161,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (intent != null) {
-            int currentMode = intent.getIntExtra(Constants.Extras.MODE, -1);
-            mViewModel.setCurrentMode(currentMode);
-            switch (currentMode) {
-                case Constants.MovieDetailMode.MODE_WRAPPER:
-                    mBinding.setUnmatch(false);
-                    long movieId = intent.getLongExtra(Constants.Extras.MOVIE_ID, -1);
-                    prepareMovieWrapper(movieId);//1.加载电影数据
-                    break;
-                case Constants.MovieDetailMode.MODE_UNRECOGNIZEDFILE:
-                    String unrecognizedFileKeyword = intent.getStringExtra(Constants.Extras.UNRECOGNIZE_FILE_KEYWORD);
-                    mBinding.setUnmatch(true);
-                    prepareUnrecogizedFile(unrecognizedFileKeyword);//2.组合未识别文件数据
-                    break;
-            }
+            long movieId = intent.getLongExtra(Constants.Extras.MOVIE_ID, -1);
+            prepareMovieWrapper(movieId);//1.加载电影数据
         }
     }
 
@@ -194,58 +183,52 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     @Override
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
-                            mCurWrapper = wrapper;
-                            mBinding.setWrapper(mCurWrapper);
+                            mBinding.setWrapper(wrapper);
                             String stagePhoto = "";
                             if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
                                 Random random = new Random();
                                 int index = random.nextInt(wrapper.stagePhotos.size());
                                 stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
                             }
-//                GlideTools.GlideWrapper(this, wrapper.movie.poster).error(R.mipmap.ic_poster_default)
-//                        .into(mBinding.ivCover);
-//                GlideTools.GlideWrapper(this, stagePhoto)
-//                        .apply(RequestOptions.bitmapTransform(new GlideBlurTransformation(MovieDetailActivity.this, 25, 3)))
-//                        .error(R.mipmap.ic_poster_default)
-//                        .into(mBinding.ivStage);
                             mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
-                            if(!TextUtils.isEmpty(stagePhoto)){
-                                GlideTools.GlideWrapper(MovieDetailActivity.this,stagePhoto).into(mBinding.ivStagephoto);
-                            }else{
-                                GlideTools.GlideWrapper(MovieDetailActivity.this,wrapper.movie.poster).into(mBinding.ivStagephoto);
+                            if (!TextUtils.isEmpty(stagePhoto)) {
+                                GlideTools.GlideWrapper(MovieDetailActivity.this, stagePhoto).into(mBinding.ivStagephoto);
+                            } else {
+                                GlideTools.GlideWrapper(MovieDetailActivity.this, wrapper.movie.poster).into(mBinding.ivStagephoto);
                             }
                             mViewModel.loadTags().subscribe(new SimpleObserver<List<String>>() {
                                 @Override
                                 public void onAction(List<String> tagList) {
-                                    Context context=MovieDetailActivity.this;
-                                    int paddingTop=DensityUtil.dip2px(context,5);
-                                    int paddingLeft=DensityUtil.dip2px(context,11);
+                                    Context context = MovieDetailActivity.this;
+                                    int paddingTop = DensityUtil.dip2px(context, 5);
+                                    int paddingLeft = DensityUtil.dip2px(context, 11);
                                     mBinding.viewTags.removeAllViews();
-                                    for(String tag:tagList){
-                                        TextView textView=new TextView(context);
+                                    for (String tag : tagList) {
+                                        TextView textView = new TextView(context);
                                         textView.setText(tag);
                                         textView.setTextSize(20);
                                         textView.setTextColor(Color.parseColor("#FFCCCCCC"));
                                         textView.setBackground(getDrawable(R.drawable.detail_tag));
-                                        textView.setPadding(paddingLeft,paddingTop,paddingLeft,paddingTop);
-                                        LinearLayout.LayoutParams layoutParams=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-                                        layoutParams.rightMargin=DensityUtil.dip2px(context,23);
-                                        mBinding.viewTags.addView(textView,layoutParams);
+                                        textView.setPadding(paddingLeft, paddingTop, paddingLeft, paddingTop);
+                                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                        layoutParams.rightMargin = DensityUtil.dip2px(context, 23);
+                                        mBinding.viewTags.addView(textView, layoutParams);
                                     }
                                 }
                             });
-                            mViewModel.loadRecommand(mCurWrapper.genres).subscribe(new SimpleObserver<List<MovieDataView>>() {
-                                @Override
-                                public void onAction(List<MovieDataView> movieDataViewList) {
-                                    if(movieDataViewList!=null&&movieDataViewList.size()>0) {
-                                        mBinding.setRecommand(true);
-                                        mRecommandMovieAdapter.addAll(movieDataViewList);
-                                        mRecommandMovieAdapter.notifyDataSetChanged();
-                                    }else{
-                                        mBinding.setRecommand(false);
-                                    }
-                                }
-                            });
+                            mViewModel.loadRecommand()
+                                    .subscribe(new SimpleObserver<List<MovieDataView>>() {
+                                        @Override
+                                        public void onAction(List<MovieDataView> movieDataViewList) {
+                                            if (movieDataViewList != null && movieDataViewList.size() > 0) {
+                                                mBinding.setRecommand(true);
+                                                mRecommandMovieAdapter.addAll(movieDataViewList);
+                                                mRecommandMovieAdapter.notifyDataSetChanged();
+                                            } else {
+                                                mBinding.setRecommand(false);
+                                            }
+                                        }
+                                    });
                         }
                     }
 
@@ -255,39 +238,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         stopLoading();
                     }
                 });
-    }
-
-    /**
-     * 组合未识别文件数据
-     *
-     * @param keyword
-     */
-    private void prepareUnrecogizedFile(String keyword) {
-        mViewModel.loadUnrecogizedFile(keyword, unrecognizedFileDataViewList -> {
-            if (unrecognizedFileDataViewList != null && unrecognizedFileDataViewList.size() > 0) {
-                Glide.with(this).load(R.mipmap.default_poster).error(R.mipmap.default_poster).into(mBinding.ivStagephoto);
-                MovieWrapper movieWrapper = new MovieWrapper();
-                movieWrapper.videoFiles = new ArrayList<>();
-                StringBuffer stringBuffer = new StringBuffer();
-                unrecognizedFileDataViewList.sort((o1, o2) -> o1.filename.compareTo(o2.filename));
-                int i = 1;
-                for (UnrecognizedFileDataView dataView : unrecognizedFileDataViewList) {
-                    stringBuffer.append(i++ + ". " + dataView.filename + "\n");
-                    VideoFile videoFile = new VideoFile();
-                    videoFile.path = dataView.path;
-                    videoFile.filename = dataView.filename;
-                    videoFile.keyword = dataView.keyword;
-                    movieWrapper.videoFiles.add(videoFile);
-                }
-                stringBuffer.substring(0, stringBuffer.length() - 1);
-                movieWrapper.movie = new Movie();
-                movieWrapper.movie.title = keyword;
-                movieWrapper.movie.plot = stringBuffer.toString();
-                movieWrapper.movie.poster = "";
-
-                mBinding.setWrapper(movieWrapper);
-            }
-        });
     }
 
     @Override
@@ -317,27 +267,37 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private void editVideoInfo() {
         String keyword = mBinding.getWrapper().videoFiles.get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
-        movieSearchFragment.setOnSelectPosterListener((movie_id,source,type) -> {
+        movieSearchFragment.setOnSelectPosterListener((movie_id, source, type) -> {
             startLoading();
-            boolean is_favoirte = false;//默认收藏状态为false
-            if (mCurWrapper != null && mCurWrapper.movie != null) {
-                String last_movie_id = mCurWrapper.movie.movieId;
-                is_favoirte = mCurWrapper.movie.isFavorite;//获取当前收藏状态
-                //TODO 更正发送信息
-                BroadcastHelper.sendBroadcastMovieUpdateSync(this, last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
-            } else {
-                BroadcastHelper.sendBroadcastMovieAddSync(this, movie_id);//向手机助手发送添加电影的广播
-            }
             //选择新电影逻辑
-            mViewModel.selectMovie( movie_id,source,type, is_favoirte, movieWrapper -> {
-                if(movieWrapper.movie!=null) {
-                    prepareMovieWrapper(movieWrapper.movie.id);
-                    refreshParent();
-                }else{
-                    ToastUtil.newInstance(this).toast(getString(R.string.toast_selectmovie_faild));
-                }
-                stopLoading();
-            });
+            mViewModel.selectMovie(movie_id, source, type)
+                    .subscribe(new SimpleObserver<MovieWrapper>() {
+
+                        @Override
+                        public void onAction(MovieWrapper movieWrapper) {
+                            if (movieWrapper.movie != null) {
+                                prepareMovieWrapper(movieWrapper.movie.id);
+                                refreshParent();
+                            } else {
+                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                            }
+                            stopLoading();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            e.printStackTrace();
+                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                            stopLoading();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            stopLoading();
+                        }
+                    });
         });
         movieSearchFragment.show(getSupportFragmentManager(), "");
     }
@@ -346,18 +306,17 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     /**
      * 切换收藏状态
      */
-    private void toggleFavroite() {
-        mViewModel.setFavorite(mBinding.getWrapper(), args -> {
-            if (args[0] != null && mCurWrapper != null && mCurWrapper.movie != null) {
-                boolean isFavorite = (boolean) args[0];
-                String movie_id = mCurWrapper.movie.movieId;
-                int is_favorite = isFavorite == true ? 1 : 0;
-                BroadcastHelper.sendBroadcastMovieUpdateSync(this, movie_id, movie_id, is_favorite);//向手机助手发送电影更改的广播
-                mCurWrapper.movie.isFavorite = isFavorite;
-                mBinding.btnFavorite.setSelected(isFavorite);
-                refreshParent();
-            }
-        });
+    private void toggleLike() {
+        mViewModel.toggleLike()
+                .subscribe(new SimpleObserver<Boolean>() {
+                    @Override
+                    public void onAction(Boolean isFavorite) {
+                        MovieWrapper wrapper = mViewModel.getMovieWrapper();
+                        BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
+                        mBinding.btnFavorite.setSelected(isFavorite);
+                        refreshParent();
+                    }
+                });
     }
 
     public void showRadioDialog() {
@@ -383,9 +342,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
 
-    public void showViewMoreDialog(){
-        MovieDetialPlotDialog dialog=MovieDetialPlotDialog.newInstance(mBinding.nestScrollview);
-        dialog.show(getSupportFragmentManager(),"");
+    public void showViewMoreDialog() {
+        MovieDetialPlotDialog dialog = MovieDetialPlotDialog.newInstance(mBinding.nestScrollview);
+        dialog.show(getSupportFragmentManager(), "");
     }
 
     private void playVideo(String path, String name) {

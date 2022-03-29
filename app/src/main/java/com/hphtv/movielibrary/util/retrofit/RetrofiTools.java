@@ -6,7 +6,6 @@ import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
 import com.station.device.TokenHelper;
 
 import java.io.IOException;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
@@ -41,7 +40,7 @@ public class RetrofiTools {
                 .baseUrl(TmdbURL.BASE_URL_CN)
                 .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .client(getOkHttpClient())
+                .client(getOkHttpClient(AuthHelper.sPreToken))
                 .build();
     }
 
@@ -50,11 +49,11 @@ public class RetrofiTools {
                 .baseUrl(TmdbURL.BASE_URL_EN)
                 .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                .client(getOkHttpClient())
+                .client(getOkHttpClient(AuthHelper.sPreTokenEN))
                 .build();
     }
 
-    private static OkHttpClient getOkHttpClient() {
+    private static OkHttpClient getOkHttpClient(String token) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         return builder.readTimeout(30, TimeUnit.SECONDS)
                 .addInterceptor(new Interceptor() {
@@ -62,7 +61,7 @@ public class RetrofiTools {
                     public Response intercept(Chain chain) throws IOException {
                         Request request = chain.request()
                                 .newBuilder()
-                                .addHeader("token", AuthHelper.sToken)
+                                .addHeader("token", token)
                                 .addHeader("client", "device")
                                 .build();
                         return chain.proceed(request);

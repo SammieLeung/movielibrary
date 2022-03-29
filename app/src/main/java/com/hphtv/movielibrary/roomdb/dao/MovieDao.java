@@ -7,6 +7,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
+import androidx.room.Update;
 
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
@@ -28,6 +29,8 @@ public interface MovieDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertOrIgnoreMovie(Movie movie);
 
+    @Update
+    public int update(Movie movie);
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source")
     public Movie queryByMovieId(String movie_id, String source);
