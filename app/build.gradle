@@ -71,10 +71,17 @@ android {
         dataBinding = true
     }
 
-    sourceSets {
-        // Adds exported schema location as test app assets.
-        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+//    sourceSets {
+//        // Adds exported schema location as test app assets.
+//        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+//    }
+    sourceSets{
+        main{
+            jniLibs.srcDir(['libs'])
+            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        }
     }
+
 }
 
 dependencies {
@@ -126,6 +133,5 @@ dependencies {
     implementation project(':dlna')
     implementation project(':VideoNameParser')
     implementation project(':stationKit')
-
 
 }

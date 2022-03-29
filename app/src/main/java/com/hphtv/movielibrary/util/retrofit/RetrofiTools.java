@@ -1,12 +1,18 @@
 package com.hphtv.movielibrary.util.retrofit;
 
+import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.scraper.api.tmdb.TmdbURL;
 import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
+import com.station.device.TokenHelper;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -51,6 +57,17 @@ public class RetrofiTools {
     private static OkHttpClient getOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         return builder.readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request()
+                                .newBuilder()
+                                .addHeader("token", AuthHelper.sToken)
+                                .addHeader("client", "device")
+                                .build();
+                        return chain.proceed(request);
+                    }
+                })
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .build();
