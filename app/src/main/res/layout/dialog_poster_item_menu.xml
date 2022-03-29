@@ -6,7 +6,13 @@
     <data>
         <import type="androidx.databinding.ObservableField"/>
         <import type="androidx.databinding.ObservableBoolean"/>
-
+        <import type="android.view.View"/>
+        <variable
+            name="keyword"
+            type="String" />
+        <variable
+            name="isMatched"
+            type="ObservableBoolean" />
         <variable
             name="ap"
             type="ObservableField&lt;String>" />
@@ -44,7 +50,18 @@
             android:gravity="center"
             android:orientation="vertical">
 
+            <TextView
+                style="@style/common_content_text_style"
+                android:visibility="@{!isMatched?View.VISIBLE:View.GONE}"
+                android:text="@{keyword}"
+                android:layout_width="481dp"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
+                android:paddingRight="@dimen/postermenu_subitem_padding_lr"
+                android:layout_marginBottom="70dp"/>
             <include
+                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
                 android:id="@+id/include_ap"
                 layout="@layout/postermenu_options_item"
                 style="@style/poster_menu_sub_item_size"
@@ -70,6 +87,7 @@
                 android:layout_marginBottom="17dp"
                 tools:ignore="IncludeLayoutParam" />
             <include
+                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
                 app:checkstate="@{likeState}"
                 app:title="@{@string/postermenu_mark_as_like}"
                 android:id="@+id/include_favorite"
@@ -78,6 +96,7 @@
                 android:layout_marginBottom="17dp"
                 tools:ignore="IncludeLayoutParam" />
             <include
+                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
                 app:title="@{@string/postermenu_clear_poster}"
                 android:id="@+id/include_clear_poster"
                 layout="@layout/postermenu_more_item"
@@ -86,6 +105,7 @@
                 tools:ignore="IncludeLayoutParam" />
 
             <include
+                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
                 app:title="@{@string/postermenu_add_to_videotag}"
                 app:stateText="@{tags}"
                 android:id="@+id/include_add_videotag"

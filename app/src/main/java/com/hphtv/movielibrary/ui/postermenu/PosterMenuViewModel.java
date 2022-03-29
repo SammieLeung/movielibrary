@@ -10,16 +10,24 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideoTagCrossRefDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieDataViewWithVdieoTags;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -30,23 +38,38 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class PosterMenuViewModel extends BaseAndroidViewModel {
     private MovieDataView mMovieDataView;
     private MovieVideoTagCrossRefDao mMovieVideoTagCrossRefDao;
+    private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
+    private MovieDao mMovieDao;
+
+    private ObservableBoolean mMatchedFlag=new ObservableBoolean();
 
     private ObservableField<String> mAccessRights = new ObservableField<>();
     private ObservableBoolean mWatchedFlag = new ObservableBoolean(), mLikeFlag = new ObservableBoolean();
     private ObservableField<String> mTagString = new ObservableField<>();
 
+    private boolean mRefreshFlag = false;
+
     public PosterMenuViewModel(@NonNull @NotNull Application application) {
         super(application);
         mMovieVideoTagCrossRefDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieVideoTagCrossRefDao();
+        mMovieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieVideofileCrossRefDao();
+        mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
     }
 
+    /**
+     * 读取movieDataView信息
+     *
+     * @param movieDataView
+     * @return
+     */
     public Observable<MovieDataView> loadMovieProperty(MovieDataView movieDataView) {
-       return Observable.just(movieDataView)
+        return Observable.just(movieDataView)
                 .doOnNext(new Consumer<MovieDataView>() {
                     @Override
                     public void accept(MovieDataView movieDataView) throws Throwable {
+                        mMatchedFlag.set(true);
                         mMovieDataView = movieDataView;
-                        if(mMovieDataView.ap!=null) {
+                        if (mMovieDataView.ap != null) {
                             switch (mMovieDataView.ap) {
                                 case ALL_AGE:
                                     mAccessRights.set(getString(R.string.shortcut_access_all_ages));
@@ -55,7 +78,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                                     mAccessRights.set(getString(R.string.shortcut_access_adult_only));
                                     break;
                             }
-                        }else if(mMovieDataView.s_ap!=null){
+                        } else if (mMovieDataView.s_ap != null) {
                             switch (mMovieDataView.s_ap) {
                                 case ALL_AGE:
                                     mAccessRights.set(getString(R.string.shortcut_access_all_ages));
@@ -88,11 +111,79 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                             }
                         }
 
-                        mTagString.set(stringBuffer.deleteCharAt(stringBuffer.length()-1).toString());
+                        mTagString.set(stringBuffer.deleteCharAt(stringBuffer.length() - 1).toString());
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * 切换观看权限
+     */
+    public void toggleAccessRights() {
+        Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+            Constants.AccessPermission accessPermission = null;
+            if (mMovieDataView.ap != null)
+                accessPermission = mMovieDataView.ap;
+            else
+                accessPermission = mMovieDataView.s_ap;
+            if (accessPermission.equals(Constants.AccessPermission.ADULT))
+                accessPermission = Constants.AccessPermission.ALL_AGE;
+            else
+                accessPermission = Constants.AccessPermission.ADULT;
+            mMovieDataView.ap = accessPermission;
+            mMovieDao.updateAccessPermission(mMovieDataView.movie_id, mMovieDataView.ap);
+
+            emitter.onNext(mMovieDataView);
+            emitter.onComplete();
+        })
+                .subscribeOn(Schedulers.single())
+                .subscribe(movieDataView -> {
+                    switch (mMovieDataView.ap) {
+                        case ALL_AGE:
+                            mAccessRights.set(getString(R.string.shortcut_access_all_ages));
+                            break;
+                        case ADULT:
+                            mAccessRights.set(getString(R.string.shortcut_access_adult_only));
+                            break;
+                    }
+                    mRefreshFlag = true;
+                });
+    }
+
+    public void toggleLike() {
+        Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+            mMovieDataView.is_favorite = !mMovieDataView.is_favorite;
+
+            mMovieDao.updateFavoriteStateByMovieId(mMovieDataView.is_favorite, mMovieDataView.movie_id);
+
+            emitter.onNext(mMovieDataView);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.single())
+                .subscribe(movieDataView -> {
+                    mLikeFlag.set(mMovieDataView.is_favorite);
+                    mRefreshFlag = true;
+                });
+    }
+
+    public Observable<MovieDataView> clearMovieInfo() {
+        return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+            mMatchedFlag.set(false);
+            List<Movie> movieList = mMovieDao.queryByMovieId(mMovieDataView.movie_id);
+            for (Movie movie : movieList) {
+                mMovieVideofileCrossRefDao.deleteById(movie.id);
+            }
+            mMovieDao.updateFavoriteStateByMovieId(false, mMovieDataView.movie_id);//电影的收藏状态在删除时要设置为false
+            mRefreshFlag = true;
+            emitter.onNext(mMovieDataView);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.single())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public ObservableBoolean getMatchedFlag() {
+        return mMatchedFlag;
     }
 
     public ObservableField<String> getAccessRights() {

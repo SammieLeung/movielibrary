@@ -51,19 +51,23 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     public void onStart() {
         super.onStart();
         mViewModel.loadMovieProperty((MovieDataView) getArguments().getSerializable("movie"))
-        .subscribe(new Consumer<MovieDataView>() {
-            @Override
-            public void accept(MovieDataView movieDataView) throws Throwable {
-                GlideTools.GlideWrapper(getContext(),movieDataView.poster).placeholder(R.mipmap.default_poster).into(mBinding.image);
-            }
-        });
+        .subscribe(movieDataView ->
+                GlideTools.GlideWrapper(getContext(),movieDataView.poster)
+                        .placeholder(R.mipmap.default_poster)
+                        .into(mBinding.image));
     }
 
     private void initView(){
+        mBinding.includeAp.view.setOnClickListener(v->mViewModel.toggleAccessRights());
+        mBinding.includeFavorite.view.setOnClickListener(v->mViewModel.toggleLike());
+        mBinding.includeAddVideotag.view.setOnClickListener(v -> {});
+        mBinding.includeSelectPoster.view.setOnClickListener(v -> {});
+        mBinding.includeClearPoster.view.setOnClickListener(v -> {});
 
     }
 
     private void bindDatas(){
+        mBinding.setIsMatched(mViewModel.getMatchedFlag());
         mBinding.setAp(mViewModel.getAccessRights());
         mBinding.setLikeState(mViewModel.getLikeFlag());
         mBinding.setTags(mViewModel.getTagString());

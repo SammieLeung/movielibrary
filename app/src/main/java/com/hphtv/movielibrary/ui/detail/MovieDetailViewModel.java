@@ -61,7 +61,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2021/6/15
  */
 public class MovieDetailViewModel extends BaseAndroidViewModel {
-    public static final int LIMIT=10;
+    public static final int LIMIT = 10;
 
     public static final String FROM_DB = "from_db";
     public static final String FROM_NETWORK = "from_network";
@@ -148,7 +148,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             genreName.add(genre.name);
                         }
                         List<MovieDataView> dataViewList = new ArrayList<>();
-                        dataViewList.addAll(mMovieDao.queryRecommand(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), genreName, mMovieWrapper.movie.id,0,10));
+                        dataViewList.addAll(mMovieDao.queryRecommand(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), genreName, mMovieWrapper.movie.id, 0, 10));
                         return dataViewList;
                     }
                 })
@@ -161,7 +161,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .map(movieWrapper -> {
                     List<String> tagList = new ArrayList<>();
                     if (!TextUtils.isEmpty(movieWrapper.movie.region)) {
-                        Locale locale=new Locale.Builder().setRegion(movieWrapper.movie.region).build();
+                        Locale locale = new Locale.Builder().setRegion(movieWrapper.movie.region).build();
                         tagList.add(locale.getDisplayName());
                     }
                     if (movieWrapper.genres.size() > 0) {
@@ -182,10 +182,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     @Override
                     public Boolean apply(MovieWrapper wrapper) throws Throwable {
                         boolean isFavorite = !wrapper.movie.isFavorite;
-                        long id = wrapper.movie.id;
-                        mMovieDao.updateFavoriteState(isFavorite, id);
-                        boolean is_favorite = mMovieDao.queryFavorite(id);
-                        return is_favorite;
+                        String movieId = wrapper.movie.movieId;
+                        mMovieDao.updateFavoriteStateByMovieId(isFavorite, movieId);
+                        return isFavorite;
                     }
                 })
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
@@ -197,7 +196,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     }
 
     public void playingVideo(String path, String name) {
-        getApplication().playingMovie(path,name)
+        getApplication().playingMovie(path, name)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
@@ -209,10 +208,13 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return Observable.just("")
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(s -> {
-                    long id = mMovieWrapper.movie.id;
                     String movie_id = mMovieWrapper.movie.movieId;
-                    mMovieVideofileCrossRefDao.deleteById(id);
-                    mMovieDao.updateFavoriteState(false, id);//电影的收藏状态在删除时要设置为false
+
+                    List<Movie> movieList=mMovieDao.queryByMovieId(movie_id);
+                    for(Movie movie:movieList){
+                        mMovieVideofileCrossRefDao.deleteById(movie.id);
+                    }
+                    mMovieDao.updateFavoriteStateByMovieId(false, movie_id);//电影的收藏状态在删除时要设置为false
                     return movie_id;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
@@ -255,7 +257,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     }
                     List<VideoFile> videoFiles = mVideoFileDao.queryByPaths(paths);
                     wrapper.videoFiles = videoFiles;
-                    ActivityHelper.saveMatchedMovieWrapper(getApplication(),wrapper,videoFiles,source);
+                    ActivityHelper.saveMatchedMovieWrapper(getApplication(), wrapper, videoFiles, source);
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<MovieWrapper>() {

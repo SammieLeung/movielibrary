@@ -54,6 +54,7 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
             Glide.with(mContext).load(R.mipmap.default_poster).into(binding.rvPoster);
         binding.setTitle(movieDataView.title);
         binding.setRating(movieDataView.ratings);
+        binding.setLike(movieDataView.is_favorite);
     }
 
 
