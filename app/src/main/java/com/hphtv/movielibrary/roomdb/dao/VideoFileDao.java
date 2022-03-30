@@ -83,6 +83,12 @@ public interface VideoFileDao {
     @Query("DELETE FROM " + TABLE.VIDEOFILE)
     public void deleteAll();
 
+    @Query("DELETE FROM " + TABLE.VIDEOFILE+" WHERE dir_path=:dirPath")
+    public void deleteVideoFilesOnShortcut(String dirPath);
+
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE dir_path=:dirPath")
+    public List<VideoFile> queryVideoFilesOnShortcut(String dirPath);
+
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE :currentTime - add_time > 604800000 ")
     public int deleteOutdated(long currentTime);
 

@@ -10,16 +10,20 @@ import androidx.lifecycle.AndroidViewModel;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.ScanDirectoryDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -35,6 +39,8 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
     public static final String TAG = ShortcutManagerViewModel.class.getSimpleName();
     private DeviceDao mDeviceDao;
     private ShortcutDao mShortcutDao;
+    private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
+    private VideoFileDao mVideoFileDao;
     private List<Shortcut> mShortcutList;
 
 
@@ -43,6 +49,8 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
         MovieLibraryRoomDatabase roomDatabase = MovieLibraryRoomDatabase.getDatabase(application);
         mDeviceDao = roomDatabase.getDeviceDao();
         mShortcutDao = roomDatabase.getShortcutDao();
+        mMovieVideofileCrossRefDao=roomDatabase.getMovieVideofileCrossRefDao();
+        mVideoFileDao=roomDatabase.getVideoFileDao();
     }
 
     /**
@@ -129,6 +137,14 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .map(_shortcut -> {
                     mShortcutDao.delete(_shortcut);
+                    List<VideoFile> videoFileList=mVideoFileDao.queryVideoFilesOnShortcut(_shortcut.uri);
+                    List<String> paths=new ArrayList<>();
+                    for(VideoFile videoFile:videoFileList){
+                        paths.add(videoFile.path);
+                    }
+                    mVideoFileDao.deleteVideoFilesOnShortcut(_shortcut.uri);
+                    mMovieVideofileCrossRefDao.deleteByPaths(paths);
+
                     return _shortcut;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
