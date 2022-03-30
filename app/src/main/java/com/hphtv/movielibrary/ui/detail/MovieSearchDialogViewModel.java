@@ -8,7 +8,7 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
+import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;

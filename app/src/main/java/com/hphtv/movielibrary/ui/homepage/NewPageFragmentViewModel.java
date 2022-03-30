@@ -22,6 +22,7 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.ui.homepage.genretag.GenreTagItem;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -79,7 +80,7 @@ public class NewPageFragmentViewModel extends BaseAndroidViewModel {
     }
 
     public void playingVideo(String path, String name, Callback callback) {
-        getApplication().playingMovie(path, name)
+        MovieHelper.playingMovie(path, name)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {

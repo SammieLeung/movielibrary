@@ -1,18 +1,14 @@
-package com.hphtv.movielibrary.scraper.api.tmdb;
+package com.hphtv.movielibrary.scraper.service;
 
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
+import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
 
-import java.util.List;
-import java.util.Locale;
-
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.BiFunction;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -59,13 +55,13 @@ public class TmdbApiService {
 
     public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String api, String type, String year) {
         keyword = keyword.trim();
-        TmdbApiRequest request = RetrofiTools.createTmdbApiRequest();
+        StationMovieProtocol request = RetrofiTools.createRequest();
         switch (api) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createTmdbApiRequest();
+                request = RetrofiTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createTmdbApiRequest_EN();
+                request = RetrofiTools.createENRequest();
                 break;
         }
         PostSearchRequetBody body = new PostSearchRequetBody(keyword, pageIndex, type, year);
@@ -74,13 +70,13 @@ public class TmdbApiService {
     }
 
     public static Observable<MovieDetailRespone> getDetail(String movieId, String api, String type) {
-        TmdbApiRequest request = RetrofiTools.createTmdbApiRequest();
+        StationMovieProtocol request = RetrofiTools.createRequest();
         switch (api) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createTmdbApiRequest();
+                request = RetrofiTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createTmdbApiRequest_EN();
+                request = RetrofiTools.createENRequest();
                 break;
         }
         PostDetailRequetBody body = new PostDetailRequetBody(movieId,type);

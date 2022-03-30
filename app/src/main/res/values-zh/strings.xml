@@ -196,4 +196,6 @@
     <string name="device_sdcard_name">TF卡 (%1$s)</string>
     <string name="device_ssd_name">M.2 SSD (%1$s)</string>
     <string name="device_harddisk_name">硬盘 (%1$s)</string>
+    <string name="device_smb">SMB设备</string>
+    <string name="device_DLNA">DLNA设备</string>
 </resources>

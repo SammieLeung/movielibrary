@@ -12,24 +12,49 @@ import com.hphtv.movielibrary.roomdb.entity.Device;
  */
 public class FormatterTools {
 
-    public static String getDeviceName(Context context,Device device){
+    public static String getDeviceName(Context context, Device device) {
         String name = device.name;
         switch (device.type) {
             case Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE:
-                return getString(context,R.string.device_internal_storage);
+                return getString(context, R.string.device_internal_storage);
             case Constants.DeviceType.DEVICE_TYPE_USB:
-                return getString(context,R.string.device_udisk_name, device.name);
+                return getString(context, R.string.device_udisk_name, device.name);
             case Constants.DeviceType.DEVICE_TYPE_SDCARDS:
-                return getString(context,R.string.device_sdcard_name, device.name);
+                return getString(context, R.string.device_sdcard_name, device.name);
             case Constants.DeviceType.DEVICE_TYPE_HARD_DISK:
-                return getString(context,R.string.device_harddisk_name, device.name);
+                return getString(context, R.string.device_harddisk_name, device.name);
             case Constants.DeviceType.DEVICE_TYPE_PCIE:
-                return getString(context,R.string.device_ssd_name, device.name);
+                return getString(context, R.string.device_ssd_name, device.name);
+            case Constants.DeviceType.DEVICE_TYPE_DLNA:
+                return getString(context, R.string.device_DLNA);
+            case Constants.DeviceType.DEVICE_TYPE_SMB:
+                return getString(context, R.string.device_smb);
         }
+
         return name;
     }
 
-    public static String getString(Context context, int res, Object... args){
-        return String.format(context.getString(res),args) ;
+    public static String getTypeName(Context context,Device device){
+            switch (device.type) {
+                case Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE:
+                    return getString(context, R.string.device_internal_storage);
+                case Constants.DeviceType.DEVICE_TYPE_USB:
+                    return getString(context, R.string.device_udisk_name, device.name);
+                case Constants.DeviceType.DEVICE_TYPE_SDCARDS:
+                    return getString(context, R.string.device_sdcard_name, device.name);
+                case Constants.DeviceType.DEVICE_TYPE_HARD_DISK:
+                    return getString(context, R.string.device_harddisk_name, device.name);
+                case Constants.DeviceType.DEVICE_TYPE_PCIE:
+                    return getString(context, R.string.device_ssd_name, device.name);
+                case Constants.DeviceType.DEVICE_TYPE_DLNA:
+                    return getString(context, R.string.device_DLNA);
+                case Constants.DeviceType.DEVICE_TYPE_SMB:
+                    return getString(context, R.string.device_smb);
+            }
+            return getString(context,R.string.unknow);
+    }
+
+    public static String getString(Context context, int res, Object... args) {
+        return String.format(context.getString(res), args);
     }
 }

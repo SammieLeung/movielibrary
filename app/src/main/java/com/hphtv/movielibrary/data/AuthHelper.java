@@ -11,10 +11,12 @@ public class AuthHelper {
     public static String sTokenEN="";
     public static String sPreToken="";
     public static String sPreTokenEN="";
+    public static String sTestToken="";
     static {
         sToken=TokenHelper.getToken(TokenHelper.CN);
         sTokenEN=TokenHelper.getToken(TokenHelper.EN);
         sPreToken=TokenHelper.getToken(TokenHelper.PRE_CN);
         sPreTokenEN=TokenHelper.getToken(TokenHelper.PRE_EN);
+        sTestToken=TokenHelper.getToken(TokenHelper.TEST);
     }
 }

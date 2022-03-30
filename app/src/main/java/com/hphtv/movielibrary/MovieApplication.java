@@ -10,6 +10,7 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.VideoPlayTools;
@@ -76,23 +77,5 @@ public class MovieApplication extends Application {
         return sMovieApplication;
     }
 
-    public Observable<String> playingMovie(String path, String name) {
-      return  Observable.just(path)
-                .subscribeOn(Schedulers.io())
-                //记录播放时间，作为播放记录
-                .doOnNext(filepath -> {
-                    VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(this).getVideoFileDao();
-                    MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(this).getMovieDao();
 
-                    long currentTime = System.currentTimeMillis();
-                    videoFileDao.updateLastPlaytime(filepath, currentTime);
-                    Movie movie = movieDao.queryByFilePath(filepath, ScraperSourceTools.getSource());
-                    if (movie != null)
-                        movieDao.updateLastPlaytime(movie.movieId, currentTime);
-                    String poster = videoFileDao.getPoster(filepath,  ScraperSourceTools.getSource());
-                    SharePreferencesTools.getInstance(this).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(s -> VideoPlayTools.play(MovieApplication.this, path, name));
-    }
 }

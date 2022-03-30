@@ -18,6 +18,7 @@ import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieDataViewWithVdieoTags;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -155,9 +156,9 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
     public void toggleLike() {
         Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
             mMovieDataView.is_favorite = !mMovieDataView.is_favorite;
-
             mMovieDao.updateFavoriteStateByMovieId(mMovieDataView.is_favorite, mMovieDataView.movie_id);
-
+            OnlineDBApiService.updateLike(mMovieDataView.movie_id,mMovieDataView.is_favorite,Constants.Scraper.TMDB);
+            OnlineDBApiService.updateLike(mMovieDataView.movie_id,mMovieDataView.is_favorite,Constants.Scraper.TMDB_EN);
             emitter.onNext(mMovieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())

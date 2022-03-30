@@ -1,9 +1,9 @@
 package com.hphtv.movielibrary.util.retrofit;
 
 import com.hphtv.movielibrary.data.AuthHelper;
-import com.hphtv.movielibrary.scraper.api.tmdb.TmdbURL;
-import com.hphtv.movielibrary.scraper.api.tmdb.request.TmdbApiRequest;
-import com.station.device.TokenHelper;
+import com.hphtv.movielibrary.scraper.api.BaseUrl;
+import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
+import com.station.device.StationDeviceTool;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -21,35 +21,86 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * date:  21-5-13
  */
 public class RetrofiTools {
+    public static final int TEST = 0;
+    public static final int RELEASE = 1;
+    public static final int PRE = 2;
+    private static int mode = TEST;
 
     private RetrofiTools() {
 
     }
 
 
-    public static TmdbApiRequest createTmdbApiRequest() {
-        return TmdbRetrofitBuilder().create(TmdbApiRequest.class);
+    public static StationMovieProtocol createRequest() {
+        switch (mode) {
+            case TEST:
+                return RetrofitTestBuilder().create(StationMovieProtocol.class);
+            case PRE:
+                return PreRetrofitBuilder().create(StationMovieProtocol.class);
+            default:
+                return RetrofitBuilder().create(StationMovieProtocol.class);
+        }
     }
 
-    public static TmdbApiRequest createTmdbApiRequest_EN() {
-        return TmdbRetrofitBuilder_EN().create(TmdbApiRequest.class);
+    public static StationMovieProtocol createENRequest() {
+        switch (mode) {
+            case TEST:
+                return RetrofitTestBuilder().create(StationMovieProtocol.class);
+            case PRE:
+                return PreRetrofitENBuilder().create(StationMovieProtocol.class);
+            default:
+                return RetrofitENBuilder().create(StationMovieProtocol.class);
+        }
     }
 
-    private static Retrofit TmdbRetrofitBuilder() {
+    //正式-中文
+    private static Retrofit RetrofitBuilder() {
         return new Retrofit.Builder()
-                .baseUrl(TmdbURL.BASE_URL_CN)
+                .baseUrl(BaseUrl.BASE_URL_CN)
+                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(getOkHttpClient(AuthHelper.sToken))
+                .build();
+    }
+
+    //正式-英语
+    private static Retrofit RetrofitENBuilder() {
+        return new Retrofit.Builder()
+                .baseUrl(BaseUrl.BASE_URL_EN)
+                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(getOkHttpClient(AuthHelper.sTokenEN))
+                .build();
+    }
+
+    //预发布-汉语
+    private static Retrofit PreRetrofitBuilder() {
+        return new Retrofit.Builder()
+                .baseUrl(BaseUrl.PRE_BASE_URL_CN)
                 .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(getOkHttpClient(AuthHelper.sPreToken))
                 .build();
     }
 
-    private static Retrofit TmdbRetrofitBuilder_EN() {
+    //预发布-英语
+    private static Retrofit PreRetrofitENBuilder() {
         return new Retrofit.Builder()
-                .baseUrl(TmdbURL.BASE_URL_EN)
+                .baseUrl(BaseUrl.PRE_BASE_URL_EN)
                 .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .client(getOkHttpClient(AuthHelper.sPreTokenEN))
+                .build();
+    }
+
+
+    //测试-中文
+    private static Retrofit RetrofitTestBuilder() {
+        return new Retrofit.Builder()
+                .baseUrl(BaseUrl.BASE_URL_TEST)
+                .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .client(getOkHttpClient(AuthHelper.sTestToken))
                 .build();
     }
 
@@ -63,6 +114,7 @@ public class RetrofiTools {
                                 .newBuilder()
                                 .addHeader("token", token)
                                 .addHeader("client", "device")
+                                .addHeader("devsn", StationDeviceTool.getDeviceSN())
                                 .build();
                         return chain.proceed(request);
                     }

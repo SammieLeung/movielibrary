@@ -8,6 +8,7 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -43,6 +44,6 @@ public class VideoSelectViewModel extends BaseAndroidViewModel {
     }
 
     public Observable<String> playVideo(String path,String name){
-        return getApplication().playingMovie(path,name);
+        return MovieHelper.playingMovie(path,name);
     }
 }

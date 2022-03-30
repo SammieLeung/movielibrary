@@ -11,10 +11,10 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
-import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
-import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.util.BroadcastHelper;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.StringTools;
 import com.hphtv.movielibrary.data.Constants;
@@ -28,7 +28,6 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.sql.Wrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -61,15 +60,20 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         super(application);
         mSingleThreadPool = Executors.newSingleThreadExecutor();
         mSource = ScraperSourceTools.getSource();
-        initData();
+        init();
     }
 
-    private void initData() {
+    private void init() {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
         mMovieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieVideofileCrossRefDao();
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
     }
 
+    /**
+     * 读取MovieWrapper
+     * @param id
+     * @return
+     */
     public Observable<MovieWrapper> loadMovieWrapper(long id) {
         return Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
@@ -81,6 +85,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     }
 
 
+    /**
+     * 获取推荐影片
+     * @return
+     */
     public Observable<List<MovieDataView>> loadRecommand() {
         return Observable.just(mMovieWrapper.genres)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
@@ -96,6 +104,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * 获取影片分类标签
+     * @return
+     */
     public Observable<List<String>> loadTags() {
         return Observable.just(mMovieWrapper)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
@@ -117,23 +129,35 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 }).observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * 设置收藏
+     * @param isLike
+     * @return
+     */
     public Observable<Boolean> setLike(boolean isLike) {
         return Observable.just(mMovieWrapper)
                 .map(wrapper -> {
                     boolean isFavorite = isLike;
                     String movieId = wrapper.movie.movieId;
                     mMovieDao.updateFavoriteStateByMovieId(isFavorite, movieId);
+                    OnlineDBApiService.updateLike(movieId,isFavorite,Constants.Scraper.TMDB);
+                    OnlineDBApiService.updateLike(movieId,isFavorite,Constants.Scraper.TMDB_EN);
                     return isFavorite;
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());
+
     }
 
+    /**
+     * 切换收藏
+     * @return
+     */
     public Observable<Boolean> toggleLike() {
         return setLike(!mMovieWrapper.movie.isFavorite);
     }
 
     public void playingVideo(String path, String name) {
-        getApplication().playingMovie(path, name)
+        MovieHelper.playingMovie(path, name)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
@@ -152,6 +176,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         mMovieVideofileCrossRefDao.deleteById(movie.id);
                     }
                     mMovieDao.updateFavoriteStateByMovieId(false, movie_id);//电影的收藏状态在删除时要设置为false
+                    OnlineDBApiService.deleteMovie(movie_id,ScraperSourceTools.getSource());
                     return movie_id;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
@@ -167,7 +192,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 boolean is_favoirte = mMovieWrapper.movie.isFavorite;
                 boolean is_watched = mMovieWrapper.movie.isWatched;
                 BroadcastHelper.sendBroadcastMovieUpdateSync(getApplication(), last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
-                ActivityHelper.saveMatchedMovieWrapper(getApplication(), wrapper, mMovieWrapper.videoFiles);
+                MovieHelper.saveMatchedMovieWrapper(getApplication(), wrapper, mMovieWrapper.videoFiles);
             } else {
                 throw new Throwable();
             }

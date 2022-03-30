@@ -19,12 +19,13 @@ import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
-import com.hphtv.movielibrary.scraper.api.tmdb.TmdbApiService;
+import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.FileScanUtil;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ServiceStatusHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.AppUtils;
@@ -245,7 +246,7 @@ public class MovieScanService extends Service {
                                                         if (respone != null) {
                                                             wrapper= respone.toEntity();
                                                             if (wrapper != null) {
-                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile);
+                                                                MovieHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile);
                                                             }else {
                                                                 LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
                                                             }
@@ -259,7 +260,7 @@ public class MovieScanService extends Service {
                                                         if (respone_en != null) {
                                                             wrapper_en = respone_en.toEntity();
                                                             if (wrapper_en != null) {
-                                                                ActivityHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile);
+                                                                MovieHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile);
                                                             }else {
                                                                 LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
                                                             }
