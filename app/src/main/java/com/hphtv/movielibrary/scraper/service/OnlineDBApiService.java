@@ -143,7 +143,7 @@ public class OnlineDBApiService {
         });
     }
 
-    public static void updateLike(String movie_id, boolean isFavorite, String source) {
+    public static void updateLike(String movie_id, boolean isFavorite, String source,String type) {
         StationMovieProtocol request = RetrofiTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
@@ -153,7 +153,7 @@ public class OnlineDBApiService {
                 request = RetrofiTools.createENRequest();
                 break;
         }
-        UpdateLikeRequestBody body = new UpdateLikeRequestBody(movie_id, isFavorite ? "1" : "0", source);
+        UpdateLikeRequestBody body = new UpdateLikeRequestBody(movie_id, isFavorite ? "1" : "0", type);
         Observable<BaseRespone> updateLikeRequest = request.updateLike(body);
         updateLikeRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override

@@ -10,6 +10,7 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.DialogPosterItemMenuBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
+import com.hphtv.movielibrary.ui.detail.ConfirmDeleteDialog;
 import com.hphtv.movielibrary.util.GlideTools;
 
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,9 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
         mBinding.includeFavorite.view.setOnClickListener(v->mViewModel.toggleLike());
         mBinding.includeAddVideotag.view.setOnClickListener(v -> {});
         mBinding.includeSelectPoster.view.setOnClickListener(v -> {});
-        mBinding.includeClearPoster.view.setOnClickListener(v -> {});
+        mBinding.includeClearPoster.view.setOnClickListener(v -> {
+
+        });
 
     }
 
@@ -72,5 +75,9 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
         mBinding.setLikeState(mViewModel.getLikeFlag());
         mBinding.setTags(mViewModel.getTagString());
         mBinding.setWatchedState(mViewModel.getWatchedFlag());
+    }
+
+    private void showDeleteConfirmDialog(){
+        ConfirmDeleteDialog confirmDeleteDialog=new ConfirmDeleteDialog();
     }
 }

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 
+import com.firefly.videonameparser.bean.Source;
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
@@ -19,6 +20,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieDataViewWithVdieoTags;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -157,8 +159,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
         Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
             mMovieDataView.is_favorite = !mMovieDataView.is_favorite;
             mMovieDao.updateFavoriteStateByMovieId(mMovieDataView.is_favorite, mMovieDataView.movie_id);
-            OnlineDBApiService.updateLike(mMovieDataView.movie_id,mMovieDataView.is_favorite,Constants.Scraper.TMDB);
-            OnlineDBApiService.updateLike(mMovieDataView.movie_id,mMovieDataView.is_favorite,Constants.Scraper.TMDB_EN);
+            OnlineDBApiService.updateLike(mMovieDataView.movie_id,mMovieDataView.is_favorite,ScraperSourceTools.getSource(),mMovieDataView.type.name());
             emitter.onNext(mMovieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
@@ -176,6 +177,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                 mMovieVideofileCrossRefDao.deleteById(movie.id);
             }
             mMovieDao.updateFavoriteStateByMovieId(false, mMovieDataView.movie_id);//电影的收藏状态在删除时要设置为false
+            OnlineDBApiService.deleteMovie(mMovieDataView.movie_id,ScraperSourceTools.getSource());
             mRefreshFlag = true;
             emitter.onNext(mMovieDataView);
             emitter.onComplete();
