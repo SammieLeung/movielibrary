@@ -5,6 +5,9 @@ import android.content.Intent;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.firefly.videonameparser.MovieNameInfo;
+import com.firefly.videonameparser.VideoNameParser;
+import com.firefly.videonameparser.bean.Source;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -15,6 +18,9 @@ import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.service.MovieScanService;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -189,9 +195,16 @@ public class LocalFileScanHelper {
                     videoFile.keyword = tVideoFile.keyword;
                     videoFile.addTime = System.currentTimeMillis();
                     videoFile.lastPlayTime = tVideoFile.lastPlayTime;
+                    videoFile.season=tVideoFile.season;
+                    videoFile.episode=tVideoFile.episode;
                     videoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();
+                    VideoNameParser parser=new VideoNameParser();
+                    MovieNameInfo info= parser.parseVideoName(videoFile.path);
+                    videoFile.keyword = info.getName();;
+                    videoFile.season = info.getSeason();
+                    videoFile.episode = info.toEpisode("0");
                     long id = videoFileDao.insertOrIgnore(videoFile);
                     videoFile.vid = id;
                 }

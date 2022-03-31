@@ -1,22 +1,17 @@
-package com.hphtv.movielibrary.ui.detail;
+package com.hphtv.movielibrary.ui.common;
 
-import android.content.BroadcastReceiver;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.ui.common.ConfirmDialog;
+import com.hphtv.movielibrary.ui.detail.MovieDetailViewModel;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.ref.WeakReference;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 
@@ -24,23 +19,31 @@ import io.reactivex.rxjava3.disposables.Disposable;
  * Created by tchip on 17-11-10.
  */
 
-public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
+public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
+    private ConfirmDeleteListener mConfirmDeleteListener;
 
     private String mMessage;
+    private String movieId;
 
-    public static ConfirmDeleteDialog newInstance() {
+    public static ConfirmDeleteDialog newInstance(String movie_id) {
 
         Bundle args = new Bundle();
 
         ConfirmDeleteDialog fragment = new ConfirmDeleteDialog();
+        args.putString("movie_id",movie_id);
         fragment.setArguments(args);
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.movieId=getArguments().getString("movie_id");
+    }
 
     @Override
-    protected MovieDetailViewModel createViewModel() {
-        return mViewModel = new ViewModelProvider(getActivity()).get(MovieDetailViewModel.class);
+    protected ConfirmDeleteViewModel createViewModel() {
+        return mViewModel = new ViewModelProvider(getActivity()).get(ConfirmDeleteViewModel.class);
     }
 
     public ConfirmDeleteDialog setMessage(String title) {
@@ -56,16 +59,13 @@ public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
 
     @Override
     public void confirm(View v) {
-        mViewModel.removeMovieWrapper()
+        mViewModel.removeMovieWrapper(this.movieId)
                 .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                    }
-
                     @Override
                     public void onAction(String movie_id) {
                         BroadcastHelper.sendBroadcastMovieRemoveSync(getContext(),movie_id);
+                        if(mConfirmDeleteListener!=null)
+                            mConfirmDeleteListener.confirmDelete(movie_id);
                         dismiss();
                     }
                 });
@@ -73,7 +73,17 @@ public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
 
     @Override
     public void cancel(View v) {
+        if(mConfirmDeleteListener!=null)
+            mConfirmDeleteListener.onDismiss();
         dismiss();
     }
 
+    public void setConfirmDeleteListener(ConfirmDeleteListener confirmDeleteListener) {
+        mConfirmDeleteListener = confirmDeleteListener;
+    }
+
+    public interface ConfirmDeleteListener{
+        void confirmDelete(String movie_id);
+        void onDismiss();
+    }
 }

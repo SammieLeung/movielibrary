@@ -19,6 +19,7 @@ import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
@@ -239,6 +240,7 @@ public class MovieScanService extends Service {
                                                         MovieDetailRespone respone = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB, type)
                                                                 .onErrorReturn(throwable -> {
                                                                     LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
+                                                                    OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
                                                                     return null;
                                                                 })
                                                                 .subscribeOn(Schedulers.io()).blockingFirst();
@@ -248,12 +250,14 @@ public class MovieScanService extends Service {
                                                             if (wrapper != null) {
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile);
                                                             }else {
+                                                                OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
                                                                 LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
                                                             }
                                                         }
                                                         MovieDetailRespone respone_en = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB_EN, type)
                                                                 .onErrorReturn(throwable -> {
                                                                     LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
+                                                                    OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
                                                                     return null;
                                                                 })
                                                                 .subscribeOn(Schedulers.io()).blockingFirst();
@@ -262,6 +266,7 @@ public class MovieScanService extends Service {
                                                             if (wrapper_en != null) {
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile);
                                                             }else {
+                                                                OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
                                                                 LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
                                                             }
                                                         }

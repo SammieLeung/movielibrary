@@ -8,14 +8,13 @@ import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.DialogPosterItemMenuBinding;
+import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.ui.detail.ConfirmDeleteDialog;
+import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
 import com.hphtv.movielibrary.util.GlideTools;
 
 import org.jetbrains.annotations.NotNull;
-
-import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * author: Sam Leung
@@ -26,7 +25,7 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     public static PosterMenuDialog newInstance(MovieDataView movieDataView) {
         Bundle args = new Bundle();
         PosterMenuDialog fragment = new PosterMenuDialog();
-        args.putSerializable("movie",movieDataView);
+        args.putSerializable("movie", movieDataView);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,24 +51,24 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     public void onStart() {
         super.onStart();
         mViewModel.loadMovieProperty((MovieDataView) getArguments().getSerializable("movie"))
-        .subscribe(movieDataView ->
-                GlideTools.GlideWrapper(getContext(),movieDataView.poster)
-                        .placeholder(R.mipmap.default_poster)
-                        .into(mBinding.image));
+                .subscribe(movieDataView ->
+                        GlideTools.GlideWrapper(getContext(), movieDataView.poster)
+                                .placeholder(R.mipmap.default_poster)
+                                .into(mBinding.image));
     }
 
-    private void initView(){
-        mBinding.includeAp.view.setOnClickListener(v->mViewModel.toggleAccessRights());
-        mBinding.includeFavorite.view.setOnClickListener(v->mViewModel.toggleLike());
-        mBinding.includeAddVideotag.view.setOnClickListener(v -> {});
-        mBinding.includeSelectPoster.view.setOnClickListener(v -> {});
-        mBinding.includeClearPoster.view.setOnClickListener(v -> {
-
+    private void initView() {
+        mBinding.includeAp.view.setOnClickListener(v -> mViewModel.toggleAccessRights());
+        mBinding.includeFavorite.view.setOnClickListener(v -> mViewModel.toggleLike());
+        mBinding.includeAddVideotag.view.setOnClickListener(v -> {
         });
+        mBinding.includeSelectPoster.view.setOnClickListener(v -> {
+        });
+        mBinding.includeClearPoster.view.setOnClickListener(v -> showDeleteConfirmDialog());
 
     }
 
-    private void bindDatas(){
+    private void bindDatas() {
         mBinding.setIsMatched(mViewModel.getMatchedFlag());
         mBinding.setAp(mViewModel.getAccessRights());
         mBinding.setLikeState(mViewModel.getLikeFlag());
@@ -77,7 +76,25 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
         mBinding.setWatchedState(mViewModel.getWatchedFlag());
     }
 
-    private void showDeleteConfirmDialog(){
-        ConfirmDeleteDialog confirmDeleteDialog=new ConfirmDeleteDialog();
+    private void showDeleteConfirmDialog() {
+        ConfirmDeleteDialog confirmDeleteDialog = ConfirmDeleteDialog.newInstance(mViewModel.getMovieDataView().movie_id);
+        confirmDeleteDialog.setMessage(getString(R.string.remove_confirm));
+        confirmDeleteDialog.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
+            @Override
+            public void confirmDelete(String movie_id) {
+                PosterMenuDialog.this.dismiss();
+                if(getActivity() instanceof OnMovieChangeListener){
+                    OnMovieChangeListener listener= (OnMovieChangeListener) getActivity();
+                    listener.OnMovieChange();
+                }
+            }
+
+            @Override
+            public void onDismiss() {
+                PosterMenuDialog.this.getDialog().show();
+            }
+        });
+        confirmDeleteDialog.show(getChildFragmentManager(),null);
+        getDialog().hide();
     }
 }

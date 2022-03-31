@@ -171,18 +171,22 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
 
     public Observable<MovieDataView> clearMovieInfo() {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            mMatchedFlag.set(false);
             List<Movie> movieList = mMovieDao.queryByMovieId(mMovieDataView.movie_id);
             for (Movie movie : movieList) {
                 mMovieVideofileCrossRefDao.deleteById(movie.id);
             }
             mMovieDao.updateFavoriteStateByMovieId(false, mMovieDataView.movie_id);//电影的收藏状态在删除时要设置为false
             OnlineDBApiService.deleteMovie(mMovieDataView.movie_id,ScraperSourceTools.getSource());
+            mMatchedFlag.set(false);
             mRefreshFlag = true;
             emitter.onNext(mMovieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public MovieDataView getMovieDataView() {
+        return mMovieDataView;
     }
 
     public ObservableBoolean getMatchedFlag() {
@@ -203,5 +207,13 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
 
     public ObservableField<String> getTagString() {
         return mTagString;
+    }
+
+    public boolean isRefreshFlag() {
+        return mRefreshFlag;
+    }
+
+    public void setRefreshFlag(boolean refreshFlag) {
+        mRefreshFlag = refreshFlag;
     }
 }

@@ -101,6 +101,33 @@ public class OnlineDBApiService {
         });
     }
 
+    public static void uploadFile(VideoFile videoFile,String source){
+        StationMovieProtocol request = RetrofiTools.createRequest();
+        switch (source) {
+            case Constants.Scraper.TMDB:
+                request = RetrofiTools.createRequest();
+                break;
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofiTools.createENRequest();
+                break;
+        }
+        String path = videoFile.path;
+        String keyword = videoFile.keyword;
+        String filename = videoFile.filename;
+        String storage = videoFile.devicePath;
+        String folder = videoFile.dirPath;
+        String duration = "0";
+        String current_point = "0";
+        UpdateMovieRequestBody body = new UpdateMovieRequestBody("0", null, path, keyword, filename, storage, folder, duration, current_point);
+        Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
+        updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
+            @Override
+            public void onAction(BaseRespone baseRespone) {
+                LogUtil.w("{uploadFile} "+Thread.currentThread().getName()+":"+baseRespone.code+": "+filename );
+            }
+        });
+    }
+
     public static void deleteMovie(String movie_id, String source) {
         StationMovieProtocol request = RetrofiTools.createRequest();
         switch (source) {

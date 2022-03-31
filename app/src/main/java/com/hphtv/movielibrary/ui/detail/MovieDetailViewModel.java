@@ -164,23 +164,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 });
     }
 
-    public Observable<String> removeMovieWrapper() {
-        return Observable.just("")
-                .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .map(s -> {
-                    String movie_id = mMovieWrapper.movie.movieId;
 
-                    List<Movie> movieList = mMovieDao.queryByMovieId(movie_id);
-                    for (Movie movie : movieList) {
-                        mMovieVideofileCrossRefDao.deleteById(movie.id);
-                    }
-                    mMovieDao.updateFavoriteStateByMovieId(false, movie_id);//电影的收藏状态在删除时要设置为false
-                    OnlineDBApiService.deleteMovie(movie_id,ScraperSourceTools.getSource());
-                    return movie_id;
-                })
-                .observeOn(AndroidSchedulers.mainThread());
-
-    }
 
     public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.SearchType type) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {

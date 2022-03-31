@@ -16,6 +16,7 @@ import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.databinding.ActivityFilterpageBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
@@ -32,7 +33,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/2/22
  */
-public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, ActivityFilterpageBinding> {
+public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, ActivityFilterpageBinding> implements OnMovieChangeListener {
     public static final String EXTRA_GENRE = "extra_genre";
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
@@ -166,4 +167,9 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
                 mMovieItemListAdapter.appendAll(movieDataViews);
         }
     };
+
+    @Override
+    public void OnMovieChange() {
+        reloadMoiveDataViews();
+    }
 }

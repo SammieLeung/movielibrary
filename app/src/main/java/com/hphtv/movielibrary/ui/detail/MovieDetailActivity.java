@@ -31,6 +31,7 @@ import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
@@ -49,20 +50,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public static final int REMOVE = 1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private NewMovieItemListAdapter mRecommandMovieAdapter;
-    private Handler mUIHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void dispatchMessage(@NonNull Message msg) {
-            super.dispatchMessage(msg);
-            switch (msg.what) {
-                case REMOVE:
-                    refreshParent();
-                    stopLoading();
-                    finish();
-                    Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
 
     //TODO 同步系统状态需要一个后台服务绑定
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -107,7 +94,21 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 }
                 break;
             case R.id.btn_remove:
-                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mUIHandler);
+                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mViewModel.getMovieWrapper().movie.movieId);
+                confirmDialogFragment.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
+                    @Override
+                    public void confirmDelete(String movie_id) {
+                        refreshParent();
+                        stopLoading();
+                        finish();
+                        Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onDismiss() {
+
+                    }
+                });
                 confirmDialogFragment.setMessage(getResources().getString(R.string.remove_confirm)).show(getSupportFragmentManager(), TAG);
                 break;
             case R.id.btn_favorite:
