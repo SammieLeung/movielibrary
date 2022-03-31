@@ -141,6 +141,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     String movieId = wrapper.movie.movieId;
                     mMovieDao.updateFavoriteStateByMovieId(isFavorite, movieId);
                     OnlineDBApiService.updateLike(movieId,isFavorite,ScraperSourceTools.getSource(),wrapper.movie.type.name());
+                    mMovieWrapper.movie.isFavorite=isLike;
                     return isFavorite;
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());

@@ -7,11 +7,11 @@ package com.hphtv.movielibrary.scraper.postbody;
 public class UpdateLikeRequestBody {
     public String movie_id;
     public String is_favorite;
-    public String source;
+    public String type;
 
-    public UpdateLikeRequestBody(String movie_id, String is_favorite, String source) {
+    public UpdateLikeRequestBody(String movie_id, String is_favorite, String type) {
         this.movie_id = movie_id;
         this.is_favorite = is_favorite;
-        this.source = source;
+        this.type = type;
     }
 }
