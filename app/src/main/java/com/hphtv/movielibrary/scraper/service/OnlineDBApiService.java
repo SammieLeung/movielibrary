@@ -14,6 +14,7 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
+import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateLikeRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateMovieRequestBody;
@@ -36,8 +37,8 @@ import io.reactivex.rxjava3.core.Observable;
 public class OnlineDBApiService {
     public static final String TAG = OnlineDBApiService.class.getSimpleName();
 
-    public static void uploadMovie(MovieWrapper movieWrapper,List<VideoFile> videoFileList, String source) {
-        Context context=MovieApplication.getInstance();
+    public static void uploadMovie(MovieWrapper movieWrapper, List<VideoFile> videoFileList, String source) {
+        Context context = MovieApplication.getInstance();
         StationMovieProtocol request = RetrofiTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
@@ -47,16 +48,16 @@ public class OnlineDBApiService {
                 request = RetrofiTools.createENRequest();
                 break;
         }
-        DeviceDao deviceDao= MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
+        DeviceDao deviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
         Movie movie = movieWrapper.movie;
         String movieId = movie.movieId;
         String type = movie.type.name();
         for (VideoFile videoFile : videoFileList) {
-            Device device=deviceDao.querybyMountPath(videoFile.devicePath);
+            Device device = deviceDao.querybyMountPath(videoFile.devicePath);
             String path = videoFile.path;
             String keyword = videoFile.keyword;
             String filename = videoFile.filename;
-            String storage = FormatterTools.getTypeName(context,device);
+            String storage = FormatterTools.getTypeName(context, device);
             String folder = videoFile.dirPath;
             String duration = "0";
             String current_point = "0";
@@ -65,7 +66,7 @@ public class OnlineDBApiService {
             updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
                 @Override
                 public void onAction(BaseRespone baseRespone) {
-                    LogUtil.w("{uploadMovie} "+baseRespone.code+": "+movieId+"<=>"+filename );
+                    LogUtil.w("{uploadMovie} " + baseRespone.code + ": " + movieId + "<=>" + filename);
                 }
             });
         }
@@ -96,12 +97,12 @@ public class OnlineDBApiService {
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{uploadMovie} "+baseRespone.code+": "+movieId+"<=>"+filename );
+                LogUtil.w("{uploadMovie} " + baseRespone.code + ": " + movieId + "<=>" + filename);
             }
         });
     }
 
-    public static void uploadFile(VideoFile videoFile,String source){
+    public static void uploadFile(VideoFile videoFile, String source) {
         StationMovieProtocol request = RetrofiTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
@@ -123,7 +124,7 @@ public class OnlineDBApiService {
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{uploadFile} "+Thread.currentThread().getName()+":"+baseRespone.code+": "+filename );
+                LogUtil.w("{uploadFile} " + Thread.currentThread().getName() + ":" + baseRespone.code + ": " + filename);
             }
         });
     }
@@ -144,7 +145,7 @@ public class OnlineDBApiService {
         deleteMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{deleteMovie} "+baseRespone.code+": "+movie_id );
+                LogUtil.w("{deleteMovie} " + baseRespone.code + ": " + movie_id);
             }
         });
     }
@@ -165,12 +166,12 @@ public class OnlineDBApiService {
         updateHistoryRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{updateHistory} "+baseRespone.code+": "+path );
+                LogUtil.w("{updateHistory} " + baseRespone.code + ": " + path);
             }
         });
     }
 
-    public static void updateLike(String movie_id, boolean isFavorite, String source,String type) {
+    public static void updateLike(String movie_id, boolean isFavorite, String source, String type) {
         StationMovieProtocol request = RetrofiTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
@@ -185,7 +186,27 @@ public class OnlineDBApiService {
         updateLikeRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{updateLike} "+baseRespone.code+": "+movie_id );
+                LogUtil.w("{updateLike} " + baseRespone.code + ": " + movie_id);
+            }
+        });
+    }
+
+    public static void removeFolder(String dir_path, String source) {
+        StationMovieProtocol request = RetrofiTools.createRequest();
+        switch (source) {
+            case Constants.Scraper.TMDB:
+                request = RetrofiTools.createRequest();
+                break;
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofiTools.createENRequest();
+                break;
+        }
+        RemoveFolderRequestBody body = new RemoveFolderRequestBody(dir_path);
+        Observable<BaseRespone> removeFolderRequest = request.removeShortcut(body);
+        removeFolderRequest.subscribe(new SimpleObserver<BaseRespone>() {
+            @Override
+            public void onAction(BaseRespone baseRespone) {
+                LogUtil.w("{removeFolder} " +Thread.currentThread().getName()+" "+ baseRespone.code + ": " + dir_path);
             }
         });
     }

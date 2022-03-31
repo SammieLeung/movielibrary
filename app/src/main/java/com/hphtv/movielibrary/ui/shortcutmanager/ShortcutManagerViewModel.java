@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.firefly.videonameparser.bean.Source;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -17,6 +18,8 @@ import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
@@ -144,7 +147,7 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                     }
                     mVideoFileDao.deleteVideoFilesOnShortcut(_shortcut.uri);
                     mMovieVideofileCrossRefDao.deleteByPaths(paths);
-
+                    OnlineDBApiService.removeFolder(_shortcut.uri, ScraperSourceTools.getSource());
                     return _shortcut;
                 })
                 .observeOn(AndroidSchedulers.mainThread());

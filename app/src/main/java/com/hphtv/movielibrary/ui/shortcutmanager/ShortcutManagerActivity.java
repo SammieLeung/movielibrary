@@ -31,6 +31,7 @@ import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsDialog;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.scan.ShortcutScanDialog;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.LogUtil;
 
 import java.util.HashSet;
 import java.util.List;

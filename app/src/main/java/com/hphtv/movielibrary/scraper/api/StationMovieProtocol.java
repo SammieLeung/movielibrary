@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.scraper.api;
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
+import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateLikeRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateMovieRequestBody;
@@ -36,4 +37,8 @@ public interface StationMovieProtocol {
 
     @POST("movie/favorite/save")
     Observable<BaseRespone> updateLike(@Body UpdateLikeRequestBody body);
+
+    @POST("movie/file/removeFolder")
+    Observable<BaseRespone> removeShortcut(@Body RemoveFolderRequestBody body);
 }
+ 
