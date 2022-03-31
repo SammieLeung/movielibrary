@@ -27,15 +27,13 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
 
     private String mMessage;
-    private WeakReference<Handler> mWeakReference;
 
-    public static ConfirmDeleteDialog newInstance(Handler handler) {
+    public static ConfirmDeleteDialog newInstance() {
 
         Bundle args = new Bundle();
 
         ConfirmDeleteDialog fragment = new ConfirmDeleteDialog();
         fragment.setArguments(args);
-        fragment.mWeakReference=new WeakReference<>(handler);
         return fragment;
     }
 
@@ -53,7 +51,7 @@ public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.setDialogTitle(getResources().getString(R.string.remove_confirm));
+        mBinding.setDialogTitle(mMessage);
     }
 
     @Override
@@ -67,7 +65,6 @@ public class ConfirmDeleteDialog extends ConfirmDialog<MovieDetailViewModel> {
 
                     @Override
                     public void onAction(String movie_id) {
-                        mWeakReference.get().sendEmptyMessage(MovieDetailActivity.REMOVE);
                         BroadcastHelper.sendBroadcastMovieRemoveSync(getContext(),movie_id);
                         dismiss();
                     }
