@@ -90,7 +90,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
     };
 
     private BaseApater2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener= (view, postion, data) -> {
-        ActivityHelper.showPosterMenuDialog(getChildFragmentManager(),data);
+        ActivityHelper.showPosterMenuDialog(getChildFragmentManager(),postion,data);
         return false;
     };
 

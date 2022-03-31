@@ -112,7 +112,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
         mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
-            ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(),data);
+            ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(),postion,data);
             return false;
         });
 

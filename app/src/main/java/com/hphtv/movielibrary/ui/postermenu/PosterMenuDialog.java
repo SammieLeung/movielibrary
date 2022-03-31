@@ -22,10 +22,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, DialogPosterItemMenuBinding> {
 
-    public static PosterMenuDialog newInstance(MovieDataView movieDataView) {
+    public static PosterMenuDialog newInstance(int pos,MovieDataView movieDataView) {
         Bundle args = new Bundle();
         PosterMenuDialog fragment = new PosterMenuDialog();
         args.putSerializable("movie", movieDataView);
+        args.putInt("position",pos);
         fragment.setArguments(args);
         return fragment;
     }

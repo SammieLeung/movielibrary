@@ -55,8 +55,8 @@ public class ActivityHelper {
         context.startActivity(intent);
     }
 
-    public static void showPosterMenuDialog(FragmentManager fragmentManager, MovieDataView movieDataView) {
-        PosterMenuDialog dialog = PosterMenuDialog.newInstance(movieDataView);
+    public static void showPosterMenuDialog(FragmentManager fragmentManager, int pos,MovieDataView movieDataView) {
+        PosterMenuDialog dialog = PosterMenuDialog.newInstance(pos,movieDataView);
         dialog.show(fragmentManager, "");
     }
 

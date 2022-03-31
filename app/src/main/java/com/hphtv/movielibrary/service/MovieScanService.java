@@ -144,7 +144,6 @@ public class MovieScanService extends Service {
     private void startSearch(Shortcut shortcut, List<VideoFile> videoFileList, Constants.SearchType searchType) {
         Log.e(TAG, "startSearch: " + searchType.name() + "模式");
         //combineLatest 将前面Observable的最新数据与最后的Observable发送的每个数据结合
-        HashSet<String> tmpMoviesSet=new HashSet<>();
         Object lock = new Object();
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger indexAtom = new AtomicInteger();
@@ -208,7 +207,6 @@ public class MovieScanService extends Service {
                                                 tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api);
                                                 break;
                                         }
-                                        //TODO，通过缩短关键词，提高搜索几率。
                                         return Observable.zip(tmdbSearchRespone,
                                                 Observable.just(keyword),
                                                 (movieSearchRespone, _keyword) -> {
@@ -273,6 +271,9 @@ public class MovieScanService extends Service {
                                                         if(wrapper==null&&wrapper_en==null){
                                                             throw new Throwable("detail respone.toEntity() faild.");
                                                         }
+                                                    }else{
+                                                        OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
+                                                        OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
                                                     }
                                                     Object[] data = new Object[2];
                                                     data[0] = movie_id;
@@ -299,7 +300,6 @@ public class MovieScanService extends Service {
                                         if (!movieId.equals("-1")) {
                                             st.posterCount = st.posterCount + 1;
                                         }
-                                        tmpMoviesSet.add(movieId);
                                         mShortcutDao.updateShortcut(st);
                                     }else{
                                         Shortcut st = (Shortcut) data[0];
@@ -363,8 +363,6 @@ public class MovieScanService extends Service {
                                                 intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
                                                 intent.putExtra(Constants.Extras.SHORTCUT, shortcut1);
                                                 LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
-                                                ArrayList<String> movieIds=new ArrayList<>(tmpMoviesSet);
-                                                BroadcastHelper.sendBroadcastSearchMoviesSync(getBaseContext(),movieIds);
                                             }
                                             if (mGlobalTaskCount.decrementAndGet() == 0) {
                                                 if(!AppUtils.isAppInBackground(MovieScanService.this)) {//扫描程序结束
