@@ -1,8 +1,10 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -18,16 +20,22 @@ import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
 import com.hphtv.movielibrary.ui.postermenu.PosterMenuDialog;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * author: Sam Leung
@@ -112,7 +120,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
         mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
-            ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(),postion,data);
+            ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), postion, data);
             return false;
         });
 
@@ -143,7 +151,8 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
         if (result.getResultCode() == RESULT_OK) {
-            reloadMoiveDataViews();//TODO 优化方向:按照详情页的具体操作加载内容
+            setResult(RESULT_OK);
+            reloadMoiveDataViews();
         }
     }
 
@@ -169,7 +178,27 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     };
 
     @Override
-    public void OnMovieChange() {
-        reloadMoiveDataViews();
+    public void OnRematchPoster(MovieDataView dataView, int pos) {
+        mMovieItemListAdapter.replace(dataView,pos);
     }
+
+    @Override
+    public void OnMovieChange(MovieDataView movieDataView, int pos) {
+        mMovieItemListAdapter.replace(movieDataView, pos);
+        setResult(RESULT_OK);
+    }
+
+
+    @Override
+    public void OnMovieRemove(String movieId, int pos) {
+        mMovieItemListAdapter.remove(movieId, pos);
+        setResult(RESULT_OK);
+    }
+
+    @Override
+    public void OnMovieInsert(MovieDataView movieDataView, int pos) {
+        mMovieItemListAdapter.insert(movieDataView, pos);
+        setResult(RESULT_OK);
+    }
+
 }

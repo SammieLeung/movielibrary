@@ -30,8 +30,9 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
         if (hasFocus) {
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
             if(mOnItemClickListener!=null) {
-                int pos= (int) v.getTag();
-                mOnItemClickListener.onItemFocus(v, pos, mList.get(pos));
+                T data= (T) v.getTag();
+                int pos= mList.indexOf(data);
+                mOnItemClickListener.onItemFocus(v, pos,data);
             }
         } else {
             ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
@@ -43,8 +44,9 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
         if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
             if(mOnItemClickListener!=null) {
-                int pos= (int) v.getTag();
-                mOnItemClickListener.onItemFocus(v, pos, mList.get(pos));
+                T data= (T) v.getTag();
+                int pos= mList.indexOf(data);
+                mOnItemClickListener.onItemFocus(v, pos,data);
             }
         } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
             ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();

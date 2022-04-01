@@ -167,15 +167,14 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
 
 
-    public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.SearchType type) {
+    public Observable<MovieWrapper> selectMovie(MovieWrapper wrapper) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
-            MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
-                    .blockingFirst().toEntity();
             if (wrapper != null) {
-                String last_movie_id = mMovieWrapper.movie.movieId;
-                boolean is_favoirte = mMovieWrapper.movie.isFavorite;
-                boolean is_watched = mMovieWrapper.movie.isWatched;
-                BroadcastHelper.sendBroadcastMovieUpdateSync(getApplication(), last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
+//                String movie_id=wrapper.movie.movieId;
+//                String last_movie_id = mMovieWrapper.movie.movieId;
+//                boolean is_favoirte = mMovieWrapper.movie.isFavorite;
+//                boolean is_watched = mMovieWrapper.movie.isWatched;
+//                BroadcastHelper.sendBroadcastMovieUpdateSync(getApplication(), last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
                 MovieHelper.saveMatchedMovieWrapper(getApplication(), wrapper, mMovieWrapper.videoFiles);
             } else {
                 throw new Throwable();

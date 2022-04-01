@@ -8,9 +8,13 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -22,6 +26,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -57,7 +63,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                     if(mVideoTag!=null)
                         vtid=mVideoTag.vtid;
                     mTotal = mMovieDao.countMovieDataView(dir_uri,vtid,mGenre,mYear,Config.getSqlConditionOfChildMode(),ScraperSourceTools.getSource());
-                    return mMovieDao.queryMovieDataView2(dir_uri,vtid,mGenre,mYear,mOrder,Config.getSqlConditionOfChildMode(),isDesc,ScraperSourceTools.getSource(),0,LIMIT);
+                    return mMovieDao.queryMovieDataView(dir_uri,vtid,mGenre,mYear,mOrder,Config.getSqlConditionOfChildMode(),isDesc,ScraperSourceTools.getSource(),0,LIMIT);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -86,9 +92,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                             dir_uri=mShortcut.uri;
                         if(mVideoTag!=null)
                             vtid=mVideoTag.vtid;
-                        return mMovieDao.queryMovieDataView2(dir_uri,vtid,mGenre,mYear,mOrder,Config.getSqlConditionOfChildMode(),isDesc,ScraperSourceTools.getSource(),offset,LIMIT);
-
-//                        return mMovieDao.queryAllMovieDataView(ScraperSourceTools.getSource(), offset, LIMIT);
+                        return mMovieDao.queryMovieDataView(dir_uri,vtid,mGenre,mYear,mOrder,Config.getSqlConditionOfChildMode(),isDesc,ScraperSourceTools.getSource(),offset,LIMIT);
                     }else{
                         List<MovieDataView> emptyList=new ArrayList();
                         return emptyList;
@@ -115,7 +119,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                             dir_uri=mShortcut.uri;
                         if(mVideoTag!=null)
                             vtid=mVideoTag.vtid;
-                        return mMovieDao.queryMovieDataView2(dir_uri,vtid,mGenre,mYear,mOrder,Config.getSqlConditionOfChildMode(),isDesc,ScraperSourceTools.getSource(),0,limit);
+                        return mMovieDao.queryMovieDataView(dir_uri,vtid,mGenre,mYear,mOrder,Config.getSqlConditionOfChildMode(),isDesc,ScraperSourceTools.getSource(),0,limit);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -127,6 +131,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                     }
                 });
     }
+
+
 
     public void onFilterChange(Shortcut shortcut, VideoTag videoTag, String genre,String year){
         mShortcut=shortcut;

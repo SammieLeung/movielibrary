@@ -70,7 +70,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         @Override
         public void browseAll() {
             Intent intent=new Intent(getContext(), FilterPageActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent);
         }
     };
 
@@ -80,7 +80,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         public void onItemClick(View view, int postion, Object data) {
             Intent intent=new Intent(getContext(), FilterPageActivity.class);
             intent.putExtra(FilterPageActivity.EXTRA_GENRE,data.toString());
-            startActivity(intent);
+            startActivityForResult(intent);
         }
 
         @Override
@@ -289,6 +289,11 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
                 mBinding.setRecommand(false);
             }
         });
+    }
+
+    @Override
+    public void startActivityForResult(Intent data) {
+        ((AppBaseActivity)getActivity()).startActivityForResult(data);
     }
 
     @Override

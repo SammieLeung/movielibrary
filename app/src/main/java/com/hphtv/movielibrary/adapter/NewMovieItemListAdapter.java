@@ -57,6 +57,11 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
         binding.setLike(movieDataView.is_favorite);
     }
 
+    public void remove(String movie_id,int pos){
+        if(mList.get(pos).movie_id.equals(movie_id)){
+            super.remove(mList.get(pos),pos);
+        }
+    }
 
 
 }

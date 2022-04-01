@@ -59,7 +59,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull VH holder, int position) {
-        holder.mBinding.getRoot().setTag(position);
+        holder.mBinding.getRoot().setTag(mList.get(position));
     }
 
 
@@ -71,16 +71,18 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
     @Override
     public void onClick(View v) {
         if (mOnItemClickListener != null) {
-            int postion = (int) v.getTag();
+            T data= (T) v.getTag();
+            int position=mList.indexOf(data);
             //注意这里使用getTag方法获取数据
-            mOnItemClickListener.onItemClick(v, postion, mList.get(postion));
+            mOnItemClickListener.onItemClick(v, position, data);
         }
     }
 
     public boolean onLongClick(View v) {
         if (mOnItemLongClickListener != null) {
-            int postion = (int) v.getTag();
-            return mOnItemLongClickListener.onItemLongClick(v, postion, mList.get(postion));
+            T data= (T) v.getTag();
+            int position=mList.indexOf(data);
+            return mOnItemLongClickListener.onItemLongClick(v, position, data);
         }
         return false;
     }
@@ -89,6 +91,24 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         mList.clear();
         mList.addAll(data);
         notifyDataSetChanged();
+    }
+
+    public void remove(T data, int position) {
+        T _data = mList.get(position);
+        if (data.equals(_data)) {
+            mList.remove(data);
+            notifyItemRemoved(position);
+        }
+    }
+
+    public void insert(T data,int position){
+        mList.add(position,data);
+        notifyItemInserted(position);
+    }
+
+    public void replace(T data,int position){
+        mList.set(position,data);
+        notifyItemChanged(position);
     }
 
     public void appendAll(List data) {

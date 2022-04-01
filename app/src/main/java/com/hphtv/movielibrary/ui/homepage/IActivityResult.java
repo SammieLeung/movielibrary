@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult;
  * date:  2022/2/21
  */
 public interface IActivityResult {
+    void startActivityForResult(Intent data);
     void onActivityResult(ActivityResult result);
     void forceRefresh();
 }

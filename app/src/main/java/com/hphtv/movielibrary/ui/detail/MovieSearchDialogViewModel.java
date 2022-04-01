@@ -7,8 +7,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
+import com.hphtv.movielibrary.util.BroadcastHelper;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -21,6 +25,8 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -47,7 +53,6 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
         adapter.clearAll();
         mCurrentPage = 1;
         notifyNewSearch(autoSearch(mCurrentPage), adapter);
-//        mCurrentPage = 3;
     }
 
     public void loading(MovieSearchAdapter adapter) {
@@ -140,6 +145,15 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
                         adapter.cancelLoadingAndShowTips(msg);
                     }
                 });
+    }
+
+    public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.SearchType type) {
+        return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
+            MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
+                    .blockingFirst().toEntity();
+            emitter.onNext(wrapper);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.newThread());
     }
 
     public String getCurrentKeyword() {

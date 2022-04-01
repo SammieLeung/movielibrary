@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.firefly.filepicker.utils.SambaAuthHelper;
+import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -34,26 +35,22 @@ public class MovieApplication extends Application {
         super.onCreate();
         sMovieApplication = this;
         init();
-        initSambaAuthHelper();
     }
 
     private void init() {
-        //友盟统计
-        MobclickAgent.setScenarioType(sMovieApplication, MobclickAgent.EScenarioType.E_UM_NORMAL);
         Intent service = new Intent(sMovieApplication, DeviceMonitorService.class);
         startService(service);
-
-    }
-
-
-    private void initSambaAuthHelper() {
         Observable.just("")
                 .observeOn(Schedulers.newThread())
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
+                        //友盟统计
+                        MobclickAgent.setScenarioType(sMovieApplication, MobclickAgent.EScenarioType.E_UM_NORMAL);
                         JcifsUtils.getInstance(MovieApplication.this);
                         SambaAuthHelper.getInstance().init(MovieApplication.this);
+                        //设备TOKEN
+                        AuthHelper.init();
                     }
                 });
     }

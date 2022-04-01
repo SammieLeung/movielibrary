@@ -41,7 +41,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -52,6 +56,7 @@ public class MovieHelper {
 
     /**
      * 播放影片
+     *
      * @param path
      * @param name
      * @return
@@ -107,7 +112,7 @@ public class MovieHelper {
         if (movie_id != -1 && movieWrapper.movie != null) {
             //VideoFile
             saveMovieVideoFileCrossRef(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
-            OnlineDBApiService.uploadMovie(movieWrapper, videoFileList,movieWrapper.movie.source);
+            OnlineDBApiService.uploadMovie(movieWrapper, videoFileList, movieWrapper.movie.source);
         }
     }
 
@@ -146,7 +151,12 @@ public class MovieHelper {
             new_movie.pinyin = old_movie.pinyin;
             movieDao.update(new_movie);
         } else {
-            new_movie.pinyin = PinyinParseAndMatchTools.parsePinyin(new_movie.title);
+            new_movie.pinyin = Observable.just(new_movie.title)
+                    .map(s -> {
+                        String pinyin = PinyinParseAndMatchTools.parsePinyin(s);
+                        return pinyin;
+                    }).observeOn(Schedulers.newThread())
+                    .blockingFirst();
             new_movie.addTime = System.currentTimeMillis();
             new_movie.updateTime = new_movie.addTime;
             long id = movieDao.insertOrIgnoreMovie(new_movie);

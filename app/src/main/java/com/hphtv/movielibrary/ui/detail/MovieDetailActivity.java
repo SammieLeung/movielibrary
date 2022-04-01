@@ -28,6 +28,7 @@ import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
+import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
@@ -268,10 +269,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private void editVideoInfo() {
         String keyword = mBinding.getWrapper().videoFiles.get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
-        movieSearchFragment.setOnSelectPosterListener((movie_id, source, type) -> {
+        movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             startLoading();
             //选择新电影逻辑
-            mViewModel.selectMovie(movie_id, source, type)
+            mViewModel.selectMovie(wrapper)
                     .subscribe(new SimpleObserver<MovieWrapper>() {
 
                         @Override

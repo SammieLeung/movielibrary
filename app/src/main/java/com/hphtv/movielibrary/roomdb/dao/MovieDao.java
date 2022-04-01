@@ -134,8 +134,9 @@ public interface MovieDao {
      */
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source AND movie_id=:movie_id " +
+            " AND type=:type "+
             "GROUP BY id")
-    public MovieDataView queryMovieDataViewByMovieId(String movie_id, String source);
+    public MovieDataView queryMovieDataViewByMovieId(String movie_id,String type, String source);
 
     /**
      * @param device_uri 设备id
@@ -219,7 +220,7 @@ public interface MovieDao {
             "CASE WHEN :order =5 THEN is_favorite END ASC " +
             "LIMIT :offset,:limit "
     )
-    public List<MovieDataView> queryMovieDataView2(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
+    public List<MovieDataView> queryMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
