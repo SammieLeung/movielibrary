@@ -27,10 +27,10 @@ public class Shortcut implements Serializable {
     @ColumnInfo(name = "device_path")
     public String devicePath;
     @ColumnInfo(name = "friendly_name")
-    public String firendlyName;
+    public String friendlyName;
     public String uri;
     @ColumnInfo(name = "device_type")
-    public int devcieType;//smb
+    public int deviceType;//smb
     @ColumnInfo(name = "file_count")
     public int fileCount = 0;
     @ColumnInfo(name = "poster_count")
@@ -45,14 +45,14 @@ public class Shortcut implements Serializable {
     @ColumnInfo(name="autoscan")
     public int autoScan=0;
 
-    public Shortcut(String uri, int devcieType, String name, String firendlyName, String queryUri) {
+    public Shortcut(String uri, int deviceType, String name, String friendlyName, String queryUri) {
         this.folderType = Constants.SearchType.auto;
         this.access = Constants.AccessPermission.ALL_AGE;
         this.uri = uri;
-        this.devcieType = devcieType;
+        this.deviceType = deviceType;
         this.queryUri = queryUri;
         String tmp;
-        switch (devcieType) {
+        switch (deviceType) {
             case Constants.DeviceType.DEVICE_TYPE_LOCAL:
             case Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE:
             case Constants.DeviceType.DEVICE_TYPE_USB:
@@ -62,11 +62,11 @@ public class Shortcut implements Serializable {
             case Constants.DeviceType.DEVICE_TYPE_SMB:
                 tmp = uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
                 this.name = TextUtils.isEmpty(name) ? tmp.substring(tmp.lastIndexOf("/") + 1) : name;
-                this.firendlyName = TextUtils.isEmpty(firendlyName) ? this.name : firendlyName;
+                this.friendlyName = TextUtils.isEmpty(friendlyName) ? this.name : friendlyName;
                 break;
             case Constants.DeviceType.DEVICE_TYPE_DLNA:
                 this.name = TextUtils.isEmpty(name) ? uri.substring(uri.lastIndexOf(":") + 1) : name;
-                this.firendlyName = TextUtils.isEmpty(firendlyName) ? this.name : firendlyName;
+                this.friendlyName = TextUtils.isEmpty(friendlyName) ? this.name : friendlyName;
                 break;
         }
     }
@@ -90,9 +90,9 @@ public class Shortcut implements Serializable {
                 "shortcutId=" + shortcutId +
                 ", name='" + name + '\'' +
                 ", devicePath='" + devicePath + '\'' +
-                ", firendlyName='" + firendlyName + '\'' +
+                ", firendlyName='" + friendlyName + '\'' +
                 ", uri='" + uri + '\'' +
-                ", devcieType=" + devcieType +
+                ", devcieType=" + deviceType +
                 ", fileCount=" + fileCount +
                 ", posterCount=" + posterCount +
                 ", folderType=" + folderType +

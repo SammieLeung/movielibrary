@@ -6,6 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
+            android:visibility="@{recentAdd||favorite||recommand?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -86,6 +87,43 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/recently_added_container_h"/>
         </LinearLayout>
+        <RelativeLayout
+            android:visibility="@{!(recentAdd||favorite||recommand)?View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:layout_marginTop="165dp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/iv_empty"
+                android:src="@mipmap/empty_img"
+                android:layout_width="158dp"
+                android:layout_height="131dp"/>
+            <TextView
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/iv_empty"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/tv_empty_tips_1"
+                android:text="@string/homepage_empty"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:focusedByDefault="true"
+                android:id="@+id/btn_quick_add_shortcut"
+                style="@style/common_content_s_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_empty_tips_1"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/new_common_spinner_bg"
+                android:padding="15dp"
+                android:text="@string/homepage_goto_add_shortcut" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <data>

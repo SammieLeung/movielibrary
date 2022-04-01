@@ -54,20 +54,7 @@ public class FilterBoxVideoTagAdapter extends RecyclerView.Adapter<FilterBoxVide
         } else {
             int realPos = position - 1;
             VideoTag videoTag = mDataList.get(realPos);
-            String name = "";
-            switch (videoTag.tag) {
-                case movie:
-                    name = mContext.getString(R.string.video_type_movie);
-                    break;
-                case tv:
-                    name = mContext.getString(R.string.video_type_tv);
-                    break;
-                case child:
-                    name = mContext.getString(R.string.video_type_cartoon);
-                    break;
-                case custom:
-                    name = videoTag.tagName;
-            }
+            String name =videoTag.toTagName(mContext);
             holder.mViewDataBinding.setName(name);
             holder.mViewDataBinding.setPos(position);
         }

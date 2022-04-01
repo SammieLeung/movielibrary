@@ -116,16 +116,16 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         if (!mFolderItemList.contains(folderItem)) {
             mFolderItemList.add(folderItem);
             mFolderItemList.sort(mComparator);
-            notifyItemInserted(mFolderItemList.size());
+            notifyDataSetChanged();
         }
     }
 
     public FolderItem buildFolderItem(Shortcut shortcut) {
         FolderItem folderItem = new FolderItem();
         folderItem.uri = shortcut.uri;
-        folderItem.title = shortcut.firendlyName;
+        folderItem.title = shortcut.friendlyName;
         folderItem.item = shortcut;
-        folderItem.type = shortcut.devcieType;
+        folderItem.type = shortcut.deviceType;
         folderItem.file_count = shortcut.fileCount;
         folderItem.poster_count = shortcut.posterCount;
         folderItem.state = shortcut.isScanned == 2 ? FolderItem.State.SCANNING : shortcut.isScanned == 1 ? FolderItem.State.SCANNED : FolderItem.State.UNSCANNED;

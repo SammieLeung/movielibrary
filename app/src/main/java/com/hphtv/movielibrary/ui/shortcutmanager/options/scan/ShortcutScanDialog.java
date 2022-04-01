@@ -54,7 +54,7 @@ public class ShortcutScanDialog extends BaseDialogFragment2<ShortcutOptionsViewM
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.setDialogTitle(mViewModel.getShortcut().firendlyName);
+        mBinding.setDialogTitle(mViewModel.getShortcut().friendlyName);
         mBinding.setTypeItem(mViewModel.getTypeItem());
         mBinding.setAccessItem(mViewModel.getAccessItem());
         mBinding.setNameItem(mViewModel.getNameItem());

@@ -74,6 +74,7 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
     @Override
     public void onResume() {
         super.onResume();
+        mBinding.setIsEmtpy(true);
         registerReceivers();
         bindService();
     }
@@ -97,6 +98,7 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
                         @Override
                         public void onAction(Shortcut shortcut) {
                             addShortcut(shortcut);
+                            mBinding.setIsEmtpy(false);
                         }
                     });
             setResult(RESULT_OK);
@@ -167,6 +169,8 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
                                 @Override
                                 public void onAction(Shortcut shortcut) {
                                     mFolderItemAdapter.removeShortcut(shortcut);
+                                    if(mFolderItemAdapter.getItemCount()==0)
+                                        mBinding.setIsEmtpy(true);
                                     ShortcutManagerActivity.this.setResult(RESULT_OK);
                                 }
                             });
@@ -183,6 +187,8 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
                         @Override
                         public void onAction(List<Shortcut> shortcuts) {
                             setResult(RESULT_OK);
+                            if(shortcuts.size()>0)
+                                mBinding.setIsEmtpy(false);
                             mFolderItemAdapter.addAllShortcuts(shortcuts);
                             HashSet<Shortcut> shortcutHashSet = ((MovieScanService.ScanBinder) service).getService().getShortcutHashSet();
                             for (Shortcut shortcut : shortcutHashSet) {

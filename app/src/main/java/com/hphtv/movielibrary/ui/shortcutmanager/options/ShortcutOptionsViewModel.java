@@ -14,13 +14,11 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
-import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.bean.ShortcutOptionsItem;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +96,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
      * 读取shortcut信息
      */
     public void loadShortcutData() {
-        mNameItem.setSubTitle(mShortcut.firendlyName);
+        mNameItem.setSubTitle(mShortcut.friendlyName);
 
         switch (mShortcut.access) {
             case ALL_AGE:
@@ -134,7 +132,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
      */
     public void saveAndNotifyScan() {
         Observable.create((ObservableOnSubscribe<Shortcut>) emitter -> {
-            mShortcut.firendlyName = mNameItem.getSubTitle();
+            mShortcut.friendlyName = mNameItem.getSubTitle();
             switch (mTypeItem.getPos()) {
                 case 0:
                     mShortcut.folderType = Constants.SearchType.auto;
@@ -171,7 +169,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                 .subscribe(new SimpleObserver<Shortcut>() {
                     @Override
                     public void onAction(Shortcut shortcut) {
-                        if(shortcut.devcieType>Constants.DeviceType.DEVICE_TYPE_HARD_DISK) {
+                        if(shortcut.deviceType >Constants.DeviceType.DEVICE_TYPE_HARD_DISK) {
                             Intent intent = new Intent();
                             intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
                             intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);

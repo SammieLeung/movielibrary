@@ -271,9 +271,6 @@ public class TvRecyclerView extends RecyclerView {
     public boolean dispatchKeyEvent(KeyEvent event) {
         boolean result = super.dispatchKeyEvent(event);
         View focusView = this.getFocusedChild();
-        if (mBindFragment != null) {
-//            mBindFragment.setCacheViewFromContent(focusView);
-        }
         if (focusView == null) {
             return result;
         } else {
@@ -354,6 +351,7 @@ public class TvRecyclerView extends RecyclerView {
                         if (getLayoutManager().getChildAt(0) == getFocusedChild()) {
                             if (mOnKeyPressListener != null)
                                 mOnKeyPressListener.onBackPress();
+                            return true;
                         } else {
                             smoothScrollToPosition(0);
                             getLayoutManager().getChildAt(0).requestFocus();
@@ -575,8 +573,15 @@ public class TvRecyclerView extends RecyclerView {
     }
 
     public interface OnKeyPressListener {
+        /**
+         * 其他按键
+         * @param keyCode
+         */
         void processKeyEvent(int keyCode);
 
+        /**
+         * 返回
+         */
         void onBackPress();
     }
 

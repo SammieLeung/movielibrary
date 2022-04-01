@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.ui.homepage;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseFragment2;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
@@ -16,12 +18,13 @@ import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding>  extends BaseFragment2<VM, VDB> implements IAutofitHeight{
+public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IAutofitHeight, IActivityResult {
     private IAutofitHeight mIAutofitHeight;
     private int mPostion;
-    public BaseAutofitHeightFragment(IAutofitHeight autofitHeight,int position){
-        mIAutofitHeight=autofitHeight;
-        mPostion=position;
+
+    public BaseAutofitHeightFragment(IAutofitHeight autofitHeight, int position) {
+        mIAutofitHeight = autofitHeight;
+        mPostion = position;
     }
 
     @Nullable
@@ -37,4 +40,15 @@ public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB
     public NoScrollAutofitHeightViewPager getAutofitHeightViewPager() {
         return mIAutofitHeight.getAutofitHeightViewPager();
     }
+
+    @Override
+    public void startActivityForResult(Intent data) {
+        if (getActivity() instanceof AppBaseActivity)
+            ((AppBaseActivity) getActivity()).startActivityForResult(data);
+    }
+
+    public HomePageActivity getBaseActivity(){
+        return (HomePageActivity) getActivity();
+    }
+
 }

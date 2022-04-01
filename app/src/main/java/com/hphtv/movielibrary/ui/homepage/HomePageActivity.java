@@ -18,6 +18,7 @@ import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
+import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
@@ -31,8 +32,8 @@ import com.station.kit.util.LogUtil;
  * author: Sam Leung
  * date:  2022/1/13
  */
-public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight {
-    private NewHomePageTabAdapter mNewHomePageTabAdapter;
+public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight {
+    private HomePageTabAdapter mNewHomePageTabAdapter;
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -44,11 +45,15 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         bindDatas();
         initView();
         autoScrollListener(mBinding.nsv);
+        //是否自动搜索文件夹
         if(Config.isAutoSearch().get()){
             autoSearch();
         }
     }
 
+    /**
+     * 后台搜索结束后调用.
+     */
     @Override
     protected void movieScarpFinish() {
         super.movieScarpFinish();
@@ -78,7 +83,7 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
      * 初始化TAB
      */
     private void initTab() {
-        mNewHomePageTabAdapter = new NewHomePageTabAdapter(this, getSupportFragmentManager());
+        mNewHomePageTabAdapter = new HomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
         mBinding.viewpager.setOffscreenPageLimit(2);
         mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
@@ -104,6 +109,7 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
                         view.getTab().select();
                     }
                 });
+        mBinding.tablayout.getTabAt(0).view.requestFocus();
     }
 
     /**
@@ -121,14 +127,18 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         mViewModel.getShowChildMode().set(Config.isChildMode());
         mViewModel.getChildMode().set(!Config.isTempCloseChildMode()&&Config.isChildMode());
         //刷新各个子Fragment状态
+        if(result.getResultCode()==RESULT_OK)
         for (Fragment fragment : mNewHomePageTabAdapter.mList) {
             if (fragment instanceof IActivityResult) {
                 IActivityResult activityResult = (IActivityResult) fragment;
-                activityResult.onActivityResult(result);
+                activityResult.forceRefresh();
             }
         }
     }
 
+    /**
+     * 强制刷新所有Fragment
+     */
     private void updateFragments(){
         for (Fragment fragment : mNewHomePageTabAdapter.mList) {
             if (fragment instanceof IActivityResult) {
@@ -148,64 +158,6 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
         return mBinding.viewpager;
     }
 
-    /**
-     * 打开搜索页
-     *
-     * @param view
-     */
-    private void startPinyinSearchPage(View view) {
-        Intent intent = new Intent(this, PinyinSearchActivity.class);
-        startActivityForResult(intent);
-    }
-
-    /**
-     * 打开设备管理页
-     *
-     * @param v
-     */
-    private void startShortcutManager(View v) {
-        Intent intent = new Intent(this, ShortcutManagerActivity.class);
-        startActivityForResult(intent);
-    }
-
-    /**
-     * 打开设置页面
-     *
-     * @param view
-     */
-    private void startSettings(View view) {
-        Intent intent = new Intent(this, SettingsActivity.class);
-        startActivityForResult(intent);
-    }
-
-    /**
-     * 开关儿童，模式
-     * @param v
-     */
-    private void toggleChildmode(View v) {
-        if (mViewModel.getChildMode().get()) {
-            mViewModel.getChildMode().notifyChange();
-            showPasswordDialog();
-        } else {
-            mViewModel.toggleChildMode();
-            mNewHomePageTabAdapter.refreshFragments();
-        }
-    }
-
-    /**
-     * 显示密码输入框
-     */
-    private void showPasswordDialog() {
-        PasswordDialogFragmentViewModel viewModel = new ViewModelProvider(this).get(PasswordDialogFragmentViewModel.class);
-        PasswordDialogFragment passwordDialogFragment = PasswordDialogFragment.newInstance();
-        passwordDialogFragment.setDialogTitle(getString(R.string.childmode_temp_close));
-        passwordDialogFragment.setOnConfirmListener(() -> {
-            mViewModel.toggleChildMode();
-            mNewHomePageTabAdapter.refreshFragments();
-        });
-        passwordDialogFragment.setViewModel(viewModel);
-        passwordDialogFragment.show(getSupportFragmentManager(), "");
-    }
 
     /**
      * 创建Tabview
@@ -256,4 +208,64 @@ public class NewHomePageActivity extends PermissionActivity<NewHomePageViewModel
 
         mBinding.nsv.smoothScrollBy(0, offset);
     }
+
+    /**
+     * 打开搜索页
+     *
+     * @param view
+     */
+    private void startPinyinSearchPage(View view) {
+        Intent intent = new Intent(this, PinyinSearchActivity.class);
+        startActivityForResult(intent);
+    }
+
+    /**
+     * 打开设备管理页
+     *
+     * @param v
+     */
+    public void startShortcutManager(View v) {
+        Intent intent = new Intent(this, ShortcutManagerActivity.class);
+        startActivityForResult(intent);
+    }
+
+    /**
+     * 打开设置页面
+     *
+     * @param view
+     */
+    private void startSettings(View view) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivityForResult(intent);
+    }
+
+    /**
+     * 开关儿童，模式
+     * @param v
+     */
+    private void toggleChildmode(View v) {
+        if (mViewModel.getChildMode().get()) {
+            mViewModel.getChildMode().notifyChange();
+            showPasswordDialog();
+        } else {
+            mViewModel.toggleChildMode();
+            mNewHomePageTabAdapter.refreshFragments();
+        }
+    }
+
+    /**
+     * 显示密码输入框
+     */
+    private void showPasswordDialog() {
+        PasswordDialogFragmentViewModel viewModel = new ViewModelProvider(this).get(PasswordDialogFragmentViewModel.class);
+        PasswordDialogFragment passwordDialogFragment = PasswordDialogFragment.newInstance();
+        passwordDialogFragment.setDialogTitle(getString(R.string.childmode_temp_close));
+        passwordDialogFragment.setOnConfirmListener(() -> {
+            mViewModel.toggleChildMode();
+            mNewHomePageTabAdapter.refreshFragments();
+        });
+        passwordDialogFragment.setViewModel(viewModel);
+        passwordDialogFragment.show(getSupportFragmentManager(), "");
+    }
+
 }

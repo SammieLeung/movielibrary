@@ -49,6 +49,13 @@
 
     <string name="filterpage_no_result_matched">No results matching your filter criteria.</string>
     <string name="filterpage_no_movie">No movies have been added to the library.</string>
+
+    <string name="filterpage_resulttext_1">According to the conditions of</string>
+    <string name="filterpage_resulttext_2">, a total of</string>
+    <string name="filterpage_resulttext_3">films were selected.Row </string>
+    <string name="filterpage_resulttext_4"></string>
+
+
     <!--    索引管理-->
     <string name="add_shortcut">Add</string>
     <string name="shortcut_manager">Device</string>
@@ -125,6 +132,10 @@
     <string name="video_type_tv">TV</string>
     <string name="video_type_undefine">Unknow</string>
     <string name="video_type_cartoon">Cartoon</string>
+    <string name="video_type_animate">Animate</string>
+    <string name="video_type_variety_show">Variety Show</string>
+    <string name="video_type_other">Other</string>
+
     <!--本地搜索页tab-->
     <string name="tab_local_search_all">All (%d)</string>
     <string name="tab_local_search_movie">Movie (%d)</string>
@@ -204,4 +215,9 @@
     <string name="device_harddisk_name">HardDisk (%1$s)</string>
     <string name="device_smb">SMB Device</string>
     <string name="device_DLNA">DLNA Device</string>
+    <!--    空白提示-->
+    <string name="homepage_empty">There is nothing here!</string>
+    <string name="homepage_goto_add_shortcut">Let\'s go to add videos</string>
+
+
 </resources>

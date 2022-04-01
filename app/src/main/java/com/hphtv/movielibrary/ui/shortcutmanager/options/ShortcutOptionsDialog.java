@@ -44,7 +44,7 @@ public class ShortcutOptionsDialog extends BaseDialogFragment2<ShortcutOptionsVi
         mBinding.btnRemove.setOnClickListener(this::removeShortcut);
         mBinding.btnScan.setOnClickListener(this::showScanDialog);
         mBinding.btnClose.setOnClickListener(this::dismiss);
-        mBinding.setDialogTitle(mViewModel.getShortcut().firendlyName);
+        mBinding.setDialogTitle(mViewModel.getShortcut().friendlyName);
     }
 
     @Override

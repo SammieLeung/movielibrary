@@ -48,6 +48,12 @@
 
     <string name="filterpage_no_result_matched">没有符合条件的影片</string>
     <string name="filterpage_no_movie">影库中还未添加电影</string>
+
+    <string name="filterpage_resulttext_1">按照</string>
+    <string name="filterpage_resulttext_2">共筛选出影片</string>
+    <string name="filterpage_resulttext_3">部,第</string>
+    <string name="filterpage_resulttext_4">行</string>
+
     <!--    索引管理-->
     <string name="add_shortcut">添加文件夹</string>
     <string name="shortcut_manager">设备管理</string>
@@ -125,6 +131,10 @@
     <string name="video_type_tv">电视</string>
     <string name="video_type_undefine">未分类</string>
     <string name="video_type_cartoon">儿童</string>
+    <string name="video_type_animate">动画</string>
+    <string name="video_type_variety_show">综艺</string>
+    <string name="video_type_other">其他</string>
+
     <!--本地搜索页tab-->
     <string name="tab_local_search_all">全部 (%d)</string>
     <string name="tab_local_search_movie">电影 (%d)</string>
@@ -198,4 +208,7 @@
     <string name="device_harddisk_name">硬盘 (%1$s)</string>
     <string name="device_smb">SMB设备</string>
     <string name="device_DLNA">DLNA设备</string>
+    <!--    空白提示-->
+    <string name="homepage_empty">空空如也</string>
+    <string name="homepage_goto_add_shortcut">快去添加影片吧</string>
 </resources>

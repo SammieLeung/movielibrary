@@ -1,10 +1,8 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -20,22 +18,15 @@ import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
-import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
-import com.hphtv.movielibrary.ui.postermenu.PosterMenuDialog;
+import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
-import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * author: Sam Leung
@@ -45,7 +36,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     public static final String EXTRA_GENRE = "extra_genre";
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
-    private NewPageFragmentViewModel mNewpageViewModel;
+    private HomeFragmentViewModel mNewpageViewModel;
 
     View.OnClickListener mOnClickListener = v -> {
         switch (v.getId()) {
@@ -67,8 +58,8 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         }
 
         @Override
-        public void onItemFocus(View view, int postion, MovieDataView data) {
-            mBinding.setCount(getString(R.string.genre_all) + " " + (postion + 1) + "/" + mViewModel.getTotal());
+        public void onItemFocus(View view, int position, MovieDataView data) {
+            mViewModel.refreshRowStr(position);
         }
     };
 
@@ -80,7 +71,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
         @Override
         public void onBackPress() {
-            finish();
+            mBinding.btnFilter.requestFocus();
         }
     };
 
@@ -89,8 +80,9 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel.setOnRefresh(mOnRefresh);
-        mNewpageViewModel = new ViewModelProvider(this).get(NewPageFragmentViewModel.class);
+        mNewpageViewModel = new ViewModelProvider(this).get(HomeFragmentViewModel.class);
         initView();
+        bindDatas();
         onNewIntent(getIntent());
     }
 
@@ -102,7 +94,6 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             mViewModel.setGenre(genreName);
         }
         reloadMoiveDataViews();
-
     }
 
     private void initView() {
@@ -121,7 +112,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
         mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
             ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), postion, data);
-            return false;
+            return true;
         });
 
         mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical(
@@ -140,6 +131,13 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             }
         });
         mBinding.recyclerview.setOnKeyPressListener(mOnKeyPressListener);
+    }
+
+    private void bindDatas(){
+        mBinding.setEmptyType(mViewModel.getEmptyType());
+        mBinding.setConditions(mViewModel.getConditionStr());
+        mBinding.setRow(mViewModel.getRowStr());
+        mBinding.setTotal(mViewModel.getMovieCount());
     }
 
     @Override
@@ -192,12 +190,14 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     @Override
     public void OnMovieRemove(String movieId, int pos) {
         mMovieItemListAdapter.remove(movieId, pos);
+        mViewModel.checkEmpty(mViewModel.decreaseTotal());
         setResult(RESULT_OK);
     }
 
     @Override
     public void OnMovieInsert(MovieDataView movieDataView, int pos) {
         mMovieItemListAdapter.insert(movieDataView, pos);
+        mViewModel.checkEmpty(mViewModel.increaseTotal());
         setResult(RESULT_OK);
     }
 

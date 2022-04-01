@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage;
+package com.hphtv.movielibrary.ui.homepage.fragment.homepage;
 
 import android.app.Application;
 import android.content.Intent;
@@ -41,14 +41,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/6/1
  */
-public class NewPageFragmentViewModel extends BaseAndroidViewModel {
+public class HomeFragmentViewModel extends BaseAndroidViewModel {
     public static final int LIMIT=10;
     private GenreDao mGenreDao;
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
     private Callback mGenreCallback;
 
-    public NewPageFragmentViewModel(@NonNull @NotNull Application application) {
+    public HomeFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
 
         initDao();

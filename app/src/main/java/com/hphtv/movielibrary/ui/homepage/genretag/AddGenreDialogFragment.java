@@ -14,7 +14,7 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.ui.homepage.NewPageFragmentViewModel;
+import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.recyclerview.ItemDragCallback;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogViewModel, DialogCustomGenreTagLayoutBinding> implements View.OnClickListener {
     private GenreListApter mGenreListApter;
     private GenreListApter mGenreSortListApter;
-    private NewPageFragmentViewModel mNewPageFragmentViewModel;
+    private HomeFragmentViewModel mNewPageFragmentViewModel;
 
     public static AddGenreDialogFragment newInstance() {
 
@@ -47,7 +47,7 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNewPageFragmentViewModel=new ViewModelProvider(getParentFragment()).get(NewPageFragmentViewModel.class);
+        mNewPageFragmentViewModel=new ViewModelProvider(getParentFragment()).get(HomeFragmentViewModel.class);
     }
 
     @Override

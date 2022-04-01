@@ -106,21 +106,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                         MovieDataViewWithVdieoTags movieDataViewWithVdieoTags = mMovieVideoTagCrossRefDao.queryMovieDataViewWithVideoTags(movieDataView.id);
                         StringBuffer stringBuffer = new StringBuffer();
                         for (VideoTag videoTag : movieDataViewWithVdieoTags.mVideoTagList) {
-                            Constants.VideoType type = videoTag.tag;
-                            switch (type) {
-                                case movie:
-                                    stringBuffer.append(getString(R.string.video_type_movie) + ",");
-                                    break;
-                                case tv:
-                                    stringBuffer.append(getString(R.string.video_type_tv) + ",");
-                                    break;
-                                case child:
-                                    stringBuffer.append(getString(R.string.video_type_cartoon) + ",");
-                                    break;
-                                case custom:
-                                    stringBuffer.append(videoTag.tagName + ",");
-                                    break;
-                            }
+                            stringBuffer.append(videoTag.toTagName(getApplication())+",");
                         }
 
                         mTagString.set(stringBuffer.deleteCharAt(stringBuffer.length() - 1).toString());

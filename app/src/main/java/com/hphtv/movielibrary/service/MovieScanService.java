@@ -23,8 +23,6 @@ import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
-import com.hphtv.movielibrary.util.ActivityHelper;
-import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ServiceStatusHelper;
@@ -172,7 +170,7 @@ public class MovieScanService extends Service {
                         Observable.fromIterable(videoFileList)
                                 .observeOn(Schedulers.from(mNetworkExecutor))
                                 .map(videoFile -> {
-                                    LogUtil.v(Thread.currentThread().getName(), "shortcut[" + shortcut1.firendlyName + "]" + "[" + videoFile.filename + "]开始匹配...");
+                                    LogUtil.v(Thread.currentThread().getName(), "shortcut[" + shortcut1.friendlyName + "]" + "[" + videoFile.filename + "]开始匹配...");
                                     String keyword = videoFile.keyword;
 
                                     //获取文件关键字

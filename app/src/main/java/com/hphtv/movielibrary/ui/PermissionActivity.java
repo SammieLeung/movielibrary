@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage;
+package com.hphtv.movielibrary.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;

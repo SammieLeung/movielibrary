@@ -1,16 +1,13 @@
 package com.hphtv.movielibrary.ui.shortcutmanager.options.remove;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.common.ConfirmDialog;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewModel;
 
@@ -38,7 +35,7 @@ public class ShortcutRemoveConfirmDialog extends ConfirmDialog<ShortcutOptionsVi
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.setDialogTitle(getString(R.string.shortcut_remove_dialog_content, mViewModel.getShortcut().firendlyName));
+        mBinding.setDialogTitle(getString(R.string.shortcut_remove_dialog_content, mViewModel.getShortcut().friendlyName));
         mBinding.btnConfirm.setOnClickListener(this::confirm);
         mBinding.btnCancel.setOnClickListener(this::cancel);
     }

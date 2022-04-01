@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -34,7 +35,7 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
 
     public FilterBoxDeviceAdapter(Context context, ObservableInt checkPos) {
         mContext = context;
-        mCheckPos=checkPos;
+        mCheckPos = checkPos;
     }
 
 
@@ -57,15 +58,19 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
     @Override
     public void onBindViewHolder(@NonNull @NotNull CommonFilterBoxViewHolder holder, int position) {
         int viewType = getItemViewType(position);
-        int realPos=position-1;
+        int realPos = position - 1;
         if (viewType == VIEWTYPE_ALL) {
             holder.mViewDataBinding.setName(mContext.getResources().getString(R.string.all));
             holder.mViewDataBinding.setPos(position);
         } else if (viewType == VIEWTYPE_DEVICE) {
             Object o = mDataList.get(realPos);
-           if (o instanceof Shortcut) {
+            if (o instanceof Shortcut) {
                 Shortcut shortcut = (Shortcut) o;
-                holder.mViewDataBinding.setName(shortcut.name);
+                if (TextUtils.isEmpty(shortcut.friendlyName))
+                    holder.mViewDataBinding.setName(shortcut.name);
+                else
+                    holder.mViewDataBinding.setName(shortcut.friendlyName);
+
             }
             holder.mViewDataBinding.setPos(position);
         } else {
@@ -78,7 +83,7 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
     public int getItemViewType(int position) {
         if (position == 0)
             return VIEWTYPE_ALL;
-        int realPos=position-1;
+        int realPos = position - 1;
         Object data = mDataList.get(realPos);
         if (data instanceof String) {
             return VIEWTYPE_HEADITEM;
@@ -117,7 +122,7 @@ public class FilterBoxDeviceAdapter extends RecyclerView.Adapter<FilterBoxDevice
             mViewDataBinding = filterBoxItemLayoutBinding;
             mViewDataBinding.viewGroup.setOnClickListener(v -> {
                 setCurrentPos(mViewDataBinding.getPos());
-                if(mOnFilterBoxItemClickListener!=null)
+                if (mOnFilterBoxItemClickListener != null)
                     mOnFilterBoxItemClickListener.OnFilterChange();
             });
         }

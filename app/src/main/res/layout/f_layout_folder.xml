@@ -35,13 +35,38 @@
 
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="64dp"
+            android:visibility="@{!isEmtpy?View.VISIBLE:View.GONE}"
             android:id="@+id/rv_added_folders"
             android:layout_width="match_parent"
-            android:layout_below="@id/btn_exit"
             android:layout_height="match_parent"
+            android:layout_below="@id/btn_exit"
+            android:layout_marginTop="64dp" />
+        <RelativeLayout
+            android:layout_below="@id/btn_exit"
+            android:visibility="@{isEmtpy?View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:layout_marginTop="165dp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/iv_empty"
+                android:src="@mipmap/empty_img"
+                android:layout_width="158dp"
+                android:layout_height="131dp"/>
+            <TextView
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/iv_empty"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/tv_empty_tips_1"
+                android:text="@string/homepage_empty"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
             />
-
+        </RelativeLayout>
     </RelativeLayout>
 
     <data>
@@ -51,6 +76,9 @@
         <variable
             name="posterHandler"
             type="ShortcutManagerEventHandler" />
+        <variable
+            name="isEmtpy"
+            type="boolean" />
     </data>
 
 </layout>

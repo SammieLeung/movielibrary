@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage;
+package com.hphtv.movielibrary.ui.homepage.fragment.homepage;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,6 +21,9 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
+import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
+import com.hphtv.movielibrary.ui.homepage.IActivityResult;
+import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
@@ -35,8 +38,8 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentViewModel, FragmentHomepageBinding> implements IActivityResult {
-    public static final String TAG = NewPageFragment.class.getSimpleName();
+public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentViewModel, FragmentHomepageBinding> {
+    public static final String TAG = HomePageFragment.class.getSimpleName();
     private HistoryListAdapter mHistoryListAdapter;
     private GenreTagAdapter mGenreTagAdapter;
     private NewMovieItemListAdapter mRecentlyAddListAdapter;
@@ -48,7 +51,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
-    private BaseApater2.OnRecyclerViewItemActionListener<MovieDataView> mDetialOnListener=new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+    //电影点击监听
+    private BaseApater2.OnRecyclerViewItemActionListener<MovieDataView> mMovieDataViewEventListener = new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
             mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
@@ -59,27 +63,27 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
 
         }
     };
-
-    private GenreTagAdapter.GenreListener mGenreListener=new GenreTagAdapter.GenreListener() {
+    //固定主题动作监听
+    private GenreTagAdapter.GenreListener mGenreListener = new GenreTagAdapter.GenreListener() {
         @Override
         public void addGenre() {
-            AddGenreDialogFragment fragment=AddGenreDialogFragment.newInstance();
-            fragment.show(getChildFragmentManager(),"Add Genres");
+            AddGenreDialogFragment fragment = AddGenreDialogFragment.newInstance();
+            fragment.show(getChildFragmentManager(), "Add Genres");
         }
 
         @Override
         public void browseAll() {
-            Intent intent=new Intent(getContext(), FilterPageActivity.class);
+            Intent intent = new Intent(getContext(), FilterPageActivity.class);
             startActivityForResult(intent);
         }
     };
 
-
-    private BaseApater2.OnRecyclerViewItemActionListener mGenreItemClickListener=new BaseApater2.OnRecyclerViewItemActionListener() {
+    //动态主题动作监听
+    private BaseApater2.OnRecyclerViewItemActionListener mGenreItemClickListener = new BaseApater2.OnRecyclerViewItemActionListener() {
         @Override
         public void onItemClick(View view, int postion, Object data) {
-            Intent intent=new Intent(getContext(), FilterPageActivity.class);
-            intent.putExtra(FilterPageActivity.EXTRA_GENRE,data.toString());
+            Intent intent = new Intent(getContext(), FilterPageActivity.class);
+            intent.putExtra(FilterPageActivity.EXTRA_GENRE, data.toString());
             startActivityForResult(intent);
         }
 
@@ -89,16 +93,13 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         }
     };
 
-    private BaseApater2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener= (view, postion, data) -> {
-        ActivityHelper.showPosterMenuDialog(getChildFragmentManager(),postion,data);
+    private BaseApater2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener = (view, postion, data) -> {
+        ActivityHelper.showPosterMenuDialog(getChildFragmentManager(), postion, data);
         return false;
     };
 
-    public NewPageFragment(IAutofitHeight autofitHeight, int postion) {
-        super(autofitHeight, postion);
-    }
-
-    private TvRecyclerView.OnKeyPressListener mOnKeyPressListener=new TvRecyclerView.OnKeyPressListener() {
+    //TvRecyclerView的按键处理(按键均被监听)
+    private TvRecyclerView.OnKeyPressListener mOnKeyPressListener = new TvRecyclerView.OnKeyPressListener() {
         @Override
         public void processKeyEvent(int keyCode) {
         }
@@ -109,9 +110,13 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         }
     };
 
-    public static NewPageFragment newInstance(IAutofitHeight autofitHeight, int positon) {
+    public HomePageFragment(IAutofitHeight autofitHeight, int postion) {
+        super(autofitHeight, postion);
+    }
+
+    public static HomePageFragment newInstance(IAutofitHeight autofitHeight, int positon) {
         Bundle args = new Bundle();
-        NewPageFragment fragment = new NewPageFragment(autofitHeight, positon);
+        HomePageFragment fragment = new HomePageFragment(autofitHeight, positon);
         fragment.setArguments(args);
         return fragment;
     }
@@ -124,7 +129,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
     }
 
     @Override
-    protected NewPageFragmentViewModel createViewModel() {
+    protected HomeFragmentViewModel createViewModel() {
         return null;
     }
 
@@ -136,8 +141,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
     }
 
 
-
     private void initViews() {
+        mBinding.btnQuickAddShortcut.setOnClickListener(getBaseActivity()::startShortcutManager);
         initRecentlyPlayedList();
         initGenreList();
         initRecentlyAddedList();
@@ -203,7 +208,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         mBinding.rvRecentlyAdded.setOnKeyPressListener(mOnKeyPressListener);
         mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecentlyAddListAdapter = new NewMovieItemListAdapter(getContext(), mRecentlyAddedList);
-        mRecentlyAddListAdapter.setOnItemClickListener(mDetialOnListener);
+        mRecentlyAddListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
         mBinding.rvRecentlyAdded.setAdapter(mRecentlyAddListAdapter);
 //        mRecentlyAddListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
 
@@ -219,7 +224,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mFavoriteListAdapter = new NewMovieItemListAdapter(getContext(), mFavoriteList);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
-        mFavoriteListAdapter.setOnItemClickListener(mDetialOnListener);
+        mFavoriteListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
 //        mFavoriteListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
 
     }
@@ -231,7 +236,7 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecommandListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
         mBinding.rvRecommand.setAdapter(mRecommandListAdapter);
-        mRecommandListAdapter.setOnItemClickListener(mDetialOnListener);
+        mRecommandListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
 //        mRecommandListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
 
     }
@@ -292,18 +297,8 @@ public class NewPageFragment extends BaseAutofitHeightFragment<NewPageFragmentVi
     }
 
     @Override
-    public void startActivityForResult(Intent data) {
-        ((AppBaseActivity)getActivity()).startActivityForResult(data);
-    }
-
-    @Override
-    public void onActivityResult(ActivityResult result) {
-        if (result.getResultCode() == Activity.RESULT_OK)
-            prepareAll();
-    }
-
-    @Override
     public void forceRefresh() {
         prepareAll();
     }
+
 }

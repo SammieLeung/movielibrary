@@ -16,10 +16,10 @@ import org.jetbrains.annotations.NotNull;
  * author: Sam Leung
  * date:  2022/1/13
  */
-public class NewHomePageViewModel extends AndroidViewModel {
+public class HomePageViewModel extends AndroidViewModel {
     public ObservableBoolean mChildMode=new ObservableBoolean(!Config.isTempCloseChildMode()&&Config.isChildMode());
     public ObservableBoolean mShowChildMode=new ObservableBoolean(Config.isChildMode());
-    public NewHomePageViewModel(@NonNull @NotNull Application application) {
+    public HomePageViewModel(@NonNull @NotNull Application application) {
         super(application);
     }
 

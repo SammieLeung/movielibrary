@@ -1,15 +1,11 @@
 package com.hphtv.movielibrary.ui.homepage;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.QuickFragmentPageAdapter;
+import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,14 +16,14 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/1/14
  */
-public class NewHomePageTabAdapter extends FragmentStatePagerAdapter {
+public class HomePageTabAdapter extends FragmentStatePagerAdapter {
     protected List<Fragment> mList=new ArrayList<>();
-    public NewHomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
+    public HomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
         super(fm);
 //        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,0);
 //        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,1);
 
-        mList.add(NewPageFragment.newInstance(autofitHeight,0));
+        mList.add(HomePageFragment.newInstance(autofitHeight,0));
 //        mList.add(NewPageFragment.newInstance(autofitHeight,1));
 //        mList.add(NewPageFragment.newInstance(autofitHeight,2));
 

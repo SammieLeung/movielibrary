@@ -43,7 +43,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -438,7 +437,7 @@ public class DeviceMonitorService extends Service {
                                 if(objArr!=null&&objArr.length==2) {
                                     Shortcut shortcut = (Shortcut) objArr[0];
                                     List<VideoFile> videoFileList = (List<VideoFile>) objArr[1];
-                                    Log.w(Thread.currentThread().getName(), shortcut.firendlyName );
+                                    Log.w(Thread.currentThread().getName(), shortcut.friendlyName);
                                     if (mMovieScanService != null)
                                         mMovieScanService.scanVideo(shortcut,videoFileList);
                                 }
@@ -487,7 +486,7 @@ public class DeviceMonitorService extends Service {
                             }
                         }
                     }
-                    LogUtil.v("startScanNetworkFiles [" + shortcut1.firendlyName + "] filecount:" + videoFileList.size());
+                    LogUtil.v("startScanNetworkFiles [" + shortcut1.friendlyName + "] filecount:" + videoFileList.size());
                     Object[] data = new Object[2];
                     data[0] = shortcut1;
                     data[1] = videoFileList;
