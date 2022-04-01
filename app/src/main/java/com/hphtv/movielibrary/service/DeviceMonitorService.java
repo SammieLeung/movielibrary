@@ -202,7 +202,7 @@ public class DeviceMonitorService extends Service {
             newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
             newFilter.addAction(Intent.ACTION_MEDIA_UNMOUNTED);
             newFilter.addDataScheme("file");
-            registerReceiver(mDeviceMountReceiver, newFilter);
+            registerReceiver(mMediaMountReceiver, newFilter);
         }
         IntentFilter localFilter = new IntentFilter();
         localFilter.addAction(Constants.BroadCastMsg.DEVICE_UP);
@@ -217,19 +217,16 @@ public class DeviceMonitorService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             mStorageManager.unregisterStorageVolumeCallback((StorageManager.StorageVolumeCallback) mStorageVolumeCallback);
         } else {
-            unregisterReceiver(mDeviceMountReceiver);
+            unregisterReceiver(mMediaMountReceiver);
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mDeviceMountReceiver);
         }
     }
 
-    /**
-     * 接受设备挂载广播
-     */
-    private BroadcastReceiver mDeviceMountReceiver = new BroadcastReceiver() {
+
+    private BroadcastReceiver mMediaMountReceiver=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            LogUtil.v(DeviceMonitorService.class.getSimpleName(), "mDeviceMountReceiver action:" + action);
             switch (action) {
                 case Intent.ACTION_MEDIA_MOUNTED:
                 case Intent.ACTION_MEDIA_UNMOUNTED:
@@ -253,6 +250,19 @@ public class DeviceMonitorService extends Service {
                         e.printStackTrace();
                     }
                     break;
+            }
+        }
+    };
+    /**
+     * 接受设备挂载广播
+     */
+    private BroadcastReceiver mDeviceMountReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            LogUtil.v(DeviceMonitorService.class.getSimpleName(), "mDeviceMountReceiver action:" + action);
+            switch (action) {
+
                 //本地广播
                 case Constants.BroadCastMsg.DEVICE_UP:
 //                    String mountPath = intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
@@ -359,10 +369,6 @@ public class DeviceMonitorService extends Service {
                     public void onAction(Object[] data) {
                         if (data.length == 2) {
                             Shortcut shortcut = (Shortcut) data[0];
-//                            int fileCount=mShortcutDao.queryTotalFiles(shortcut.uri);
-//                            int matchedCount=mShortcutDao.queryMatchedFiles(shortcut.uri);
-//                            shortcut.fileCount=fileCount;
-//                            shortcut.posterCount=matchedCount;
                             List<VideoFile> videoFileList = (List<VideoFile>) data[1];
                             if (videoFileList != null && videoFileList.size() > 0) {
                                 if (mMovieScanService != null)
