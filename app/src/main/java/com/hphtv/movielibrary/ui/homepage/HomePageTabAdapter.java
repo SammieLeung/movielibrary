@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
+import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknowFileFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,7 @@ public class HomePageTabAdapter extends FragmentStatePagerAdapter {
 //        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,1);
 
         mList.add(HomePageFragment.newInstance(autofitHeight,0));
+        mList.add(UnknowFileFragment.newInstance(autofitHeight,1));
 //        mList.add(NewPageFragment.newInstance(autofitHeight,1));
 //        mList.add(NewPageFragment.newInstance(autofitHeight,2));
 

@@ -88,7 +88,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.viewpager.setOffscreenPageLimit(2);
         mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
         mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
-//        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.tab_movie)));
+        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
 //        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
 
         for (int i = 0; i < mBinding.tablayout.getTabCount(); i++) {

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:layout_marginTop="47dp"
+                style="@style/homepage_head_title"
+                android:id="@+id/tv_recently_added"
+                android:text="@string/unknowfile_list_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
+                android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
+                android:id="@+id/rv_recently_added"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+        <RelativeLayout
+            android:visibility="@{isEmpty?View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+            <ImageView
+                android:layout_marginTop="165dp"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/iv_empty"
+                android:src="@mipmap/empty_img"
+                android:layout_width="158dp"
+                android:layout_height="131dp"/>
+            <TextView
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/iv_empty"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/tv_empty_tips_1"
+                android:text="@string/homepage_empty"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                style="@style/common_content_s_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_empty_tips_1"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="13dp"
+                android:text="@string/unknowfile_empty" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="isEmpty"
+            type="boolean" />
+    </data>
+</layout>

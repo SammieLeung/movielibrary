@@ -17,6 +17,8 @@
     <string name="my_favorite_list_title">Favorite</string>
     <string name="recommand_list_title">Recommand</string>
 
+    <!--未匹配-->
+    <string name="unknowfile_list_title">Unknow Files</string>
     <!--分类浏览-->
     <string name="category_all">All</string>
     <string name="category_movie">Movie</string>
@@ -218,6 +220,7 @@
     <!--    空白提示-->
     <string name="homepage_empty">There is nothing here!</string>
     <string name="homepage_goto_add_shortcut">Let\'s go to add videos</string>
+    <string name="unknowfile_empty">There are no unmatched files</string>
 
 
 </resources>

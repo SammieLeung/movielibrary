@@ -17,6 +17,8 @@
     <string name="my_favorite_list_title">我的收藏</string>
     <string name="recommand_list_title">推荐影片</string>
 
+    <!--未匹配-->
+    <string name="unknowfile_list_title">未匹配文件</string>
     <!--分类浏览-->
     <string name="category_all">全部</string>
     <string name="category_movie">电影</string>
@@ -211,4 +213,6 @@
     <!--    空白提示-->
     <string name="homepage_empty">空空如也</string>
     <string name="homepage_goto_add_shortcut">快去添加影片吧</string>
+    <string name="unknowfile_empty">没有未匹配的文件</string>
+
 </resources>
