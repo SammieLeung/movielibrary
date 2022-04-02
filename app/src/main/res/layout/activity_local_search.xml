@@ -19,7 +19,6 @@
         <TextView
             style="@style/title_style"
             android:id="@+id/btn_exit"
-            android:layout_marginLeft="@dimen/shortcut_container_padding"
             android:text="@string/search"
             />
 

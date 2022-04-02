@@ -11,10 +11,10 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/title_style"
             android:id="@+id/btn_exit"
-            android:text="@string/shortcut_manager"
-             />
+            style="@style/title_style"
+            android:layout_marginLeft="0dp"
+            android:text="@string/shortcut_manager" />
         <Button
             android:focusedByDefault="true"
             android:id="@+id/btn_add_device"

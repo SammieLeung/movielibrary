@@ -41,7 +41,8 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     View.OnClickListener mOnClickListener = v -> {
         switch (v.getId()) {
             case R.id.btn_home:
-                ActivityHelper.startHomePageActivity(FilterPageActivity.this);
+            case R.id.tv_title:
+                finish();
                 break;
             case R.id.btn_filter:
                 FilterBoxDialogFragment filterBoxDialogFragment = FilterBoxDialogFragment.newInstance();
@@ -59,7 +60,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
         @Override
         public void onItemFocus(View view, int position, MovieDataView data) {
-            mViewModel.refreshRowStr(position);
+//            mViewModel.refreshRowStr(position);
         }
     };
 
@@ -90,15 +91,14 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String genreName = getIntent().getStringExtra(EXTRA_GENRE);
-        if (!TextUtils.isEmpty(genreName)) {
-            mViewModel.setGenre(genreName);
-        }
+        mViewModel.setGenre(genreName);
         reloadMoiveDataViews();
     }
 
     private void initView() {
         mBinding.btnHome.setOnClickListener(mOnClickListener);
         mBinding.btnFilter.setOnClickListener(mOnClickListener);
+        mBinding.tvTitle.setOnClickListener(mOnClickListener);
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
         gridLayoutManager.setVisibleItemListener(v -> {
             if (v != null) {
@@ -178,6 +178,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     @Override
     public void OnRematchPoster(MovieDataView dataView, int pos) {
         mMovieItemListAdapter.replace(dataView,pos);
+        setResult(RESULT_OK);
     }
 
     @Override

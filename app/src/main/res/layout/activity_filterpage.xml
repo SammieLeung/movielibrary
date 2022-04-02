@@ -43,55 +43,59 @@
             android:drawableLeft="@drawable/icon_circle_home"
             android:text="@string/homepage" />
 
-        <LinearLayout
-            android:visibility="@{emptyType==0?View.VISIBLE:View.GONE}"
-            android:id="@+id/view_result_count"
-            android:layout_alignBottom="@id/btn_home"
-            android:layout_marginLeft="86dp"
-            android:textColor="@color/white"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:text="@string/filterpage_resulttext_1"
-                style="@style/filterpage_result_text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@{conditions}"
-                style="@style/filterpage_result_text_style_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@string/filterpage_resulttext_2"
-                style="@style/filterpage_result_text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@{total}"
-                style="@style/filterpage_result_text_style_bold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@string/filterpage_resulttext_3"
-                style="@style/filterpage_result_text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@{row}"
-                style="@style/filterpage_result_text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <TextView
-                android:text="@string/filterpage_resulttext_4"
-                style="@style/filterpage_result_text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/title_style"
+            android:text='@{conditions}' />
+<!--        <LinearLayout-->
+<!--            android:visibility="@{emptyType==0?View.VISIBLE:View.GONE}"-->
+<!--            android:id="@+id/view_result_count"-->
+<!--            android:layout_alignBottom="@id/btn_home"-->
+<!--            android:layout_marginLeft="86dp"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_1"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@{conditions}"-->
+<!--                style="@style/filterpage_result_text_style_bold"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_2"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@{total}"-->
+<!--                style="@style/filterpage_result_text_style_bold"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_3"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@{row}"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_4"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
 
-        </LinearLayout>
+<!--        </LinearLayout>-->
 
         <RelativeLayout
-            android:layout_below="@id/view_result_count"
+            android:layout_below="@id/tv_title"
             android:visibility="@{emptyType>0?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -134,12 +138,11 @@
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/view_result_count"
+            android:layout_below="@id/tv_title"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="30dp"
             android:layout_marginBottom="-5dp"
-            android:paddingBottom="5dp"
-       />
+            android:paddingBottom="5dp" />
     </RelativeLayout>
 </layout>

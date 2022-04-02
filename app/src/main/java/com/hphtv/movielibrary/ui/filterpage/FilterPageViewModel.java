@@ -142,8 +142,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     public void onFilterChange(Shortcut shortcut, VideoTag videoTag, String genre, String year) {
         mShortcut = shortcut;
         mVideoTag = videoTag;
-        mGenre = genre;
         mYear = year;
+        setGenre(genre);
     }
 
     public void onSortByChange(int order, boolean isDesc) {
@@ -176,8 +176,15 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
             mEmptyType.set(EP_NO_RESULT);
         else {
             mEmptyType.set(EP_NOT_EMPTY);
-            refreshResultStr(mTotal);
+//            refreshResultStr(mTotal);
         }
+    }
+
+    private void refreshGenre(){
+        if(mGenre==null)
+            mConditionStr.set(getString(R.string.all));
+        else
+            mConditionStr.set(mGenre);
     }
 
     private void refreshResultStr(int total) {
@@ -217,6 +224,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
 
     public void setGenre(String genre) {
         mGenre = genre;
+        refreshGenre();
     }
 
     public String getGenre() {
