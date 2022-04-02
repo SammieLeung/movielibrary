@@ -46,7 +46,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         initView();
         autoScrollListener(mBinding.nsv);
         //是否自动搜索文件夹
-        if(Config.isAutoSearch().get()){
+        if (Config.isAutoSearch().get()) {
             autoSearch();
         }
     }
@@ -63,7 +63,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     /**
      * 绑定数据
      */
-    private void bindDatas(){
+    private void bindDatas() {
         mBinding.setChildmode(mViewModel.mChildMode);
         mBinding.setShowChildMode(mViewModel.mShowChildMode);
     }
@@ -71,7 +71,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     /**
      * 初始化UI
      */
-    private void initView(){
+    private void initView() {
         mBinding.btnPinyinSearch.setOnClickListener(this::startPinyinSearchPage);
         mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
         mBinding.btnSettings.setOnClickListener(this::startSettings);
@@ -115,8 +115,8 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     /**
      * 自动搜索本地设备
      */
-    private void autoSearch(){
-        Intent intent=new Intent();
+    private void autoSearch() {
+        Intent intent = new Intent();
         intent.setAction(Constants.BroadCastMsg.RESCAN_ALL);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -125,9 +125,21 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     protected void onActivityResultCallback(ActivityResult result) {
         //刷新显示儿童模式状态
         mViewModel.getShowChildMode().set(Config.isChildMode());
-        mViewModel.getChildMode().set(!Config.isTempCloseChildMode()&&Config.isChildMode());
+        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
         //刷新各个子Fragment状态
-        if(result.getResultCode()==RESULT_OK)
+        if (result.getResultCode() == RESULT_OK)
+            for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+                if (fragment instanceof IActivityResult) {
+                    IActivityResult activityResult = (IActivityResult) fragment;
+                    activityResult.forceRefresh();
+                }
+            }
+    }
+
+    /**
+     * 强制刷新所有Fragment
+     */
+    private void updateFragments() {
         for (Fragment fragment : mNewHomePageTabAdapter.mList) {
             if (fragment instanceof IActivityResult) {
                 IActivityResult activityResult = (IActivityResult) fragment;
@@ -136,11 +148,9 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
-    /**
-     * 强制刷新所有Fragment
-     */
-    private void updateFragments(){
-        for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+    public void refreshFragment(int pos) {
+        if (pos < mNewHomePageTabAdapter.mList.size()) {
+            Fragment fragment=mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IActivityResult) {
                 IActivityResult activityResult = (IActivityResult) fragment;
                 activityResult.forceRefresh();
@@ -241,6 +251,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     /**
      * 开关儿童，模式
+     *
      * @param v
      */
     private void toggleChildmode(View v) {

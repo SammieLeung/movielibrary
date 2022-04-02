@@ -4,48 +4,42 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
+        android:layout_height="wrap_content">
+        <com.hphtv.movielibrary.ui.view.TvRecyclerView
             android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}"
+            android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
+            android:id="@+id/rv_unknowsfile"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <TextView
-                android:layout_marginTop="47dp"
-                style="@style/homepage_head_title"
-                android:id="@+id/tv_recently_added"
-                android:text="@string/unknowfile_list_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
-                android:id="@+id/rv_recently_added"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </LinearLayout>
+            android:layout_height="660dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginBottom="-5dp"
+            android:paddingBottom="5dp"
+            android:layout_marginRight="30dp"/>
+
         <RelativeLayout
-            android:visibility="@{isEmpty?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
+            android:visibility="@{isEmpty?View.VISIBLE:View.GONE}">
+
             <ImageView
-                android:layout_marginTop="165dp"
-                android:layout_centerHorizontal="true"
                 android:id="@+id/iv_empty"
-                android:src="@mipmap/empty_img"
                 android:layout_width="158dp"
-                android:layout_height="131dp"/>
+                android:layout_height="131dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="165dp"
+                android:src="@mipmap/empty_img" />
+
             <TextView
-                android:layout_marginTop="30dp"
+                android:id="@+id/tv_empty_tips_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/iv_empty"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/tv_empty_tips_1"
+                android:layout_marginTop="30dp"
                 android:text="@string/homepage_empty"
-                android:textSize="26sp"
-                android:textStyle="bold"
                 android:textColor="@color/white"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
             <TextView
                 style="@style/common_content_s_text_style"

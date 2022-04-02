@@ -12,13 +12,15 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  */
 @DatabaseView(
         value = "SELECT u.filename,u.keyword,u.path,u.last_playtime," +
-                "m.poster,m.source,m.title,m.ratings,m.ap,m.s_ap," +
-                "st.img_url as stage_photo " +
+                "m.poster,m.source,m.title,m.ratings,m.ap,st.access AS s_ap," +
+                "sp.img_url AS stage_photo " +
                 "FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" AS u " +
                 "LEFT OUTER JOIN "+VIEW.MOVIE_DATAVIEW+" AS m " +
                 "ON u.path=m.file_uri " +
-                "LEFT OUTER JOIN "+ TABLE.STAGEPHOTO +" AS st " +
-                "ON st.movie_id=m.id "+
+                "LEFT OUTER JOIN "+ TABLE.STAGEPHOTO +" AS sp " +
+                "ON sp.movie_id=m.id "+
+                "LEFT OUTER JOIN shortcut AS st " +
+                "ON st.uri=u.dir_uri "+
                 "WHERE u.last_playtime!=0 " +
                 "GROUP BY u.path,m.source " +
                 "ORDER BY u.last_playtime DESC"
