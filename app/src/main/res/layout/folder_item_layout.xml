@@ -21,14 +21,15 @@
         android:layout_marginBottom="26dp"
         android:background="@drawable/new_shortcut_item_bg"
         >
+
         <ImageView
-            android:layout_alignParentStart="true"
             android:id="@+id/img_icon"
-            android:src="@mipmap/icon_new_folder"
-            android:layout_centerVertical="true"
             android:layout_width="45dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
             android:layout_marginRight="23dp"
-            android:layout_height="wrap_content"/>
+            android:src="@mipmap/icon_new_folder" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"

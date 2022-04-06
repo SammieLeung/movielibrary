@@ -7,12 +7,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerEventHandler;
 import com.hphtv.movielibrary.ui.shortcutmanager.bean.FolderItem;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FolderItemLayoutBinding;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.StringTools;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,13 +67,13 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 //            binding.setPosterHandler(mEventHandler);
 //            return vh;
 //        } else {
-            FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-            CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
-            binding.getRoot().setOnClickListener(v -> {
-                if (mOnClickListener != null)
-                    mOnClickListener.onClick((FolderItem) v.getTag());
-            });
-            return vh;
+        FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
+        binding.getRoot().setOnClickListener(v -> {
+            if (mOnClickListener != null)
+                mOnClickListener.onClick((FolderItem) v.getTag());
+        });
+        return vh;
 //        }
     }
 
@@ -86,6 +89,17 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         if (getItemViewType(position) == TYPE_FOLDER) {
             FolderItem folderItem = mFolderItemList.get(position);
             CommonViewHolder<FolderItemLayoutBinding> vh = holder;
+            switch (folderItem.type) {
+                case Constants.DeviceType.DEVICE_TYPE_DLNA:
+                    Glide.with(mContext).load(R.mipmap.icon_new_dlna_folder).into(vh.mDataBinding.imgIcon);
+                    break;
+                case Constants.DeviceType.DEVICE_TYPE_SMB:
+                    Glide.with(mContext).load(R.mipmap.icon_new_smb_folder).into(vh.mDataBinding.imgIcon);
+                    break;
+                default:
+                    Glide.with(mContext).load(R.mipmap.icon_new_folder).into(vh.mDataBinding.imgIcon);
+                    break;
+            }
             vh.mDataBinding.setItem(folderItem);
             vh.mDataBinding.getRoot().setTag(folderItem);
         }
@@ -152,7 +166,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     public void updateShortcut(Shortcut shortcut) {
         for (int i = 0; i < mFolderItemList.size(); i++) {
             FolderItem folderItem = mFolderItemList.get(i);
-            String uri=shortcut.uri;
+            String uri = shortcut.uri;
             if (folderItem.uri.equals(uri)) {
                 folderItem = buildFolderItem(shortcut);
                 mFolderItemList.set(i, folderItem);
@@ -161,10 +175,10 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         }
     }
 
-    public void removeShortcut(Shortcut shortcut){
+    public void removeShortcut(Shortcut shortcut) {
         for (int i = 0; i < mFolderItemList.size(); i++) {
             FolderItem folderItem = mFolderItemList.get(i);
-            String uri=shortcut.uri;
+            String uri = shortcut.uri;
             if (folderItem.uri.equals(uri)) {
                 mFolderItemList.remove(folderItem);
                 notifyItemRemoved(i);
