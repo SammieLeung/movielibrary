@@ -84,7 +84,7 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
      */
     public Observable<Shortcut> addShortcut(Uri uri) {
         return Observable.just(uri)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(Schedulers.newThread())
                 .map(queryUri -> {
                     String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
                     String base64Id = queryUri.getPathSegments().get(1);//dir id
@@ -110,7 +110,6 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                             }
                         }
                     } else if (deviceTypeStr.equals("dlna") || deviceTypeStr.equals("samba")) {
-
                         Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                         if (shortcut == null) {
                             if (deviceTypeStr.equals("samba")) {

@@ -120,7 +120,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
                 DensityUtil.dip2px(this, 43),
                 DensityUtil.dip2px(this, 32),
                 DensityUtil.dip2px(this, 40),
-                DensityUtil.dip2px(this, 30),
+                DensityUtil.dip2px(this, 33),
                 5)
         );
         mBinding.recyclerview.setAdapter(mMovieItemListAdapter);

@@ -142,10 +142,6 @@ public class LocalFileScanHelper {
         //队列结束保存文件信息入库
         saveVideoFileInfotoDB(allVideoFileList, videoFileDao);
         updateShortcutFileCount(shortcutList,shortcutDao);
-//        clearRedundantVideoFiles();
-//        Intent intent = new Intent();
-//        intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
-//        LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 
 

@@ -166,23 +166,11 @@ public class MovieScanService extends Service {
                     @Override
                     public Object[] apply(Shortcut shortcut1, Constants.SearchType searchType1, List<VideoFile> videoFileList) throws Throwable {
                         Log.e(Thread.currentThread().getName(), "准备分发==>" + videoFileList);
-
                         Observable.fromIterable(videoFileList)
                                 .observeOn(Schedulers.from(mNetworkExecutor))
                                 .map(videoFile -> {
                                     LogUtil.v(Thread.currentThread().getName(), "shortcut[" + shortcut1.friendlyName + "]" + "[" + videoFile.filename + "]开始匹配...");
                                     String keyword = videoFile.keyword;
-
-                                    //获取文件关键字
-                                    if (TextUtils.isEmpty(keyword)) {
-                                        LogUtil.v(Thread.currentThread().getName(), "");
-                                        MovieNameInfo movieNameInfo = MovieScanService.this.createMovieNameInfo(videoFile);
-                                        keyword = movieNameInfo.getName();
-                                        videoFile.keyword = keyword;
-                                        videoFile.season = movieNameInfo.getSeason();
-                                        videoFile.episode = movieNameInfo.toEpisode("0");
-                                        mVideoFileDao.update(videoFile);
-                                    }
 
                                     //选择搜索api
                                     String api = Constants.Scraper.TMDB_EN;

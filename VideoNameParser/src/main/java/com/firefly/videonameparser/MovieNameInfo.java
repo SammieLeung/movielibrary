@@ -91,13 +91,12 @@ public class MovieNameInfo {
                 for (int i : episodes) {
                     sb.append(prefix + i + "-");
                 }
-                sb.substring(0, sb.length() - 1);
             } else {
                 for (int i : episodes) {
                     sb.append(prefix + i + ",");
                 }
-                sb.substring(0, sb.length() - 1);
             }
+            sb.delete(sb.length() - 1,sb.length());
             return sb.toString();
         }
         return "";

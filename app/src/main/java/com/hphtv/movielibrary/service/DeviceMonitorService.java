@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.firefly.videonameparser.MovieNameInfo;
+import com.firefly.videonameparser.VideoNameParser;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
@@ -466,6 +468,9 @@ public class DeviceMonitorService extends Service {
                     String networkPath = shortcut1.uri;
                     Cursor cursor = getContentResolver().query(Uri.parse(queryUri), null, null, null, null);
                     if (cursor != null) {
+                        int fileCount=cursor.getCount();
+                        shortcut1.fileCount=fileCount;
+                        mShortcutDao.updateShortcut(shortcut1);
                         while (cursor.moveToNext()) {
                             String path = cursor.getString(cursor.getColumnIndex("path"));
                             String filename = cursor.getString(cursor.getColumnIndex("_display_name"));
@@ -480,6 +485,12 @@ public class DeviceMonitorService extends Service {
                                 videoFile.path = cursor.getString(cursor.getColumnIndex("path"));
                                 videoFile.filename = filename;
                                 videoFile.dirPath = dirPath;
+                                videoFile.addTime = System.currentTimeMillis();
+                                VideoNameParser parser=new VideoNameParser();
+                                MovieNameInfo info= parser.parseVideoName(videoFile.path);
+                                videoFile.keyword = info.getName();;
+                                videoFile.season = info.getSeason();
+                                videoFile.episode = info.toEpisode("0");
                                 long vid = mVideoFileDao.insertOrIgnore(videoFile);
                                 videoFile.vid = vid;
                                 videoFileList.add(videoFile);
@@ -505,7 +516,6 @@ public class DeviceMonitorService extends Service {
                             } else {    //TODO mPosterPairingDevice处理
                                 LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
                                 ServiceStatusHelper.removeView(DeviceMonitorService.this);
-
                             }
                         }
                     }

@@ -36,10 +36,8 @@ public class VideoFile implements Serializable {
     public int isScanned=0;
 
     public String keyword;
-
     @ColumnInfo(name = "add_time",defaultValue = "0")
     public long addTime;//文件添加时间
-
     @ColumnInfo(name = "last_playtime",defaultValue = "0")
     public long lastPlayTime;//上次播放时间
     public int season=0;

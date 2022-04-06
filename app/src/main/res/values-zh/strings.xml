@@ -197,7 +197,7 @@
     <string name="postermenu_clear_poster">清理匹配信息</string>
     <string name="postermenu_add_to_videotag">添加到分类</string>
     <string name="unknowfilemenu_playmovie">播放视频</string>
-    <string name="unknowfilemenu_reselect_poster">重新匹配海报</string>
+    <string name="unknowfilemenu_reselect_poster">匹配海报</string>
 
 
     <string name="refresh_text">正在刷新</string>

@@ -90,7 +90,6 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
-        mShortcutManagerEventHandler.pickerClose();
         if (result.getResultCode() == RESULT_OK) {
             final Uri uri = result.getData().getData();
             mViewModel.addShortcut(uri)
@@ -103,8 +102,8 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
                     });
             setResult(RESULT_OK);
         }
+        mShortcutManagerEventHandler.pickerClose();
     }
-
 
     private void registerReceivers() {
         IntentFilter intentFilter = new IntentFilter();

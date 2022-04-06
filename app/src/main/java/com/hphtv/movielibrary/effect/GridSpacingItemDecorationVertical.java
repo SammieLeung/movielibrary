@@ -55,7 +55,7 @@ public class GridSpacingItemDecorationVertical extends RecyclerView.ItemDecorati
                 if (mEdageSpacing != -1) {
                     if (i == 0) {
                         lastLeftColumn = mEdageSpacing;
-                        lastRightColumn = eachWidth - mEdageSpacing - mItemWidth;
+                        lastRightColumn = eachColumnSpacing - lastLeftColumn;
                     } else if (i == mSpanCount - 1) {
                         lastLeftColumn = eachColumnSpacing - lastRightColumn;
                         lastRightColumn = mEdageSpacing;
