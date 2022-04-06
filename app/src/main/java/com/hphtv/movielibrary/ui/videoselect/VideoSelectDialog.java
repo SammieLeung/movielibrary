@@ -101,12 +101,7 @@ public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel,
         obj = getArguments().getSerializable(MOVIE_WRAPPER);
         if (obj != null && obj instanceof MovieWrapper) {
             MovieWrapper wrapper = (MovieWrapper) obj;
-            wrapper.videoFiles.sort(new Comparator<VideoFile>() {
-                @Override
-                public int compare(VideoFile o1, VideoFile o2) {
-                    return o1.filename.compareTo(o2.filename);
-                }
-            });
+            wrapper.videoFiles.sort(Comparator.comparing(o -> o.filename));
             mVideoSelectListAdapter.addAll(wrapper.videoFiles);
         }
     }

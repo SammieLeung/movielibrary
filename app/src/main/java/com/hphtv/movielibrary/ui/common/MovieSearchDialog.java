@@ -1,13 +1,16 @@
-package com.hphtv.movielibrary.ui.detail;
+package com.hphtv.movielibrary.ui.common;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -98,11 +101,16 @@ public class MovieSearchDialog extends DialogFragment {
                 mViewModel.loading(mAdapter);
             }
         });
+        mBinding.etBoxName.setOnEditorActionListener((v, actionId, event) -> {
+            if(actionId== EditorInfo.IME_ACTION_SEARCH){
+                reSearch();
+                return true;
+            }
+            return false;
+        });
         //搜索按钮
         mBinding.btnSearch.setOnClickListener(v -> {
-            mAdapter.clearAll();
-            String keyword = mBinding.etBoxName.getText().toString();
-            mViewModel.refresh(keyword, mAdapter);
+            reSearch();
         });
         mBinding.btnClose.setOnClickListener(v -> dismiss());
         if (mViewModel.getCurrentKeyword() != null) {
@@ -135,6 +143,13 @@ public class MovieSearchDialog extends DialogFragment {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+
+    private void reSearch(){
+        mAdapter.clearAll();
+        String keyword = mBinding.etBoxName.getText().toString();
+        mViewModel.refresh(keyword, mAdapter);
     }
 
     private OnSelectPosterListener mOnSelectPosterListener;

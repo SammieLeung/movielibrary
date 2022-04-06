@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.detail;
+package com.hphtv.movielibrary.ui.common;
 
 import android.content.Context;
 import android.text.TextUtils;

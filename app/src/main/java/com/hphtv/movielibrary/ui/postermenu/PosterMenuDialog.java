@@ -11,18 +11,15 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.DialogPosterItemMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
-import com.hphtv.movielibrary.ui.detail.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
-
-import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * author: Sam Leung
