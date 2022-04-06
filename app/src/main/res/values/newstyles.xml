@@ -161,6 +161,11 @@
         <item name="android:layout_width">481dp</item>
     </style>
 
+    <style name="unknowfile_menu_sub_item_size">
+        <item name="android:layout_height">69dp</item>
+        <item name="android:layout_width">467dp</item>
+    </style>
+
     <style name="setting_item_with_drawable" parent="setting_item_size">
         <item name="android:paddingLeft">23dp</item>
         <item name="android:paddingRight">23dp</item>

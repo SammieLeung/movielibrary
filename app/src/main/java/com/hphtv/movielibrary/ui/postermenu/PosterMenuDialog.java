@@ -105,7 +105,7 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     private void showSearchDialog() {
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(mViewModel.getMovieDataView().title);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            mViewModel.reMatchMovie(wrapper, mViewModel.getMovieDataView())
+            mViewModel.reMatchMovie(wrapper)
                     .subscribe(new SimpleObserver<MovieDataView>() {
                         @Override
                         public void onAction(MovieDataView movieDataView) {

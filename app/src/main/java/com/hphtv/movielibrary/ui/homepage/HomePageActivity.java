@@ -18,6 +18,8 @@ import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
+import com.hphtv.movielibrary.listener.OnMovieChangeListener;
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
@@ -32,7 +34,7 @@ import com.station.kit.util.LogUtil;
  * author: Sam Leung
  * date:  2022/1/13
  */
-public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight {
+public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight, OnMovieChangeListener {
     private HomePageTabAdapter mNewHomePageTabAdapter;
 
     @Override
@@ -279,4 +281,23 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         passwordDialogFragment.show(getSupportFragmentManager(), "");
     }
 
+    @Override
+    public void OnRematchPoster(MovieDataView movieDataView, int pos) {
+        updateFragments();
+    }
+
+    @Override
+    public void OnMovieChange(MovieDataView movieDataView, int pos) {
+
+    }
+
+    @Override
+    public void OnMovieRemove(String movie_id, int pos) {
+
+    }
+
+    @Override
+    public void OnMovieInsert(MovieDataView movieDataView, int pos) {
+
+    }
 }

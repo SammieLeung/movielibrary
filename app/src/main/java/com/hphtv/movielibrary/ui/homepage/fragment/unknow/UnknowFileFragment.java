@@ -16,6 +16,8 @@ import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
+import com.hphtv.movielibrary.ui.postermenu.UnknownsFileMenuDialog;
+import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  * author: Sam Leung
  * date:  2022/4/2
  */
-public class UnknowFileFragment  extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> {
+public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> {
 
     public UnknowFileFragment(IAutofitHeight autofitHeight, int position) {
         super(autofitHeight, position);
@@ -63,7 +65,7 @@ public class UnknowFileFragment  extends BaseAutofitHeightFragment<UnknowFileVie
     /**
      * 初始化UI
      */
-    private void initViews(){
+    private void initViews() {
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false);
         mBinding.rvUnknowsfile.setLayoutManager(gridLayoutManager);
         mBinding.rvUnknowsfile.setAdapter(mViewModel.getUnknownsFileItemListAdapter());
@@ -81,29 +83,39 @@ public class UnknowFileFragment  extends BaseAutofitHeightFragment<UnknowFileVie
                 DensityUtil.dip2px(getContext(), 30),
                 5)
         );
-        mViewModel.getUnknownsFileItemListAdapter().setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
-            @Override
-            public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
-                mViewModel.playVideo(data.path,data.filename)
-                        .subscribe(new SimpleObserver<String>() {
-                            @Override
-                            public void onAction(String s) {
-                                getBaseActivity().refreshFragment(0);//主页刷新历史播放
-                            }
-                        });
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, UnrecognizedFileDataView data) {
-
-            }
-        });
-        mViewModel.getUnknownsFileItemListAdapter().setOnItemLongClickListener(new BaseApater2.OnItemLongClickListener<UnrecognizedFileDataView>() {
-            @Override
-            public boolean onItemLongClick(View view, int postion, UnrecognizedFileDataView data) {
-                return false;
-            }
-        });
+        mViewModel.getUnknownsFileItemListAdapter().setOnItemClickListener(mActionListener);
+        mViewModel.getUnknownsFileItemListAdapter().setOnItemLongClickListener(this::showUnknowsFileMenuDialog);
     }
+
+    /**
+     * 显示菜单
+     *
+     * @param view
+     * @param postion
+     * @param data
+     * @return
+     */
+    private boolean showUnknowsFileMenuDialog(View view, int postion, UnrecognizedFileDataView data) {
+        ActivityHelper.showUnknowsFileMenuDialog(getChildFragmentManager(), postion, data);
+        return true;
+    }
+
+    private BaseApater2.OnRecyclerViewItemActionListener mActionListener = new BaseApater2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
+        @Override
+        public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
+            mViewModel.playVideo(data.path, data.filename)
+                    .subscribe(new SimpleObserver<String>() {
+                        @Override
+                        public void onAction(String s) {
+                            getBaseActivity().refreshFragment(0);//主页刷新历史播放
+                        }
+                    });
+        }
+
+        @Override
+        public void onItemFocus(View view, int postion, UnrecognizedFileDataView data) {
+
+        }
+    };
 
 }

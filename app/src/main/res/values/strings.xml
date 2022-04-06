@@ -203,6 +203,8 @@
     <string name="postermenu_mark_as_like">Like</string>
     <string name="postermenu_clear_poster">Clean up the poster</string>
     <string name="postermenu_add_to_videotag">Add to tag</string>
+    <string name="unknowfilemenu_playmovie">Play</string>
+    <string name="unknowfilemenu_reselect_poster">Rematch the poster</string>
 
     <string name="refresh_text">Loading</string>
     <string name="tx_search_input_hint">Please enter a keyword</string>
