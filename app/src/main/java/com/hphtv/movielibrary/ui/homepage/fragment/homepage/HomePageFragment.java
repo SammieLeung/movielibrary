@@ -173,7 +173,6 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
             public void onItemClick(View view, int postion, HistoryMovieDataView data) {
                 mViewModel.playingVideo(data.path, data.filename, list -> {
                     mHistoryListAdapter.addAll(list);
-                    mHistoryListAdapter.notifyDataSetChanged();
                 });
             }
 

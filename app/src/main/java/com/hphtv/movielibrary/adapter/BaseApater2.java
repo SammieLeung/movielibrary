@@ -59,7 +59,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull VH holder, int position) {
-        holder.mBinding.getRoot().setTag(mList.get(position));
+        holder.mBinding.getRoot().setTag(position);
     }
 
 
@@ -71,8 +71,8 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
     @Override
     public void onClick(View v) {
         if (mOnItemClickListener != null) {
-            T data= (T) v.getTag();
-            int position=mList.indexOf(data);
+            int position= (int) v.getTag();
+            T data= mList.get(position);
             //注意这里使用getTag方法获取数据
             mOnItemClickListener.onItemClick(v, position, data);
         }
@@ -80,8 +80,8 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     public boolean onLongClick(View v) {
         if (mOnItemLongClickListener != null) {
-            T data= (T) v.getTag();
-            int position=mList.indexOf(data);
+            int position= (int) v.getTag();
+            T data= mList.get(position);
             return mOnItemLongClickListener.onItemLongClick(v, position, data);
         }
         return false;
