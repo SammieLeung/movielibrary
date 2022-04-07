@@ -11,8 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.Constants;
@@ -24,15 +27,12 @@ import com.hphtv.movielibrary.data.Constants;
 public class PosterContentProvider extends ContentProvider {
 
     private UriMatcher matcher;
-    private VideoFileDao mVideoFileDao;
 
     public static final int POSTER = 1;
     public static final int LOCAL_CACHE = 2;
 
     @Override
     public boolean onCreate() {
-        MovieLibraryRoomDatabase database = MovieLibraryRoomDatabase.getDatabase(getContext());
-        mVideoFileDao = database.getVideoFileDao();
         matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI("com.hphtv.movielibrary", "poster", POSTER);
         return false;
@@ -79,10 +79,19 @@ public class PosterContentProvider extends ContentProvider {
         switch (code) {
             case POSTER:
                 String path= values.getAsString("path");
-                VideoFile videoFile = mVideoFileDao.queryByPath(path);
-                mVideoFileDao.updateLastPlaytime(path, System.currentTimeMillis());
-                String poster = mVideoFileDao.getPoster(videoFile.path, source);
+
+                VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getVideoFileDao();
+                MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieDao();
+
+                long currentTime = System.currentTimeMillis();
+                videoFileDao.updateLastPlaytime(path, currentTime);
+
+                String poster = videoFileDao.getPoster(path, source);
+                Movie movie = movieDao.queryByFilePath(path, ScraperSourceTools.getSource());
+                if (movie != null)
+                    movieDao.updateLastPlaytime(movie.movieId, currentTime);
                 SharePreferencesTools.getInstance(getContext()).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER,poster);
+                OnlineDBApiService.updateHistory(path, ScraperSourceTools.getSource());
                 return 1;
         }
         return -1;
