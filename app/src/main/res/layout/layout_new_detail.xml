@@ -140,6 +140,7 @@
                         style="@style/detail_btn_style"
                         android:id="@+id/btn_play"
                         android:text="@string/btn_play"
+                        android:focusedByDefault="true"
                         android:drawableLeft="@drawable/ic_btn_play_drawable"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/btn_favorite"
