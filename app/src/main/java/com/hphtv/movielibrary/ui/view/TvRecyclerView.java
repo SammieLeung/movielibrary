@@ -339,12 +339,15 @@ public class TvRecyclerView extends RecyclerView {
                             int upOffset = getHeight() / 2 - (upView.getBottom() - upView.getHeight() / 2);
                             this.customSmoothScrollBy(0, -upOffset);
                             return true;
-                        } else {
-                            if (isVertical())
-                                return true;
-                            else
-                                return false;
                         }
+                        //防止顶层
+                        return false;
+//                        } else {
+//                            if (isVertical())
+//                                return true;
+//                            else
+//                                return false;
+//                        }
                     case KeyEvent.KEYCODE_BACK:
                         if (mOnKeyPressListener != null)
                             mOnKeyPressListener.processKeyEvent(event.getKeyCode());
@@ -353,7 +356,7 @@ public class TvRecyclerView extends RecyclerView {
                                 mOnKeyPressListener.onBackPress();
                             return true;
                         } else {
-                            smoothScrollToPosition(0);
+                            scrollToPosition(0);
                             getLayoutManager().getChildAt(0).requestFocus();
                             return true;
                         }
