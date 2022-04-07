@@ -113,9 +113,9 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                     sInstance = Room.databaseBuilder(
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
-//                            .createFromAsset("database/movielibrary_db_v2_version_1.db")
+                            .createFromAsset("database/movielibrary_db_v2_version_1.db")
 //                            .addMigrations(MIGRATION_1_2)
-//                            .fallbackToDestructiveMigration()
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
