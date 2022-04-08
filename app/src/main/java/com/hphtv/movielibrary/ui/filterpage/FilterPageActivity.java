@@ -100,12 +100,6 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mBinding.btnFilter.setOnClickListener(mOnClickListener);
         mBinding.tvTitle.setOnClickListener(mOnClickListener);
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
-        gridLayoutManager.setVisibleItemListener(v -> {
-            if (v != null) {
-                mBinding.btnFilter.setNextFocusDownId(v.getId());
-                mBinding.btnHome.setNextFocusDownId(v.getId());
-            }
-        });
         mBinding.recyclerview.setLayoutManager(gridLayoutManager);
 
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
@@ -120,7 +114,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
                 DensityUtil.dip2px(this, 43),
                 DensityUtil.dip2px(this, 32),
                 DensityUtil.dip2px(this, 40),
-                DensityUtil.dip2px(this, 33),
+                DensityUtil.dip2px(this, 28),
                 5)
         );
         mBinding.recyclerview.setAdapter(mMovieItemListAdapter);
@@ -128,6 +122,16 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             @Override
             protected void onLoading(int countItem, int lastItem) {
                 loadAMoreAllMovies();
+            }
+
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+            }
+
+            @Override
+            protected void onStopLoading() {
+                super.onStopLoading();
             }
         });
         mBinding.recyclerview.setOnKeyPressListener(mOnKeyPressListener);
@@ -138,6 +142,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mBinding.setConditions(mViewModel.getConditionStr());
         mBinding.setRow(mViewModel.getRowStr());
         mBinding.setTotal(mViewModel.getMovieCount());
+        mBinding.setBottomMaskAphla(mViewModel.getBottomMaskAphla());
     }
 
     @Override

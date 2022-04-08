@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <import type="androidx.databinding.ObservableInt"/>
+        <import type="androidx.databinding.ObservableFloat"/>
         <import type="androidx.databinding.ObservableField"/>
 
         <import type="android.view.View"/>
@@ -19,6 +21,9 @@
         <variable
             name="conditions"
             type="ObservableField&lt;String>"  />
+        <variable
+            name="bottomMaskAphla"
+            type="ObservableFloat" />
     </data>
 
     <RelativeLayout
@@ -144,5 +149,12 @@
             android:layout_marginRight="40dp"
             android:layout_marginBottom="-5dp"
             android:paddingBottom="5dp" />
+
+        <View
+            android:background="@drawable/bottom_mask"
+            android:alpha="@{bottomMaskAphla}"
+            android:layout_alignParentBottom="true"
+            android:layout_height="230dp"
+            android:layout_width="match_parent"></View>
     </RelativeLayout>
 </layout>

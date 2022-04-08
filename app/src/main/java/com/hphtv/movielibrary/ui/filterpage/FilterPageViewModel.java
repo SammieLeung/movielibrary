@@ -4,7 +4,9 @@ import android.app.Application;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
+import androidx.databinding.ObservableFloat;
 import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
@@ -54,6 +56,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     private ObservableField<String> mConditionStr = new ObservableField<>();
     private ObservableField<String> mMovieCount = new ObservableField<>();
     private ObservableField<String> mRowStr = new ObservableField<>();
+
+   private ObservableFloat mBottomMaskAphla=new ObservableFloat(1);
 
 
     public FilterPageViewModel(@NonNull @NotNull Application application) {
@@ -246,6 +250,10 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
 
     public ObservableField<String> getRowStr() {
         return mRowStr;
+    }
+
+    public ObservableFloat getBottomMaskAphla() {
+        return mBottomMaskAphla;
     }
 
     public int decreaseTotal() {

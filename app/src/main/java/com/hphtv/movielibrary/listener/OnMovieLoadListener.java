@@ -1,5 +1,7 @@
 package com.hphtv.movielibrary.listener;
 
+import android.util.Log;
+
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +23,14 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
      */
     protected abstract void onLoading(int countItem, int lastItem);
 
+    protected void onStartLoading() {
+    }
+
+
+    protected void onStopLoading() {
+    }
+
+
     @Override
     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
         /* 测试这三个参数的作用
@@ -36,8 +46,10 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
         //拖拽或者惯性滑动时isScolled设置为true
         if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
             isScolled = true;
+            onStartLoading();
         } else {
             isScolled = false;
+            onStopLoading();
         }
 
     }
@@ -49,8 +61,8 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
 
             countItem = layoutManager.getItemCount();
             lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
-            if(layoutManager instanceof VisibleItemListener)
-                ((VisibleItemListener)layoutManager).getFirstVisibleItem(layoutManager.findViewByPosition(layoutManager.findFirstVisibleItemPosition()));
+            if (layoutManager instanceof VisibleItemListener)
+                ((VisibleItemListener) layoutManager).getFirstVisibleItem(layoutManager.findViewByPosition(layoutManager.findFirstVisibleItemPosition()));
         }
         if (isScolled && countItem != lastItem && lastItem == countItem - 1) {
             onLoading(countItem, lastItem);
