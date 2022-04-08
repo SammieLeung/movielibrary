@@ -65,7 +65,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class DeviceMonitorService extends Service {
     public static final String TAG = DeviceMonitorService.class.getSimpleName();
     private MonitorBinder mBinder;
-    private StorageManager mStorageManager;
     private MovieScanService mMovieScanService;
     private ConcurrentHashSet<String> mPosterPairingDevice = new ConcurrentHashSet<>();
     /**
@@ -87,34 +86,97 @@ public class DeviceMonitorService extends Service {
     /**
      * 处理Android 11设备挂载/卸载回调
      */
-    Object mStorageVolumeCallback;
+    private Object mStorageVolumeCallback;
+    private StorageManager mStorageManager;
+
+
+    private BroadcastReceiver mMediaMountReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            switch (action) {
+                case Intent.ACTION_MEDIA_MOUNTED:
+                case Intent.ACTION_MEDIA_UNMOUNTED:
+                    StorageVolume storageVolume = intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
+                    String state_txt = storageVolume.getState();
+                    int state = state_txt.equals(Constants.DeviceMountState.MOUNTED_TEXT) ? Constants.DeviceMountState.MOUNTED : Constants.DeviceMountState.UNMOUNTED;
+                    //Android 11以上
+                    try {
+                        Class clazz = storageVolume.getClass();
+                        Method meth = clazz.getDeclaredMethod("getPath");
+                        meth.setAccessible(true);
+                        String path = (String) meth.invoke(storageVolume);
+                        executeOnMountThread(storageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+    };
 
     /**
-     * 初始化工作
+     * 接受设备挂载广播
      */
+    private BroadcastReceiver mDeviceMountReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            LogUtil.v(DeviceMonitorService.class.getSimpleName(), "mDeviceMountReceiver action:" + action);
+            switch (action) {
+
+                //本地广播
+                case Constants.BroadCastMsg.DEVICE_UP:
+//                    String mountPath = intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
+//                    LogUtil.v("currentPath=" + mountPath);
+                    executeOnFileScanThread();
+                    break;
+                case Constants.BroadCastMsg.DEVICE_DOWN:
+                    break;
+                case Constants.BroadCastMsg.RESCAN_ALL:
+                    reScanDevices();
+                    break;
+                case Constants.BroadCastMsg.POSTER_PAIRING:
+                    if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
+                        Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
+                        startScanLocalShortcut(shortcut);
+                    } else {
+                        startScanAllLocalUnScannedFiles();
+                    }
+                    break;
+                case Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI:
+                    if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
+                        Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
+                        startScanNetworkFiles(shortcut);
+                    }
+                    break;
+            }
+        }
+    };
+
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mMovieScanService = ((MovieScanService.ScanBinder) service).getService();
+            scanDevices();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
     @Override
     public void onCreate() {
-        LogUtil.v(TAG, "OnCreate");
         super.onCreate();
-        initThreadPools();
-        initDb();
-    }
-
-    /**
-     * 初始化数据库类
-     */
-    private void initDb() {
-        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
-        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
-        mShortcutDao = movieLibraryRoomDatabase.getShortcutDao();
-    }
-
-    //初始化线程池
-    private void initThreadPools() {
-        mDeviceMountExecutor = Executors.newSingleThreadExecutor();
-        mFileScanExecutor = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        mDeviceInitExecutor = Executors.newSingleThreadExecutor();
-        mSingleThreadPool = Executors.newSingleThreadExecutor();
+        init();
     }
 
     /**
@@ -156,6 +218,16 @@ public class DeviceMonitorService extends Service {
         unbindServices();
     }
 
+    //初始化
+    private void init() {
+        MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
+        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
+        mShortcutDao = movieLibraryRoomDatabase.getShortcutDao();
+        mDeviceMountExecutor = Executors.newSingleThreadExecutor();
+        mFileScanExecutor = new ThreadPoolExecutor(5, 5, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        mDeviceInitExecutor = Executors.newSingleThreadExecutor();
+        mSingleThreadPool = Executors.newSingleThreadExecutor();
+    }
 
     private void bindServices() {
         Intent intent = new Intent();
@@ -222,89 +294,6 @@ public class DeviceMonitorService extends Service {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mDeviceMountReceiver);
         }
     }
-
-
-    private BroadcastReceiver mMediaMountReceiver=new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            switch (action) {
-                case Intent.ACTION_MEDIA_MOUNTED:
-                case Intent.ACTION_MEDIA_UNMOUNTED:
-                    StorageVolume storageVolume = intent.getParcelableExtra(StorageVolume.EXTRA_STORAGE_VOLUME);
-                    String state_txt = storageVolume.getState();
-                    int state = state_txt.equals(Constants.DeviceMountState.MOUNTED_TEXT) ? Constants.DeviceMountState.MOUNTED : Constants.DeviceMountState.UNMOUNTED;
-                    //Android 11以上
-                    try {
-                        Class clazz = storageVolume.getClass();
-                        Method meth = clazz.getDeclaredMethod("getPath");
-                        meth.setAccessible(true);
-                        String path = (String) meth.invoke(storageVolume);
-                        executeOnMountThread(storageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, false, "", state);
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-        }
-    };
-    /**
-     * 接受设备挂载广播
-     */
-    private BroadcastReceiver mDeviceMountReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            LogUtil.v(DeviceMonitorService.class.getSimpleName(), "mDeviceMountReceiver action:" + action);
-            switch (action) {
-
-                //本地广播
-                case Constants.BroadCastMsg.DEVICE_UP:
-//                    String mountPath = intent.getStringExtra(Constants.Extras.DEVICE_MOUNT_PATH);
-//                    LogUtil.v("currentPath=" + mountPath);
-                    executeOnFileScanThread();
-                    break;
-                case Constants.BroadCastMsg.DEVICE_DOWN:
-                    break;
-                case Constants.BroadCastMsg.RESCAN_ALL:
-                    reScanDevices();
-                    break;
-                case Constants.BroadCastMsg.POSTER_PAIRING:
-                    if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
-                        Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
-                        startScanLocalShortcut(shortcut);
-                    } else {
-                        startScanAllLocalUnScannedFiles();
-                    }
-                    break;
-                case Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI:
-                    if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
-                        Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
-                        startScanNetworkFiles(shortcut);
-                    }
-                    break;
-            }
-        }
-    };
-
-    ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mMovieScanService = ((MovieScanService.ScanBinder) service).getService();
-            scanDevices();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    };
 
     /**
      * 扫描本地所有挂载设备并扫描文件
@@ -376,14 +365,14 @@ public class DeviceMonitorService extends Service {
                                     mMovieScanService.scanVideo(shortcut, videoFileList);
                             } else {    //TODO mPosterPairingDevice处理
                                 LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
-                                shortcut.isScanned=1;
+                                shortcut.isScanned = 1;
                                 mShortcutDao.updateShortcut(shortcut);
                                 Intent intent = new Intent();
                                 intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
                                 intent.putExtra(Constants.Extras.SHORTCUT, shortcut);
                                 LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(intent);
                             }
-                        }else{
+                        } else {
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
                         }
                     }
@@ -402,24 +391,24 @@ public class DeviceMonitorService extends Service {
                 .subscribeOn(Schedulers.newThread())
                 .map(arg -> {
                     List<VideoFile> unScannedFiles = getUnScannedLocalFiles();
-                    HashMap<String,List<VideoFile>> map=new HashMap<>();
-                    for(VideoFile videoFile:unScannedFiles){
-                        if(map.get(videoFile.dirPath)==null){
-                            map.put(videoFile.dirPath,new ArrayList<>());
-                        }else{
+                    HashMap<String, List<VideoFile>> map = new HashMap<>();
+                    for (VideoFile videoFile : unScannedFiles) {
+                        if (map.get(videoFile.dirPath) == null) {
+                            map.put(videoFile.dirPath, new ArrayList<>());
+                        } else {
                             map.get(videoFile.dirPath).add(videoFile);
                         }
                     }
-                    Set<String> shortcutUris=  map.keySet();
-                    Iterator<String> urisIterator=shortcutUris.iterator();
-                    List<Object[]> dataList=new ArrayList<>();
-                    while(urisIterator.hasNext()){
-                        String uri=urisIterator.next();
-                        Shortcut shortcut=mShortcutDao.queryShortcutByUri(uri);
-                        if(shortcut!=null){
-                            Object[] data=new Object[2];
-                            data[0]=shortcut;
-                            data[1]=map.get(uri);
+                    Set<String> shortcutUris = map.keySet();
+                    Iterator<String> urisIterator = shortcutUris.iterator();
+                    List<Object[]> dataList = new ArrayList<>();
+                    while (urisIterator.hasNext()) {
+                        String uri = urisIterator.next();
+                        Shortcut shortcut = mShortcutDao.queryShortcutByUri(uri);
+                        if (shortcut != null) {
+                            Object[] data = new Object[2];
+                            data[0] = shortcut;
+                            data[1] = map.get(uri);
                             dataList.add(data);
                         }
                     }
@@ -433,18 +422,23 @@ public class DeviceMonitorService extends Service {
                 .subscribe(new SimpleObserver<List<Object[]>>() {
                     @Override
                     public void onAction(List<Object[]> dataList) {
-                        if(dataList.size()>0){
-                            Log.w(Thread.currentThread().getName(), "StartScanAllUnScannedVideos=>" );
-                            for(Object[] objArr:dataList) {
-                                if(objArr!=null&&objArr.length==2) {
+                        if (dataList.size() > 0) {
+                            Log.w(Thread.currentThread().getName(), "StartScanAllUnScannedVideos=>");
+                            for (Object[] objArr : dataList) {
+                                if (objArr != null && objArr.length == 2) {
                                     Shortcut shortcut = (Shortcut) objArr[0];
                                     List<VideoFile> videoFileList = (List<VideoFile>) objArr[1];
-                                    Log.w(Thread.currentThread().getName(), shortcut.friendlyName);
-                                    if (mMovieScanService != null)
-                                        mMovieScanService.scanVideo(shortcut,videoFileList);
+                                    if(videoFileList.size()>0) {
+                                        Log.w(Thread.currentThread().getName(), shortcut.friendlyName);
+                                        if (mMovieScanService != null)
+                                            mMovieScanService.scanVideo(shortcut, videoFileList);
+                                    }else{
+                                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
+                                        ServiceStatusHelper.removeView(DeviceMonitorService.this);
+                                    }
                                 }
                             }
-                        }else{
+                        } else {
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.BroadCastMsg.MOVIE_SCRAP_STOP));
                             ServiceStatusHelper.removeView(DeviceMonitorService.this);
                         }
@@ -468,8 +462,8 @@ public class DeviceMonitorService extends Service {
                     String networkPath = shortcut1.uri;
                     Cursor cursor = getContentResolver().query(Uri.parse(queryUri), null, null, null, null);
                     if (cursor != null) {
-                        int fileCount=cursor.getCount();
-                        shortcut1.fileCount=fileCount;
+                        int fileCount = cursor.getCount();
+                        shortcut1.fileCount = fileCount;
                         mShortcutDao.updateShortcut(shortcut1);
                         while (cursor.moveToNext()) {
                             String path = cursor.getString(cursor.getColumnIndex("path"));
@@ -486,9 +480,10 @@ public class DeviceMonitorService extends Service {
                                 videoFile.filename = filename;
                                 videoFile.dirPath = dirPath;
                                 videoFile.addTime = System.currentTimeMillis();
-                                VideoNameParser parser=new VideoNameParser();
-                                MovieNameInfo info= parser.parseVideoName(videoFile.path);
-                                videoFile.keyword = info.getName();;
+                                VideoNameParser parser = new VideoNameParser();
+                                MovieNameInfo info = parser.parseVideoName(videoFile.path);
+                                videoFile.keyword = info.getName();
+                                ;
                                 videoFile.season = info.getSeason();
                                 videoFile.episode = info.toEpisode("0");
                                 long vid = mVideoFileDao.insertOrIgnore(videoFile);

@@ -15,7 +15,7 @@ import java.io.Serializable;
  * date:  2021/5/27
  */
 @Entity(tableName = TABLE.ACTOR)
-public class Actor  implements Serializable {
+public class Actor implements Serializable {
     @PrimaryKey
     @ColumnInfo(name = "actor_id")
     public long actorId;
@@ -26,6 +26,6 @@ public class Actor  implements Serializable {
 
     @Override
     public String toString() {
-        return name + (!TextUtils.isEmpty(nameEn)? "(" + nameEn + ")":"");
+        return name + (!TextUtils.isEmpty(nameEn) ? "(" + nameEn + ")" : "");
     }
 }

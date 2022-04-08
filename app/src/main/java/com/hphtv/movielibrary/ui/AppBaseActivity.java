@@ -107,7 +107,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
             switch (action){
                 case Constants.BroadCastMsg.MOVIE_SCRAP_START:
                     if(!AppUtils.isAppInBackground(AppBaseActivity.this))
-                        ServiceStatusHelper.addView(getString(R.string.scanning_in_background),AppBaseActivity.this);
+                        ServiceStatusHelper.addView(getString(R.string.scanning_in_background), AppBaseActivity.this);
                     break;
                 case Constants.BroadCastMsg.MOVIE_SCRAP_STOP:
                     ServiceStatusHelper.removeView(context);

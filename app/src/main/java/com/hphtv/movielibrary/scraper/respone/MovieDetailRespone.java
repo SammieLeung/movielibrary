@@ -38,10 +38,10 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
         private String year;
         private String released;
         private String duration;
-        private String[] genre;
+        private ResponeGenres[] genres;
         private People[] directors;
         private People[] writers;//TODO 添加 writers
-        private People[] actors;
+        private ResponeActor[] actors;
         private String plot;
         private String language;
         private String country;
@@ -73,10 +73,10 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movie.source = api;
 
             List<Genre> genreList = new ArrayList<>();
-            if (genre != null && genre.length > 0) {
-                for (String genreItem : genre) {
+            if (genres != null && genres.length > 0) {
+                for (ResponeGenres genreItem : genres) {
                     Genre genre = new Genre();
-                    genre.name = genreItem;
+                    genre.name = genreItem.name;
                     genre.source = api;
                     genreList.add(genre);
                 }
@@ -88,9 +88,9 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
                     People directorPeople = directors[i];
                     Director director = new Director();
                     director.name = directorPeople.name;
-                    director.nameEn = directorPeople.name_en;
-                    director.img = directorPeople.img;
-                    director.director_id = directorPeople.person_id;
+                    director.nameEn = directorPeople.original_name;
+                    director.img = directorPeople.profile_path;
+                    director.director_id = directorPeople.id;
                     directorList.add(director);
                 }
             }
@@ -98,12 +98,12 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             List<Actor> actorList = new ArrayList<>();
             if (actors != null && actors.length > 0)
                 for (int i = 0; i < 10 && i < actors.length; i++) {
-                    People actorPeople = actors[i];
+                    ResponeActor actorPeople = actors[i];
                     Actor actor = new Actor();
-                    actor.actorId = actorPeople.person_id;
-                    actor.img = actorPeople.img;
+                    actor.actorId = actorPeople.id;
+                    actor.img = actorPeople.profile_path;
                     actor.name = actorPeople.name;
-                    actor.nameEn = actorPeople.name_en;
+                    actor.nameEn = actorPeople.original_name;
                     actorList.add(actor);
                 }
 
@@ -124,8 +124,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
                 for (int i = 0; i < 10 && i < stage_img.length; i++) {
                     Img img = stage_img[i];
                     StagePhoto stagePhoto = new StagePhoto();
-                    stagePhoto.imgUrl = img.img_url;
-                    stagePhoto.stageId = img.img_id;
+                    stagePhoto.imgUrl = img.file_path;
                     stagePhotoList.add(stagePhoto);
                 }
             }
@@ -158,12 +157,27 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             return movieWrapper;
         }
 
-        private class People {
-            private long person_id;
+        private class ResponeActor {
+            private long id;
+            private long gender;
             private String name;
-            private String name_en;
-            private String img;
-            private String type;
+            private String original_name;
+            private String known_for_department;
+            private String profile_path;
+            private String character;
+            private int order;
+
+        }
+
+        private class People{
+            private long id;
+            private long gender;
+            private String name;
+            private String original_name;
+            private String known_for_department;
+            private String profile_path;
+            private String department;
+            private String job;
         }
 
         private class Video {
@@ -174,8 +188,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
         }
 
         private class Img {
-            private long img_id;
-            private String img_url;
+            private String file_path;
         }
 
         private class Season {
@@ -185,6 +198,10 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             private String overview;
             private String poster_path;
             private int season_number;
+        }
+
+        private class ResponeGenres{
+            private String name;
         }
     }
 

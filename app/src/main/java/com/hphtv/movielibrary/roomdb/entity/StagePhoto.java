@@ -12,7 +12,7 @@ import java.io.Serializable;
  * author: Sam Leung
  * date:  2021/6/16
  */
-@Entity (tableName = TABLE.STAGEPHOTO)
+@Entity (tableName = TABLE.STAGEPHOTO,indices = {})
 public class StagePhoto implements Serializable {
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "stage_id")
