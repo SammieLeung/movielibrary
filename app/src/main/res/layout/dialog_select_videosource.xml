@@ -11,6 +11,8 @@
         android:gravity="center">
 
         <RelativeLayout
+            android:layout_marginTop="126dp"
+            android:layout_marginBottom="126dp"
             android:layout_width="548dp"
             android:layout_height="wrap_content"
             android:background="@drawable/new_common_dialog_bg">
