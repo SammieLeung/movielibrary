@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
@@ -17,6 +18,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.postermenu.UnknownsFileMenuDialog;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
@@ -83,6 +85,19 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
                 DensityUtil.dip2px(getContext(), 30),
                 5)
         );
+        mBinding.rvUnknowsfile.setOnKeyPressListener(new TvRecyclerView.OnKeyPressListener() {
+            @Override
+            public void processKeyEvent(int keyCode) {
+
+            }
+
+            @Override
+            public void onBackPress() {
+                ActivityNewHomepageBinding binding = getBaseActivity().getBinding();
+                int pos = binding.tablayout.getSelectedTabPosition();
+                binding.tablayout.getTabAt(pos).view.requestFocus();
+            }
+        });
         mViewModel.getUnknownsFileItemListAdapter().setOnItemClickListener(mActionListener);
         mViewModel.getUnknownsFileItemListAdapter().setOnItemLongClickListener(this::showUnknowsFileMenuDialog);
     }

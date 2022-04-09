@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -71,8 +72,8 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
     @Override
     public void onClick(View v) {
         if (mOnItemClickListener != null) {
-            int position= (int) v.getTag();
-            T data= mList.get(position);
+            int position = (int) v.getTag();
+            T data = mList.get(position);
             //注意这里使用getTag方法获取数据
             mOnItemClickListener.onItemClick(v, position, data);
         }
@@ -80,8 +81,8 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     public boolean onLongClick(View v) {
         if (mOnItemLongClickListener != null) {
-            int position= (int) v.getTag();
-            T data= mList.get(position);
+            int position = (int) v.getTag();
+            T data = mList.get(position);
             return mOnItemLongClickListener.onItemLongClick(v, position, data);
         }
         return false;
@@ -101,13 +102,13 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         }
     }
 
-    public void insert(T data,int position){
-        mList.add(position,data);
+    public void insert(T data, int position) {
+        mList.add(position, data);
         notifyItemInserted(position);
     }
 
-    public void replace(T data,int position){
-        mList.set(position,data);
+    public void replace(T data, int position) {
+        mList.set(position, data);
         notifyItemChanged(position);
     }
 
@@ -180,6 +181,15 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
             mBinding = binding;
             mBinding.getRoot().setOnClickListener(BaseApater2.this::onClick);
             mBinding.getRoot().setOnLongClickListener(BaseApater2.this::onLongClick);
+            mBinding.getRoot().setOnKeyListener((v, keyCode, event) -> {
+                if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
+                    int pos = (int) v.getTag();
+                    if (mOnItemClickListener != null)
+                        mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
+                    return true;
+                }
+                return false;
+            });
         }
     }
 }

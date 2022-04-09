@@ -131,7 +131,7 @@
     <string name="tab_homepage">主页</string>
     <string name="video_type_movie">电影</string>
     <string name="video_type_tv">电视</string>
-    <string name="video_type_undefine">未分类</string>
+    <string name="video_type_undefine">未匹配</string>
     <string name="video_type_cartoon">儿童</string>
     <string name="video_type_animate">动画</string>
     <string name="video_type_variety_show">综艺</string>
