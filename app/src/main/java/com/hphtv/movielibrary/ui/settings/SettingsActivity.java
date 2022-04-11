@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.Observable;
@@ -48,6 +49,11 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
         mBinding.tabAbout.view.setOnClickListener(this::about);
         mBinding.btnExit.setOnClickListener(v->finish());
         mBinding.setSelectPos(mViewModel.getSelectPos());
+        mBinding.tabChildmode.view.setOnFocusChangeListener((v, hasFocus) -> childMode(v));
+        mBinding.tabPoster.view.setOnFocusChangeListener((v, hasFocus) -> poster(v));
+        mBinding.tabPreference.view.setOnFocusChangeListener((v, hasFocus) -> preference(v));
+        mBinding.tabAbout.view.setOnFocusChangeListener((v, hasFocus) -> about(v));
+
 //        requestFocusOnHover(
 //                mBinding.tabChildmode.view,
 //                mBinding.tabPoster.view,
@@ -63,26 +69,44 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
                     setResult(Activity.RESULT_OK);
             }
         });
+
+
     }
 
+    /**
+     * 儿童模式
+     * @param view
+     */
     private void childMode(View view) {
         mViewModel.getSelectPos().set(0);
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mChildModeFragment).commit();
     }
 
+    /**
+     * 海报设置
+     * @param view
+     */
     private void poster(View view){
         mViewModel.getSelectPos().set(1);
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mPosterFragment).commit();
     }
 
+    /**
+     * 偏好设置
+     * @param view
+     */
     private void preference(View view){
         mViewModel.getSelectPos().set(2);
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         getSupportFragmentManager().beginTransaction().replace(mBinding.viewContent.getId(),mPreferenceFragment).commit();
     }
 
+    /**
+     * 关于
+     * @param view
+     */
     private void about(View view){
         mViewModel.getSelectPos().set(3);
         getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
