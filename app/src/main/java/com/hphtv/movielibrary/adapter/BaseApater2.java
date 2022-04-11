@@ -182,11 +182,13 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
             mBinding.getRoot().setOnClickListener(BaseApater2.this::onClick);
             mBinding.getRoot().setOnLongClickListener(BaseApater2.this::onLongClick);
             mBinding.getRoot().setOnKeyListener((v, keyCode, event) -> {
-                if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
-                    int pos = (int) v.getTag();
-                    if (mOnItemClickListener != null)
-                        mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
-                    return true;
+                if(event.getAction()==KeyEvent.ACTION_UP) {
+                    if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
+                        int pos = (int) v.getTag();
+                        if (mOnItemClickListener != null)
+                            mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
+                        return true;
+                    }
                 }
                 return false;
             });
