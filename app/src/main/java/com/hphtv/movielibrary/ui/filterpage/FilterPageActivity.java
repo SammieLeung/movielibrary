@@ -116,7 +116,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical(
                 getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),
                 DensityUtil.dip2px(this, 43),
-                DensityUtil.dip2px(this, 32),
+                DensityUtil.dip2px(this, 27),
                 DensityUtil.dip2px(this, 40),
                 DensityUtil.dip2px(this, 28),
                 5)

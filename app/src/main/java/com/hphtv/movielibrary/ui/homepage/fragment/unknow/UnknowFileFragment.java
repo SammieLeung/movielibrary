@@ -80,9 +80,9 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
         mBinding.rvUnknowsfile.addItemDecoration(new GridSpacingItemDecorationVertical(
                 getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),
                 DensityUtil.dip2px(getContext(), 43),
-                DensityUtil.dip2px(getContext(), 32),
+                DensityUtil.dip2px(getContext(), 27),
                 DensityUtil.dip2px(getContext(), 40),
-                DensityUtil.dip2px(getContext(), 30),
+                DensityUtil.dip2px(getContext(), 28),
                 5)
         );
         mBinding.rvUnknowsfile.setOnKeyPressListener(new TvRecyclerView.OnKeyPressListener() {

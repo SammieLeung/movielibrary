@@ -10,9 +10,9 @@
             android:id="@+id/rv_unknowsfile"
             android:layout_width="match_parent"
             android:layout_height="660dp"
-            android:layout_marginLeft="40dp"
+            android:layout_marginLeft="45dp"
             android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
-            android:layout_marginRight="40dp"
+            android:layout_marginRight="45dp"
             android:layout_marginBottom="-5dp"
             android:paddingBottom="5dp"
             android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />
