@@ -31,6 +31,6 @@ public class ActorPosterItemListApdater extends BaseScaleApater<ActorPosterItemB
         Actor actor = mList.get(position);
         ActorPosterItemBinding binding = (ActorPosterItemBinding) holder.mBinding;
         binding.setName(actor.name);
-        Glide.with(mContext).load(actor.img).into(binding.ivActorPoster);
+        Glide.with(mContext).load(actor.img).placeholder(R.mipmap.actor_placeholder).error(R.mipmap.actor_placeholder).into(binding.ivActorPoster);
     }
 }
