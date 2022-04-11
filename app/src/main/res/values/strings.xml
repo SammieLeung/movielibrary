@@ -5,6 +5,8 @@
     <string name="unknow">unknow</string>
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="goback">Return</string>
+
     <!--    主页-->
     <string name="homepage_custom_genre_tag_title">Custom Genre</string>
     <string name="homepage_custom_genre_tag_title_2">Genre Sort</string>

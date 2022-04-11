@@ -52,36 +52,43 @@
             app:hint="@{@string/hint_confirm_new_psw}"
             app:label="@{@string/label_confirm_psw}" />
 
-        <Button
-            android:id="@+id/btn_confirm"
-            style="@style/common_btn_style"
-            android:layout_width="195dp"
-            android:layout_height="65dp"
+        <RelativeLayout
+            android:layout_centerHorizontal="true"
             android:layout_below="@id/include_confirm_pwd"
-            android:layout_marginLeft="103dp"
-            android:autoSizeTextType="uniform"
-            android:autoSizeMaxTextSize="23sp"
-            android:paddingLeft="20dp"
-            android:paddingTop="10dp"
-            android:paddingRight="20dp"
-            android:paddingBottom="10dp"
-            android:text="@string/title_change_password"
-            android:textSize="23sp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btn_confirm"
+                style="@style/common_btn_style"
+                android:layout_width="195dp"
+                android:layout_height="65dp"
+                android:autoSizeMaxTextSize="23sp"
+                android:autoSizeTextType="uniform"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:text="@string/title_change_password"
+                android:textSize="23sp" />
 
 
-        <Button
-            style="@style/common_btn_style"
-            android:id="@+id/btn_cancel"
-            android:layout_width="195dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="10dp"
-            android:layout_height="65dp"
-            android:layout_marginLeft="63dp"
-            android:layout_toEndOf="@id/btn_confirm"
-            android:layout_below="@id/include_confirm_pwd"
-            android:text="@string/cancel"
-            android:textSize="23sp" />
+            <Button
+                style="@style/common_btn_style"
+                android:id="@+id/btn_cancel"
+                android:layout_width="195dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_height="65dp"
+                android:layout_marginLeft="63dp"
+                android:layout_toEndOf="@id/btn_confirm"
+                android:text="@string/goback"
+                android:textSize="23sp" />
+
+
+        </RelativeLayout>
+
     </RelativeLayout>
 </layout>

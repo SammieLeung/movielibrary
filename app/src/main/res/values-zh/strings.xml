@@ -5,6 +5,7 @@
     <string name="unknow">未知</string>
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
+    <string name="goback">返回</string>
     <!--    主页-->
     <string name="homepage_custom_genre_tag_title">自定义主题</string>
     <string name="homepage_custom_genre_tag_title_2">主题排序</string>
