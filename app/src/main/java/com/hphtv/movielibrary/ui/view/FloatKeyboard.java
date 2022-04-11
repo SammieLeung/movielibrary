@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -56,11 +57,10 @@ public class FloatKeyboard extends RelativeLayout {
     }
 
     public void setDatas(String[] datas) {
+        tv_bottom.setEnabled(false);
+        tv_center.setNextFocusDownId(tv_center.getId());
+
         tv_bottom.setText(null);
-        tv_right.setText(null);
-        tv_top.setText(null);
-        tv_left.setText(null);
-        tv_center.setText(null);
         if (datas.length > 0) {
             if (tv_top != null) {
                 tv_top.setText(datas[0]);
@@ -80,6 +80,8 @@ public class FloatKeyboard extends RelativeLayout {
                         if (datas.length > 4) {
                             if (tv_bottom != null) {
                                 tv_bottom.setText(datas[4]);
+                                tv_bottom.setEnabled(true);
+                                tv_center.setNextFocusDownId(View.NO_ID);
                             }
                         }
                     }
@@ -111,7 +113,7 @@ public class FloatKeyboard extends RelativeLayout {
 
         isShowed = true;
         this.setVisibility(View.VISIBLE);
-        this.requestFocus();
+        tv_center.requestFocus();
     }
 
 
@@ -202,4 +204,30 @@ public class FloatKeyboard extends RelativeLayout {
         this.buttonClickListener = listener;
     }
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_DPAD_UP:
+                    buttonClickListener.OnButtonClick(getTopValue());
+                    break;
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                    buttonClickListener.OnButtonClick(getBottomValue());
+                    break;
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                    buttonClickListener.OnButtonClick(getLeftValue());
+                    break;
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                    buttonClickListener.OnButtonClick(getRightValue());
+                    break;
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                    buttonClickListener.OnButtonClick(getCenterValue());
+                    break;
+                case KeyEvent.KEYCODE_BACK:
+                    hide();
+            }
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
 }

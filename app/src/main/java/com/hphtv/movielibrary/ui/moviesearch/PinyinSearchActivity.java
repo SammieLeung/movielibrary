@@ -133,43 +133,6 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         mBinding.kclear.setOnClickListener(mOnClickListener);
         mBinding.kdel.setOnClickListener(mOnClickListener);
 
-        mBinding.floatkeyboard.setOnKeyListener((v, keyCode, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                    mBinding.etSearch.append(mBinding.floatkeyboard.getCenterValue());
-                    mBinding.floatkeyboard.hide();
-                    return true;
-                }
-
-                if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
-                    mBinding.etSearch.append(mBinding.floatkeyboard.getBottomValue());
-                    mBinding.floatkeyboard.hide();
-                    return true;
-                }
-                if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
-                    mBinding.etSearch.append(mBinding.floatkeyboard.getLeftValue());
-                    mBinding.floatkeyboard.hide();
-                    return true;
-                }
-                if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
-                    mBinding.etSearch.append(mBinding.floatkeyboard.getTopValue());
-                    mBinding.floatkeyboard.hide();
-                    return true;
-                }
-                if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
-                    mBinding.etSearch.append(mBinding.floatkeyboard.getRightValue());
-                    mBinding.floatkeyboard.hide();
-                    return true;
-                }
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    mBinding.floatkeyboard.hide();
-                    return true;
-                }
-            }
-
-            return false;
-        });
-
         mBinding.floatkeyboard.setOnButtonClickListener(data -> {
             mBinding.etSearch.append(data);
             mBinding.floatkeyboard.hide();
