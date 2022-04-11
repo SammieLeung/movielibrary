@@ -14,4 +14,9 @@
     <item name="class_private" type="id"/>
     <item name="tra_0" type="id"/>
     <item name="tra_last" type="id"/>
+
+    <item name="pinyinsearch_tab_all" type="id"/>
+    <item name="pinyinsearch_tab_movie" type="id"/>
+    <item name="pinyinsearch_tab_tv" type="id"/>
+
 </resources>

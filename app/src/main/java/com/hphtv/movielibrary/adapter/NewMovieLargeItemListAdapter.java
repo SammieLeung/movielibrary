@@ -38,6 +38,8 @@ public class NewMovieLargeItemListAdapter extends BaseScaleApater<PosterItemLarg
         MovieDataView movieDataView = mFilterMovieDataViewList.get(position);
         PosterItemLargeBinding binding = (PosterItemLargeBinding) holder.mBinding;
         Glide.with(mContext).load(movieDataView.poster)
+                .placeholder(R.mipmap.default_poster)
+                .error(R.mipmap.default_poster)
                 .into(binding.rvPoster);
         binding.setTitle(movieDataView.title);
     }

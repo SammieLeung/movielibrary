@@ -4,15 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.FocusFinder;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
@@ -25,6 +29,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.LogUtil;
 
 import java.util.ArrayList;
 
@@ -80,6 +85,11 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 mBinding.etSearch.getText().clear();
                 break;
         }
+    };
+
+    private View.OnFocusChangeListener mTabFocusChangeListener = (v, hasFocus) -> {
+        if (hasFocus)
+            v.performClick();
     };
 
     private void showFloatKeyboard(View v, String[] datas) {
@@ -214,9 +224,38 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 DensityUtil.dip2px(this, 30),
                 DensityUtil.dip2px(this, 30),
                 3));
+        mBinding.rvSearchMovies.getViewTreeObserver().addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
+            //在Recyclerview的子项获取焦点后按照两种焦点情况先设定他的下一次向上焦点。
+            if (oldFocus instanceof RelativeLayout && oldFocus.getId() != View.NO_ID && newFocus instanceof RelativeLayout && newFocus.getId() == View.NO_ID) {
+                int pos = mBinding.rvSearchMovies.getChildLayoutPosition(newFocus);
+                if (pos != RecyclerView.NO_POSITION) {
+                    for (int i = 0; i < 3 && i < mMovieAdapter.getItemCount(); i++) {
+                        int id=mBinding.tablayout.getTabAt(mBinding.tablayout.getSelectedTabPosition()).view.getId();
+                        mBinding.rvSearchMovies.getChildAt(i).setNextFocusUpId(id);
+                    }
+                }
+            } else if (newFocus instanceof RelativeLayout && oldFocus instanceof TabLayout.TabView) {
+                int pos = mBinding.rvSearchMovies.getChildLayoutPosition(newFocus);
+                if (pos != RecyclerView.NO_POSITION) {
+                    for (int i = 0; i < 3 && i < mMovieAdapter.getItemCount(); i++) {
+                        mBinding.rvSearchMovies.getChildAt(i).setNextFocusUpId(oldFocus.getId());
+                    }
+                }
+            }
+            Log.e(TAG, "onGlobalFocusChanged: " + oldFocus.toString());
+            Log.e(TAG, "onGlobalFocusChanged2: " + newFocus.toString());
+        });
         TabLayout.Tab tab1 = mBinding.tablayout.newTab();
         TabLayout.Tab tab2 = mBinding.tablayout.newTab();
         TabLayout.Tab tab3 = mBinding.tablayout.newTab();
+        tab1.view.setId(R.id.pinyinsearch_tab_all);
+        tab2.view.setId(R.id.pinyinsearch_tab_movie);
+        tab3.view.setId(R.id.pinyinsearch_tab_tv);
+
+        tab1.view.setOnFocusChangeListener(mTabFocusChangeListener);
+        tab2.view.setOnFocusChangeListener(mTabFocusChangeListener);
+        tab3.view.setOnFocusChangeListener(mTabFocusChangeListener);
+
         mBinding.tablayout.addTab(tab1);
         mBinding.tablayout.addTab(tab2);
         mBinding.tablayout.addTab(tab3);
@@ -251,6 +290,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
 
     }
 
+
     private void setTabs(int a, int b, int c) {
         mBinding.tablayout.getTabAt(0).setText(getString(R.string.tab_local_search_all, a));
         mBinding.tablayout.getTabAt(1).setText(getString(R.string.tab_local_search_movie, b));
@@ -266,7 +306,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 mBinding.setShowTab(true);
                 mMovieAdapter.addAll(data);
                 int movie_count = 0;
-                int tv_count=0;
+                int tv_count = 0;
                 for (int i = 0; i < mMovieAdapter.getRealCount(); i++) {
                     if (data.get(i).type == Constants.SearchType.movie)
                         movie_count++;
