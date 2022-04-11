@@ -21,9 +21,6 @@
         <variable
             name="conditions"
             type="ObservableField&lt;String>"  />
-        <variable
-            name="bottomMaskAphla"
-            type="ObservableFloat" />
     </data>
 
     <RelativeLayout
@@ -151,8 +148,8 @@
             android:paddingBottom="5dp" />
 
         <View
+            android:id="@+id/bottomMask"
             android:background="@drawable/bottom_mask"
-            android:alpha="@{bottomMaskAphla}"
             android:layout_alignParentBottom="true"
             android:layout_height="230dp"
             android:layout_width="match_parent"></View>

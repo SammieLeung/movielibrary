@@ -57,7 +57,6 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     private ObservableField<String> mMovieCount = new ObservableField<>();
     private ObservableField<String> mRowStr = new ObservableField<>();
 
-   private ObservableFloat mBottomMaskAphla=new ObservableFloat(1);
 
 
     public FilterPageViewModel(@NonNull @NotNull Application application) {
@@ -252,9 +251,6 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
         return mRowStr;
     }
 
-    public ObservableFloat getBottomMaskAphla() {
-        return mBottomMaskAphla;
-    }
 
     public int decreaseTotal() {
         mTotalRow = (int) Math.ceil(1.0f * --mTotal / 5);

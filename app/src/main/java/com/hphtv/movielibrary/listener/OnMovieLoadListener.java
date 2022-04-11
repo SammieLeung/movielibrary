@@ -23,11 +23,11 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
      */
     protected abstract void onLoading(int countItem, int lastItem);
 
-    protected void onStartLoading() {
+    protected void onScrollStart() {
     }
 
 
-    protected void onStopLoading() {
+    protected void onScrolledEnd() {
     }
 
 
@@ -46,10 +46,10 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
         //拖拽或者惯性滑动时isScolled设置为true
         if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
             isScolled = true;
-            onStartLoading();
+            onScrollStart();
         } else {
             isScolled = false;
-            onStopLoading();
+            onScrolledEnd();
         }
 
     }

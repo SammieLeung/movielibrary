@@ -1,7 +1,9 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -37,6 +39,8 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
     private HomeFragmentViewModel mNewpageViewModel;
+    private Handler mHandler=new Handler();
+    private Runnable mBottomMaskFadeInTask;
 
     View.OnClickListener mOnClickListener = v -> {
         switch (v.getId()) {
@@ -125,13 +129,25 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             }
 
             @Override
-            protected void onStartLoading() {
-                super.onStartLoading();
+            protected void onScrollStart() {
+                super.onScrollStart();
+                mHandler.removeCallbacks(mBottomMaskFadeInTask);
+                if(mBinding.bottomMask.getAlpha()>0) {
+                    ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
+                    objectAnimator.start();
+                }
             }
 
             @Override
-            protected void onStopLoading() {
-                super.onStopLoading();
+            protected void onScrolledEnd() {
+                super.onScrolledEnd();
+                mHandler.removeCallbacks(mBottomMaskFadeInTask);
+                mBottomMaskFadeInTask= () -> {
+                    ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(200);
+                    objectAnimator.start();
+                };
+                mHandler.postDelayed(mBottomMaskFadeInTask,500);
+
             }
         });
         mBinding.recyclerview.setOnKeyPressListener(mOnKeyPressListener);
@@ -142,7 +158,6 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         mBinding.setConditions(mViewModel.getConditionStr());
         mBinding.setRow(mViewModel.getRowStr());
         mBinding.setTotal(mViewModel.getMovieCount());
-        mBinding.setBottomMaskAphla(mViewModel.getBottomMaskAphla());
     }
 
     @Override

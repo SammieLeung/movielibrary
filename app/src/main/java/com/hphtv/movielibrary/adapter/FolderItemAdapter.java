@@ -129,8 +129,9 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         FolderItem folderItem = buildFolderItem(shortcut);
         if (!mFolderItemList.contains(folderItem)) {
             mFolderItemList.add(folderItem);
+            notifyItemInserted(mFolderItemList.size()-1);
             mFolderItemList.sort(mComparator);
-            notifyDataSetChanged();
+            notifyItemRangeChanged(0,mFolderItemList.size());
         }
     }
 
