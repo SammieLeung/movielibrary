@@ -102,7 +102,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
                         if (e instanceof UnknownHostException) {
                             msg = getApplication().getString(R.string.toast_UnknownHostException);
                         } else {
-                            msg = e.getMessage();
+                            msg = getApplication().getString(R.string.toast_selectmovie_faild);
                             e.printStackTrace();
                         }
                         adapter.cancelLoadingAndShowTips(msg);
