@@ -1,10 +1,12 @@
 package com.hphtv.movielibrary.ui.settings.fragment.childmode;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.hphtv.movielibrary.R;
@@ -38,12 +40,15 @@ public class ChildModeFragment extends BaseFragment2<SettingsViewModel, Fragment
         mBinding.setChildmode(mViewModel.getChildModeState());
         mBinding.viewChildmode.view.setOnClickListener(this::toggleChildMode);
         mBinding.tvChangepsw.setOnClickListener(this::showChangePassword);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mBinding.tvChangepsw.requestFocus();
+        getParentFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                if (ChildModeFragment.this.isVisible()) {
+                    //当前fragment可见时(如果是界面的跟新在onstart或onresume就好了,isVisible()方法更大的用处是在于可以做些操作避免当前Fragment不被重复加入返回栈).....
+                    mBinding.tvChangepsw.requestFocus();
+                }
+            }
+        });
     }
 
     private void showChangePassword(View v) {

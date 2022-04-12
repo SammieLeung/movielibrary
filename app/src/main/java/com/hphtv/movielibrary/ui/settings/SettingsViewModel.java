@@ -33,7 +33,7 @@ public class SettingsViewModel extends BaseAndroidViewModel {
 
     private ObservableBoolean mFlagRefresh = new ObservableBoolean(false);
 
-    private ObservableInt mSelectPos = new ObservableInt();
+    private ObservableInt mSelectPos = new ObservableInt(-1);
     private ObservableBoolean mChildModeState = new ObservableBoolean(Config.isChildMode());
 
     private ObservableBoolean mAutoSearchState = new ObservableBoolean(Config.isAutoSearch());
@@ -41,12 +41,6 @@ public class SettingsViewModel extends BaseAndroidViewModel {
 
     public SettingsViewModel(@NonNull @NotNull Application application) {
         super(application);
-        mSelectPos.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-            @Override
-            public void onPropertyChanged(Observable sender, int propertyId) {
-                LogUtil.v("onPropertyChanged " + sender.toString() + " " + propertyId);
-            }
-        });
     }
 
     public ObservableBoolean getFlagRefresh() {
