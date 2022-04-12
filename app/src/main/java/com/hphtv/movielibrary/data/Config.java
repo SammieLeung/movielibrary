@@ -70,13 +70,13 @@ public class Config {
         return sChildMode;
     }
 
-    public static boolean isTempCloseChildMode() {
-        return sTempCloseChildMode;
-    }
+//    public static boolean isTempCloseChildMode() {
+//        return sTempCloseChildMode;
+//    }
 
-    public static void setTempCloseChildMode(boolean tempCloseChildMode) {
-        sTempCloseChildMode = tempCloseChildMode;
-    }
+//    public static void setTempCloseChildMode(boolean tempCloseChildMode) {
+//        sTempCloseChildMode = tempCloseChildMode;
+//    }
 
     /**
      * 获取用于数据库查询的儿童模式相关语句

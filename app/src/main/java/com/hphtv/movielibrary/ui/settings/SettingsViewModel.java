@@ -64,7 +64,7 @@ public class SettingsViewModel extends BaseAndroidViewModel {
     public void toggleChildMode(View v) {
         mChildModeState.set(!mChildModeState.get());
         Config.setChildMode(mChildModeState.get());
-        Config.setTempCloseChildMode(false);
+//        Config.setTempCloseChildMode(false);
         mFlagRefresh.set(true);
     }
 

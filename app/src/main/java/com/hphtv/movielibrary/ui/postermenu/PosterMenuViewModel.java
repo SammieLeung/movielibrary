@@ -138,7 +138,9 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
             else
                 accessPermission = mMovieDataView.s_ap;
 
-            boolean childMode=!Config.isTempCloseChildMode()&&Config.isChildMode();
+//            boolean childMode=!Config.isTempCloseChildMode()&&Config.isChildMode();
+            boolean childMode=Config.isChildMode();
+
 
             if (accessPermission.equals(Constants.AccessPermission.ADULT)) {
                 accessPermission = Constants.AccessPermission.ALL_AGE;

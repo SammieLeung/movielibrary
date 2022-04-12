@@ -17,7 +17,9 @@ import org.jetbrains.annotations.NotNull;
  * date:  2022/1/13
  */
 public class HomePageViewModel extends AndroidViewModel {
-    public ObservableBoolean mChildMode=new ObservableBoolean(!Config.isTempCloseChildMode()&&Config.isChildMode());
+//    public ObservableBoolean mChildMode=new ObservableBoolean(!Config.isTempCloseChildMode()&&Config.isChildMode());
+    public ObservableBoolean mChildMode=new ObservableBoolean(Config.isChildMode());
+
     public ObservableBoolean mShowChildMode=new ObservableBoolean(Config.isChildMode());
     public HomePageViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -31,7 +33,8 @@ public class HomePageViewModel extends AndroidViewModel {
 
     public void toggleChildMode(){
         mChildMode.set(!mChildMode.get());
-        Config.setTempCloseChildMode(!Config.isTempCloseChildMode());
+//        Config.setTempCloseChildMode(!Config.isTempCloseChildMode());
+        Config.setChildMode(mChildMode.get());
     }
 
 }

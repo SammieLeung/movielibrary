@@ -127,7 +127,9 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     protected void onActivityResultCallback(ActivityResult result) {
         //刷新显示儿童模式状态
         mViewModel.getShowChildMode().set(Config.isChildMode());
-        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
+//        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
+        mViewModel.getChildMode().set(Config.isChildMode());
+
         //刷新各个子Fragment状态
         if (result.getResultCode() == RESULT_OK)
             for (Fragment fragment : mNewHomePageTabAdapter.mList) {
