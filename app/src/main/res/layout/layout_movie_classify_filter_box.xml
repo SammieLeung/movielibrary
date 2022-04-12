@@ -17,7 +17,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@id/view_sortby_device"
                 android:layout_alignEnd="@id/view_sortby_device"
-                android:text="@string/lb_sort_device" />
+                android:text="@string/lb_sort_directory" />
             <TextView
                 android:id="@+id/tv_year"
                 android:layout_alignStart="@id/view_sortby_year"

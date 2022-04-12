@@ -50,7 +50,7 @@
     <dimen name="filter_box_item_margin_lr">21dp</dimen>
     <dimen name="filter_box_item_margin_tb">11dp</dimen>
     <dimen name="filter_box_item_textsize">26sp</dimen>
-    <dimen name="filter_box_headitem_height">34dp</dimen>
+    <dimen name="filter_box_headitem_height">38dp</dimen>
 
     <!-- 索引管理-->
     <dimen name="shortcut_container_padding">72dp</dimen>

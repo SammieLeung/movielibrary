@@ -40,6 +40,12 @@ public class ChildModeFragment extends BaseFragment2<SettingsViewModel, Fragment
         mBinding.tvChangepsw.setOnClickListener(this::showChangePassword);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBinding.tvChangepsw.requestFocus();
+    }
+
     private void showChangePassword(View v) {
         getParentFragmentManager()
                 .beginTransaction()
