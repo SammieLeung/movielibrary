@@ -140,14 +140,12 @@ public class MovieScanService extends Service {
      * @param searchType 搜索模式
      */
     private void startSearch(Shortcut shortcut, List<VideoFile> videoFileList, Constants.SearchType searchType) {
-        Log.e(TAG, "startSearch: " + searchType.name() + "模式");
         //combineLatest 将前面Observable的最新数据与最后的Observable发送的每个数据结合
         Object lock = new Object();
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger indexAtom = new AtomicInteger();
         AtomicInteger currentTaskCount = new AtomicInteger();
         Observable.combineLatest(Observable.just(shortcut), Observable.just(searchType), Observable.just(videoFileList).concatMap((Function<List<VideoFile>, ObservableSource<List<VideoFile>>>) videoFileList1 -> {
-            Log.e(Thread.currentThread().getName(), "combineLatest->分割videolist");
             //为了支持4线程搜索,将数据分成大于4份,并行数量取决于mNetworkExecutor
             //[1,2,3,4,11,12,13,14,21,22,23,24,31,32]
             //                  ↓
@@ -165,11 +163,9 @@ public class MovieScanService extends Service {
                 new Function3<Shortcut, Constants.SearchType, List<VideoFile>, Object[]>() {
                     @Override
                     public Object[] apply(Shortcut shortcut1, Constants.SearchType searchType1, List<VideoFile> videoFileList) throws Throwable {
-                        Log.e(Thread.currentThread().getName(), "准备分发==>" + videoFileList);
                         Observable.fromIterable(videoFileList)
                                 .observeOn(Schedulers.from(mNetworkExecutor))
                                 .map(videoFile -> {
-                                    LogUtil.v(Thread.currentThread().getName(), "shortcut[" + shortcut1.friendlyName + "]" + "[" + videoFile.filename + "]开始匹配...");
                                     String keyword = videoFile.keyword;
 
                                     //选择搜索api
@@ -220,10 +216,9 @@ public class MovieScanService extends Service {
                                                     String movie_id = mostSimilarMovie == null ? "-1" : mostSimilarMovie.movieId;
                                                     if (!movie_id.equals("-1")) {
                                                         String type = mostSimilarMovie.type.name();
-                                                        LogUtil.w(Thread.currentThread().getName(), "开始获取电影" + movie_id);
                                                         MovieDetailRespone respone = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB, type)
                                                                 .onErrorReturn(throwable -> {
-                                                                    LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
+                                                                    LogUtil.e(Thread.currentThread().getName(), "onErrorReturn: "+_keyword+" 获取电影" + movie_id + "失败");
                                                                     OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
                                                                     return null;
                                                                 })
@@ -235,12 +230,12 @@ public class MovieScanService extends Service {
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(),wrapper,videoFile);
                                                             }else {
                                                                 OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
-                                                                LogUtil.e(Thread.currentThread().getName(), "获取电影" + movie_id + "失败");
+                                                                LogUtil.e(Thread.currentThread().getName(), "wrapper为空 "+_keyword+" 获取电影" + movie_id + "失败");
                                                             }
                                                         }
                                                         MovieDetailRespone respone_en = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB_EN, type)
                                                                 .onErrorReturn(throwable -> {
-                                                                    LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
+                                                                    LogUtil.e(Thread.currentThread().getName(), "onErrorReturn: "+_keyword+" 获取电影(英)" + movie_id + "失败");
                                                                     OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
                                                                     return null;
                                                                 })
@@ -251,15 +246,16 @@ public class MovieScanService extends Service {
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(),wrapper_en,videoFile);
                                                             }else {
                                                                 OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
-                                                                LogUtil.e(Thread.currentThread().getName(), "获取电影(英)" + movie_id + "失败");
+                                                                LogUtil.e(Thread.currentThread().getName(), "wrapper为空 "+_keyword+" 获取电影(英)" + movie_id + "失败");
                                                             }
                                                         }
                                                         if(wrapper==null&&wrapper_en==null){
-                                                            throw new Throwable("detail respone.toEntity() faild.");
+                                                            throw new Throwable(_keyword+"detail respone.toEntity() faild.");
                                                         }
                                                     }else{
                                                         OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
                                                         OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
+                                                        LogUtil.e(Thread.currentThread().getName(), _keyword+" 没有匹配到电影！！");
                                                     }
                                                     Object[] data = new Object[2];
                                                     data[0] = movie_id;
@@ -323,22 +319,18 @@ public class MovieScanService extends Service {
                                                 int success = successCount.incrementAndGet();
                                                 sendMatchMovieSuccess(st, movieId, success, scannedCount, shortcut.fileCount);
 //                                                BroadcastHelper.sendBroadcastMovieAddSync(getBaseContext(),movieId);
-                                                LogUtil.w(TAG, "onAction(" + scannedCount + ") movieId:" + movieId);
                                             } else {
                                                 sendMatchMovieFailed(st, scannedCount, shortcut.fileCount);
-                                                LogUtil.w(TAG, "onAction(" + scannedCount + ") 匹配失败,movieI -1");
                                             }
                                         } else {
                                             Shortcut st = (Shortcut) data[0];
                                             sendMatchMovieFailed(st, scannedCount, shortcut.fileCount);
-                                            LogUtil.w(TAG, "onAction(" + scannedCount + ") 匹配失败");
                                         }
                                     }
 
                                     @Override
                                     public void onComplete() {
                                         super.onComplete();
-                                        LogUtil.v(TAG, "onComplete");
                                         synchronized (lock) {
                                             if (currentTaskCount.decrementAndGet() == 0) {
                                                 //文件夹扫描结束
@@ -349,8 +341,11 @@ public class MovieScanService extends Service {
                                                 intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
                                                 intent.putExtra(Constants.Extras.SHORTCUT, shortcut1);
                                                 LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+                                                LogUtil.v(TAG, shortcut1.friendlyName+ " finish");
+
                                             }
                                             if (mGlobalTaskCount.decrementAndGet() == 0) {
+                                                LogUtil.v(TAG,  "All finish");
                                                 if(!AppUtils.isAppInBackground(MovieScanService.this)) {//扫描程序结束
                                                     Intent intent = new Intent();
                                                     intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);

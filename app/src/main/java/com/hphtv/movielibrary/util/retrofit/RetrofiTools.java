@@ -24,7 +24,7 @@ public class RetrofiTools {
     public static final int TEST = 0;
     public static final int RELEASE = 1;
     public static final int PRE = 2;
-    private static int mode = PRE;
+    public static int mode = TEST;
 
     private RetrofiTools() {
 
