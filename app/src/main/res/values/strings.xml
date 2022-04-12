@@ -168,6 +168,8 @@
     <string name="errtips_psw_inconsistent">* The two passwords do not match</string>
 
     <string name="hint_enter_psw">Please enter your password (default password is 1111)</string>
+    <string name="hint_enter_psw_2">Please enter your password</string>
+
     <string name="hint_input4digit_psw">Please enter a new 4-digit password</string>
     <string name="hint_confirm_new_psw">Please enter new password again</string>
     <string name="title_input_psw">Enter Password</string>

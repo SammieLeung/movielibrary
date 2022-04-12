@@ -167,6 +167,8 @@
     <string name="errtips_psw_inconsistent">* 两次输入的密码不一致</string>
 
     <string name="hint_enter_psw">请输入密码 (默认密码为1111)</string>
+    <string name="hint_enter_psw_2">请输入密码</string>
+
     <string name="hint_input4digit_psw">请输入一个4位新密码</string>
     <string name="hint_confirm_new_psw">请再次输入新密码</string>
     <string name="title_input_psw">输入密码</string>

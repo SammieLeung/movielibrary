@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.databinding.FragmentSettingsChildmodeChangepwdBinding;
 import com.hphtv.movielibrary.ui.BaseFragment2;
 import com.hphtv.movielibrary.ui.settings.SettingsViewModel;
@@ -43,6 +44,7 @@ public class ChangePasswordFragment extends BaseFragment2<SettingsViewModel, Fra
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView();
+        updateOldHint();
     }
 
     private void initView() {
@@ -56,6 +58,12 @@ public class ChangePasswordFragment extends BaseFragment2<SettingsViewModel, Fra
         });
         mBinding.btnConfirm.setOnClickListener(this::changePassword);
         mBinding.btnCancel.setOnClickListener(this::fallback);
+    }
+
+    private void updateOldHint(){
+        if(Config.getChildModePassword().equals(Config.DEAULT_PASSWORD)){
+            mBinding.setOldHint(getString(R.string.hint_enter_psw_2));
+        }
     }
 
     private void changePassword(View v) {

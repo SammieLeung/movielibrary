@@ -23,7 +23,7 @@ public class Config {
     public static final String DEFAULT_SEARCH_MODE="default_search_mode";
 
     //默认密码
-    private static final String DEAULT_PASSWORD="1111";
+    public static final String DEAULT_PASSWORD="1111";
 
     private static boolean sChildMode;
     private static String sChildModePassword;
