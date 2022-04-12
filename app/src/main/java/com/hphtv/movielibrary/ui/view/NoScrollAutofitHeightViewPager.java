@@ -140,6 +140,7 @@ public class NoScrollAutofitHeightViewPager extends ViewPager {
 
     @Override
     public boolean arrowScroll(int direction) {
+        //禁止viewpager翻页qgq
         return false;
     }
 }
