@@ -25,6 +25,7 @@
             android:layout_below="@id/option_title"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
+            app:nextFocus="@{nextFocus}"
             app:state="@{posterState}"
             app:title="@{@string/settings_poster_show_poster}"
             tools:ignore="IncludeLayoutParam" />
@@ -36,6 +37,7 @@
             android:layout_below="@id/option_poster"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
+            app:nextFocus="@{nextFocus}"
             app:state="@{ratingState}"
             app:title="@{@string/settings_poster_show_ratings}"
             tools:ignore="IncludeLayoutParam" />
@@ -47,6 +49,7 @@
             android:layout_below="@id/option_rating"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
+            app:nextFocus="@{nextFocus}"
             app:state="@{cornerMarkState}"
             app:title="@{@string/settings_poster_show_cornermark}"
             tools:ignore="IncludeLayoutParam" />
@@ -58,6 +61,7 @@
             android:layout_below="@id/option_cornermark"
             android:layout_marginLeft="84dp"
             android:layout_marginBottom="15dp"
+            app:nextFocus="@{nextFocus}"
             app:state="@{likeState}"
             app:title="@{@string/settings_poster_show_like}"
             tools:ignore="IncludeLayoutParam" />
@@ -69,6 +73,7 @@
             android:layout_marginLeft="84dp"
             android:layout_marginTop="170dp"
             android:layout_marginBottom="15dp"
+            app:nextFocus="@{nextFocus}"
             app:state="@{titleState}"
             app:title="@{@string/settings_poster_show_title}"
             tools:ignore="IncludeLayoutParam" />
@@ -114,5 +119,8 @@
         <variable
             name="ratingState"
             type="ObservableBoolean" />
+        <variable
+            name="nextFocus"
+            type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
 </layout>

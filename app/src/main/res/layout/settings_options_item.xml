@@ -16,9 +16,13 @@
         <variable
             name="stateText"
             type="ObservableField" />
+        <variable
+            name="nextFocus"
+            type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
 
     <RelativeLayout
+        android:nextFocusLeft="@{nextFocus.nextFocusLeft}"
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

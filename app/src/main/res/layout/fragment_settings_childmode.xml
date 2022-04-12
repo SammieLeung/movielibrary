@@ -14,6 +14,7 @@
             style="@style/setting_item_size"
             android:layout_marginLeft="75dp"
             android:layout_marginTop="170dp"
+            app:nextFocus="@{nextFocus}"
             app:title="@{@string/childmode}"
             app:hints="@{@string/childmode_switch_tips}"
             app:checkstate="@{childmode}"
@@ -27,6 +28,7 @@
             android:layout_marginBottom="9dp"
             android:background="#1AFFFFFF" />
         <TextView
+            android:nextFocusLeft="@id/tab_childmode"
             android:id="@+id/tv_changepsw"
             android:layout_marginLeft="75dp"
             android:text="@string/title_change_password"
@@ -40,6 +42,8 @@
         <variable
             name="childmode"
             type="ObservableBoolean" />
-
+        <variable
+            name="nextFocus"
+            type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
 </layout>

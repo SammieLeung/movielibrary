@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.hphtv.movielibrary.NextFocusModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.FragmentSettingsChildmodeBinding;
 import com.hphtv.movielibrary.ui.BaseFragment2;
@@ -37,7 +38,11 @@ public class ChildModeFragment extends BaseFragment2<SettingsViewModel, Fragment
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.setChildmode(mViewModel.getChildModeState());
+        initView();
+        bindDatas();
+
+    }
+    private void initView(){
         mBinding.viewChildmode.view.setOnClickListener(this::toggleChildMode);
         mBinding.tvChangepsw.setOnClickListener(this::showChangePassword);
         getParentFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -49,6 +54,12 @@ public class ChildModeFragment extends BaseFragment2<SettingsViewModel, Fragment
                 }
             }
         });
+    }
+    private void bindDatas(){
+        NextFocusModel model=new NextFocusModel();
+        model.setNextFocusLeft(R.id.tab_childmode);
+        mBinding.setNextFocus(model);
+        mBinding.setChildmode(mViewModel.getChildModeState());
     }
 
     private void showChangePassword(View v) {

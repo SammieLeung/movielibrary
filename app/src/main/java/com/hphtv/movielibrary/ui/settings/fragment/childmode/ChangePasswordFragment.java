@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.hphtv.movielibrary.NextFocusModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.databinding.FragmentSettingsChildmodeChangepwdBinding;
@@ -44,7 +45,7 @@ public class ChangePasswordFragment extends BaseFragment2<SettingsViewModel, Fra
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView();
-        updateOldHint();
+        bindDatas();
     }
 
     private void initView() {
@@ -58,6 +59,13 @@ public class ChangePasswordFragment extends BaseFragment2<SettingsViewModel, Fra
         });
         mBinding.btnConfirm.setOnClickListener(this::changePassword);
         mBinding.btnCancel.setOnClickListener(this::fallback);
+    }
+
+    private void bindDatas(){
+        updateOldHint();
+        NextFocusModel model=new NextFocusModel();
+        model.setNextFocusLeft(R.id.btn_confirm);
+        mBinding.setNextFocus(model);
     }
 
     private void updateOldHint(){

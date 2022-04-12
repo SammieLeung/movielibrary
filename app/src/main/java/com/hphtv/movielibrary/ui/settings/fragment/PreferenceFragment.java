@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.hphtv.movielibrary.NextFocusModel;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.FragmentSettingsPreferenceBinding;
 import com.hphtv.movielibrary.ui.BaseFragment2;
 import com.hphtv.movielibrary.ui.settings.SettingsViewModel;
@@ -36,11 +38,15 @@ public class PreferenceFragment extends BaseFragment2<SettingsViewModel, Fragmen
         initView();
     }
 
-    private void bindDatas(){
+    private void bindDatas() {
         mViewModel.getDeafutSearchModeString();
         mBinding.setStateName(mViewModel.getDefaultSearchMode());
+        NextFocusModel model = new NextFocusModel();
+        model.setNextFocusLeft(R.id.tab_preference);
+        mBinding.setNextFocus(model);
     }
-    private void initView(){
+
+    private void initView() {
 
         mBinding.viewAutosearch.view.setOnClickListener(mViewModel::toggleAutoSearchState);
         mBinding.viewDefaultSearchMode.view.setOnClickListener(mViewModel::changeDefaultSearchState);

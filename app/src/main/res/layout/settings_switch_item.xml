@@ -4,6 +4,7 @@
 
     <data>
         <import type="androidx.databinding.ObservableBoolean"/>
+        <import type="com.hphtv.movielibrary.NextFocusModel"/>
         <variable
             name="title"
             type="String" />
@@ -13,10 +14,14 @@
         <variable
             name="hints"
             type="String" />
+        <variable
+            name="nextFocus"
+            type="NextFocusModel" />
     </data>
 
     <RelativeLayout
         android:id="@+id/view"
+        android:nextFocusLeft="@{nextFocus.nextFocusLeft}"
         style="@style/setting_item_size"
         android:paddingLeft="@dimen/setting_item_padding_lr"
         android:paddingRight="@dimen/setting_item_padding_lr"

@@ -6,6 +6,10 @@
         <variable
             name="oldHint"
             type="String" />
+
+        <variable
+            name="nextFocus"
+            type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
 
     <RelativeLayout
@@ -29,6 +33,7 @@
             android:layout_marginLeft="103dp"
             android:layout_marginTop="79dp"
             android:layout_marginBottom="38dp"
+            app:nextFocus="@{nextFocus}"
             app:hint="@{oldHint}"
             app:label="@{@string/label_old_psw}" />
 
@@ -41,7 +46,8 @@
             android:layout_marginLeft="103dp"
             android:layout_marginBottom="38dp"
             app:hint="@{@string/hint_input4digit_psw}"
-            app:label="@{@string/label_new_psw}" />
+            app:label="@{@string/label_new_psw}"
+            app:nextFocus="@{nextFocus}" />
 
         <include
             android:id="@+id/include_confirm_pwd"
@@ -52,7 +58,8 @@
             android:layout_marginLeft="103dp"
             android:layout_marginBottom="68dp"
             app:hint="@{@string/hint_confirm_new_psw}"
-            app:label="@{@string/label_confirm_psw}" />
+            app:label="@{@string/label_confirm_psw}"
+            app:nextFocus="@{nextFocus}" />
 
         <RelativeLayout
             android:layout_centerHorizontal="true"
@@ -67,6 +74,7 @@
                 android:layout_height="65dp"
                 android:autoSizeMaxTextSize="23sp"
                 android:autoSizeTextType="uniform"
+                android:nextFocusLeft="@id/btn_confirm"
                 android:paddingLeft="20dp"
                 android:paddingTop="10dp"
                 android:paddingRight="20dp"
@@ -76,16 +84,16 @@
 
 
             <Button
-                style="@style/common_btn_style"
                 android:id="@+id/btn_cancel"
+                style="@style/common_btn_style"
                 android:layout_width="195dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
                 android:layout_height="65dp"
                 android:layout_marginLeft="63dp"
                 android:layout_toEndOf="@id/btn_confirm"
+                android:paddingLeft="20dp"
+                android:paddingTop="10dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
                 android:text="@string/goback"
                 android:textSize="23sp" />
 

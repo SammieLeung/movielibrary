@@ -9,6 +9,9 @@
         <variable
             name="stateName"
             type="ObservableField" />
+        <variable
+            name="nextFocus"
+            type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
 
     <RelativeLayout
@@ -21,6 +24,7 @@
             layout="@layout/settings_switch_item"
             android:layout_marginLeft="75dp"
             android:layout_marginTop="170dp"
+            app:nextFocus="@{nextFocus}"
             app:checkstate="@{Config.isAutoSearch()}"
             app:title="@{@string/settings_preference_autosearch_title}"
             tools:ignore="IncludeLayoutParam" />
@@ -29,6 +33,7 @@
             android:id="@+id/view_default_search_mode"
             style="@style/setting_item_size"
             layout="@layout/settings_options_item"
+            app:nextFocus="@{nextFocus}"
             app:stateText="@{stateName}"
             app:title="@{@string/settings_preference_default_searchmode}"
             android:layout_below="@id/view_autosearch"

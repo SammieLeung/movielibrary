@@ -8,6 +8,9 @@
         <variable
             name="hint"
             type="String" />
+        <variable
+            name="nextFocus"
+            type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
 
     <RelativeLayout
@@ -30,6 +33,7 @@
 
         </TextView>
         <EditText
+            android:nextFocusLeft="@{nextFocus.nextFocusLeft}"
             android:id="@+id/et_psw"
             android:inputType="numberPassword"
             android:layout_alignParentEnd="true"
