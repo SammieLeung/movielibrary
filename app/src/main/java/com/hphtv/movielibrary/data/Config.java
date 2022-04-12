@@ -49,7 +49,7 @@ public class Config {
         sShowRating=new ObservableBoolean(tools.readProperty(SHOW_RATING,true));
         sShowLike=new ObservableBoolean(tools.readProperty(SHOW_LIKE,true));
 
-        sAutoSearch=new ObservableBoolean(tools.readProperty(AUTO_SEARCH,false));
+        sAutoSearch=new ObservableBoolean(tools.readProperty(AUTO_SEARCH,true));
         sDefaultSearchMode =tools.readProperty(DEFAULT_SEARCH_MODE, Constants.SearchType.auto.name());
     }
 
