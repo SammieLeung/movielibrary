@@ -1,10 +1,14 @@
 package com.hphtv.movielibrary.roomdb.entity;
 
+import android.text.TextUtils;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import java.io.Serializable;
 
@@ -24,6 +28,9 @@ public class Writer implements Serializable {
 
     @Override
     public String toString() {
-        return name+"("+nameEn+")";
+        if (ScraperSourceTools.getSource().equals(Constants.Scraper.TMDB))
+            return name;
+        else
+            return TextUtils.isEmpty(nameEn) ? name : nameEn;
     }
 }

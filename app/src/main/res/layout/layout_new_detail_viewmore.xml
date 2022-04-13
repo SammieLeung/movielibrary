@@ -39,6 +39,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginTop="64dp"
                     android:layout_marginEnd="84dp"
+                    android:autoSizeMaxTextSize="21sp"
+                    android:autoSizeTextType="uniform"
                     android:background="@drawable/btn_bg_detial_plot_fold"
                     android:drawableLeft="@drawable/ic_fold"
                     android:paddingLeft="18dp"

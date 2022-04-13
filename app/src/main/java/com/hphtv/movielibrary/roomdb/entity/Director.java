@@ -7,7 +7,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import java.io.Serializable;
 
@@ -26,6 +28,9 @@ public class Director implements Serializable {
 
     @Override
     public String toString() {
-        return name + (!TextUtils.isEmpty(nameEn)? "(" + nameEn + ")":"");
+        if (ScraperSourceTools.getSource().equals(Constants.Scraper.TMDB))
+            return name;
+        else
+            return TextUtils.isEmpty(nameEn) ? name : nameEn;
     }
 }
