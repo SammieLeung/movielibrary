@@ -70,7 +70,7 @@ public class OnlineDBApiService {
             updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
                 @Override
                 public void onAction(BaseRespone baseRespone) {
-                    LogUtil.w("{uploadMovie} " + baseRespone.code + ": " + movieId + "<=>" + filename);
+                    LogUtil.w("{uploadMovie:"+source+"} " + baseRespone.code + ": " + movieId + "<=>" + filename);
                 }
             });
         }
@@ -101,7 +101,7 @@ public class OnlineDBApiService {
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{uploadMovie} " + baseRespone.code + ": " + movieId + "<=>" + filename);
+                LogUtil.w("{uploadMovie:"+source+"} " + baseRespone.code + ": " + movieId + "<=>" + filename);
             }
         });
     }

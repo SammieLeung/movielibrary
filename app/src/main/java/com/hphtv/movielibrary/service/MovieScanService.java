@@ -255,7 +255,7 @@ public class MovieScanService extends Service {
                                                     }else{
                                                         OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB_EN);
                                                         OnlineDBApiService.uploadFile(videoFile,Constants.Scraper.TMDB);
-                                                        LogUtil.e(Thread.currentThread().getName(), _keyword+" 没有匹配到电影！！");
+                                                        LogUtil.e(Thread.currentThread().getName(), _keyword+" 此关键字无搜索结果");
                                                     }
                                                     Object[] data = new Object[2];
                                                     data[0] = movie_id;

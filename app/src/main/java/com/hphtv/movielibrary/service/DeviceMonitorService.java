@@ -80,7 +80,7 @@ public class DeviceMonitorService extends Service {
 
     private VideoFileDao mVideoFileDao;
     private ShortcutDao mShortcutDao;
-    private int mScanFlag = 0;
+    private boolean isScanning = false;
 
 
     /**
@@ -299,10 +299,10 @@ public class DeviceMonitorService extends Service {
      * 扫描本地所有挂载设备并扫描文件
      */
     public void scanDevices() {
-        if (mScanFlag == 0) {
+        if (!isScanning) {
             synchronized (DeviceMonitorService.this) {
-                if (mScanFlag == 0) {
-                    mScanFlag = 1;
+                if (!isScanning) {
+                    isScanning =true;
                     mDeviceInitExecutor.execute(new DeviceInitThread(this));
                 }
             }
@@ -310,7 +310,7 @@ public class DeviceMonitorService extends Service {
     }
 
     public void reScanDevices() {
-        mScanFlag = 0;
+        isScanning =false;
         scanDevices();
     }
 
