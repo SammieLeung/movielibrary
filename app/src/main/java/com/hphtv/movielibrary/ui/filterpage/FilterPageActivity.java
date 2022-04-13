@@ -39,7 +39,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
     private HomeFragmentViewModel mNewpageViewModel;
-    private Handler mHandler=new Handler();
+    private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
 
     View.OnClickListener mOnClickListener = v -> {
@@ -132,7 +132,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             protected void onScrollStart() {
                 super.onScrollStart();
                 mHandler.removeCallbacks(mBottomMaskFadeInTask);
-                if(mBinding.bottomMask.getAlpha()>0) {
+                if (mBinding.bottomMask.getAlpha() > 0) {
                     ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
                     objectAnimator.start();
                 }
@@ -142,18 +142,18 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             protected void onScrolledEnd() {
                 super.onScrolledEnd();
                 mHandler.removeCallbacks(mBottomMaskFadeInTask);
-                mBottomMaskFadeInTask= () -> {
-                    ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(500);
+                mBottomMaskFadeInTask = () -> {
+                    ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 1).setDuration(500);
                     objectAnimator.start();
                 };
-                mHandler.postDelayed(mBottomMaskFadeInTask,800);
+                mHandler.postDelayed(mBottomMaskFadeInTask, 800);
 
             }
         });
         mBinding.recyclerview.setOnKeyPressListener(mOnKeyPressListener);
     }
 
-    private void bindDatas(){
+    private void bindDatas() {
         mBinding.setEmptyType(mViewModel.getEmptyType());
         mBinding.setConditions(mViewModel.getConditionStr());
         mBinding.setRow(mViewModel.getRowStr());
@@ -186,6 +186,10 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         @Override
         public void newSearch(List<MovieDataView> newMovieDataView) {
             mMovieItemListAdapter.addAll(newMovieDataView);
+            if (mMovieItemListAdapter.getItemCount() <= 5)
+                mBinding.bottomMask.setAlpha(0);
+            else
+                mBinding.bottomMask.setAlpha(1);
         }
 
         @Override
@@ -197,7 +201,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
     @Override
     public void OnRematchPoster(MovieDataView dataView, int pos) {
-        mMovieItemListAdapter.replace(dataView,pos);
+        mMovieItemListAdapter.replace(dataView, pos);
         setResult(RESULT_OK);
     }
 

@@ -39,7 +39,7 @@ import com.station.kit.util.LogUtil;
  */
 public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight, OnMovieChangeListener {
     private HomePageTabAdapter mNewHomePageTabAdapter;
-    private Handler mHandler=new Handler();
+    private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
 
     @Override
@@ -132,17 +132,17 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     /**
      * 蒙版隱藏動畫
      */
-    private void startBottomMaskAnimate(){
+    private void startBottomMaskAnimate() {
         mHandler.removeCallbacks(mBottomMaskFadeInTask);
-        if(mBinding.bottomMask.getAlpha()>0) {
+        if (mBinding.bottomMask.getAlpha() > 0) {
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
             objectAnimator.start();
         }
-        mBottomMaskFadeInTask= () -> {
-            ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(500);
+        mBottomMaskFadeInTask = () -> {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 1).setDuration(500);
             objectAnimator.start();
         };
-        mHandler.postDelayed(mBottomMaskFadeInTask,800);
+        mHandler.postDelayed(mBottomMaskFadeInTask, 800);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     public void refreshFragment(int pos) {
         if (pos < mNewHomePageTabAdapter.mList.size()) {
-            Fragment fragment=mNewHomePageTabAdapter.getItem(pos);
+            Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IActivityResult) {
                 IActivityResult activityResult = (IActivityResult) fragment;
                 activityResult.forceRefresh();
@@ -312,16 +312,13 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public void OnMovieChange(MovieDataView movieDataView, int pos) {
-
     }
 
     @Override
     public void OnMovieRemove(String movie_id, int pos) {
-
     }
 
     @Override
     public void OnMovieInsert(MovieDataView movieDataView, int pos) {
-
     }
 }
