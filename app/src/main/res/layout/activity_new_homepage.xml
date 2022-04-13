@@ -2,88 +2,104 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<androidx.core.widget.NestedScrollView
-    android:id="@+id/nsv"
-    android:layout_width="match_parent"
-    android:background="@drawable/new_main_background"
-    android:layout_height="match_parent">
-        <RelativeLayout
-            android:id="@+id/constraintLayout"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsv"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-           >
+            android:layout_height="match_parent"
+            android:background="@drawable/new_main_background">
 
-            <Button
-                android:id="@+id/btn_pinyin_search"
-                style="@style/homepage_circle_btn_style"
-                android:layout_width="wrap_content"
-                android:layout_toStartOf="@id/btn_shortcutmanager"
-                android:drawableLeft="@drawable/icon_circle_search"
-                android:text="@string/search" />
-
-            <Button
-                android:id="@+id/btn_shortcutmanager"
-                style="@style/homepage_circle_btn_style"
-                android:layout_width="wrap_content"
-                android:layout_toStartOf="@id/btn_childmode"
-                android:drawableLeft="@drawable/icon_circle_folder"
-                android:text="@string/shortcut_manager" />
-
-            <CheckBox
-                android:visibility="@{showChildMode?View.VISIBLE:View.GONE}"
-                android:id="@+id/btn_childmode"
-                style="@style/homepage_circle_btn_style"
-                android:layout_width="wrap_content"
-                android:layout_toStartOf="@id/btn_settings"
-                android:background="@drawable/circle_checkbox_bg"
-                android:button="@null"
-                android:checked="@{childmode}"
-                android:drawableLeft="@drawable/icon_circle_childmode"
-                android:text="@string/childmode" />
-
-            <Button
-                android:id="@+id/btn_settings"
-                style="@style/homepage_circle_btn_style"
-                android:layout_width="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginRight="72dp"
-                android:drawableLeft="@drawable/icon_circle_setting"
-                android:text="@string/settings" />
-
-            <!--        <Button-->
-            <!--            android:id="@+id/btn_child_mode"-->
-            <!--            style="@style/homepage_circle_btn_style"-->
-            <!--            android:layout_toStartOf="@id/btn_settings" />-->
-
-            <!--        <Button-->
-            <!--            android:id="@+id/btn_settings"-->
-            <!--            style="@style/homepage_circle_btn_style"-->
-            <!--            android:layout_marginRight="72dp"-->
-            <!--            android:layout_alignParentEnd="true" />-->
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tablayout"
-                android:layout_width="wrap_content"
-                android:layout_height="56dp"
-                android:layout_below="@id/btn_pinyin_search"
-                app:tabIndicatorHeight="0dp"
-                app:tabBackground="@drawable/new_common_tab_bg_2"
-                android:layout_marginLeft="72dp"
-                app:tabRippleColor="@android:color/transparent"
-                android:layout_marginTop="5dp" />
-
-            <com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
-                android:id="@+id/viewpager"
+            <RelativeLayout
+                android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tablayout" />
-        </RelativeLayout>
-</androidx.core.widget.NestedScrollView>
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btn_pinyin_search"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_toStartOf="@id/btn_shortcutmanager"
+                    android:drawableLeft="@drawable/icon_circle_search"
+                    android:text="@string/search" />
+
+                <Button
+                    android:id="@+id/btn_shortcutmanager"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_toStartOf="@id/btn_childmode"
+                    android:drawableLeft="@drawable/icon_circle_folder"
+                    android:text="@string/shortcut_manager" />
+
+                <Button
+                    android:id="@+id/btn_settings"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="72dp"
+                    android:drawableLeft="@drawable/icon_circle_setting"
+                    android:text="@string/settings" />
+
+                <CheckBox
+                    android:id="@+id/btn_childmode"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_toStartOf="@id/btn_settings"
+                    android:background="@drawable/circle_checkbox_bg"
+                    android:button="@null"
+                    android:checked="@{childmode}"
+                    android:drawableLeft="@drawable/icon_circle_childmode"
+                    android:text="@string/childmode"
+                    android:visibility="@{showChildMode?View.VISIBLE:View.GONE}" />
+
+                <!--        <Button-->
+                <!--            android:id="@+id/btn_child_mode"-->
+                <!--            style="@style/homepage_circle_btn_style"-->
+                <!--            android:layout_toStartOf="@id/btn_settings" />-->
+
+                <!--        <Button-->
+                <!--            android:id="@+id/btn_settings"-->
+                <!--            style="@style/homepage_circle_btn_style"-->
+                <!--            android:layout_marginRight="72dp"-->
+                <!--            android:layout_alignParentEnd="true" />-->
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tablayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:layout_below="@id/btn_pinyin_search"
+                    android:layout_marginLeft="72dp"
+                    android:layout_marginTop="5dp"
+                    app:tabBackground="@drawable/new_common_tab_bg_2"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabRippleColor="@android:color/transparent" />
+
+                <com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
+                    android:id="@+id/viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tablayout" />
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+        <View
+            android:id="@+id/bottomMask"
+            android:background="@drawable/bottom_mask"
+            android:layout_alignParentBottom="true"
+            android:layout_height="230dp"
+            android:layout_width="match_parent"></View>
+    </RelativeLayout>
+
     <data>
-        <import type="android.view.View"/>
-        <import type="androidx.databinding.ObservableBoolean"/>
+
+        <import type="android.view.View" />
+
+        <import type="androidx.databinding.ObservableBoolean" />
+
         <variable
             name="childmode"
             type="ObservableBoolean" />
+
         <variable
             name="showChildMode"
             type="ObservableBoolean" />

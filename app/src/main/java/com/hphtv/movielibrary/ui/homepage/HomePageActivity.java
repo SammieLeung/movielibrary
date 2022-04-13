@@ -1,13 +1,16 @@
 package com.hphtv.movielibrary.ui.homepage;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -36,6 +39,8 @@ import com.station.kit.util.LogUtil;
  */
 public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight, OnMovieChangeListener {
     private HomePageTabAdapter mNewHomePageTabAdapter;
+    private Handler mHandler=new Handler();
+    private Runnable mBottomMaskFadeInTask;
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -78,6 +83,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
         mBinding.btnSettings.setOnClickListener(this::startSettings);
         mBinding.btnChildmode.setOnClickListener(this::toggleChildmode);
+        mBinding.nsv.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
         initTab();
     }
 
@@ -121,6 +127,22 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         Intent intent = new Intent();
         intent.setAction(Constants.BroadCastMsg.RESCAN_ALL);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    /**
+     * 蒙版隱藏動畫
+     */
+    private void startBottomMaskAnimate(){
+        mHandler.removeCallbacks(mBottomMaskFadeInTask);
+        if(mBinding.bottomMask.getAlpha()>0) {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
+            objectAnimator.start();
+        }
+        mBottomMaskFadeInTask= () -> {
+            ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(500);
+            objectAnimator.start();
+        };
+        mHandler.postDelayed(mBottomMaskFadeInTask,800);
     }
 
     @Override

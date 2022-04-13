@@ -152,6 +152,6 @@
             android:background="@drawable/bottom_mask"
             android:layout_alignParentBottom="true"
             android:layout_height="230dp"
-            android:layout_width="match_parent"></View>
+            android:layout_width="match_parent" />
     </RelativeLayout>
 </layout>

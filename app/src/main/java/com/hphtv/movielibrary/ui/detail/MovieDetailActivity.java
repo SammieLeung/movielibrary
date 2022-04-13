@@ -1,11 +1,13 @@
 package com.hphtv.movielibrary.ui.detail;
 
+import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,6 +50,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public static final int REMOVE = 1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private NewMovieItemListAdapter mRecommandMovieAdapter;
+
+    private Handler mHandler=new Handler();
+    private Runnable mBottomMaskFadeInTask;
+
 
     //TODO 同步系统状态需要一个后台服务绑定
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -153,6 +160,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
             }
         });
+        mBinding.nestScrollview.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
     }
 
     @Override
@@ -258,6 +266,21 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         super.onDestroy();
     }
 
+    /**
+     * 蒙版隱藏動畫
+     */
+    private void startBottomMaskAnimate(){
+        mHandler.removeCallbacks(mBottomMaskFadeInTask);
+        if(mBinding.bottomMask.getAlpha()>0) {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
+            objectAnimator.start();
+        }
+        mBottomMaskFadeInTask= () -> {
+            ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(500);
+            objectAnimator.start();
+        };
+        mHandler.postDelayed(mBottomMaskFadeInTask,800);
+    }
 
     /**
      * 编辑封面信息

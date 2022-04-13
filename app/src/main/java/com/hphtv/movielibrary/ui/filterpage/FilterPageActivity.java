@@ -143,10 +143,10 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
                 super.onScrolledEnd();
                 mHandler.removeCallbacks(mBottomMaskFadeInTask);
                 mBottomMaskFadeInTask= () -> {
-                    ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(200);
+                    ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(500);
                     objectAnimator.start();
                 };
-                mHandler.postDelayed(mBottomMaskFadeInTask,500);
+                mHandler.postDelayed(mBottomMaskFadeInTask,800);
 
             }
         });
