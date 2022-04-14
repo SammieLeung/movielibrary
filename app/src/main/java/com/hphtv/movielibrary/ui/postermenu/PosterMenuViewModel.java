@@ -166,6 +166,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                             break;
                     }
                     mRefreshFlag = true;
+                    OnlineDBApiService.setMovieAccessPermission(mMovieDataView.movie_id, mMovieDataView.type.name(), mMovieDataView.ap, ScraperSourceTools.getSource());
                 });
     }
 

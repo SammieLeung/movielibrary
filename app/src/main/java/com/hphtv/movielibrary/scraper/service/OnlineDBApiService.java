@@ -13,6 +13,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
+import com.hphtv.movielibrary.scraper.postbody.MovieAccessRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
@@ -211,6 +212,26 @@ public class OnlineDBApiService {
             @Override
             public void onAction(BaseRespone baseRespone) {
                 LogUtil.w("{removeFolder} " +Thread.currentThread().getName()+" "+ baseRespone.code + ": " + dir_path);
+            }
+        });
+    }
+
+    public static void setMovieAccessPermission(String movie_id, String type, Constants.AccessPermission accessPermission,String source) {
+        StationMovieProtocol request = RetrofiTools.createRequest();
+        switch (source) {
+            case Constants.Scraper.TMDB:
+                request = RetrofiTools.createRequest();
+                break;
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofiTools.createENRequest();
+                break;
+        }
+        MovieAccessRequestBody body = new MovieAccessRequestBody(movie_id,type,accessPermission);
+        Observable<BaseRespone> movieAccessRequest = request.setMovieAccessPermission(body);
+        movieAccessRequest.subscribe(new SimpleObserver<BaseRespone>() {
+            @Override
+            public void onAction(BaseRespone baseRespone) {
+                LogUtil.w("{setMovieAccessPermission} " +Thread.currentThread().getName()+" "+ baseRespone.code + ": " + movie_id);
             }
         });
     }
