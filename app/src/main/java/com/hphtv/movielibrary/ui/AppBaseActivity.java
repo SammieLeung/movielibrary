@@ -13,7 +13,6 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -69,8 +68,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         mHanlder.removeCallbacksAndMessages(null);
         ServiceStatusHelper.resumeView();
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_START);
-        intentFilter.addAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
+        intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
+        intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
 
@@ -105,11 +104,11 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         public void onReceive(Context context, Intent intent) {
             String action=intent.getAction();
             switch (action){
-                case Constants.BroadCastMsg.MOVIE_SCRAP_START:
+                case Constants.ACTION.MOVIE_SCRAP_START:
                     if(!AppUtils.isAppInBackground(AppBaseActivity.this))
                         ServiceStatusHelper.addView(getString(R.string.scanning_in_background), AppBaseActivity.this);
                     break;
-                case Constants.BroadCastMsg.MOVIE_SCRAP_STOP:
+                case Constants.ACTION.MOVIE_SCRAP_STOP:
                     ServiceStatusHelper.removeView(context);
                     movieScarpFinish();
                     break;

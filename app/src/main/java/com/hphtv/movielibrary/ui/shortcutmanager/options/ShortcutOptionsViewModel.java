@@ -171,17 +171,17 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                     public void onAction(Shortcut shortcut) {
                         if(shortcut.deviceType >Constants.DeviceType.DEVICE_TYPE_HARD_DISK) {
                             Intent intent = new Intent();
-                            intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING_FOR_NETWORK_URI);
+                            intent.setAction(Constants.ACTION.ADD_NETWORK_SHORTCUT);
                             intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                         }else{
                             Intent intent=new Intent();
-                            intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
+                            intent.setAction(Constants.ACTION.ADD_LOCAL_SHORTCUT);
                             intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                         }
                         Intent intent=new Intent();
-                        intent.setAction(Constants.BroadCastMsg.SHORTCUT_INFO_UPDATE);
+                        intent.setAction(Constants.ACTION.SHORTCUT_INFO_UPDATE);
                         intent.putExtra(Constants.Extras.SHORTCUT,mShortcut);
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                     }
@@ -191,7 +191,7 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
 
     public void removeShortcut(){
         Intent intent=new Intent();
-        intent.setAction(Constants.BroadCastMsg.SHORTCUT_REMOVE);
+        intent.setAction(Constants.ACTION.SHORTCUT_REMOVE);
         intent.putExtra(Constants.Extras.SHORTCUT,mShortcut);
         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
     }

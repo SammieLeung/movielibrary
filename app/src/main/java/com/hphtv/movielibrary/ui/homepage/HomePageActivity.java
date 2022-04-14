@@ -52,10 +52,8 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         bindDatas();
         initView();
         autoScrollListener(mBinding.nsv);
-        //是否自动搜索文件夹
-        if (Config.isAutoSearch().get()) {
-            autoSearch();
-        }
+        //自动搜索文件夹
+        autoSearch();
     }
 
     /**
@@ -125,7 +123,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      */
     private void autoSearch() {
         Intent intent = new Intent();
-        intent.setAction(Constants.BroadCastMsg.RESCAN_ALL);
+        intent.setAction(Constants.ACTION.RESCAN_ALL_FILES);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

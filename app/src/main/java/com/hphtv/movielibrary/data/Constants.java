@@ -17,10 +17,6 @@ public class Constants {
     public static final String ACTION_FILE_PICKER = "com.firefly.FILE_PICKER";
     public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
     public static final int ANIMATION_DURATION=300;
-    /**
-     * 设备路径与id映射
-     */
-    public static final ConcurrentHashMap<String, String> connectDeviceIds = new ConcurrentHashMap<>();
 
     //--------------HashMap keys------------
     //1.for LeftMenuListAdapter and HomePageActivity
@@ -183,20 +179,21 @@ public class Constants {
 
 
 
-    public interface BroadCastMsg {
+    public interface ACTION {
         String FILE_SCANNING="file_scannig";
         /**
          * 设备挂载/卸载广播
          */
-        String DEVICE_UP = "action_mounted";
-        String DEVICE_DOWN = "action_unmounted";
-        String POSTER_PAIRING = "action.poster_pairing";
-        String POSTER_PAIRING_FOR_NETWORK_URI ="action.network_uri.poster_pairing";
+        String DEVICE_INIT="action.devices.init";
+        String DEVICE_MOUNTED = "action_mounted";
+        String DEVICE_UNMOUNTED = "action_unmounted";
+        String ADD_LOCAL_SHORTCUT = "action.local_shortcut.add";
+        String ADD_NETWORK_SHORTCUT ="action.network_uri.add";
 
         /**
          * 重新扫描设备
          */
-        String RESCAN_ALL = "com.station.rescan_all";
+        String RESCAN_ALL_FILES = "com.station.rescan_all";
 
         String MOVIE_SCRAP_START= "action.movie.scrap.start";
         String MOVIE_SCRAP_STOP = "action.movie.scrap.stop";

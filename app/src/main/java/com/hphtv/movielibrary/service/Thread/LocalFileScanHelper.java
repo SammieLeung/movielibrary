@@ -7,7 +7,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
-import com.firefly.videonameparser.bean.Source;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -18,9 +17,7 @@ import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.ScanDirectory;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
-import com.hphtv.movielibrary.service.MovieScanService;
-import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.station.kit.util.LogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -38,19 +35,25 @@ public class LocalFileScanHelper {
     public static final String TAG = LocalFileScanHelper.class.getSimpleName();
     private static final int MAX_DIRS = 2000;//扫描目录队列最大长度
 
-    public static void scanAllLocalShortcuts(Context context) {
+    public static void searchAllLocalShortcuts(Context context) {
         ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
         List<Shortcut> shortcutList = shortcutDao.queryAllLocalShortcuts();
+        long curTime=System.currentTimeMillis();
         scanShortcuts(context,shortcutList);
-        Intent intent = new Intent();
-        intent.setAction(Constants.BroadCastMsg.POSTER_PAIRING);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+        LogUtil.v(TAG,"search All Local takes "+(System.currentTimeMillis()-curTime)+"ms");
     }
 
-    public static void scanShortcut(Context context,Shortcut shortcut){
+    public static void searchShortcut(Context context, Shortcut shortcut){
         List<Shortcut> shortcutList=new ArrayList<>();
         shortcutList.add(shortcut);
         scanShortcuts(context,shortcutList);
+    }
+
+    public static List<Shortcut> scanDevice(Context context,String devicePath){
+        ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
+        List<Shortcut> shortcutList=shortcutDao.queryLocalShortcuts(devicePath);
+        scanShortcuts(context,shortcutList);
+        return shortcutList;
     }
 
     /**
@@ -145,7 +148,7 @@ public class LocalFileScanHelper {
     }
 
 
-    private boolean isNomedia(File file) {
+    private boolean isNoMedia(File file) {
         if (file.getName().equals(".nomedia"))
             return true;
         return false;

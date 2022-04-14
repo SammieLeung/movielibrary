@@ -1,7 +1,11 @@
 package com.hphtv.movielibrary.service.Thread;
 
+import android.content.Intent;
 import android.text.TextUtils;
 
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
@@ -11,6 +15,7 @@ import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -40,6 +45,7 @@ public class DeviceInitThread extends Thread {
         super.run();
         //清除数据库设备,
         mDeviceDao.deleteAll();
+
         LogUtil.v(TAG, "=============>挂载设备:");
 
         String internelStorage = StorageHelper.getFlashStoragePath(mDeviceMonitorService);
@@ -53,8 +59,7 @@ public class DeviceInitThread extends Thread {
             for (String path : allCardPaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
                 int type = Constants.DeviceType.DEVICE_TYPE_SDCARDS;
-                int state = Constants.DeviceMountState.MOUNTED;
-                mDeviceMonitorService.executeOnMountThread(deviceName, type, path, false, "", state);
+                saveDevice(path,type,deviceName);
             }
         }
 
@@ -63,8 +68,7 @@ public class DeviceInitThread extends Thread {
             for (String path : allUsbPaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
                 int type = Constants.DeviceType.DEVICE_TYPE_USB;
-                int state = Constants.DeviceMountState.MOUNTED;
-                mDeviceMonitorService.executeOnMountThread(deviceName, type, path, false, "", state);
+                saveDevice(path,type,deviceName);
             }
         }
 
@@ -73,8 +77,7 @@ public class DeviceInitThread extends Thread {
             for (String path : allPciePaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
                 int type = Constants.DeviceType.DEVICE_TYPE_PCIE;
-                int state = Constants.DeviceMountState.MOUNTED;
-                mDeviceMonitorService.executeOnMountThread(deviceName, type, path, false, "", state);
+                saveDevice(path,type,deviceName);
             }
         }
 
@@ -83,8 +86,7 @@ public class DeviceInitThread extends Thread {
             for (String path : allHardDiskPaths) {
                 String deviceName = path.substring(path.lastIndexOf("/") + 1);
                 int type = Constants.DeviceType.DEVICE_TYPE_HARD_DISK;
-                int state = Constants.DeviceMountState.MOUNTED;
-                mDeviceMonitorService.executeOnMountThread(deviceName, type, path, false, "", state);
+                saveDevice(path,type,deviceName);
             }
         }
 
@@ -92,9 +94,39 @@ public class DeviceInitThread extends Thread {
             //扫描内置存储
             String deviceName = internelStorage.substring(internelStorage.lastIndexOf("/") + 1);//TODO 验证Android 11上的可行性
             int type = Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
-            int state = Constants.DeviceMountState.MOUNTED;
-            mDeviceMonitorService.executeOnMountThread(deviceName, type, internelStorage, false, "", state);
+            saveDevice(internelStorage,type,deviceName);
         }
 
+        Intent intent=new Intent();
+        intent.setAction(Constants.ACTION.DEVICE_INIT);
+        LocalBroadcastManager.getInstance(mDeviceMonitorService).sendBroadcast(intent);
     }
+
+    private void saveDevice(String mountPath, int deviceType, String name) {
+        Device device = new Device();
+        File file = new File(mountPath);
+        if (!file.exists())//不是本地挂载设备返回null
+            return;
+        device.path = mountPath;
+        device.name = name;
+
+        //获取设备具体类型
+        if (deviceType == Constants.DeviceType.DEVICE_TYPE_LOCAL) {
+            if (StorageHelper.isMountUsb(mDeviceMonitorService, mountPath)) {
+                device.type = Constants.DeviceType.DEVICE_TYPE_USB;
+            } else if (StorageHelper.isMountSdCard(mDeviceMonitorService, mountPath)) {
+                device.type = Constants.DeviceType.DEVICE_TYPE_SDCARDS;
+            } else if (StorageHelper.isMountHardDisk(mDeviceMonitorService, mountPath)) {
+                device.type = Constants.DeviceType.DEVICE_TYPE_HARD_DISK;
+            } else if (StorageHelper.isMountPcie(mDeviceMonitorService, mountPath)) {
+                device.type = Constants.DeviceType.DEVICE_TYPE_PCIE;
+            } else {
+                device.type = Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE;
+            }
+        } else {
+            device.type = deviceType;
+        }
+        mDeviceDao.insertDevice(device);
+    }
+
 }

@@ -20,6 +20,9 @@ import java.util.List;
 @Dao
 public interface DeviceDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public long insertDevice(Device device);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long[] insertDevices(Device... devices);
 
     @Update

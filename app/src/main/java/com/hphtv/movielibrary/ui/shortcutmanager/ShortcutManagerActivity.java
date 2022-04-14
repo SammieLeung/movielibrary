@@ -1,6 +1,5 @@
 package com.hphtv.movielibrary.ui.shortcutmanager;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,13 +8,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
 
 import androidx.activity.result.ActivityResult;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -31,7 +26,6 @@ import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsDialog;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.scan.ShortcutScanDialog;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
-import com.station.kit.util.LogUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -107,12 +101,12 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
 
     private void registerReceivers() {
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.BroadCastMsg.SHORTCUT_INFO_UPDATE);
-        intentFilter.addAction(Constants.BroadCastMsg.SHORTCUT_REMOVE);
-        intentFilter.addAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_START);
-        intentFilter.addAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
-        intentFilter.addAction(Constants.BroadCastMsg.MATCHED_MOVIE);
-        intentFilter.addAction(Constants.BroadCastMsg.MATCHED_MOVIE_FAILED);
+        intentFilter.addAction(Constants.ACTION.SHORTCUT_INFO_UPDATE);
+        intentFilter.addAction(Constants.ACTION.SHORTCUT_REMOVE);
+        intentFilter.addAction(Constants.ACTION.SHORTCUT_SCRAP_START);
+        intentFilter.addAction(Constants.ACTION.SHORTCUT_SCRAP_STOP);
+        intentFilter.addAction(Constants.ACTION.MATCHED_MOVIE);
+        intentFilter.addAction(Constants.ACTION.MATCHED_MOVIE_FAILED);
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
 
@@ -149,19 +143,19 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
             String action = intent.getAction();
             Shortcut shortcut;
             switch (action) {
-                case Constants.BroadCastMsg.SHORTCUT_SCRAP_START:
-                case Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP:
-                case Constants.BroadCastMsg.MATCHED_MOVIE:
-                case Constants.BroadCastMsg.MATCHED_MOVIE_FAILED:
+                case Constants.ACTION.SHORTCUT_SCRAP_START:
+                case Constants.ACTION.SHORTCUT_SCRAP_STOP:
+                case Constants.ACTION.MATCHED_MOVIE:
+                case Constants.ACTION.MATCHED_MOVIE_FAILED:
                     shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.SHORTCUT);
                     mFolderItemAdapter.updateShortcut(shortcut);
                     break;
-                case Constants.BroadCastMsg.SHORTCUT_INFO_UPDATE:
+                case Constants.ACTION.SHORTCUT_INFO_UPDATE:
                     shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.SHORTCUT);
                     mFolderItemAdapter.updateShortcut(shortcut);
                     ShortcutManagerActivity.this.setResult(RESULT_OK);
                     break;
-                case Constants.BroadCastMsg.SHORTCUT_REMOVE:
+                case Constants.ACTION.SHORTCUT_REMOVE:
                     shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.SHORTCUT);
                     mViewModel.removeShortcut(shortcut)
                             .subscribe(new SimpleObserver<Shortcut>() {

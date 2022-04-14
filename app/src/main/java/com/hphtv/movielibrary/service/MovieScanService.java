@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -295,7 +294,7 @@ public class MovieScanService extends Service {
                                         //全局任务标志为0发送广播：扫描
                                         if (mGlobalTaskCount.getAndIncrement() == 0) {
                                             Intent intent = new Intent();
-                                            intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_START);
+                                            intent.setAction(Constants.ACTION.MOVIE_SCRAP_START);
                                             LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
                                         }
                                         //当前Shortcut任务标志为0发送Shortcut开始扫描Action
@@ -303,7 +302,7 @@ public class MovieScanService extends Service {
                                             mShortcutHashSet.add(shortcut1);
                                             shortcut1.isScanned=2;
                                             Intent intent = new Intent();
-                                            intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_START);
+                                            intent.setAction(Constants.ACTION.SHORTCUT_SCRAP_START);
                                             intent.putExtra(Constants.Extras.SHORTCUT, shortcut1);
                                             LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
                                         }
@@ -338,7 +337,7 @@ public class MovieScanService extends Service {
                                                 mShortcutDao.updateShortcut(shortcut1);
                                                 mShortcutHashSet.remove(shortcut1);
                                                 Intent intent = new Intent();
-                                                intent.setAction(Constants.BroadCastMsg.SHORTCUT_SCRAP_STOP);
+                                                intent.setAction(Constants.ACTION.SHORTCUT_SCRAP_STOP);
                                                 intent.putExtra(Constants.Extras.SHORTCUT, shortcut1);
                                                 LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
                                                 LogUtil.v(TAG, shortcut1.friendlyName+ " finish");
@@ -348,7 +347,7 @@ public class MovieScanService extends Service {
                                                 LogUtil.v(TAG,  "All finish");
                                                 if(!AppUtils.isAppInBackground(MovieScanService.this)) {//扫描程序结束
                                                     Intent intent = new Intent();
-                                                    intent.setAction(Constants.BroadCastMsg.MOVIE_SCRAP_STOP);
+                                                    intent.setAction(Constants.ACTION.MOVIE_SCRAP_STOP);
                                                     LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
                                                 }else{
                                                     ServiceStatusHelper.removeView(MovieScanService.this);
@@ -373,7 +372,7 @@ public class MovieScanService extends Service {
 
     private void sendMatchMovieSuccess(Shortcut shortcut, String movie_id, int success, int scanned_count, int total) {
         Intent intent = new Intent();
-        intent.setAction(Constants.BroadCastMsg.MATCHED_MOVIE);
+        intent.setAction(Constants.ACTION.MATCHED_MOVIE);
         intent.putExtra(Constants.Extras.MOVIE_ID, movie_id);
         intent.putExtra(Constants.Extras.SUCCESS_COUNT, success);
         intent.putExtra(Constants.Extras.SCANNED_COUNT, scanned_count);
@@ -384,7 +383,7 @@ public class MovieScanService extends Service {
 
     private void sendMatchMovieFailed(Shortcut shortcut, int scanned_count, int total) {
         Intent intent = new Intent();
-        intent.setAction(Constants.BroadCastMsg.MATCHED_MOVIE_FAILED);
+        intent.setAction(Constants.ACTION.MATCHED_MOVIE_FAILED);
         intent.putExtra(Constants.Extras.SCANNED_COUNT, scanned_count);
         intent.putExtra(Constants.Extras.TOTAL, total);
         intent.putExtra(Constants.Extras.SHORTCUT, shortcut);
