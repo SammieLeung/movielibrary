@@ -455,9 +455,8 @@ public class DeviceMonitorService extends Service {
                         for (VideoFile videoFile : unScannedFiles) {
                             if (map.get(videoFile.dirPath) == null) {
                                 map.put(videoFile.dirPath, new ArrayList<>());
-                            } else {
-                                map.get(videoFile.dirPath).add(videoFile);
                             }
+                            map.get(videoFile.dirPath).add(videoFile);
                         }
                         Set<String> shortcutUris = map.keySet();
                         Iterator<String> urisIterator = shortcutUris.iterator();
@@ -661,7 +660,7 @@ public class DeviceMonitorService extends Service {
             if (o == null || getClass() != o.getClass()) return false;
             UnMountRunnable that = (UnMountRunnable) o;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                return Objects.equals(mPath,that.mPath);
+                return Objects.equals(mPath, that.mPath);
             }
             return false;
         }

@@ -132,13 +132,13 @@ public class MovieScanService extends Service {
                     //[1,2,3,4,11,12,13,14,21,22,23,24,31,32]
                     //                  ↓
                     //[1,11,21,31],[2,12,22,32],[3,13,23],[4,14,24]
-                    int thredCount = 4;
+                    int threadCount = 4;
                     List<List<VideoFile>> dataSet = new ArrayList<>();
-                    for (int i = 0; i < thredCount; i++) {
+                    for (int i = 0; i < threadCount; i++) {
                         dataSet.add(new ArrayList<>());
                     }
                     for (int i = 0; i < videoFileList1.size(); i++) {
-                        dataSet.get(i % thredCount).add(videoFileList1.get(i));
+                        dataSet.get(i % threadCount).add(videoFileList1.get(i));
                     }
                     return Observable.fromIterable(dataSet);
                 }),
@@ -226,7 +226,7 @@ public class MovieScanService extends Service {
                                                         if (respone_en != null) {
                                                             wrapper_en = respone_en.toEntity();
                                                             if (wrapper_en != null) {
-                                                                wrapper.movie.ap=shortcut1.access;
+                                                                wrapper_en.movie.ap=shortcut1.access;
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(), wrapper_en, videoFile);
                                                             } else {
                                                                 OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
