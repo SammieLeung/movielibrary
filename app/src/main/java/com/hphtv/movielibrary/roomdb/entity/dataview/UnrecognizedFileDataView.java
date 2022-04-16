@@ -33,7 +33,7 @@ public class UnrecognizedFileDataView implements Serializable {
     public String path;
     public String dir_uri;
     public String device_uri;
-    public Constants.AccessPermission s_ap;
+    public Constants.WatchLimit s_ap;
     public long last_playtime;
     public long add_time;
     public String episode;

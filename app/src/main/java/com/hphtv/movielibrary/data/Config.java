@@ -88,7 +88,7 @@ public class Config {
             否则返回ALL_AGE+ADULT类型影片。
          */
         if(!sTempCloseChildMode&&sChildMode)
-            return Constants.AccessPermission.ALL_AGE.name();
+            return Constants.WatchLimit.ALL_AGE.name();
         return null;
     }
 

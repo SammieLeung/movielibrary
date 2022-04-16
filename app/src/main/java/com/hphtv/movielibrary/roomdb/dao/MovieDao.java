@@ -9,7 +9,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
-import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
@@ -54,7 +53,7 @@ public interface MovieDao {
     @Query("UPDATE " + TABLE.MOVIE +
             " SET ap=:ap " +
             " WHERE movie_id=:movie_id")
-    public int updateAccessPermission(String movie_id, Constants.AccessPermission ap);
+    public int updateAccessPermission(String movie_id, Constants.WatchLimit ap);
 
     @Query("SELECT is_favorite FROM " + TABLE.MOVIE + " WHERE id=:id")
     public boolean queryFavorite(long id);

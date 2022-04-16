@@ -19,7 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hphtv.movielibrary.adapter.FolderItemAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutFolderBinding;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.service.MovieScanService;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsDialog;
@@ -29,6 +32,10 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
 
 /**
  * 设备管理页
@@ -125,9 +132,22 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
 
     private void addShortcut(Shortcut shortcut) {
         mFolderItemAdapter.add(shortcut);
+        new Thread(() -> {
+            ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getShortcutDao();
+            List<Shortcut> shortcutList = shortcutDao.queryAllConnectShortcuts();
+            OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB);
+            OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB_EN);
+        }).start();
         mOptionsViewModel.setShortcut(shortcut);
-        ShortcutScanDialog dialog = ShortcutScanDialog.newInstance(true);
-        dialog.show(getSupportFragmentManager(), "");
+        Observable.timer(100, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<Long>() {
+                    @Override
+                    public void onAction(Long aLong) {
+                        ShortcutScanDialog dialog = ShortcutScanDialog.newInstance(true);
+                        dialog.show(getSupportFragmentManager(), "");
+                    }
+                });
     }
 
     FolderItemAdapter.OnClickListener mFolderItemClickListener = item -> {

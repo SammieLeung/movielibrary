@@ -8,11 +8,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
+import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.StorageHelper;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * author: Sam Leung
@@ -66,6 +70,10 @@ public class DeviceMountThread extends Thread {
         } else {
             broadIntent.setAction(Constants.ACTION.DEVICE_UNMOUNTED);
         }
+        ShortcutDao shortcutDao= MovieLibraryRoomDatabase.getDatabase(mContext).getShortcutDao();
+        List<Shortcut> shortcutList = shortcutDao.queryAllConnectShortcuts();
+        OnlineDBApiService.notifyShortcuts(shortcutList,Constants.Scraper.TMDB);
+        OnlineDBApiService.notifyShortcuts(shortcutList,Constants.Scraper.TMDB_EN);
         LocalBroadcastManager.getInstance(mContext).sendBroadcast(broadIntent);
     }
 

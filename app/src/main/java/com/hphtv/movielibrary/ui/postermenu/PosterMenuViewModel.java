@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
 
-import com.firefly.videonameparser.bean.Source;
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
@@ -17,17 +16,14 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideoTagCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieDataViewWithVdieoTags;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +31,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -58,14 +53,14 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
     private ObservableField<String> mTagString = new ObservableField<>();
 
     private boolean mRefreshFlag = false;
-    private int mItemPosition=0;
+    private int mItemPosition = 0;
 
     public PosterMenuViewModel(@NonNull @NotNull Application application) {
         super(application);
         mMovieVideoTagCrossRefDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieVideoTagCrossRefDao();
         mMovieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieVideofileCrossRefDao();
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
-        mVideoFileDao=MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
+        mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
     }
 
     /**
@@ -106,7 +101,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                         MovieDataViewWithVdieoTags movieDataViewWithVdieoTags = mMovieVideoTagCrossRefDao.queryMovieDataViewWithVideoTags(movieDataView.id);
                         StringBuffer stringBuffer = new StringBuffer();
                         for (VideoTag videoTag : movieDataViewWithVdieoTags.mVideoTagList) {
-                            stringBuffer.append(videoTag.toTagName(getApplication())+",");
+                            stringBuffer.append(videoTag.toTagName(getApplication()) + ",");
                         }
 
                         mTagString.set(stringBuffer.deleteCharAt(stringBuffer.length() - 1).toString());
@@ -116,11 +111,11 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieDataView> reMatchMovie(MovieWrapper newWrapper){
+    public Observable<MovieDataView> reMatchMovie(MovieWrapper newWrapper) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            List<VideoFile> videoFileList=mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
-            MovieHelper.saveMatchedMovieWrapper(getApplication(),newWrapper,videoFileList);
-            MovieDataView movieDataView=mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId,newWrapper.movie.type.name(),ScraperSourceTools.getSource());
+            List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
+            MovieHelper.saveMatchedMovieWrapper(getApplication(), newWrapper, videoFileList);
+            MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId, newWrapper.movie.type.name(), ScraperSourceTools.getSource());
             emitter.onNext(movieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.newThread())
@@ -132,27 +127,32 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
      */
     public void toggleAccessRights(OnMovieChangeListener listener) {
         Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            Constants.AccessPermission accessPermission = null;
+            Constants.WatchLimit watchLimit = null;
             if (mMovieDataView.ap != null)
-                accessPermission = mMovieDataView.ap;
+                watchLimit = mMovieDataView.ap;
             else
-                accessPermission = mMovieDataView.s_ap;
+                watchLimit = mMovieDataView.s_ap;
 
 //            boolean childMode=!Config.isTempCloseChildMode()&&Config.isChildMode();
-            boolean childMode=Config.isChildMode();
+            boolean childMode = Config.isChildMode();
 
 
-            if (accessPermission.equals(Constants.AccessPermission.ADULT)) {
-                accessPermission = Constants.AccessPermission.ALL_AGE;
-                if(childMode)
-                    listener.OnMovieInsert(mMovieDataView,mItemPosition);
-            }else {
-                accessPermission = Constants.AccessPermission.ADULT;
-                if(childMode)
-                    listener.OnMovieRemove(mMovieDataView.movie_id,mItemPosition);
+            if (watchLimit.equals(Constants.WatchLimit.ADULT)) {
+                watchLimit = Constants.WatchLimit.ALL_AGE;
+                if (childMode)
+                    listener.OnMovieInsert(mMovieDataView, mItemPosition);
+            } else {
+                watchLimit = Constants.WatchLimit.ADULT;
+                if (childMode)
+                    listener.OnMovieRemove(mMovieDataView.movie_id, mItemPosition);
             }
-            mMovieDataView.ap = accessPermission;
+            mMovieDataView.ap = watchLimit;
             mMovieDao.updateAccessPermission(mMovieDataView.movie_id, mMovieDataView.ap);
+            List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
+            for (VideoFile videoFile : videoFileList) {
+                OnlineDBApiService.uploadWatchLimit(videoFile.path,watchLimit,Constants.Scraper.TMDB_EN);
+                OnlineDBApiService.uploadWatchLimit(videoFile.path,watchLimit,Constants.Scraper.TMDB);
+            }
             emitter.onNext(mMovieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
@@ -166,7 +166,6 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                             break;
                     }
                     mRefreshFlag = true;
-                    OnlineDBApiService.setMovieAccessPermission(mMovieDataView.movie_id, mMovieDataView.type.name(), mMovieDataView.ap, ScraperSourceTools.getSource());
                 });
     }
 
@@ -175,7 +174,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
             mMovieDataView.is_favorite = !mMovieDataView.is_favorite;
             mMovieDao.updateFavoriteStateByMovieId(mMovieDataView.is_favorite, mMovieDataView.movie_id);
             OnlineDBApiService.updateLike(mMovieDataView.movie_id, mMovieDataView.is_favorite, ScraperSourceTools.getSource(), mMovieDataView.type.name());
-            listener.OnMovieChange(mMovieDataView,mItemPosition);
+            listener.OnMovieChange(mMovieDataView, mItemPosition);
             emitter.onNext(mMovieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.single())
@@ -184,7 +183,6 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                     mRefreshFlag = true;
                 });
     }
-
 
 
     public MovieDataView getMovieDataView() {

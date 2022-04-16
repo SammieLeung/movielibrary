@@ -47,8 +47,8 @@ public class MovieDataView implements Serializable {
     public String year;
     public String source;
     public Constants.SearchType type;
-    public Constants.AccessPermission ap;
-    public Constants.AccessPermission s_ap;
+    public Constants.WatchLimit ap;
+    public Constants.WatchLimit s_ap;
     public String file_uri;
     public String dir_uri;
     public String device_uri;

@@ -32,6 +32,9 @@ public interface ShortcutDao {
     @Query("SELECT * FROM " + TABLE.SHORTCUT + " WHERE device_type <=5")
     public List<Shortcut> queryAllLocalShortcuts();
 
+    @Query("SELECT * FROM " + TABLE.SHORTCUT + " WHERE device_path IN (SELECT path FROM "+TABLE.DEVICE+") OR device_path IS NULL")
+    public List<Shortcut> queryAllConnectShortcuts();
+
     @Query("SELECT * FROM " + TABLE.SHORTCUT + " WHERE device_type <=5 and device_path=:devicePath")
     public List<Shortcut> queryLocalShortcuts(String devicePath);
 

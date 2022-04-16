@@ -227,8 +227,8 @@ public class MovieScanService extends Service {
                                                         if (respone != null) {
                                                             wrapper = respone.toEntity();
                                                             if (wrapper != null) {
+                                                                wrapper.movie.ap=shortcut1.access;
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(), wrapper, videoFile);
-                                                                OnlineDBApiService.setMovieAccessPermission(movie_id, wrapper.movie.type.name(), shortcut1.access, Constants.Scraper.TMDB);
                                                             } else {
                                                                 OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB);
                                                                 LogUtil.e(Thread.currentThread().getName(), "wrapper为空 " + _keyword + " 获取电影" + movie_id + "失败");
@@ -244,8 +244,8 @@ public class MovieScanService extends Service {
                                                         if (respone_en != null) {
                                                             wrapper_en = respone_en.toEntity();
                                                             if (wrapper_en != null) {
+                                                                wrapper.movie.ap=shortcut1.access;
                                                                 MovieHelper.saveMovieWrapper(getBaseContext(), wrapper_en, videoFile);
-                                                                OnlineDBApiService.setMovieAccessPermission(movie_id, wrapper.movie.type.name(), shortcut1.access, Constants.Scraper.TMDB_EN);
                                                             } else {
                                                                 OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
                                                                 LogUtil.e(Thread.currentThread().getName(), "wrapper为空 " + _keyword + " 获取电影(英)" + movie_id + "失败");

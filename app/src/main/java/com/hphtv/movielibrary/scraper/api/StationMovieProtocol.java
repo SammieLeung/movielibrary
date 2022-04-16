@@ -1,7 +1,7 @@
 package com.hphtv.movielibrary.scraper.api;
 
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
-import com.hphtv.movielibrary.scraper.postbody.MovieAccessRequestBody;
+import com.hphtv.movielibrary.scraper.postbody.DeviceConfigRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
@@ -42,7 +42,7 @@ public interface StationMovieProtocol {
     @POST("movie/file/removeFolder")
     Observable<BaseRespone> removeShortcut(@Body RemoveFolderRequestBody body);
 
-    @POST("movie/movie/save")
-    Observable<BaseRespone> setMovieAccessPermission(@Body MovieAccessRequestBody body);
+    @POST("device/device/saveConfig")
+    Observable<BaseRespone> changeConfig(@Body DeviceConfigRequestBody body);
 }
  

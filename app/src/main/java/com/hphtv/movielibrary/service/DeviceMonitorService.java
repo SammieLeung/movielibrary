@@ -29,6 +29,7 @@ import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.service.Thread.DeviceInitThread;
 import com.hphtv.movielibrary.service.Thread.DeviceMountThread;
 import com.hphtv.movielibrary.service.Thread.LocalFileScanHelper;
@@ -152,6 +153,11 @@ public class DeviceMonitorService extends Service {
                 case Constants.ACTION.DEVICE_UNMOUNTED:
                     break;
                 case Constants.ACTION.DEVICE_INIT:
+                    new Thread(() -> {
+                        List<Shortcut> shortcutList = mShortcutDao.queryAllConnectShortcuts();
+                        OnlineDBApiService.notifyShortcuts(shortcutList,Constants.Scraper.TMDB);
+                        OnlineDBApiService.notifyShortcuts(shortcutList,Constants.Scraper.TMDB_EN);
+                    }).start();
                 case Constants.ACTION.RESCAN_ALL_FILES:
                     if (Config.isAutoSearch().get()) {
                         startScanAllLocalUnScannedFiles();
@@ -339,7 +345,7 @@ public class DeviceMonitorService extends Service {
     private void startScanLocalDevices(String devicePath) {
         Observable.create((ObservableOnSubscribe<Object[]>) emitter -> {
             List<Shortcut> shortcutList = LocalFileScanHelper.scanDevice(getApplication(), devicePath);
-            for(Shortcut shortcut:shortcutList){
+            for (Shortcut shortcut : shortcutList) {
                 List<VideoFile> videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut.uri);
                 Object[] data = new Object[2];
                 data[0] = shortcut;
@@ -352,44 +358,44 @@ public class DeviceMonitorService extends Service {
                     throwable.printStackTrace();
                     return new Object[0];
                 })//TODO 切换成主线程?
-        .subscribe(new SimpleObserver<Object[]>() {
-            @Override
-            public void onAction(Object[] data) {
-                if (data.length == 2) {
-                    Shortcut shortcut = (Shortcut) data[0];
-                    List<VideoFile> videoFileList = (List<VideoFile>) data[1];
-                    if (videoFileList != null && videoFileList.size() > 0) {
-                        if (mMovieScanService != null)
-                            mMovieScanService.scanVideo(shortcut, videoFileList);
-                    } else {    //TODO mPosterPairingDevice处理
-                        LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                        shortcut.isScanned = 1;
-                        mShortcutDao.updateShortcut(shortcut);
-                        Intent intent = new Intent();
-                        intent.setAction(Constants.ACTION.SHORTCUT_SCRAP_STOP);
-                        intent.putExtra(Constants.Extras.SHORTCUT, shortcut);
-                        LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(intent);
+                .subscribe(new SimpleObserver<Object[]>() {
+                    @Override
+                    public void onAction(Object[] data) {
+                        if (data.length == 2) {
+                            Shortcut shortcut = (Shortcut) data[0];
+                            List<VideoFile> videoFileList = (List<VideoFile>) data[1];
+                            if (videoFileList != null && videoFileList.size() > 0) {
+                                if (mMovieScanService != null)
+                                    mMovieScanService.scanVideo(shortcut, videoFileList);
+                            } else {    //TODO mPosterPairingDevice处理
+                                LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
+                                shortcut.isScanned = 1;
+                                mShortcutDao.updateShortcut(shortcut);
+                                Intent intent = new Intent();
+                                intent.setAction(Constants.ACTION.SHORTCUT_SCRAP_STOP);
+                                intent.putExtra(Constants.Extras.SHORTCUT, shortcut);
+                                LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(intent);
+                            }
+                        } else {
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
+                            ServiceStatusHelper.removeView(DeviceMonitorService.this);
+                        }
                     }
-                } else {
-                    LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                    ServiceStatusHelper.removeView(DeviceMonitorService.this);
-                }
-            }
 
-            @Override
-            public void onError(Throwable e) {
-                super.onError(e);
-                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                ServiceStatusHelper.removeView(DeviceMonitorService.this);
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
+                        ServiceStatusHelper.removeView(DeviceMonitorService.this);
+                    }
 
-            @Override
-            public void onSubscribe(Disposable d) {
-                super.onSubscribe(d);
-                if (!AppUtils.isAppInBackground(getBaseContext()))
-                    ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
-            }
-        });
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (!AppUtils.isAppInBackground(getBaseContext()))
+                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
+                    }
+                });
     }
 
     private void startScanLocalShortcut(Shortcut shortcut) {

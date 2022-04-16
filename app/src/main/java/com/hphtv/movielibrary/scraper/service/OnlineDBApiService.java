@@ -3,37 +3,33 @@ package com.hphtv.movielibrary.scraper.service;
 import android.content.Context;
 
 import com.hphtv.movielibrary.MovieApplication;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
-import com.hphtv.movielibrary.scraper.postbody.MovieAccessRequestBody;
-import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
+import com.hphtv.movielibrary.scraper.postbody.DeviceConfigRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateLikeRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateMovieRequestBody;
 import com.hphtv.movielibrary.scraper.respone.BaseRespone;
-import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.util.FormatterTools;
 import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.device.StationDeviceTool;
 import com.station.kit.util.LogUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * author: Sam Leung
@@ -66,12 +62,13 @@ public class OnlineDBApiService {
             String folder = videoFile.dirPath;
             String duration = "0";
             String current_point = "0";
-            UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point);
+            String watch_limit = movieWrapper.movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+            UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
             Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
             updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
                 @Override
                 public void onAction(BaseRespone baseRespone) {
-                    LogUtil.w("{uploadMovie:"+source+"} " + baseRespone.code + ": " + movieId + "<=>" + filename);
+                    LogUtil.w("{uploadMovie:" + source + "} " + baseRespone.code + ": " + movieId + "<=>" + filename);
                 }
             });
         }
@@ -97,12 +94,13 @@ public class OnlineDBApiService {
         String folder = videoFile.dirPath;
         String duration = "0";
         String current_point = "0";
-        UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point);
+        String watch_limit = movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+        UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
         Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{uploadMovie:"+source+"} " + baseRespone.code + ": " + movieId + "<=>" + filename);
+                LogUtil.w("{uploadMovie:" + source + "} " + baseRespone.code + ": " + movieId + "<=>" + filename);
             }
         });
     }
@@ -124,12 +122,34 @@ public class OnlineDBApiService {
         String folder = videoFile.dirPath;
         String duration = "0";
         String current_point = "0";
-        UpdateMovieRequestBody body = new UpdateMovieRequestBody("0", null, path, keyword, filename, storage, folder, duration, current_point);
+        String watch_limit = "0";
+        UpdateMovieRequestBody body = new UpdateMovieRequestBody("0", null, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
         Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
                 LogUtil.w("{uploadFile} " + Thread.currentThread().getName() + ":" + baseRespone.code + ": " + filename);
+            }
+        });
+    }
+
+    public static void uploadWatchLimit(String path, Constants.WatchLimit watchLimit, String source) {
+        StationMovieProtocol request = RetrofiTools.createRequest();
+        switch (source) {
+            case Constants.Scraper.TMDB:
+                request = RetrofiTools.createRequest();
+                break;
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofiTools.createENRequest();
+                break;
+        }
+        String watch_limit = watchLimit.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+        UpdateMovieRequestBody body = new UpdateMovieRequestBody(null, null, path, null, null, null, null, null, null, watch_limit);
+        Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
+        updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
+            @Override
+            public void onAction(BaseRespone baseRespone) {
+                LogUtil.w("{uploadWatchLimit} " + Thread.currentThread().getName() + ":" + baseRespone.code + ": " + path);
             }
         });
     }
@@ -211,12 +231,12 @@ public class OnlineDBApiService {
         removeFolderRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{removeFolder} " +Thread.currentThread().getName()+" "+ baseRespone.code + ": " + dir_path);
+                LogUtil.w("{removeFolder} " + Thread.currentThread().getName() + " " + baseRespone.code + ": " + dir_path);
             }
         });
     }
 
-    public static void setMovieAccessPermission(String movie_id, String type, Constants.AccessPermission accessPermission,String source) {
+    public static void notifyChildMode(String source) {
         StationMovieProtocol request = RetrofiTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
@@ -226,13 +246,39 @@ public class OnlineDBApiService {
                 request = RetrofiTools.createENRequest();
                 break;
         }
-        MovieAccessRequestBody body = new MovieAccessRequestBody(movie_id,type,accessPermission);
-        Observable<BaseRespone> movieAccessRequest = request.setMovieAccessPermission(body);
-        movieAccessRequest.subscribe(new SimpleObserver<BaseRespone>() {
+        DeviceConfigRequestBody body = new DeviceConfigRequestBody();
+        body.child_model = Config.isChildMode() ? "1" : "0";
+        request.changeConfig(body).subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{setMovieAccessPermission} " +Thread.currentThread().getName()+" "+ baseRespone.code + ": " + movie_id);
+                LogUtil.w("{notifyChildMode} " + baseRespone.code );
             }
         });
     }
+
+    public static void notifyShortcuts(List<Shortcut> shortcutList,String source) {
+        StationMovieProtocol request = RetrofiTools.createRequest();
+        switch (source) {
+            case Constants.Scraper.TMDB:
+                request = RetrofiTools.createRequest();
+                break;
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofiTools.createENRequest();
+                break;
+        }
+        DeviceConfigRequestBody body = new DeviceConfigRequestBody();
+        List<String> pathList=new ArrayList<>();
+        for(Shortcut shortcut:shortcutList){
+            pathList.add(shortcut.uri);
+        }
+        body.movie_folder = pathList.toArray(new String[0]);
+        request.changeConfig(body).subscribe(new SimpleObserver<BaseRespone>() {
+            @Override
+            public void onAction(BaseRespone baseRespone) {
+                LogUtil.w("{notifyShortcuts} " + baseRespone.code );
+            }
+
+        });
+    }
+
 }

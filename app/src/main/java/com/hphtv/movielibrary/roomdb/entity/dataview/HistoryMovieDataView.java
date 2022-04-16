@@ -33,8 +33,8 @@ public class HistoryMovieDataView {
     public String title;
     public String filename;
     public String ratings;
-    public Constants.AccessPermission ap;
-    public Constants.AccessPermission s_ap;
+    public Constants.WatchLimit ap;
+    public Constants.WatchLimit s_ap;
     public String path;
     public String source;
     public String stage_photo;

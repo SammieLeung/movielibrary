@@ -1,20 +1,15 @@
 package com.hphtv.movielibrary.roomdb.entity;
 
 import androidx.room.ColumnInfo;
-import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.google.gson.annotations.Until;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
-import org.intellij.lang.annotations.Language;
-
 import java.io.Serializable;
-import java.util.Locale;
 
 /**
  * author: Sam Leung
@@ -55,7 +50,7 @@ public class Movie implements Serializable {
     @ColumnInfo(name = "is_watched")
     public boolean isWatched;//标记是否已观看
     @ColumnInfo(name = "ap")
-    public Constants.AccessPermission ap;//分级 ALL_AGE,ADAULT
+    public Constants.WatchLimit ap;//分级 ALL_AGE,ADAULT
 
     @Ignore
     public String tag;

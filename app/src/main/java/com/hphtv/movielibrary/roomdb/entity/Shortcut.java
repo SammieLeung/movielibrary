@@ -37,7 +37,7 @@ public class Shortcut implements Serializable {
     public int posterCount = 0;
     @ColumnInfo(name = "folder_type")
     public Constants.SearchType folderType;
-    public Constants.AccessPermission access;
+    public Constants.WatchLimit access;
     @ColumnInfo(name = "query_uri")
     public String queryUri;
     @ColumnInfo(name = "is_scanned")
@@ -47,7 +47,7 @@ public class Shortcut implements Serializable {
 
     public Shortcut(String uri, int deviceType, String name, String friendlyName, String queryUri) {
         this.folderType = Constants.SearchType.auto;
-        this.access = Constants.AccessPermission.ALL_AGE;
+        this.access = Constants.WatchLimit.ALL_AGE;
         this.uri = uri;
         this.deviceType = deviceType;
         this.queryUri = queryUri;

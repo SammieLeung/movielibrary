@@ -146,7 +146,8 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                     }
                     mVideoFileDao.deleteVideoFilesOnShortcut(_shortcut.uri);
                     mMovieVideofileCrossRefDao.deleteByPaths(paths);
-                    OnlineDBApiService.removeFolder(_shortcut.uri, ScraperSourceTools.getSource());
+                    OnlineDBApiService.removeFolder(_shortcut.uri, Constants.Scraper.TMDB);
+                    OnlineDBApiService.removeFolder(_shortcut.uri, Constants.Scraper.TMDB_EN);
                     return _shortcut;
                 })
                 .observeOn(AndroidSchedulers.mainThread());

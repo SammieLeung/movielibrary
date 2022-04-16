@@ -146,10 +146,10 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
             }
             switch (mAccessItem.getPos()) {
                 case 0:
-                    mShortcut.access = Constants.AccessPermission.ALL_AGE;
+                    mShortcut.access = Constants.WatchLimit.ALL_AGE;
                     break;
                 case 1:
-                    mShortcut.access = Constants.AccessPermission.ADULT;
+                    mShortcut.access = Constants.WatchLimit.ADULT;
                     break;
             }
 

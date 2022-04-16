@@ -92,7 +92,7 @@ public class Constants {
         custom
     }
 
-    public enum AccessPermission{
+    public enum WatchLimit {
         ALL_AGE,
         ADULT
     }

@@ -15,6 +15,8 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.AppUtils;
 import com.station.kit.util.LogUtil;
 
@@ -66,6 +68,8 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         Config.setChildMode(mChildModeState.get());
 //        Config.setTempCloseChildMode(false);
         mFlagRefresh.set(true);
+        OnlineDBApiService.notifyChildMode(Constants.Scraper.TMDB);
+        OnlineDBApiService.notifyChildMode(Constants.Scraper.TMDB_EN);
     }
 
 

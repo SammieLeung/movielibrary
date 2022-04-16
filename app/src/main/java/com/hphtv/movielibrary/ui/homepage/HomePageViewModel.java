@@ -9,6 +9,8 @@ import androidx.databinding.ObservableField;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +37,8 @@ public class HomePageViewModel extends AndroidViewModel {
         mChildMode.set(!mChildMode.get());
 //        Config.setTempCloseChildMode(!Config.isTempCloseChildMode());
         Config.setChildMode(mChildMode.get());
+        OnlineDBApiService.notifyChildMode(Constants.Scraper.TMDB);
+        OnlineDBApiService.notifyChildMode(Constants.Scraper.TMDB_EN);
     }
 
 }
