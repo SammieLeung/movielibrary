@@ -55,8 +55,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class MovieScanService extends Service {
     public static final String TAG = MovieScanService.class.getSimpleName();
-    public static final int KEY_MOVIE_ID = 0;
-    public static final int KEY_VIDEOFILE = 1;
     private ScanBinder mScanBinder;
 
     private ExecutorService mSearchMovieExecutor;
@@ -113,22 +111,6 @@ public class MovieScanService extends Service {
     public void scanVideo(Shortcut shortcut, List<VideoFile> videoFileList) {
         startSearch(shortcut, videoFileList, shortcut.folderType);
     }
-
-    /**
-     * 提取关键字
-     *
-     * @param videoFile
-     * @return
-     */
-    private MovieNameInfo createMovieNameInfo(VideoFile videoFile) {
-        String path = videoFile.path;
-        String raw = path;
-        if (!videoFile.path.startsWith("/")) {
-            raw = videoFile.filename;
-        }
-        return FileScanUtil.simpleParse(raw);
-    }
-
 
     AtomicInteger mGlobalTaskCount = new AtomicInteger();//后台扫描标志
 
@@ -296,9 +278,9 @@ public class MovieScanService extends Service {
                                         super.onSubscribe(d);
                                         //全局任务标志为0发送广播：扫描
                                         if (mGlobalTaskCount.getAndIncrement() == 0) {
-                                            Intent intent = new Intent();
-                                            intent.setAction(Constants.ACTION.MOVIE_SCRAP_START);
-                                            LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+//                                            Intent intent = new Intent();
+//                                            intent.setAction(Constants.ACTION.MOVIE_SCRAP_START);
+//                                            LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
                                         }
                                         //当前Shortcut任务标志为0发送Shortcut开始扫描Action
                                         if (currentTaskCount.getAndIncrement() == 0) {
@@ -348,13 +330,7 @@ public class MovieScanService extends Service {
                                             }
                                             if (mGlobalTaskCount.decrementAndGet() == 0) {
                                                 LogUtil.v(TAG, "All finish");
-                                                if (!AppUtils.isAppInBackground(MovieScanService.this)) {//扫描程序结束
-                                                    Intent intent = new Intent();
-                                                    intent.setAction(Constants.ACTION.MOVIE_SCRAP_STOP);
-                                                    LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
-                                                } else {
-                                                    ServiceStatusHelper.removeView(MovieScanService.this);
-                                                }
+                                                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                                             }
                                         }
                                     }

@@ -58,18 +58,19 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     @Override
     protected void onPause() {
         super.onPause();
-        mHanlder.postDelayed(() -> ServiceStatusHelper.pauseView(),100);
+        mHanlder.removeCallbacksAndMessages(null);
+        ServiceStatusHelper.pauseView();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mReceiver);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mHanlder.removeCallbacksAndMessages(null);
-        ServiceStatusHelper.resumeView();
+        mHanlder.postDelayed(() -> ServiceStatusHelper.resumeView(),100);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
 
@@ -105,11 +106,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
             String action=intent.getAction();
             switch (action){
                 case Constants.ACTION.MOVIE_SCRAP_START:
-                    if(!AppUtils.isAppInBackground(AppBaseActivity.this))
-                        ServiceStatusHelper.addView(getString(R.string.scanning_in_background), AppBaseActivity.this);
                     break;
                 case Constants.ACTION.MOVIE_SCRAP_STOP:
-                    ServiceStatusHelper.removeView(context);
                     movieScarpFinish();
                     break;
             }

@@ -13,7 +13,6 @@ public class AuthHelper {
     public static String sPreToken = "";
     public static String sPreTokenEN = "";
     public static String sTestToken = "";
-
     static {
         init();
     }
@@ -21,7 +20,13 @@ public class AuthHelper {
     public static void init() {
         switch (RetrofiTools.mode) {
             case RetrofiTools.TEST:
-                sTestToken = TokenHelper.getToken(TokenHelper.TEST);
+                try {
+                    sTestToken = TokenHelper.getToken(TokenHelper.TEST);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 break;
             case RetrofiTools.PRE:
                 try {

@@ -41,27 +41,26 @@ public abstract class PermissionActivity<VM extends AndroidViewModel, VDB extend
                     LogUtil.v(TAG, "showRequest false");
                 }
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-
             } else {
                 permissionGranted();
             }
         }
     }
 
+    public abstract void firstPermissionGranted();
     public abstract void permissionGranted();
 
     private void checkPermissions(){
         for(String permission:sRequestPermissions){
             if (ActivityCompat.checkSelfPermission(this,permission) != PackageManager.PERMISSION_GRANTED) {
                 if(shouldShowRequestPermissionRationale(permission)){
-
                 }else{
                 }
                 requestPermissions(new String[]{permission},1000);
                 return;
             }
         }
-        permissionGranted();
+        firstPermissionGranted();
     }
 
 

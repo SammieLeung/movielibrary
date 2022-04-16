@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.scraper.service;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
@@ -275,7 +276,7 @@ public class OnlineDBApiService {
         request.changeConfig(body).subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{notifyShortcuts} " + baseRespone.code );
+                LogUtil.w("{notifyShortcuts} " + baseRespone.code+new Gson().toJson(body.movie_folder));
             }
 
         });

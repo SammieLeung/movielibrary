@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.service;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -7,10 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
@@ -39,8 +42,6 @@ import com.station.kit.util.AppUtils;
 import com.station.kit.util.LogUtil;
 import com.hphtv.movielibrary.data.Constants;
 
-import org.eclipse.jetty.util.ConcurrentHashSet;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -49,16 +50,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -71,7 +72,6 @@ public class DeviceMonitorService extends Service {
     public static final String TAG = DeviceMonitorService.class.getSimpleName();
     private MonitorBinder mBinder;
     private MovieScanService mMovieScanService;
-    private ConcurrentHashSet<String> mPosterPairingDevice = new ConcurrentHashSet<>();
     /**
      * 单线程池服务，设备挂载，卸载线程
      */
@@ -85,8 +85,9 @@ public class DeviceMonitorService extends Service {
 
     private VideoFileDao mVideoFileDao;
     private ShortcutDao mShortcutDao;
-    private boolean isScanning = false;
-
+    private AtomicBoolean isScanning = new AtomicBoolean(false);
+    private Handler mHandler = new Handler();
+    private Runnable mMountedTask, mUnmountedTask;
 
     /**
      * 处理Android 11设备挂载/卸载回调
@@ -155,12 +156,13 @@ public class DeviceMonitorService extends Service {
                 case Constants.ACTION.DEVICE_INIT:
                     new Thread(() -> {
                         List<Shortcut> shortcutList = mShortcutDao.queryAllConnectShortcuts();
-                        OnlineDBApiService.notifyShortcuts(shortcutList,Constants.Scraper.TMDB);
-                        OnlineDBApiService.notifyShortcuts(shortcutList,Constants.Scraper.TMDB_EN);
+                        OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB);
+                        OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB_EN);
                     }).start();
                 case Constants.ACTION.RESCAN_ALL_FILES:
                     if (Config.isAutoSearch().get()) {
-                        startScanAllLocalUnScannedFiles();
+                        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+                            startScanAllLocalUnScannedFiles();
                     }
                     break;
                 case Constants.ACTION.ADD_LOCAL_SHORTCUT:
@@ -174,6 +176,14 @@ public class DeviceMonitorService extends Service {
                         Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
                         startScanNetworkFiles(shortcut);
                     }
+                    break;
+                case Constants.ACTION.MOVIE_SCRAP_START:
+                    if (!AppUtils.isAppInBackground(getBaseContext()))
+                        ServiceStatusHelper.addView(getString(R.string.scanning_in_background), getBaseContext());
+                    break;
+                case Constants.ACTION.MOVIE_SCRAP_STOP:
+                    isScanning.set(false);
+                    ServiceStatusHelper.removeView(context);
                     break;
             }
         }
@@ -258,6 +268,7 @@ public class DeviceMonitorService extends Service {
         unbindService(mServiceConnection);
     }
 
+
     /**
      * 注册广播
      */
@@ -269,20 +280,16 @@ public class DeviceMonitorService extends Service {
                     super.onStateChanged(volume);
                     String state_txt = volume.getState();
                     int state = state_txt.equals(Constants.DeviceMountState.MOUNTED_TEXT) ? Constants.DeviceMountState.MOUNTED : Constants.DeviceMountState.UNMOUNTED;
+
                     if (state == Constants.DeviceMountState.MOUNTED) {
-                        executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, volume.getDirectory().getPath(), state);
+                        mHandler.removeCallbacks(mMountedTask);
+                        mMountedTask = new MountedRunnable(volume, state);
+                        mHandler.postDelayed(mMountedTask, 500);
                     } else {
                         //拔出U盘的时候volume.getDirectory()返回的是null，所以被迫使用反射获取mPath的值
-                        try {
-                            Class clazz = volume.getClass();
-                            Field field_mPath = clazz.getDeclaredField("mPath");
-                            field_mPath.setAccessible(true);
-                            File fpath = (File) field_mPath.get(volume);
-                            String path = fpath.toString();
-                            executeOnMountThread(volume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, path, state);
-                        } catch (NoSuchFieldException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
+                        mHandler.removeCallbacks(mUnmountedTask);
+                        mUnmountedTask = new UnMountRunnable(volume, state);
+                        mHandler.postDelayed(mUnmountedTask, 500);
                     }
                     LogUtil.v("onStateChanged name " + volume.getMediaStoreVolumeName() + " " + volume.getState());
                 }
@@ -303,6 +310,8 @@ public class DeviceMonitorService extends Service {
         localFilter.addAction(Constants.ACTION.RESCAN_ALL_FILES);
         localFilter.addAction(Constants.ACTION.ADD_LOCAL_SHORTCUT);
         localFilter.addAction(Constants.ACTION.ADD_NETWORK_SHORTCUT);
+        localFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
+        localFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP);
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
     }
 
@@ -319,14 +328,7 @@ public class DeviceMonitorService extends Service {
      * 扫描本地所有挂载设备并扫描文件
      */
     public void scanDevices() {
-        if (!isScanning) {
-            synchronized (DeviceMonitorService.this) {
-                if (!isScanning) {
-                    isScanning = true;
-                    mDeviceInitExecutor.execute(new DeviceInitThread(this));
-                }
-            }
-        }
+        mDeviceInitExecutor.execute(new DeviceInitThread(this));
     }
 
 
@@ -378,7 +380,6 @@ public class DeviceMonitorService extends Service {
                             }
                         } else {
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                            ServiceStatusHelper.removeView(DeviceMonitorService.this);
                         }
                     }
 
@@ -386,14 +387,12 @@ public class DeviceMonitorService extends Service {
                     public void onError(Throwable e) {
                         super.onError(e);
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                        ServiceStatusHelper.removeView(DeviceMonitorService.this);
                     }
 
                     @Override
                     public void onSubscribe(Disposable d) {
                         super.onSubscribe(d);
-                        if (!AppUtils.isAppInBackground(getBaseContext()))
-                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
+                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_START));
                     }
                 });
     }
@@ -433,85 +432,84 @@ public class DeviceMonitorService extends Service {
                             }
                         } else {
                             LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                            ServiceStatusHelper.removeView(DeviceMonitorService.this);
                         }
                     }
 
                     @Override
                     public void onSubscribe(Disposable d) {
                         super.onSubscribe(d);
-                        if (!AppUtils.isAppInBackground(getBaseContext()))
-                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
+                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_START));
                     }
                 });
     }
 
-    private void startScanAllLocalUnScannedFiles() {
-        Observable.just("")
-                .subscribeOn(Schedulers.newThread())
-                .map(arg -> {
-                    LocalFileScanHelper.searchAllLocalShortcuts(getBaseContext());
-                    List<VideoFile> unScannedFiles = getUnScannedLocalFiles();
-                    HashMap<String, List<VideoFile>> map = new HashMap<>();
-                    for (VideoFile videoFile : unScannedFiles) {
-                        if (map.get(videoFile.dirPath) == null) {
-                            map.put(videoFile.dirPath, new ArrayList<>());
-                        } else {
-                            map.get(videoFile.dirPath).add(videoFile);
-                        }
-                    }
-                    Set<String> shortcutUris = map.keySet();
-                    Iterator<String> urisIterator = shortcutUris.iterator();
-                    List<Object[]> dataList = new ArrayList<>();
-                    while (urisIterator.hasNext()) {
-                        String uri = urisIterator.next();
-                        Shortcut shortcut = mShortcutDao.queryShortcutByUri(uri);
-                        if (shortcut != null) {
-                            Object[] data = new Object[2];
-                            data[0] = shortcut;
-                            data[1] = map.get(uri);
-                            dataList.add(data);
-                        }
-                    }
-                    return dataList;
 
-                })
-                .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
-                    return new ArrayList<>();
-                })
-                .subscribe(new SimpleObserver<List<Object[]>>() {
-                    @Override
-                    public void onAction(List<Object[]> dataList) {
-                        if (dataList.size() > 0) {
-                            Log.w(Thread.currentThread().getName(), "StartScanAllUnScannedVideos=>");
-                            for (Object[] objArr : dataList) {
-                                if (objArr != null && objArr.length == 2) {
-                                    Shortcut shortcut = (Shortcut) objArr[0];
-                                    List<VideoFile> videoFileList = (List<VideoFile>) objArr[1];
-                                    if (videoFileList.size() > 0) {
-                                        Log.w(Thread.currentThread().getName(), shortcut.friendlyName);
-                                        if (mMovieScanService != null)
-                                            mMovieScanService.scanVideo(shortcut, videoFileList);
-                                    } else {
-                                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                                        ServiceStatusHelper.removeView(DeviceMonitorService.this);
+    private void startScanAllLocalUnScannedFiles() {
+        if (!isScanning.get())
+            Observable.just("")
+                    .subscribeOn(Schedulers.newThread())
+                    .map(arg -> {
+                        LocalFileScanHelper.searchAllLocalShortcuts(getBaseContext());
+                        List<VideoFile> unScannedFiles = getUnScannedLocalFiles();
+                        HashMap<String, List<VideoFile>> map = new HashMap<>();
+                        for (VideoFile videoFile : unScannedFiles) {
+                            if (map.get(videoFile.dirPath) == null) {
+                                map.put(videoFile.dirPath, new ArrayList<>());
+                            } else {
+                                map.get(videoFile.dirPath).add(videoFile);
+                            }
+                        }
+                        Set<String> shortcutUris = map.keySet();
+                        Iterator<String> urisIterator = shortcutUris.iterator();
+                        List<Object[]> dataList = new ArrayList<>();
+                        while (urisIterator.hasNext()) {
+                            String uri = urisIterator.next();
+                            Shortcut shortcut = mShortcutDao.queryShortcutByUri(uri);
+                            if (shortcut != null) {
+                                Object[] data = new Object[2];
+                                data[0] = shortcut;
+                                data[1] = map.get(uri);
+                                dataList.add(data);
+                            }
+                        }
+                        return dataList;
+
+                    })
+                    .onErrorReturn(throwable -> {
+                        throwable.printStackTrace();
+                        return new ArrayList<>();
+                    })
+                    .subscribe(new SimpleObserver<List<Object[]>>() {
+                        @Override
+                        public void onAction(List<Object[]> dataList) {
+                            if (dataList.size() > 0) {
+                                Log.w(Thread.currentThread().getName(), "StartScanAllUnScannedVideos=>");
+                                for (Object[] objArr : dataList) {
+                                    if (objArr != null && objArr.length == 2) {
+                                        Shortcut shortcut = (Shortcut) objArr[0];
+                                        List<VideoFile> videoFileList = (List<VideoFile>) objArr[1];
+                                        if (videoFileList.size() > 0) {
+                                            Log.w(Thread.currentThread().getName(), shortcut.friendlyName);
+                                            if (mMovieScanService != null)
+                                                mMovieScanService.scanVideo(shortcut, videoFileList);
+                                        } else {
+                                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
+                                        }
                                     }
                                 }
+                            } else {
+                                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                             }
-                        } else {
-                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                            ServiceStatusHelper.removeView(DeviceMonitorService.this);
                         }
-                    }
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        if (!AppUtils.isAppInBackground(getBaseContext()))
-                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
-                    }
-                });
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            super.onSubscribe(d);
+                            isScanning.set(true);
+                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_START));
+
+                        }
+                    });
     }
 
     private void startScanNetworkFiles(Shortcut shortcut) {
@@ -595,6 +593,82 @@ public class DeviceMonitorService extends Service {
     public class MonitorBinder extends Binder {
         public DeviceMonitorService getService() {
             return DeviceMonitorService.this;
+        }
+    }
+
+    public class MountedRunnable implements Runnable {
+        private StorageVolume mStorageVolume;
+        private int mState;
+
+        public MountedRunnable(StorageVolume volume, int state) {
+            mStorageVolume = volume;
+            mState = state;
+
+        }
+
+        @Override
+        public void run() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                executeOnMountThread(mStorageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, mStorageVolume.getDirectory().getPath(), mState);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            MountedRunnable that = (MountedRunnable) o;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                return Objects.equals(mStorageVolume.getDirectory().getPath(), that.mStorageVolume.getDirectory().getPath());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(mStorageVolume);
+        }
+    }
+
+    public class UnMountRunnable implements Runnable {
+        private StorageVolume mStorageVolume;
+        private int mState;
+        private String mPath;
+
+        public UnMountRunnable(StorageVolume volume, int state) {
+            mStorageVolume = volume;
+            mState = state;
+            try {
+                Class clazz = mStorageVolume.getClass();
+                Field field_mPath = clazz.getDeclaredField("mPath");
+                field_mPath.setAccessible(true);
+                File fpath = (File) field_mPath.get(mStorageVolume);
+                mPath = fpath.toString();
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        public void run() {
+            executeOnMountThread(mStorageVolume.getUuid(), Constants.DeviceType.DEVICE_TYPE_LOCAL, mPath, mState);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UnMountRunnable that = (UnMountRunnable) o;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                return Objects.equals(mPath,that.mPath);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(mStorageVolume);
         }
     }
 }

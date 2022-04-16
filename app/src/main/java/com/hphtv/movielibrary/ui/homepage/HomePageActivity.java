@@ -17,6 +17,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
@@ -33,6 +34,12 @@ import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
 /**
  * author: Sam Leung
  * date:  2022/1/13
@@ -45,6 +52,17 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void firstPermissionGranted() {
+        bindDatas();
+        initView();
+        autoScrollListener(mBinding.nsv);
+        new Thread(() -> {
+            AuthHelper.init();
+            autoSearch();
+        }).start();
     }
 
     @Override
