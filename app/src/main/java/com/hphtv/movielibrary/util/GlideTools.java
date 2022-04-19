@@ -9,6 +9,8 @@ import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.bumptech.glide.signature.ObjectKey;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
@@ -36,6 +38,8 @@ public class GlideTools {
     }
 
     public static RequestBuilder<Drawable> GlideWrapper(Context context, String path) {
+        DrawableCrossFadeFactory.Builder builder=new DrawableCrossFadeFactory.Builder(500);
+        DrawableCrossFadeFactory fadeFactory=builder.setCrossFadeEnabled(false).build();
         if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/")||path.lastIndexOf(".")==-1)||path.endsWith("/")) {
             return Glide.with(context)
                     .load(R.mipmap.default_poster);
@@ -43,10 +47,12 @@ public class GlideTools {
             return Glide.with(context)
                     .load(path)
 //                    .load(buildGlideUrl(path))
-                    .thumbnail(0.3f)
-//                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-//                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
+//                    .skipMemoryCache(true)
+                    .transition(DrawableTransitionOptions.with(fadeFactory))
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
                     .placeholder(R.mipmap.default_poster)
+                    .fallback(R.mipmap.default_poster)
                     .error(R.mipmap.default_poster);
         }
     }

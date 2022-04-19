@@ -35,7 +35,7 @@
                 <ImageView
                     android:id="@+id/iv_stagephoto"
                     android:layout_width="1065dp"
-                    android:scaleType="matrix"
+                    android:scaleType="centerCrop"
                     android:foreground="@drawable/stagephoto_fg"
                     android:layout_alignParentEnd="true"
                     android:layout_height="605dp" />

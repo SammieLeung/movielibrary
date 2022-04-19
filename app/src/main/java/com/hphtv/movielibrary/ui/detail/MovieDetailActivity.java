@@ -21,6 +21,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
@@ -197,11 +200,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                 stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
                             }
                             mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
+
                             if (!TextUtils.isEmpty(stagePhoto)) {
-                                GlideTools.GlideWrapper(MovieDetailActivity.this, stagePhoto).into(mBinding.ivStagephoto);
-                            } else {
-                                GlideTools.GlideWrapper(MovieDetailActivity.this, wrapper.movie.poster).into(mBinding.ivStagephoto);
+                                GlideTools.GlideWrapper(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
+                            } else if(!TextUtils.isEmpty(wrapper.movie.poster)){
+                                GlideTools.GlideWrapper(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
+                            } else{
+                                Glide.with(getBaseContext()).load(R.mipmap.default_poster).into(mBinding.ivStagephoto);
                             }
+
                             mViewModel.loadTags().subscribe(new SimpleObserver<List<String>>() {
                                 @Override
                                 public void onAction(List<String> tagList) {
