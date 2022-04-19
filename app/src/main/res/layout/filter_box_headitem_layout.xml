@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <TextView
-        android:textColor="@color/white"
+        android:textColor="#FF838384"
         android:layout_width="match_parent"
         android:layout_height="@dimen/filter_box_headitem_height"
         android:gravity="center"

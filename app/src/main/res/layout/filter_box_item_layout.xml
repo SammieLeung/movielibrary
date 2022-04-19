@@ -8,26 +8,28 @@
         app:viewSelect="@{checkPos==pos}"
         android:layout_marginBottom="18dp"
         android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/cbtv_title"
-            android:textSize="@dimen/filter_box_item_textsize"
-            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/filter_box_item_height"
             android:layout_centerInParent="true"
-            android:focusable="true"
-            android:duplicateParentState="true"
             android:background="@drawable/new_common_tab_bg"
             android:drawableRight="@drawable/ic_icon_filter_check"
-            android:drawableTint="@drawable/icon_filter_checkbtn_22dp_tint"
-            android:layout_width="wrap_content"
             android:drawablePadding="11dp"
+            android:drawableTint="@drawable/icon_filter_checkbtn_22dp_tint"
+            android:duplicateParentState="true"
+            android:focusable="true"
+            android:gravity="center"
             android:minWidth="134dp"
-            android:paddingRight="19dp"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             android:paddingLeft="19dp"
+            android:paddingRight="19dp"
             android:text="@{name}"
-            app:filterSelect="@{checkPos==pos}"
             android:textColor="@drawable/icon_filter_item_textcolor"
-            android:layout_height="@dimen/filter_box_item_height"
-      />
+            android:textSize="@dimen/filter_box_item_textsize"
+            app:filterSelect="@{checkPos==pos}" />
     </RelativeLayout>
     <data>
         <variable

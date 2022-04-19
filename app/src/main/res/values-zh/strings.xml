@@ -108,7 +108,7 @@
     <string name="recommand_empty">暂无推荐影片。</string>
     <!--详情 更多详情-->
     <string name="actor_list">演员列表</string>
-    <string name="video_list">视频列表</string>
+    <string name="video_list">路径</string>
     <string name="edit_title">海报匹配</string>
     <!--详情 选择播放源-->
     <string name="select_videosource">选择影片</string>

@@ -109,7 +109,7 @@
     <string name="recommand_empty">No recommendations.</string>
     <!--详情 更多详情-->
     <string name="actor_list">Characters</string>
-    <string name="video_list">Videos</string>
+    <string name="video_list">Paths</string>
     <string name="edit_title">Select Poster</string>
     <!--详情 选择播放源-->
     <string name="select_videosource">Choose Video to Play</string>
