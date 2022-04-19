@@ -152,7 +152,7 @@
     <!--设置-儿童模式-->
     <string name="childmode_switch_tips">开启儿童模式，将会隐藏不适合儿童观看内容</string>
     <string name="childmode_changepsw_subtitle">儿童模式 > 修改密码</string>
-    <string name="childmode_temp_close">暂时关闭儿童模式</string>
+    <string name="childmode_temp_close">关闭儿童模式</string>
 
     <!--设置-儿童模式-修改密码-->
     <string name="title_change_password">修改密码</string>

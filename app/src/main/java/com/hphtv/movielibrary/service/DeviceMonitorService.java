@@ -394,6 +394,8 @@ public class DeviceMonitorService extends Service {
                         super.onSubscribe(d);
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_START));
                     }
+
+
                 });
     }
 
@@ -541,7 +543,6 @@ public class DeviceMonitorService extends Service {
                                 VideoNameParser parser = new VideoNameParser();
                                 MovieNameInfo info = parser.parseVideoName(videoFile.path);
                                 videoFile.keyword = info.getName();
-                                ;
                                 videoFile.season = info.getSeason();
                                 videoFile.episode = info.toEpisode("0");
                                 long vid = mVideoFileDao.insertOrIgnore(videoFile);

@@ -25,21 +25,25 @@ public class ServiceStatusHelper {
 
     public static synchronized void addView(String text, Context context) {
         if (sFloatDialogBinding == null) {
-            sFloatDialogBinding = FloatDialogBinding.inflate(LayoutInflater.from(context));
-            sFloatDialogBinding.setText(text);
-            WindowManager wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
-            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            layoutParams.format = PixelFormat.RGBA_8888;
-            layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-            layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+            try {
+                sFloatDialogBinding = FloatDialogBinding.inflate(LayoutInflater.from(context));
+                sFloatDialogBinding.setText(text);
+                WindowManager wm = (WindowManager) context.getSystemService(WINDOW_SERVICE);
+                WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+                layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+                layoutParams.format = PixelFormat.RGBA_8888;
+                layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+                layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
 
-            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            layoutParams.gravity= Gravity.BOTTOM|Gravity.END;
+                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                layoutParams.gravity = Gravity.BOTTOM | Gravity.END;
 
-            wm.addView(sFloatDialogBinding.getRoot(), layoutParams);
+                wm.addView(sFloatDialogBinding.getRoot(), layoutParams);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
