@@ -240,6 +240,8 @@ public class MovieScanService extends Service {
                                                         OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
                                                         OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB);
                                                         LogUtil.e(Thread.currentThread().getName(), _keyword + " 此关键字无搜索结果");
+                                                        videoFile.isScanned=1;
+                                                        mVideoFileDao.update(videoFile);
                                                     }
                                                     Object[] data = new Object[2];
                                                     data[0] = movie_id;
