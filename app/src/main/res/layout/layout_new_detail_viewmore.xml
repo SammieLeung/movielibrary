@@ -14,9 +14,15 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.hphtv.movielibrary.ui.view.BlurBGImageView
+<!--        <com.hphtv.movielibrary.ui.view.BlurBGImageView-->
+<!--            android:id="@+id/iv_fastblur"-->
+<!--            app:radius="50"-->
+<!--            android:foreground="#80000000"-->
+<!--            android:layout_width="783dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_alignParentEnd="true"/>-->
+        <ImageView
             android:id="@+id/iv_fastblur"
-            app:radius="50"
             android:foreground="#80000000"
             android:layout_width="783dp"
             android:layout_height="match_parent"

@@ -9,6 +9,7 @@ import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicBlur;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -27,6 +28,7 @@ import jp.wasabeef.glide.transformations.internal.FastBlur;
  * date:  2022/1/19
  */
 public class BlurBGImageView extends androidx.appcompat.widget.AppCompatImageView {
+    public static final String TAG=BlurBGImageView.class.getSimpleName();
     Bitmap overlay;
     int scaleFactor = 2;
     int radius = 8;
@@ -58,7 +60,9 @@ public class BlurBGImageView extends androidx.appcompat.widget.AppCompatImageVie
         bgView.buildDrawingCache();
         Bitmap bitmap1 = null;
         try {
+            long t=System.currentTimeMillis();
             bitmap1 = getBitmap(bgView);
+            Log.e(TAG, "getBitmap: "+(System.currentTimeMillis()-t)+"ms" );
         } catch (Exception e) {
             e.printStackTrace();
         }
