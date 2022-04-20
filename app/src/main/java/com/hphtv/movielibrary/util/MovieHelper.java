@@ -144,7 +144,6 @@ public class MovieHelper {
             new_movie.id = old_movie.id;
             new_movie.addTime = old_movie.addTime;
             new_movie.updateTime = System.currentTimeMillis();
-            new_movie.ap = old_movie.ap;
             new_movie.isFavorite = old_movie.isFavorite;
             new_movie.isWatched = old_movie.isWatched;
             new_movie.lastPlayTime = old_movie.lastPlayTime;

@@ -167,7 +167,7 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
 
     public void prepareFavorite(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),0,LIMIT);
+            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),Config.getSqlConditionOfChildMode(),0,LIMIT);
             emitter.onNext(movieDataViewList);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io())
