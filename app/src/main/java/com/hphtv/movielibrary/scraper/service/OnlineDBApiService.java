@@ -63,7 +63,7 @@ public class OnlineDBApiService {
             String folder = videoFile.dirPath;
             String duration = "0";
             String current_point = "0";
-            String watch_limit = movieWrapper.movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+            String watch_limit = movieWrapper.movie.ap!=null&&movieWrapper.movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
             UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
             Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
             updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
@@ -95,7 +95,7 @@ public class OnlineDBApiService {
         String folder = videoFile.dirPath;
         String duration = "0";
         String current_point = "0";
-        String watch_limit = movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+        String watch_limit =  movie.ap!=null&&movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
         UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
         Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {

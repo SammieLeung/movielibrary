@@ -74,6 +74,7 @@
     <string name="shortcut_scan_dialog_confirm">Scan</string>
     <string name="shortcut_options_dialog_remove">Remove</string>
     <string name="shortcut_options_dialog_rescan">Rescan</string>
+    <string name="shortcut_options_dialog_quickscan">Quick Scan</string>
 
     <string name="shortcut_remove_dialog_content">Remove folder %s?</string>
 

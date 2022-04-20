@@ -168,13 +168,15 @@ public class DeviceMonitorService extends Service {
                 case Constants.ACTION.ADD_LOCAL_SHORTCUT:
                     if (intent.hasExtra(Constants.Extras.QUERY_SHORTCUT)) {
                         Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
-                        startScanLocalShortcut(shortcut);
+                        boolean isQuickMode = intent.getBooleanExtra(Constants.Extras.QUICKMODE, true);
+                        startScanLocalShortcut(shortcut, isQuickMode);
                     }
                     break;
                 case Constants.ACTION.ADD_NETWORK_SHORTCUT:
                     if (intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT) != null) {
                         Shortcut shortcut = (Shortcut) intent.getSerializableExtra(Constants.Extras.QUERY_SHORTCUT);
-                        startScanNetworkFiles(shortcut);
+                        boolean isQuickMode = intent.getBooleanExtra(Constants.Extras.QUICKMODE, true);
+                        startScanNetworkFiles(shortcut, isQuickMode);
                     }
                     break;
                 case Constants.ACTION.MOVIE_SCRAP_START:
@@ -399,12 +401,19 @@ public class DeviceMonitorService extends Service {
                 });
     }
 
-    private void startScanLocalShortcut(Shortcut shortcut) {
+    private void startScanLocalShortcut(Shortcut shortcut, boolean isQuick) {
         Observable.just(shortcut)
                 .observeOn(Schedulers.newThread())
                 .map(shortcut1 -> {
                     LocalFileScanHelper.searchShortcut(getApplication(), shortcut1);
-                    List<VideoFile> videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut1.uri);
+                    List<VideoFile> videoFileList;
+                    if (isQuick)
+                        videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut1.uri);
+                    else {
+                        videoFileList = mVideoFileDao.queryVideoFilesOnShortcut(shortcut1.uri);
+                        shortcut1.posterCount = 0;
+                        mShortcutDao.updateShortcut(shortcut1);
+                    }
                     Object[] data = new Object[2];
                     data[0] = shortcut1;
                     data[1] = videoFileList;
@@ -445,6 +454,82 @@ public class DeviceMonitorService extends Service {
                 });
     }
 
+
+    private void startScanNetworkFiles(Shortcut shortcut, boolean isQuick) {
+        Observable.just(shortcut)
+                .subscribeOn(Schedulers.newThread())
+                .map(shortcut1 -> {
+                    List<VideoFile> videoFileList = new ArrayList<>();
+                    String queryUri = shortcut1.queryUri;
+                    String networkPath = shortcut1.uri;
+                    Cursor cursor = getContentResolver().query(Uri.parse(queryUri), null, null, null, null);
+                    if (cursor != null) {
+                        int fileCount = cursor.getCount();
+                        if (!isQuick)
+                            shortcut1.posterCount = 0;
+                        shortcut1.fileCount = fileCount;
+                        mShortcutDao.updateShortcut(shortcut1);
+                        while (cursor.moveToNext()) {
+                            String path = cursor.getString(cursor.getColumnIndex("path"));
+                            String filename = cursor.getString(cursor.getColumnIndex("_display_name"));
+                            String dirPath = networkPath;
+
+                            VideoFile videoFile = mVideoFileDao.queryByPath(path);
+                            if (videoFile != null) {
+                                if (isQuick) {
+                                    if (videoFile.isScanned == 0)
+                                        videoFileList.add(videoFile);
+                                } else {
+                                    videoFileList.add(videoFile);
+                                }
+                            } else {
+                                videoFile = new VideoFile();
+                                videoFile.path = cursor.getString(cursor.getColumnIndex("path"));
+                                videoFile.filename = filename;
+                                videoFile.dirPath = dirPath;
+                                videoFile.addTime = System.currentTimeMillis();
+                                VideoNameParser parser = new VideoNameParser();
+                                MovieNameInfo info = parser.parseVideoName(videoFile.path);
+                                videoFile.keyword = info.getName();
+                                videoFile.season = info.getSeason();
+                                videoFile.episode = info.toEpisode("0");
+                                long vid = mVideoFileDao.insertOrIgnore(videoFile);
+                                videoFile.vid = vid;
+                                videoFileList.add(videoFile);
+                            }
+                        }
+                    }
+                    LogUtil.v("startScanNetworkFiles [" + shortcut1.friendlyName + "] filecount:" + videoFileList.size());
+                    Object[] data = new Object[2];
+                    data[0] = shortcut1;
+                    data[1] = videoFileList;
+                    return data;
+                })
+                .onErrorReturn(throwable -> new Object[0])
+                .subscribe(new SimpleObserver<Object[]>() {
+                    @Override
+                    public void onAction(Object[] data) {
+                        if (data.length == 2) {
+                            Shortcut shortcut = (Shortcut) data[0];
+                            List<VideoFile> videoFileList = (List<VideoFile>) data[1];
+                            if (videoFileList != null && videoFileList.size() > 0) {
+                                if (mMovieScanService != null)
+                                    mMovieScanService.scanVideo(shortcut, videoFileList);
+                            } else {    //TODO mPosterPairingDevice处理
+                                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
+                                ServiceStatusHelper.removeView(DeviceMonitorService.this);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (!AppUtils.isAppInBackground(getBaseContext()))
+                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
+                    }
+                });
+    }
 
     private void startScanAllLocalUnScannedFiles() {
         if (!isScanning.get())
@@ -511,76 +596,6 @@ public class DeviceMonitorService extends Service {
 
                         }
                     });
-    }
-
-    private void startScanNetworkFiles(Shortcut shortcut) {
-        Observable.just(shortcut)
-                .subscribeOn(Schedulers.newThread())
-                .map(shortcut1 -> {
-                    List<VideoFile> videoFileList = new ArrayList<>();
-                    String queryUri = shortcut1.queryUri;
-                    String networkPath = shortcut1.uri;
-                    Cursor cursor = getContentResolver().query(Uri.parse(queryUri), null, null, null, null);
-                    if (cursor != null) {
-                        int fileCount = cursor.getCount();
-                        shortcut1.fileCount = fileCount;
-                        mShortcutDao.updateShortcut(shortcut1);
-                        while (cursor.moveToNext()) {
-                            String path = cursor.getString(cursor.getColumnIndex("path"));
-                            String filename = cursor.getString(cursor.getColumnIndex("_display_name"));
-                            String dirPath = networkPath;
-
-                            VideoFile videoFile = mVideoFileDao.queryByPath(path);
-                            if (videoFile != null) {
-                                if (videoFile.isScanned == 0)
-                                    videoFileList.add(videoFile);
-                            } else {
-                                videoFile = new VideoFile();
-                                videoFile.path = cursor.getString(cursor.getColumnIndex("path"));
-                                videoFile.filename = filename;
-                                videoFile.dirPath = dirPath;
-                                videoFile.addTime = System.currentTimeMillis();
-                                VideoNameParser parser = new VideoNameParser();
-                                MovieNameInfo info = parser.parseVideoName(videoFile.path);
-                                videoFile.keyword = info.getName();
-                                videoFile.season = info.getSeason();
-                                videoFile.episode = info.toEpisode("0");
-                                long vid = mVideoFileDao.insertOrIgnore(videoFile);
-                                videoFile.vid = vid;
-                                videoFileList.add(videoFile);
-                            }
-                        }
-                    }
-                    LogUtil.v("startScanNetworkFiles [" + shortcut1.friendlyName + "] filecount:" + videoFileList.size());
-                    Object[] data = new Object[2];
-                    data[0] = shortcut1;
-                    data[1] = videoFileList;
-                    return data;
-                })
-                .onErrorReturn(throwable -> new Object[0])
-                .subscribe(new SimpleObserver<Object[]>() {
-                    @Override
-                    public void onAction(Object[] data) {
-                        if (data.length == 2) {
-                            Shortcut shortcut = (Shortcut) data[0];
-                            List<VideoFile> videoFileList = (List<VideoFile>) data[1];
-                            if (videoFileList != null && videoFileList.size() > 0) {
-                                if (mMovieScanService != null)
-                                    mMovieScanService.scanVideo(shortcut, videoFileList);
-                            } else {    //TODO mPosterPairingDevice处理
-                                LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
-                                ServiceStatusHelper.removeView(DeviceMonitorService.this);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        if (!AppUtils.isAppInBackground(getBaseContext()))
-                            ServiceStatusHelper.addView(getString(R.string.scanning_in_background), DeviceMonitorService.this);
-                    }
-                });
     }
 
     /**

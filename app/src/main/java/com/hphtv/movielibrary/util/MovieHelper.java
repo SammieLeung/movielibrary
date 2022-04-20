@@ -149,7 +149,6 @@ public class MovieHelper {
             new_movie.isWatched = old_movie.isWatched;
             new_movie.lastPlayTime = old_movie.lastPlayTime;
             new_movie.pinyin = old_movie.pinyin;
-            new_movie.ap=old_movie.ap;
             movieDao.update(new_movie);
         } else {
             new_movie.pinyin = Observable.just(new_movie.title)

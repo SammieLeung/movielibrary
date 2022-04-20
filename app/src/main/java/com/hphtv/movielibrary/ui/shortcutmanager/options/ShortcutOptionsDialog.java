@@ -41,8 +41,9 @@ public class ShortcutOptionsDialog extends BaseDialogFragment2<ShortcutOptionsVi
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.btnRemove.setOnClickListener(this::removeShortcut);
-        mBinding.btnScan.setOnClickListener(this::showScanDialog);
+        mBinding.btnRemove.setOnClickListener(v->removeShortcut());
+        mBinding.btnScan.setOnClickListener(v->showScanDialog());
+        mBinding.btnQuickScan.setOnClickListener(v->quickScan());
         mBinding.btnClose.setOnClickListener(this::dismiss);
         mBinding.setDialogTitle(mViewModel.getShortcut().friendlyName);
     }
@@ -62,15 +63,20 @@ public class ShortcutOptionsDialog extends BaseDialogFragment2<ShortcutOptionsVi
         return this;
     }
 
-    private void showScanDialog(View v){
+    private void showScanDialog(){
         ShortcutScanDialog dialog= ShortcutScanDialog.newInstance();
         dialog.show(getActivity().getSupportFragmentManager(),"");
         dismiss();
     }
 
-    private void removeShortcut(View v){
+    private void removeShortcut(){
         ShortcutRemoveConfirmDialog dialog=ShortcutRemoveConfirmDialog.newInstance();
         dialog.show(getActivity().getSupportFragmentManager(),"");
+        dismiss();
+    }
+
+    private void quickScan(){
+        mViewModel.quickScan();
         dismiss();
     }
 

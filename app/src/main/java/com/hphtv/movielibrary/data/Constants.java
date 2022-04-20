@@ -159,6 +159,7 @@ public class Constants {
         String MOUNT_TYPE = "device_type";
         String QUERY_URI ="query_uri";
         String QUERY_SHORTCUT ="query_shortcut";
+        String QUICKMODE="query_quick_mode";
         String SEARCH_TYPE ="search_type";
         String NETWORK_DIR_PATH="network_dir_path";
         String IS_FROM_NETWORK = "is_from_network";

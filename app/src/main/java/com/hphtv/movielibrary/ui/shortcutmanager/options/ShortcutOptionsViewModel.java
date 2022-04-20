@@ -126,6 +126,16 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
         }
     }
 
+    public void quickScan(){
+        Intent intent = new Intent();
+        if(mShortcut.deviceType >Constants.DeviceType.DEVICE_TYPE_HARD_DISK) {
+            intent.setAction(Constants.ACTION.ADD_NETWORK_SHORTCUT);
+        }else{
+            intent.setAction(Constants.ACTION.ADD_LOCAL_SHORTCUT);
+        }
+        intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
+        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
+    }
 
     /**
      * 保存索引修改
@@ -169,21 +179,20 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                 .subscribe(new SimpleObserver<Shortcut>() {
                     @Override
                     public void onAction(Shortcut shortcut) {
+                        Intent intent = new Intent();
                         if(shortcut.deviceType >Constants.DeviceType.DEVICE_TYPE_HARD_DISK) {
-                            Intent intent = new Intent();
                             intent.setAction(Constants.ACTION.ADD_NETWORK_SHORTCUT);
-                            intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
-                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                         }else{
-                            Intent intent=new Intent();
                             intent.setAction(Constants.ACTION.ADD_LOCAL_SHORTCUT);
-                            intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
-                            LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
                         }
-                        Intent intent=new Intent();
-                        intent.setAction(Constants.ACTION.SHORTCUT_INFO_UPDATE);
-                        intent.putExtra(Constants.Extras.SHORTCUT,mShortcut);
+                        intent.putExtra(Constants.Extras.QUERY_SHORTCUT,mShortcut);
+                        intent.putExtra(Constants.Extras.QUICKMODE,false);
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(intent);
+
+                        Intent notifyIntent=new Intent();
+                        notifyIntent.setAction(Constants.ACTION.SHORTCUT_INFO_UPDATE);
+                        notifyIntent.putExtra(Constants.Extras.SHORTCUT,mShortcut);
+                        LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(notifyIntent);
                     }
                 });
 

@@ -30,7 +30,14 @@
                     android:textStyle="bold"
                     android:text="@{dialogTitle}" />
 
-
+                <Button
+                    android:id="@+id/btn_quick_scan"
+                    android:text="@string/shortcut_options_dialog_quickscan"
+                    android:focusedByDefault="true"
+                    style="@style/common_dialog_btn_style"
+                    android:layout_width="@dimen/shortcut_scan_diaolg_btn_w"
+                    android:layout_height="@dimen/shortcut_scan_diaolg_btn_h"
+                    android:layout_marginBottom="38dp"/>
                 <Button
                     android:id="@+id/btn_scan"
                     android:text="@string/shortcut_options_dialog_rescan"

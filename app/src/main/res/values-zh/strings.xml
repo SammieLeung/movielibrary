@@ -71,6 +71,7 @@
     <string name="shortcut_scan_dialog_confirm">确认扫描</string>
     <string name="shortcut_options_dialog_remove">移除文件夹</string>
     <string name="shortcut_options_dialog_rescan">重新扫描</string>
+    <string name="shortcut_options_dialog_quickscan">快速扫描</string>
 
     <string name="shortcut_remove_dialog_content">确认移除文件夹 %s 吗？</string>
 
