@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.databinding.CommonPasswordDialogLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PasswordDialogFragment extends BaseDialogFragment2<PasswordDialogFragmentViewModel, CommonPasswordDialogLayoutBinding> {
     public String mDialogTitle;
+
     public static PasswordDialogFragment newInstance() {
         PasswordDialogFragment fragment = new PasswordDialogFragment();
         return fragment;
@@ -42,8 +44,12 @@ public class PasswordDialogFragment extends BaseDialogFragment2<PasswordDialogFr
     }
 
     private void bindDatas() {
-        mBinding.setInputHint(getString(R.string.hint_enter_psw));
-        mBinding.setDialogTitle(TextUtils.isEmpty(mDialogTitle)?getString(R.string.title_input_psw):mDialogTitle);
+        if (Config.getChildModePassword().equals(Config.DEAULT_PASSWORD)) {
+            mBinding.setInputHint(getString(R.string.hint_enter_psw));
+        } else {
+            mBinding.setInputHint(getString(R.string.hint_enter_psw_2));
+        }
+        mBinding.setDialogTitle(TextUtils.isEmpty(mDialogTitle) ? getString(R.string.title_input_psw) : mDialogTitle);
         mBinding.setViewmodel(mViewModel);
     }
 

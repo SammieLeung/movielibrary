@@ -70,6 +70,8 @@ public class ChangePasswordFragment extends BaseFragment2<SettingsViewModel, Fra
 
     private void updateOldHint(){
         if(Config.getChildModePassword().equals(Config.DEAULT_PASSWORD)){
+            mBinding.setOldHint(getString(R.string.hint_enter_psw));
+        }else{
             mBinding.setOldHint(getString(R.string.hint_enter_psw_2));
         }
     }

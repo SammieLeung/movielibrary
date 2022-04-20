@@ -129,7 +129,7 @@ public class OnlineDBApiService {
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{uploadFile} " + Thread.currentThread().getName() + ":" + baseRespone.code + ": " + filename);
+                LogUtil.w("{uploadFile} " + Thread.currentThread().getName() + ":" + baseRespone.code + ": " + path);
             }
         });
     }
