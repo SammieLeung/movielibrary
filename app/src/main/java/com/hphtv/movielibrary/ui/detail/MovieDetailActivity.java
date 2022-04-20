@@ -202,9 +202,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                             mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
 
                             if (!TextUtils.isEmpty(stagePhoto)) {
-                                GlideTools.GlideWrapper(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
+                                GlideTools.GlideWrapperWithCrossFade(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
                             } else if(!TextUtils.isEmpty(wrapper.movie.poster)){
-                                GlideTools.GlideWrapper(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
+                                GlideTools.GlideWrapperWithCrossFade(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
                             } else{
                                 Glide.with(getBaseContext()).load(R.mipmap.default_poster).into(mBinding.ivStagephoto);
                             }

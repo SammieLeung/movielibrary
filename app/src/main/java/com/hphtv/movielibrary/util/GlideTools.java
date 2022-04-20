@@ -38,6 +38,23 @@ public class GlideTools {
     }
 
     public static RequestBuilder<Drawable> GlideWrapper(Context context, String path) {
+        if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/")||path.lastIndexOf(".")==-1)||path.endsWith("/")) {
+            return Glide.with(context)
+                    .load(R.mipmap.default_poster);
+        } else {
+            return Glide.with(context)
+                    .load(path)
+//                    .load(buildGlideUrl(path))
+//                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
+                    .placeholder(R.mipmap.default_poster)
+                    .fallback(R.mipmap.default_poster)
+                    .error(R.mipmap.default_poster);
+        }
+    }
+
+    public static RequestBuilder<Drawable> GlideWrapperWithCrossFade(Context context, String path) {
         DrawableCrossFadeFactory.Builder builder=new DrawableCrossFadeFactory.Builder(500);
         DrawableCrossFadeFactory fadeFactory=builder.setCrossFadeEnabled(false).build();
         if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/")||path.lastIndexOf(".")==-1)||path.endsWith("/")) {
