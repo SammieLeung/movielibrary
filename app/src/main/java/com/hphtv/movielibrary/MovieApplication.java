@@ -38,8 +38,7 @@ public class MovieApplication extends Application {
     }
 
     private void init() {
-        Intent service = new Intent(sMovieApplication, DeviceMonitorService.class);
-        startService(service);
+
         Observable.just("")
                 .observeOn(Schedulers.newThread())
                 .subscribe(new SimpleObserver<String>() {

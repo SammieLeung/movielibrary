@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -24,6 +25,7 @@ import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
@@ -31,8 +33,10 @@ import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
+import com.station.kit.util.AppUtils;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
+import com.station.kit.util.PackageTools;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
@@ -56,17 +60,25 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public void firstPermissionGranted() {
+        Log.i(TAG, "firstPermissionGranted: ");
         bindDatas();
         initView();
         autoScrollListener(mBinding.nsv);
         new Thread(() -> {
             AuthHelper.init();
-            autoSearch();
+            if(!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())){
+                Intent service = new Intent(this, DeviceMonitorService.class);
+                this.startService(service);
+            }else {
+                autoSearch();
+            }
+
         }).start();
     }
 
     @Override
     public void permissionGranted() {
+        Log.i(TAG, "permissionGranted: ");
         bindDatas();
         initView();
         autoScrollListener(mBinding.nsv);

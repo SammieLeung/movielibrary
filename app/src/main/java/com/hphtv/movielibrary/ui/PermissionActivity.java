@@ -14,6 +14,8 @@ import androidx.lifecycle.AndroidViewModel;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.station.kit.util.LogUtil;
 
+import java.security.Permission;
+
 /**
  * author: Sam Leung
  * date:  2022/2/24
@@ -40,7 +42,7 @@ public abstract class PermissionActivity<VM extends AndroidViewModel, VDB extend
                 } else {
                     LogUtil.v(TAG, "showRequest false");
                 }
-                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PackageManager.GET_PERMISSIONS);
             } else {
                 permissionGranted();
             }
@@ -67,7 +69,7 @@ public abstract class PermissionActivity<VM extends AndroidViewModel, VDB extend
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode==1000&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
+        if(requestCode==PackageManager.GET_PERMISSIONS&&grantResults[0]==PackageManager.PERMISSION_GRANTED){
             checkPermissions();
         }
     }
