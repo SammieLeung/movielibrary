@@ -35,6 +35,8 @@ public class BindingAdapterHelper {
 
                 List<String> tagList = Arrays.asList(tagArr);
                 int pos = tagList.indexOf(tag);
+                if (pos < 0)
+                    pos = 0;
                 Glide.with(v.getContext())
                         .load(ta.getResourceId(pos, 0))
                         .into(v);
@@ -45,26 +47,26 @@ public class BindingAdapterHelper {
 
     @BindingAdapter("filterSelect")
     public static void selectBackground(TextView textView, boolean selected) {
-            if (selected == true) {
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, textView.getContext().getDrawable(R.drawable.ic_icon_filter_check), null);
-                textView.getPaint().setFakeBoldText(true);
-            } else {
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
-                textView.getPaint().setFakeBoldText(false);
-            }
+        if (selected == true) {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, textView.getContext().getDrawable(R.drawable.ic_icon_filter_check), null);
+            textView.getPaint().setFakeBoldText(true);
+        } else {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
+            textView.getPaint().setFakeBoldText(false);
+        }
     }
 
 
     @BindingAdapter(value = {"orderSelect", "orderDesc"}, requireAll = false)
     public static void setOrderSelect(TextView textView, boolean selected, ObservableBoolean isDesc) {
-            if (selected == true) {
-                Drawable drawable = textView.getContext().getDrawable(isDesc.get() ? R.drawable.desc_order : R.drawable.asc_order);
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
-                textView.getPaint().setFakeBoldText(true);
-            } else {
-                textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
-                textView.getPaint().setFakeBoldText(false);
-            }
+        if (selected == true) {
+            Drawable drawable = textView.getContext().getDrawable(isDesc.get() ? R.drawable.desc_order : R.drawable.asc_order);
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null);
+            textView.getPaint().setFakeBoldText(true);
+        } else {
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, null, null);
+            textView.getPaint().setFakeBoldText(false);
+        }
     }
 
     @BindingAdapter(value = "textViewSelect")
@@ -77,7 +79,6 @@ public class BindingAdapterHelper {
     public static void setViewSelected(View view, boolean selected) {
         view.setSelected(selected);
     }
-
 
 
 }
