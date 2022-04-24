@@ -1,19 +1,13 @@
 package com.hphtv.movielibrary.ui.videoselect;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.ViewCompat;
 import androidx.databinding.ViewDataBinding;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.adapter.BaseAdapter;
 import com.hphtv.movielibrary.adapter.BaseApater2;
-import com.hphtv.movielibrary.adapter.CommonViewHolder;
 import com.hphtv.movielibrary.databinding.RvItemVideosourceBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.util.StringTools;

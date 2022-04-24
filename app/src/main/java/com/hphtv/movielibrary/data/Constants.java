@@ -165,6 +165,8 @@ public class Constants {
         String IS_FROM_NETWORK = "is_from_network";
         String DEVICE_ID = "device_id";
 
+        String TYPE="type";
+
     }
 
     /**

@@ -13,6 +13,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hphtv.movielibrary.util.ViewHolderCreator;
 import com.station.kit.view.mvvm.ViewDataBindingHelper;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.ViewHolder, T> extends RecyclerView.Adapter<VH> implements View.OnClickListener {
+public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.ViewHolder, T> extends RecyclerView.Adapter<VH> implements View.OnClickListener, View.OnKeyListener, View.OnLongClickListener {
     protected Context mContext;
     protected List<T> mList;
 
@@ -41,17 +42,8 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         VDB binding = ViewDataBindingHelper.inflateVDB(mContext, parent, this.getClass());
         VH viewHolder = null;
         try {
-            Type superclass = getClass().getGenericSuperclass();
-            ParameterizedType parameterizedType = null;
-            if (superclass instanceof ParameterizedType) {
-                parameterizedType = (ParameterizedType) superclass;
-                Type[] typeArray = parameterizedType.getActualTypeArguments();
-                if (typeArray != null && typeArray.length > 0) {
-                    Class Class_VH = (Class) typeArray[1];
-                    Constructor[] constructors = (Constructor[]) Class_VH.getDeclaredConstructors();
-                    viewHolder = (VH) constructors[0].newInstance(this, binding);
-                }
-            }
+            Constructor<VH>[] constructors = ViewHolderCreator.getViewHolderConstructors(this.getClass());
+            viewHolder = (VH) constructors[0].newInstance(this, binding);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,6 +71,20 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         }
     }
 
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_UP) {
+            if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
+                int pos = (int) v.getTag();
+                if (mOnItemClickListener != null)
+                    mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean onLongClick(View v) {
         if (mOnItemLongClickListener != null) {
             int position = (int) v.getTag();
@@ -163,6 +169,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         mOnItemLongClickListener = onItemLongClickListener;
     }
 
+
     public interface OnRecyclerViewItemActionListener<T> {
         void onItemClick(View view, int postion, T data);
 
@@ -179,19 +186,9 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         public ViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.getRoot().setOnClickListener(BaseApater2.this::onClick);
-            mBinding.getRoot().setOnLongClickListener(BaseApater2.this::onLongClick);
-            mBinding.getRoot().setOnKeyListener((v, keyCode, event) -> {
-                if(event.getAction()==KeyEvent.ACTION_UP) {
-                    if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
-                        int pos = (int) v.getTag();
-                        if (mOnItemClickListener != null)
-                            mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
-                        return true;
-                    }
-                }
-                return false;
-            });
+            mBinding.getRoot().setOnClickListener(BaseApater2.this);
+            mBinding.getRoot().setOnLongClickListener(BaseApater2.this);
+            mBinding.getRoot().setOnKeyListener(BaseApater2.this);
         }
     }
 }

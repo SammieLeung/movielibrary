@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.lqm.roundview.RoundImageView
+            android:id="@+id/rv_poster"
+            android:layout_width="@dimen/poster_item_1_w"
+            android:layout_height="@dimen/poster_item_1_h"
+            android:background="@drawable/poster_item_bg"
+            android:src="@drawable/common_poster_more"
+            android:duplicateParentState="true"
+            app:border_color="@android:color/transparent"
+            app:border_width="@dimen/poster_border_width"
+            app:corner_radius="@dimen/poster_item_1_radius" />
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="@dimen/poster_item_1_w"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/rv_poster"
+            android:layout_marginTop="14dp"
+            android:ellipsize="middle"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/btn_expand"
+            android:textColor="@color/white"
+            android:textSize="23sp"
+            />
+    </RelativeLayout>
+</layout>

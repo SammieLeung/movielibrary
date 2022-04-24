@@ -229,6 +229,15 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source);
 
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " GROUP BY id " +
+            " ORDER BY add_time DESC)"
+    )
+    public int countMovieDataViewForRecentlyAdded(String source, String ap);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
             " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
@@ -278,6 +287,11 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source GROUP BY id ORDER BY pinyin ASC")
     public List<MovieDataView> queryFavoriteMovieDataView(String source);
+
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " GROUP BY id ORDER BY pinyin ASC)")
+    public int countFavoriteMovieDataView(String source,String ap);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +

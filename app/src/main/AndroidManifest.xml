@@ -48,7 +48,7 @@
         <activity android:name=".ui.shortcutmanager.ShortcutManagerActivity" />
 
         <activity android:name=".ui.filterpage.FilterPageActivity" />
-
+        <activity android:name=".ui.pagination.PaginationActivity"/>
         <service android:name=".service.MovieScanService" />
 
         <service android:name=".service.DeviceMonitorService" />

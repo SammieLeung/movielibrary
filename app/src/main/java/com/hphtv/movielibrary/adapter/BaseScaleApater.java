@@ -58,8 +58,8 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
 
         public ViewHolder(ViewDataBinding binding) {
             super(binding);
-            mBinding.getRoot().setOnFocusChangeListener(BaseScaleApater.this::onFocusChange);
-            mBinding.getRoot().setOnHoverListener(BaseScaleApater.this::onHover);
+            mBinding.getRoot().setOnFocusChangeListener(BaseScaleApater.this);
+            mBinding.getRoot().setOnHoverListener(BaseScaleApater.this);
         }
     }
 

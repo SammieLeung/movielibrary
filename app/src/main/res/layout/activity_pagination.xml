@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="androidx.databinding.ObservableInt"/>
+        <import type="androidx.databinding.ObservableFloat"/>
+        <import type="androidx.databinding.ObservableField"/>
+
+        <import type="android.view.View"/>
+        <variable
+            name="emptyType"
+            type="ObservableInt" />
+        <variable
+            name="title"
+            type="ObservableField&lt;String>"  />
+    </data>
+
+    <RelativeLayout
+        android:background="@drawable/new_main_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/title_style"
+            android:layout_marginTop="23dp"
+            android:text='@{title}' />
+<!--        <LinearLayout-->
+<!--            android:visibility="@{emptyType==0?View.VISIBLE:View.GONE}"-->
+<!--            android:id="@+id/view_result_count"-->
+<!--            android:layout_alignBottom="@id/btn_home"-->
+<!--            android:layout_marginLeft="86dp"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_1"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@{conditions}"-->
+<!--                style="@style/filterpage_result_text_style_bold"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_2"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@{total}"-->
+<!--                style="@style/filterpage_result_text_style_bold"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_3"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@{row}"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+<!--            <TextView-->
+<!--                android:text="@string/filterpage_resulttext_4"-->
+<!--                style="@style/filterpage_result_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+<!--        </LinearLayout>-->
+
+        <RelativeLayout
+            android:layout_below="@id/tv_title"
+            android:visibility="@{emptyType>0?View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageView
+                android:id="@+id/iv_empty"
+                android:layout_width="158dp"
+                android:layout_height="131dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:src="@mipmap/empty_img" />
+            <TextView
+                android:visibility="@{emptyType==1?View.VISIBLE:View.GONE}"
+                android:layout_marginTop="30dp"
+                android:layout_below="@id/iv_empty"
+                android:layout_centerHorizontal="true"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:text="@string/filterpage_no_movie"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_empty"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:text="@string/filterpage_no_result_matched"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:visibility="@{emptyType==2?View.VISIBLE:View.GONE}" />
+            />
+        </RelativeLayout>
+
+
+        <com.hphtv.movielibrary.ui.view.TvRecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tv_title"
+            android:layout_marginLeft="45dp"
+            android:layout_marginRight="45dp"
+            android:layout_marginBottom="-5dp"
+            android:paddingBottom="5dp" />
+
+        <View
+            android:id="@+id/bottomMask"
+            android:background="@drawable/bottom_mask"
+            android:layout_alignParentBottom="true"
+            android:layout_height="230dp"
+            android:layout_width="match_parent" />
+    </RelativeLayout>
+</layout>
