@@ -75,8 +75,8 @@ android {
 //        // Adds exported schema location as test app assets.
 //        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
 //    }
-    sourceSets{
-        main{
+    sourceSets {
+        main {
             jniLibs.srcDir(['libs'])
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
         }
@@ -123,6 +123,11 @@ dependencies {
 
     //圆角图片
     implementation 'com.lqm:RoundImageView:1.0.0'
+    //stetho的核心库
+    implementation 'com.facebook.stetho:stetho:1.6.0'
+
+    //监控okhttp的请求
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.6.0'
 
     //测试相关类
     testImplementation 'junit:junit:4.+'

@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.util.retrofit;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.scraper.api.BaseUrl;
 import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
@@ -121,6 +122,7 @@ public class RetrofiTools {
                 })
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
+                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
     }
 
