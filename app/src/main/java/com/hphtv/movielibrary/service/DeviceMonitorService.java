@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.service;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -26,6 +27,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
@@ -155,9 +157,11 @@ public class DeviceMonitorService extends Service {
                     break;
                 case Constants.ACTION.DEVICE_INIT:
                     new Thread(() -> {
-                        List<Shortcut> shortcutList = mShortcutDao.queryAllConnectShortcuts();
-                        OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB);
-                        OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB_EN);
+                        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            List<Shortcut> shortcutList = mShortcutDao.queryAllConnectShortcuts();
+                            OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB);
+                            OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB_EN);
+                        }
                     }).start();
                 case Constants.ACTION.RESCAN_ALL_FILES:
                     if (Config.isAutoSearch().get()) {
@@ -195,7 +199,12 @@ public class DeviceMonitorService extends Service {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mMovieScanService = ((MovieScanService.ScanBinder) service).getService();
-            scanDevices();
+            new Thread(() -> {
+                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    AuthHelper.init();
+                    scanDevices();
+                }
+            }).start();
         }
 
         @Override

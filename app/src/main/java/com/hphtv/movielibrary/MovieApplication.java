@@ -52,7 +52,7 @@ public class MovieApplication extends Application {
                         JcifsUtils.getInstance(MovieApplication.this);
                         SambaAuthHelper.getInstance().init(MovieApplication.this);
                         //设备TOKEN
-                        AuthHelper.init();
+//                        AuthHelper.init();
                     }
                 });
     }

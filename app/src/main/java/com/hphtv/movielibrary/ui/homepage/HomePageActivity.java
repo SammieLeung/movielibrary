@@ -65,7 +65,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         initView();
         autoScrollListener(mBinding.nsv);
         new Thread(() -> {
-            AuthHelper.init();
             if(!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())){
                 Intent service = new Intent(this, DeviceMonitorService.class);
                 this.startService(service);
@@ -83,7 +82,15 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         initView();
         autoScrollListener(mBinding.nsv);
         //自动搜索文件夹
-        autoSearch();
+        new Thread(() -> {
+            if(!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())){
+                Intent service = new Intent(this, DeviceMonitorService.class);
+                this.startService(service);
+            }else {
+                autoSearch();
+            }
+
+        }).start();
     }
 
     /**

@@ -17,7 +17,7 @@ public class AuthHelper {
         init();
     }
 
-    public static void init() {
+    public static synchronized boolean init() {
         switch (RetrofiTools.mode) {
             case RetrofiTools.TEST:
                 try {
@@ -26,6 +26,7 @@ public class AuthHelper {
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    return false;
                 }
                 break;
             case RetrofiTools.PRE:
@@ -33,11 +34,13 @@ public class AuthHelper {
                     sPreToken = TokenHelper.getToken(TokenHelper.PRE_CN);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 try {
                     sPreTokenEN = TokenHelper.getToken(TokenHelper.PRE_EN);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 break;
             case RetrofiTools.RELEASE:
@@ -45,13 +48,16 @@ public class AuthHelper {
                     sToken = TokenHelper.getToken(TokenHelper.CN);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 try {
                     sTokenEN = TokenHelper.getToken(TokenHelper.EN);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return false;
                 }
                 break;
         }
+        return true;
     }
 }
