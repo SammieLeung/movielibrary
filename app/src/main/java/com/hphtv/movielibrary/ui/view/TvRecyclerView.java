@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.ui.BaseFragment2;
+import com.station.kit.util.LogUtil;
 
 /**
  * author: Sam Leung
@@ -292,7 +294,10 @@ public class TvRecyclerView extends RecyclerView {
                             return true;
                         } else {
                             if (isVertical())
-                                return false;
+                                if (mOnForceFocusListener != null)
+                                    return mOnForceFocusListener.forceFocusRight(focusView);
+                                else
+                                    return false;
                             else
                                 return true;
                         }
@@ -307,7 +312,10 @@ public class TvRecyclerView extends RecyclerView {
                             return true;
                         } else {
                             if (isVertical())
-                                return false;
+                                if (mOnForceFocusListener != null)
+                                    return mOnForceFocusListener.forceFocusLeft(focusView);
+                                else
+                                    return false;
                             else
                                 return true;
                         }
@@ -327,6 +335,8 @@ public class TvRecyclerView extends RecyclerView {
                             //防止长按向下键丢失焦点
                             if (isVertical())
                                 return true;
+                            else if (mOnForceFocusListener != null)
+                                return mOnForceFocusListener.forceFocusDown(focusView);
                             else
                                 return false;
                         }
@@ -341,7 +351,15 @@ public class TvRecyclerView extends RecyclerView {
                             return true;
                         }
                         //防止顶层
-                        return false;
+                        if (getLayoutManager() instanceof FilterGridLayoutManager && isVertical())
+                            return false;
+                        else if (isVertical())
+                            return true;
+                        else if (mOnForceFocusListener != null)
+                            return mOnForceFocusListener.forceFocusUp(focusView);
+                        else
+                            return false;
+//                        return false;
 //                        } else {
 //                            if (isVertical())
 //                                return true;
@@ -578,6 +596,7 @@ public class TvRecyclerView extends RecyclerView {
     public interface OnKeyPressListener {
         /**
          * 其他按键
+         *
          * @param keyCode
          */
         void processKeyEvent(int keyCode);
@@ -586,6 +605,24 @@ public class TvRecyclerView extends RecyclerView {
          * 返回
          */
         void onBackPress();
+    }
+
+    public interface OnForceFocusListener {
+        boolean forceFocusLeft(View currentFocus);
+
+        boolean forceFocusRight(View currentFocus);
+
+        boolean forceFocusUp(View currentFocus);
+
+        boolean forceFocusDown(View currentFocus);
+
+    }
+
+    private OnForceFocusListener mOnForceFocusListener;
+
+
+    public void setOnForceFocusListener(OnForceFocusListener onForceFocusListener) {
+        mOnForceFocusListener = onForceFocusListener;
     }
 
     private OnKeyPressListener mOnKeyPressListener;
