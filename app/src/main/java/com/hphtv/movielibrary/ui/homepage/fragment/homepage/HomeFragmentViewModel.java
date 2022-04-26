@@ -187,7 +187,7 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
             List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source,Config.getSqlConditionOfChildMode(),0,LIMIT);
             List<String> genreList = new ArrayList<>();
             List<Long> idList = new ArrayList<>();
-            for (int i = 0;idList.size()>3|| i < history.size(); i++) {
+            for (int i = 0;idList.size()<3&& i < history.size(); i++) {
                 MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
                 if(wrapper!=null) {
                     for (Genre genre : wrapper.genres) {
