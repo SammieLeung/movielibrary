@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Intent;
 
 import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
-import com.facebook.stetho.Stetho;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Constants;
@@ -45,8 +44,6 @@ public class MovieApplication extends Application {
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
-                        //初始化stetho
-                        Stetho.initializeWithDefaults(getBaseContext());
                         //友盟统计
                         MobclickAgent.setScenarioType(sMovieApplication, MobclickAgent.EScenarioType.E_UM_NORMAL);
                         JcifsUtils.getInstance(MovieApplication.this);
