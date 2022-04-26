@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.ViewCompat;
+import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,7 +32,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/8/12
  */
-public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
+public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> implements View.OnFocusChangeListener {
     private final static int TYPE_CONTENT = 0;//正常内容
     private final static int TYPE_FOOTER = 1;//下拉刷新
 
@@ -39,9 +40,11 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     private Context mContext;
     private List<Movie> mMovieList;
     private UnionsearchMovieFooterBinding mFooterBinding;
+    private ObservableInt mSeletPos;
 
-    public MovieSearchAdapter(Context context) {
+    public MovieSearchAdapter(Context context,ObservableInt seletPos) {
         mContext = context;
+        mSeletPos=seletPos;
         mMovieList = new ArrayList<>();
     }
 
@@ -56,6 +59,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         } else {
             UnionsearchMovieItemBinding binding = UnionsearchMovieItemBinding.inflate(LayoutInflater.from(mContext), parent, false);
             ViewHolder vh = new ViewHolder(binding);
+            vh.mDataBinding.setSelectPos(mSeletPos);
             return vh;
         }
     }
@@ -68,6 +72,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             ViewHolder vh = (ViewHolder) holder;
             Movie movie = mMovieList.get(position);
             vh.mDataBinding.setMovie(movie);
+            vh.mDataBinding.setPos(position);
             GlideTools.GlideWrapper(mContext, movie.poster)
                     .into(vh.mDataBinding.ivCover);
         }
@@ -102,6 +107,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
                 @Override
                 public int getSpanSize(int position) {
                     if (getItemViewType(position) == TYPE_FOOTER) {
+                        //footer占用一整行
                         return layout.getSpanCount();
                     } else {
                         //The number of spans occupied by the item at the provided position，Default Each item occupies 1 span.
@@ -109,6 +115,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
                         return 1;
                     }
                 }
+
             };
             layout.setSpanSizeLookup(mGridSpanSizeLookup);
         }
@@ -157,6 +164,16 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 
     private OnClickListener mOnClickListener;
 
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if(v.getTag()!=null){
+            if(v.getTag() instanceof Integer){
+                if(hasFocus)
+                    mSeletPos.set((Integer) v.getTag());
+            }
+        }
+    }
+
     public interface OnClickListener {
         void onClick(Movie movie);
     }
@@ -173,6 +190,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> {
                 if (mOnClickListener != null)
                     mOnClickListener.onClick(mDataBinding.getMovie());
             });
+            mDataBinding.getRoot().setOnFocusChangeListener(MovieSearchAdapter.this);
         }
     }
 

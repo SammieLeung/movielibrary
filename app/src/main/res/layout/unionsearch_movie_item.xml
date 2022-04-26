@@ -3,11 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="androidx.databinding.ObservableInt"/>
         <import type="android.text.TextUtils"/>
+        <import type="com.hphtv.movielibrary.data.Constants.SearchType"/>
         <import type="com.hphtv.movielibrary.roomdb.entity.Movie"/>
         <variable
             name="movie"
             type="Movie" />
+        <variable
+            name="searchType"
+            type="SearchType" />
+        <variable
+            name="selectPos"
+            type="ObservableInt" />
+        <variable
+            name="pos"
+            type="int" />
     </data>
 
     <RelativeLayout
@@ -15,21 +26,22 @@
         android:layout_width="match_parent"
         android:layout_marginBottom="22dp"
         android:layout_height="wrap_content">
-            <com.lqm.roundview.RoundImageView
-                app:corner_radius="8dp"
-                app:border_color="@android:color/transparent"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:layout_marginLeft="25dp"
-                android:id="@+id/iv_cover"
-                android:scaleType="fitXY"
-                android:layout_marginRight="14dp"
-                android:src="@mipmap/default_poster"
-                android:layout_width="@dimen/unionsearch_movie_cover_w"
-                android:layout_height="@dimen/unionsearch_movie_cover_h"/>
+
+        <com.lqm.roundview.RoundImageView
+            android:id="@+id/iv_cover"
+            android:layout_width="@dimen/unionsearch_movie_cover_w"
+            android:layout_height="@dimen/unionsearch_movie_cover_h"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="14dp"
+            android:layout_marginBottom="20dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/default_poster"
+            app:border_color="@android:color/transparent"
+            app:corner_radius="8dp" />
 
         <TextView
-            android:textSize="11sp"
+            android:textSize="18sp"
             android:textColor="#FFE56B45"
             android:layout_marginLeft="11dp"
             android:layout_marginBottom="8dp"
@@ -39,21 +51,63 @@
             android:text="@{movie.ratings}"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <TextView
-            android:id="@+id/tv_title"
-            android:text="@{movie.title}"
-            android:textStyle="bold"
-            android:layout_alignTop="@id/iv_cover"
-            android:layout_toEndOf="@id/iv_cover"
-            android:layout_width="wrap_content"
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/view_title_group"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="23sp"/>
+            android:layout_alignTop="@id/iv_cover"
+            android:layout_marginRight="23dp"
+            android:layout_toEndOf="@id/iv_cover"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                app:viewSelect="@{selectPos==pos}"
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:singleLine="true"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:maxWidth="480dp"
+                android:text="@{movie.title}"
+                android:textColor="@color/white"
+                android:textSize="23sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_marginLeft="13dp"
+                android:id="@+id/tv_video_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/searchvideo_item_video_type_bg"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:textColor="#FFAAAAAA"
+                android:text="@{movie.type.equals(searchType.movie)?@string/video_type_movie:@string/video_type_tv}" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <TextView
+            android:id="@+id/tips_releasedate"
+            android:layout_below="@id/view_title_group"
+            android:layout_toEndOf="@id/iv_cover"
+            android:textColor="#FFCFCFCF"
+            android:text="@string/search_video_dialog_release_date"
+            android:layout_marginRight="6dp"
+            android:layout_marginTop="13dp"
+            android:textSize="17sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_releasedate"
-            android:layout_below="@id/tv_title"
-            android:layout_toEndOf="@id/iv_cover"
+            android:layout_below="@id/view_title_group"
+            android:layout_toEndOf="@id/tips_releasedate"
+            android:textColor="#FFCFCFCF"
             android:text="@{!TextUtils.isEmpty(movie.releaseDate) ? movie.releaseDate:@string/unknow}"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="13dp"
+            android:textSize="17sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -62,9 +116,11 @@
             android:layout_below="@id/tv_releasedate"
             android:layout_toEndOf="@id/iv_cover"
             android:layout_alignBottom="@id/iv_cover"
+            android:textColor="#FFAAAAAA"
             android:text="@{!TextUtils.isEmpty(movie.plot)?movie.plot:@string/plot_s_empty}"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="13dp"
             android:ellipsize="end"
+            android:textSize="17sp"
             android:layout_marginRight="23dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

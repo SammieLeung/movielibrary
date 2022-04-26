@@ -221,5 +221,6 @@
     <string name="homepage_empty">空空如也</string>
     <string name="homepage_goto_add_shortcut">快去添加影片吧</string>
     <string name="unknowfile_empty">没有未匹配的文件</string>
-
+    <!--上映时间-->
+    <string name="search_video_dialog_release_date">上映时间</string>
 </resources>

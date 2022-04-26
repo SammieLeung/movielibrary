@@ -4,6 +4,7 @@ import android.app.Application;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableInt;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.R;
@@ -37,6 +38,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
     private int mSearchMode;
 
     private String mCurrentKeyword;
+    private ObservableInt mSelectPos=new ObservableInt(0);
 
     public MovieSearchDialogViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -166,5 +168,9 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
     public void setSearchMode(int searchMode,MovieSearchAdapter adapter) {
         mSearchMode=searchMode;
         refresh(mCurrentKeyword,adapter);
+    }
+
+    public ObservableInt getSelectPos() {
+        return mSelectPos;
     }
 }

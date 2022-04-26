@@ -74,7 +74,7 @@ public class MovieSearchDialog extends DialogFragment {
 
     private void initView() {
         //recyclerview
-        mAdapter = new MovieSearchAdapter(getContext());
+        mAdapter = new MovieSearchAdapter(getContext(),mViewModel.getSelectPos());
         mAdapter.setOnItemClickListener(movie -> {
             if(getActivity() instanceof AppBaseActivity)
                 ((AppBaseActivity)getActivity()).startLoading();

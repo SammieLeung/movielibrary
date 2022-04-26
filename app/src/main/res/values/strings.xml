@@ -228,6 +228,7 @@
     <string name="homepage_empty">There is nothing here!</string>
     <string name="homepage_goto_add_shortcut">Let\'s go to add videos</string>
     <string name="unknowfile_empty">There are no unmatched files</string>
-
+    <!--上映时间-->
+    <string name="search_video_dialog_release_date">Relaese date</string>
 
 </resources>

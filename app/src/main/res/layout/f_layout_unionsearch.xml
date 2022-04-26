@@ -11,7 +11,7 @@
         <RelativeLayout
             android:background="@drawable/detail_poster_bg"
             android:layout_width="841dp"
-            android:layout_height="625dp"
+            android:layout_height="645dp"
             android:gravity="center|top"
             android:orientation="vertical">
             <TextView
@@ -68,13 +68,14 @@
                     android:src="@drawable/icon_circle_search_35"
                     android:textAllCaps="false" />
 
-                <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
+                <com.hphtv.movielibrary.ui.view.TvRecyclerView
                     android:id="@+id/recyclerview_search_result"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_below="@id/et_box_name"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="21dp" />
+                    android:layout_marginTop="21dp"
+                    android:layout_marginBottom="21dp" />
 
             </RelativeLayout>
             <ImageView

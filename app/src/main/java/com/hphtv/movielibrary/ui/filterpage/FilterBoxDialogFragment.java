@@ -147,14 +147,11 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
 
     @Override
     public void processKeyEvent(int keyCode) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            dismiss();
-        }
     }
 
     @Override
     public void onBackPress() {
-
+        dismiss();
     }
 
     private void requestNextRightFocus(View currentFocusView) {

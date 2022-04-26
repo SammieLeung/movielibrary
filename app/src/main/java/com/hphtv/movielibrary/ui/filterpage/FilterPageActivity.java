@@ -76,7 +76,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
         @Override
         public void onBackPress() {
-            mBinding.btnFilter.requestFocus();
+            mBinding.tvTitle.requestFocus();
         }
     };
 

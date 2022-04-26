@@ -368,16 +368,8 @@ public class TvRecyclerView extends RecyclerView {
 //                        }
                     case KeyEvent.KEYCODE_BACK:
                         if (mOnKeyPressListener != null)
-                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
-                        if (getLayoutManager().getChildAt(0) == getFocusedChild()) {
-                            if (mOnKeyPressListener != null)
-                                mOnKeyPressListener.onBackPress();
-                            return true;
-                        } else {
-                            scrollToPosition(0);
-                            getLayoutManager().getChildAt(0).requestFocus();
-                            return true;
-                        }
+                            mOnKeyPressListener.onBackPress();
+                        return true;
                 }
             }
         }
