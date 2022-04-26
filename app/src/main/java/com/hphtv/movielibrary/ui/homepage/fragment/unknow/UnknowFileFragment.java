@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.unknow;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * date:  2022/4/2
  */
 public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> {
-
+    public static final String TAG=UnknowFileFragment.class.getSimpleName();
     public UnknowFileFragment(IAutofitHeight autofitHeight, int position) {
         super(autofitHeight, position);
     }
@@ -56,11 +58,6 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
         mViewModel.reLoadUnknowFiles();
     }
 
