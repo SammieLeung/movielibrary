@@ -22,13 +22,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseApater2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.databinding.LayoutNewDetailBinding;
+import com.hphtv.movielibrary.databinding.LayoutMovieDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -49,7 +47,7 @@ import java.util.Random;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutNewDetailBinding> {
+public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutMovieDetailBinding> {
     public static final int REMOVE = 1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private NewMovieItemListAdapter mRecommandMovieAdapter;
@@ -154,12 +152,12 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
         mRecommandMovieAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
             @Override
-            public void onItemClick(View view, int postion, MovieDataView data) {
+            public void onItemClick(View view, int position, MovieDataView data) {
                 prepareMovieWrapper(data.id);
             }
 
             @Override
-            public void onItemFocus(View view, int postion, MovieDataView data) {
+            public void onItemFocus(View view, int position, MovieDataView data) {
 
             }
         });
@@ -229,7 +227,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                     }
                                 }
                             });
-                            mViewModel.loadRecommand()
+                            mViewModel.loadRecommend()
                                     .subscribe(new SimpleObserver<List<MovieDataView>>() {
                                         @Override
                                         public void onAction(List<MovieDataView> movieDataViewList) {
@@ -371,7 +369,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     public void showViewMoreDialog() {
-        MovieDetialPlotDialog dialog = MovieDetialPlotDialog.newInstance(mBinding.nestScrollview);
+        MovieDetailPlotDialog dialog = MovieDetailPlotDialog.newInstance(mBinding.nestScrollview);
         dialog.show(getSupportFragmentManager(), "");
     }
 

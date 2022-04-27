@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper"></import>
+
+        <import type="android.text.TextUtils" />
+
+        <import type="android.view.View" />
+
+        <variable
+            name="wrapper"
+            type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper" />
+
+        <variable
+            name="expand"
+            type="boolean" />
+
+        <variable
+            name="recommand"
+            type="boolean" />
+
+        <variable
+            name="viewmore"
+            type="boolean" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nest_scrollview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/main_bg_color_end">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/iv_stagephoto"
+                    android:layout_width="1065dp"
+                    android:layout_height="605dp"
+                    android:layout_alignParentEnd="true"
+                    android:foreground="@drawable/stagephoto_fg"
+                    android:scaleType="centerCrop" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                  android:id="@+id/view_main"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginLeft="72dp"
+                  android:layout_marginTop="68dp"
+                  android:orientation="vertical">
+
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:text="@{wrapper.movie.title}"
+                      android:textColor="@color/white"
+                      android:textSize="36sp"
+                      android:textStyle="bold" />
+
+                    <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="11dp"
+                      android:text="@{wrapper.movie.ratings}"
+                      android:textColor="@color/detail_rating_textcolor"
+                      android:textSize="26sp"
+                      android:textStyle="bold" />
+
+                    <LinearLayout
+                      android:id="@+id/view_tags"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="21dp"
+                      android:orientation="horizontal"></LinearLayout>
+
+                    <LinearLayout
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="33dp">
+
+                        <TextView
+                          style="@style/common_label_text_style"
+                          android:layout_marginRight="23dp"
+                          android:text="@string/director" />
+
+                        <TextView
+                          style="@style/common_content_text_style"
+                          android:layout_marginRight="23dp"
+                          android:text="@{wrapper.toDirectorString()}" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="18dp">
+
+                        <TextView
+                          style="@style/common_label_text_style"
+                          android:layout_marginRight="23dp"
+                          android:text="@string/actors" />
+
+                        <TextView
+                          style="@style/common_content_text_style"
+                          android:layout_marginEnd="23dp"
+                          android:text="@{wrapper.toActorString()}" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="18dp">
+
+                        <TextView
+                          style="@style/common_label_text_style"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_marginRight="23dp"
+                          android:text="@string/plot_s" />
+
+                        <TextView
+                          style="@style/common_content_text_style"
+                          android:layout_marginRight="23dp"
+                          android:ellipsize="end"
+                          android:maxWidth="466dp"
+                          android:maxLines="2"
+                          android:text="@{wrapper.movie.plot}" />
+
+                        <TextView
+                          android:id="@+id/tv_more"
+                          style="@style/common_content_text_style"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_gravity="bottom"
+                          android:drawableRight="@drawable/icon_new_more"
+                          android:gravity="center"
+                          android:text="@string/plot_expand"
+                          android:textColor="@drawable/icon_close_tint"
+                          app:drawableTint="@drawable/icon_close_tint" />
+                    </LinearLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                      android:id="@+id/constraintLayout2"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="45dp">
+
+                        <Button
+                          android:id="@+id/btn_play"
+                          style="@style/detail_btn_style"
+                          android:drawableLeft="@drawable/ic_btn_play_drawable"
+                          android:focusedByDefault="true"
+                          android:text="@string/btn_play"
+                          app:layout_constraintBottom_toBottomOf="parent"
+                          app:layout_constraintEnd_toStartOf="@id/btn_favorite"
+                          app:layout_constraintStart_toStartOf="parent"
+                          app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                          android:id="@+id/btn_favorite"
+                          style="@style/detail_btn_style"
+                          android:drawableLeft="@drawable/ic_btn_like_drawable"
+                          android:text="@string/btn_favorite"
+                          app:layout_constraintBottom_toBottomOf="parent"
+                          app:layout_constraintEnd_toStartOf="@id/btn_edit"
+                          app:layout_constraintStart_toEndOf="@id/btn_play"
+                          app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                          android:id="@+id/btn_edit"
+                          style="@style/detail_btn_style"
+                          android:drawableLeft="@drawable/ic_update"
+                          android:text="@string/btn_edit"
+                          android:visibility="@{expand?View.VISIBLE:View.GONE}"
+                          app:layout_constraintBottom_toBottomOf="parent"
+                          app:layout_constraintEnd_toStartOf="@id/btn_remove"
+                          app:layout_constraintStart_toEndOf="@id/btn_favorite"
+                          app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                          android:id="@+id/btn_remove"
+                          style="@style/detail_btn_style"
+                          android:drawableLeft="@drawable/ic_remove"
+                          android:text="@string/btn_delete"
+                          android:visibility="@{expand?View.VISIBLE:View.GONE}"
+                          app:layout_constraintBottom_toBottomOf="parent"
+                          app:layout_constraintEnd_toStartOf="@id/btn_expand"
+                          app:layout_constraintStart_toEndOf="@id/btn_edit"
+                          app:layout_constraintTop_toTopOf="parent" />
+
+                        <Button
+                          android:id="@+id/btn_expand"
+                          style="@style/detail_btn_style"
+                          android:drawableLeft="@{expand?@drawable/ic_fold:@drawable/ic_btn_more}"
+                          android:text="@{expand?@string/plot_fold:@string/btn_expand}"
+                          app:layout_constraintBottom_toBottomOf="parent"
+                          app:layout_constraintEnd_toEndOf="parent"
+                          app:layout_constraintStart_toEndOf="@id/btn_remove"
+                          app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+                <TextView
+                  android:id="@+id/tv_recommand"
+                  android:layout_below="@id/view_main"
+                  style="@style/common_content_text_style"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="80dp"
+                  android:layout_alignStart="@id/view_main"
+                  android:text="@string/label_recommandvideo"
+                  android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                  android:id="@+id/rv_recommand"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@id/tv_recommand"
+                  android:layout_marginTop="23dp"
+                  android:visibility="@{!recommand?View.GONE:View.VISIBLE}" />
+
+                <TextView
+
+                    style="@style/common_content_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_recommand"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="72dp"
+                    android:text="@string/recommand_empty"
+                    android:visibility="@{recommand?View.GONE:View.VISIBLE}" />
+
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/bottomMask"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bottom_mask" />
+    </RelativeLayout>
+
+</layout>

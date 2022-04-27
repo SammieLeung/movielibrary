@@ -9,15 +9,11 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
-import com.hphtv.movielibrary.scraper.service.TmdbApiService;
-import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.StringTools;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
@@ -37,7 +33,6 @@ import java.util.concurrent.Executors;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -52,7 +47,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     private ExecutorService mSingleThreadPool;
     private MovieWrapper mMovieWrapper;
-    private List<MovieDataView> mRecommandList = new ArrayList<>();
+    private List<MovieDataView> mRecommendList = new ArrayList<>();
 
     private String mSource;
 
@@ -89,7 +84,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
      * 获取推荐影片
      * @return
      */
-    public Observable<List<MovieDataView>> loadRecommand() {
+    public Observable<List<MovieDataView>> loadRecommend() {
         return Observable.just(mMovieWrapper.genres)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(list -> {
@@ -189,16 +184,13 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     public Observable<String> loadFileList() {
         return Observable.just(mMovieWrapper)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
-                .map(new Function<MovieWrapper, String>() {
-                    @Override
-                    public String apply(MovieWrapper wrapper) throws Throwable {
-                        List<VideoFile> list = wrapper.videoFiles;
-                        StringBuffer sb = new StringBuffer();
-                        for (VideoFile videoFile : list) {
-                            sb.append(StringTools.hideSmbAuthInfo(videoFile.path) + "\n");
-                        }
-                        return sb.toString();
+                .map(wrapper -> {
+                    List<VideoFile> list = wrapper.videoFiles;
+                    StringBuffer sb = new StringBuffer();
+                    for (VideoFile videoFile : list) {
+                        sb.append(StringTools.hideSmbAuthInfo(videoFile.path) + "\n");
                     }
+                    return sb.toString();
                 })
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -208,8 +200,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     }
 
 
-    public List<MovieDataView> getRecommandList() {
-        return mRecommandList;
+    public List<MovieDataView> getRecommendList() {
+        return mRecommendList;
     }
 
     public interface Callback2 {

@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.PixelCopy;
 import android.view.View;
@@ -26,40 +25,32 @@ import com.hphtv.movielibrary.databinding.LayoutNewDetailViewmoreBinding;
 import com.hphtv.movielibrary.effect.GlideBlurTransformation;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import jp.wasabeef.glide.transformations.BlurTransformation;
 
 /**
  * author: Sam Leung
  * date:  2022/1/19
  */
-public class MovieDetialPlotDialog extends BaseDialogFragment2<MovieDetailViewModel, LayoutNewDetailViewmoreBinding> {
+public class MovieDetailPlotDialog extends BaseDialogFragment2<MovieDetailViewModel, LayoutNewDetailViewmoreBinding> {
     WeakReference<View> mViewWeakReference;
     private ActorPosterItemListApdater mActorPosterItemListApdater;
     private Bitmap mScreenBitmap;
     private Disposable mGetBitmapDisposable;
 
-    public static MovieDetialPlotDialog newInstance(View view) {
+    public static MovieDetailPlotDialog newInstance(View view) {
         Bundle args = new Bundle();
-        MovieDetialPlotDialog fragment = new MovieDetialPlotDialog();
+        MovieDetailPlotDialog fragment = new MovieDetailPlotDialog();
         fragment.mViewWeakReference = new WeakReference<>(view);
         fragment.setArguments(args);
         return fragment;
