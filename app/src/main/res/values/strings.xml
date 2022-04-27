@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Movie Library</string>
 
-    <string name="unknow">unknow</string>
+    <string name="unknown">unknown</string>
     <string name="confirm">OK</string>
     <string name="cancel">Cancel</string>
     <string name="goback">Return</string>
@@ -17,10 +17,10 @@
     <string name="category_list_title">Category Browse</string>
     <string name="recently_added_list_title">Recently Added</string>
     <string name="my_favorite_list_title">Favorite</string>
-    <string name="recommand_list_title">Recommand</string>
+    <string name="recommand_list_title">Recommend</string>
 
     <!--未匹配-->
-    <string name="unknowfile_list_title">Unknow Files</string>
+    <string name="unknown_file_list_title">Unknown Files</string>
     <!--分类浏览-->
     <string name="category_all">All</string>
     <string name="category_movie">Movie</string>
@@ -63,7 +63,7 @@
     <!--    索引管理-->
     <string name="add_shortcut">Add</string>
     <string name="shortcut_manager">Device</string>
-    <string name="shortcut_state_unscanned">Unscanned</string>
+    <string name="shortcut_state_unscanned">UnScanned</string>
     <string name="shortcut_state_scanned">Scanned</string>
     <string name="shortcut_state_scanning">Scanning</string>
     <string name="scanning_in_background">Scanning video in Background</string>
@@ -74,7 +74,7 @@
     <string name="shortcut_scan_dialog_confirm">Scan</string>
     <string name="shortcut_options_dialog_remove">Remove</string>
     <string name="shortcut_options_dialog_rescan">Rescan</string>
-    <string name="shortcut_options_dialog_quickscan">Quick Scan</string>
+    <string name="shortcut_options_dialog_quick_scan">Quick Scan</string>
 
     <string name="shortcut_remove_dialog_content">Remove folder %s?</string>
 
@@ -91,7 +91,7 @@
     <string name="shortcut_access_all_ages">All Ages</string>
     <!--    文件管理->索引默认名称-->
     <string name="shortcut_name_default">Default</string>
-    <string name="shortcut_name_editdialog_title">Eidt Name</string>
+    <string name="shortcut_name_editdialog_title">Edit Name</string>
     <string name="shortcut_name_editdialog_hint">Please enter a name</string>
 
     <!--详情页-->
@@ -135,7 +135,7 @@
     <string name="tab_homepage">Home</string>
     <string name="video_type_movie">Movie</string>
     <string name="video_type_tv">TV</string>
-    <string name="video_type_undefine">Unknow</string>
+    <string name="video_type_undefine">Unknown</string>
     <string name="video_type_cartoon">Cartoon</string>
     <string name="video_type_animate">Animate</string>
     <string name="video_type_variety_show">Variety Show</string>
@@ -229,6 +229,7 @@
     <string name="homepage_goto_add_shortcut">Let\'s go to add videos</string>
     <string name="unknowfile_empty">There are no unmatched files</string>
     <!--上映时间-->
-    <string name="search_video_dialog_release_date">Relaese date</string>
-
+    <string name="search_video_dialog_release_date">Release date</string>
+    <!--电视剧详情-->
+    <string name="detial_episodes_list_title">Episode list (%d Episodes)</string>
 </resources>

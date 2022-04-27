@@ -105,7 +105,7 @@
             android:layout_below="@id/view_title_group"
             android:layout_toEndOf="@id/tips_releasedate"
             android:textColor="#FFCFCFCF"
-            android:text="@{!TextUtils.isEmpty(movie.releaseDate) ? movie.releaseDate:@string/unknow}"
+            android:text="@{!TextUtils.isEmpty(movie.releaseDate) ? movie.releaseDate:@string/unknown}"
             android:layout_marginTop="13dp"
             android:textSize="17sp"
             android:layout_width="wrap_content"

@@ -51,7 +51,7 @@ public class FormatterTools {
                 case Constants.DeviceType.DEVICE_TYPE_SMB:
                     return getString(context, R.string.device_smb);
             }
-            return getString(context,R.string.unknow);
+            return getString(context,R.string.unknown);
     }
 
     public static String getString(Context context, int res, Object... args) {
