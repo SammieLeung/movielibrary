@@ -63,7 +63,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     @Override
     public void onClick(View v) {
-        if (mOnItemClickListener != null) {
+        if (mOnItemClickListener != null&&v.getTag()!=null) {
             int position = (int) v.getTag();
             T data = mList.get(position);
             //注意这里使用getTag方法获取数据
@@ -75,10 +75,12 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_UP) {
             if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
-                int pos = (int) v.getTag();
-                if (mOnItemClickListener != null)
-                    mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
-                return true;
+                if(v.getTag()!=null) {
+                    int pos = (int) v.getTag();
+                    if (mOnItemLongClickListener != null)
+                        mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
+                    return true;
+                }
             }
         }
         return false;
@@ -86,7 +88,7 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
 
     @Override
     public boolean onLongClick(View v) {
-        if (mOnItemLongClickListener != null) {
+        if (mOnItemLongClickListener != null&&v.getTag()!=null) {
             int position = (int) v.getTag();
             T data = mList.get(position);
             return mOnItemLongClickListener.onItemLongClick(v, position, data);
