@@ -18,7 +18,6 @@
             android:layout_marginTop="170dp"
             android:layout_marginStart="75dp"
             android:layout_width="834dp"
-            android:minHeight="75dp"
             android:paddingLeft="@dimen/setting_item_padding_lr"
             android:paddingRight="@dimen/setting_item_padding_lr"
             android:layout_height="wrap_content">
@@ -30,12 +29,12 @@
                 android:textSize="23sp"
                 android:text="@string/settings_about_source"
                 android:textStyle="bold"/>
+
             <ImageView
-                android:padding="10dp"
-                android:src="@drawable/source_tmdb"
-                android:layout_alignParentEnd="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+              android:layout_width="75dp"
+              android:layout_height="75dp"
+              android:layout_alignParentEnd="true"
+              android:src="@drawable/source_tmdb" />
         </RelativeLayout>
         <View
             android:layout_width="786dp"
