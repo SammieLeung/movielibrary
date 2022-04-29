@@ -205,8 +205,6 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                     }
                 }
             }
-            Log.e(TAG, "onGlobalFocusChanged: " + oldFocus.toString());
-            Log.e(TAG, "onGlobalFocusChanged2: " + newFocus.toString());
         });
         TabLayout.Tab tab1 = mBinding.tablayout.newTab();
         TabLayout.Tab tab2 = mBinding.tablayout.newTab();
