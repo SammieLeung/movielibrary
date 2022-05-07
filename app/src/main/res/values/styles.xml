@@ -38,17 +38,7 @@
     </style>
 
 
-    <style name="DrawTopButtonStyle">
-        <item name="android:layout_height">110dp</item>
-        <item name="android:layout_width">110dp</item>
-        <item name="android:layout_marginRight">13.3dp</item>
-        <item name="android:background">@drawable/t9_keybtn_bg</item>
-        <item name="android:gravity">center</item>
-        <item name="android:paddingTop">18dp</item>
-        <item name="android:textColor">@color/selector_category_text</item>
-        <item name="android:textSize">18.6sp</item>
-        <item name="dtbDrawableTopSize">46dp</item>
-    </style>
+
 
     <style name="folder_item_text">
         <item name="android:textSize">24sp</item>
@@ -76,19 +66,37 @@
     </style>
 
     <style name="homepage_circle_btn_style">
+        <item name="android:textColor">@color/circle_btn_colorlist</item>
         <item name="android:background">@drawable/circle_btn_bg</item>
-        <item name="android:layout_width">@dimen/homepage_circle_btn_w</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">@dimen/homepage_circle_btn_w</item>
         <item name="android:layout_marginLeft">23dp</item>
         <item name="android:layout_marginTop">23dp</item>
         <item name="android:paddingLeft">11dp</item>
         <item name="android:paddingRight">11dp</item>
-        <item name="android:drawablePadding">6dp</item>
-        <item name="drawableTint">@drawable/circle_btn_icon_tint</item>
+        <item name="android:drawablePadding">@dimen/common_circle_btn_padding</item>
+        <item name="drawableTint">@color/circle_btn_colorlist</item>
 
     </style>
 
     <declare-styleable name="FloatKeyboard">
         <attr name="offsetDis" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="GifTextView">
+        <attr name="gifDrawStart" format="reference" />
+        <attr name="gifPlaceHolder" format="reference" />
+        <attr name="gifDrawWidth" format="dimension" />
+        <attr name="gifDrawHeight" format="dimension" />
+        <attr name="gifDrawPadding" format="dimension" />
+        <attr name="gifText" format="string" />
+        <attr name="gifTextSize" format="dimension" />
+        <attr name="gifTextColor" format="reference|color" />
+        <attr name="gifTextStyle">
+            <flag name="normal" value="0" />
+            <flag name="bold" value="1" />
+            <flag name="italic" value="2" />
+        </attr>
+
     </declare-styleable>
 </resources>

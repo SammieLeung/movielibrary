@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="56dp"
-        android:layout_marginEnd="72dp"
+        android:layout_marginEnd="@dimen/common_activity_margin_lr"
         android:paddingLeft="22dp"
         android:background="@drawable/new_floatwindow_bg">
         <TextView

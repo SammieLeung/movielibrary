@@ -104,8 +104,8 @@
     </style>
 
     <style name="homepage_head_title">
-        <item name="android:paddingLeft">@dimen/homepage_main_margin</item>
-        <item name="android:paddingRight">@dimen/homepage_main_margin</item>
+        <item name="android:paddingLeft">@dimen/common_activity_margin_lr</item>
+        <item name="android:paddingRight">@dimen/common_activity_margin_lr</item>
         <item name="android:textSize">35sp</item>
         <item name="android:textColor">@color/white</item>
     </style>
@@ -132,7 +132,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
-        <item name="android:layout_marginLeft">@dimen/shortcut_container_padding</item>
+        <item name="android:layout_marginLeft">@dimen/common_activity_margin_lr</item>
     </style>
 
     <style name="localsearch_tabTextAppearance">

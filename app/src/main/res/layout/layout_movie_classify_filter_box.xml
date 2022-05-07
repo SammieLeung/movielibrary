@@ -61,7 +61,7 @@
                 android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tv_device"
-                android:layout_marginLeft="@dimen/homepage_main_margin" />
+                android:layout_marginLeft="@dimen/common_activity_margin_lr" />
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/view_sortby_type"
@@ -94,7 +94,7 @@
                 style="@style/filter_box_recyclerview_style"
                 android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/homepage_main_margin"
+                android:layout_marginRight="@dimen/common_activity_margin_lr"
                 android:layout_toRightOf="@id/view_sortby_year" />
         </RelativeLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>

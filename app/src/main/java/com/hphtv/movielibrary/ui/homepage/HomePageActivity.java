@@ -107,7 +107,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      */
     private void bindDatas() {
         mBinding.setChildmode(mViewModel.mChildMode);
-        mBinding.setShowChildMode(mViewModel.mShowChildMode);
     }
 
     /**
@@ -183,7 +182,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         //刷新显示儿童模式状态
-        mViewModel.getShowChildMode().set(Config.isChildMode());
 //        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
         mViewModel.getChildMode().set(Config.isChildMode());
 
@@ -319,9 +317,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         if (mViewModel.getChildMode().get()) {
             mViewModel.getChildMode().notifyChange();
             showPasswordDialog();
-        } else {
-            mViewModel.toggleChildMode();
-            mNewHomePageTabAdapter.refreshFragments();
         }
     }
 

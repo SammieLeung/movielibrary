@@ -34,7 +34,7 @@
                 android:id="@+id/view_inputgroup"
                 android:layout_width="379dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="72dp"
+                android:layout_marginLeft="@dimen/common_activity_margin_lr"
                 android:layout_marginRight="32dp">
 
                 <EditText

@@ -85,4 +85,6 @@
     <color name="c929292">#929292</color>
     <color name="c444c5a">#444c5a</color>
     <color name="c14171b">#14171b</color>
+
+    <color name="circle_btn_color">#FFA09AB8</color>
 </resources>

@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--主页3.0-->
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="fkeyboard_width">182dp</dimen>
+    <dimen name="keybtn_item_w">127dp</dimen>
+    <dimen name="keybtn_item_h">116dp</dimen>
+
+
+    <dimen name="history_w">410dp</dimen>
+    <dimen name="history_h">216dp</dimen>
+
+
+    <dimen name="unionsearch_movie_cover_w">158dp</dimen>
+    <dimen name="unionsearch_movie_cover_h">219dp</dimen>
+
+    <!--主页3.0-->
     <dimen name="homepage_circle_btn_w">42dp</dimen>
     <dimen name="homepage_circle_btn_margin">23dp</dimen>
-    <dimen name="homepage_main_margin">72dp</dimen>
     <dimen name="homepage_title_margin_top">45dp</dimen>
     <dimen name="homepage_video_rv_margin_top">23dp</dimen>
-
     <!--    -->
     <dimen name="image_btn_wh">64dp</dimen>
     <dimen name="recently_added_container_h">442dp</dimen>
@@ -53,7 +64,6 @@
     <dimen name="filter_box_headitem_height">38dp</dimen>
 
     <!-- 索引管理-->
-    <dimen name="shortcut_container_padding">72dp</dimen>
     <dimen name="shortcut_item_textsize">24sp</dimen>
     <dimen name="shortcut_item_small_textsize">17sp</dimen>
 

@@ -106,7 +106,7 @@
     <string name="btn_expand">More</string>
     <string name="btn_edit">Update</string>
     <string name="btn_delete">Remove</string>
-    <string name="label_recommandvideo">Recommendations</string>
+    <string name="label_recommend_video">Recommendations</string>
     <string name="recommand_empty">No recommendations.</string>
     <!--详情 更多详情-->
     <string name="actor_list">Characters</string>
@@ -231,5 +231,5 @@
     <!--上映时间-->
     <string name="search_video_dialog_release_date">Release date</string>
     <!--电视剧详情-->
-    <string name="detial_episodes_list_title">Episode list (%d Episodes)</string>
+    <string name="detail_episodes_list_title">Episode list (%d Episodes)</string>
 </resources>

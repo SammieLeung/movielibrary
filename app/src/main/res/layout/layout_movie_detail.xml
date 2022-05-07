@@ -54,7 +54,7 @@
                   android:id="@+id/view_main"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginLeft="72dp"
+                  android:layout_marginLeft="@dimen/common_activity_margin_lr"
                   android:layout_marginTop="68dp"
                   android:orientation="vertical">
 
@@ -217,7 +217,7 @@
                   android:layout_height="wrap_content"
                   android:layout_marginTop="80dp"
                   android:layout_alignStart="@id/view_main"
-                  android:text="@string/label_recommandvideo"
+                  android:text="@string/label_recommend_video"
                   android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
