@@ -7,15 +7,15 @@
         android:layout_height="wrap_content">
 
         <androidx.core.widget.NestedScrollView
-            android:id="@+id/nsv"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/new_main_background">
+          android:id="@+id/nsv"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:background="@drawable/new_main_background">
 
             <RelativeLayout
-                android:id="@+id/constraintLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+              android:id="@+id/constraintLayout"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
 
                 <com.hphtv.movielibrary.ui.view.CollapseButton
                   android:id="@+id/btn_pinyin_search"
@@ -26,21 +26,21 @@
                   android:text="@string/search" />
 
                 <com.hphtv.movielibrary.ui.view.CollapseButton
-                    android:id="@+id/btn_shortcutmanager"
-                    style="@style/homepage_circle_btn_style"
-                    android:layout_width="wrap_content"
-                    android:layout_toStartOf="@id/btn_childmode"
-                    android:drawableLeft="@drawable/icon_circle_folder"
-                    android:text="@string/shortcut_manager" />
+                  android:id="@+id/btn_shortcutmanager"
+                  style="@style/homepage_circle_btn_style"
+                  android:layout_width="wrap_content"
+                  android:layout_toStartOf="@id/btn_childmode"
+                  android:drawableLeft="@drawable/icon_circle_folder"
+                  android:text="@string/shortcut_manager" />
 
                 <com.hphtv.movielibrary.ui.view.CollapseButton
-                    android:id="@+id/btn_settings"
-                    style="@style/homepage_circle_btn_style"
-                    android:layout_width="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginRight="@dimen/common_activity_margin_lr"
-                    android:drawableLeft="@drawable/icon_circle_setting"
-                    android:text="@string/settings" />
+                  android:id="@+id/btn_settings"
+                  style="@style/homepage_circle_btn_style"
+                  android:layout_width="wrap_content"
+                  android:layout_alignParentEnd="true"
+                  android:layout_marginRight="@dimen/common_activity_margin_lr"
+                  android:drawableLeft="@drawable/icon_circle_setting"
+                  android:text="@string/settings" />
 
                 <com.hphtv.movielibrary.ui.view.CollapseButton
                   android:id="@+id/btn_childmode"
@@ -64,21 +64,21 @@
                 <!--            android:layout_marginRight="@dimen/common_activity_margin_lr"-->
                 <!--            android:layout_alignParentEnd="true" />-->
                 <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tablayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="56dp"
-                    android:layout_below="@id/btn_pinyin_search"
-                    android:layout_marginLeft="@dimen/common_activity_margin_lr"
-                    android:layout_marginTop="5dp"
-                    app:tabBackground="@drawable/new_common_tab_bg_2"
-                    app:tabIndicatorHeight="0dp"
-                    app:tabRippleColor="@android:color/transparent" />
+                  android:id="@+id/tab_layout"
+                  android:layout_width="wrap_content"
+                  android:layout_height="56dp"
+                  android:layout_below="@id/btn_pinyin_search"
+                  android:layout_marginLeft="@dimen/common_activity_margin_lr"
+                  android:layout_marginTop="5dp"
+                  app:tabBackground="@drawable/new_common_tab_bg_2"
+                  app:tabIndicatorHeight="0dp"
+                  app:tabRippleColor="@android:color/transparent" />
 
                 <com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
-                    android:id="@+id/viewpager"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tablayout" />
+                  android:id="@+id/viewpager"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@id/tab_layout" />
             </RelativeLayout>
         </androidx.core.widget.NestedScrollView>
         <View

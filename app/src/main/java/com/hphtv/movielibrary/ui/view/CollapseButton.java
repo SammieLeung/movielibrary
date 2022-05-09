@@ -4,14 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleableRes;
 
 import com.hphtv.movielibrary.R;
 
@@ -66,7 +64,7 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
                 @Override
                 public void onAnimationStart(Animator animation) {
                     super.onAnimationStart(animation);
-                    setTextColor(getResources().getColorStateList(R.color.circle_btn_colorlist, null));
+                    setTextColor(getResources().getColorStateList(R.color.circle_btn_color_list, null));
                 }
 
                 @Override

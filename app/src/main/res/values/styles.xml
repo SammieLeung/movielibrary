@@ -56,17 +56,8 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="rount_image_view_style">
-        <item name="shapeAppearance">@style/RoundedStyle</item>
-    </style>
-
-    <style name="RoundedStyle">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">30dp</item>
-    </style>
-
     <style name="homepage_circle_btn_style">
-        <item name="android:textColor">@color/circle_btn_colorlist</item>
+        <item name="android:textColor">@color/circle_btn_color_list</item>
         <item name="android:background">@drawable/circle_btn_bg</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">@dimen/homepage_circle_btn_w</item>
@@ -75,8 +66,7 @@
         <item name="android:paddingLeft">11dp</item>
         <item name="android:paddingRight">11dp</item>
         <item name="android:drawablePadding">@dimen/common_circle_btn_padding</item>
-        <item name="drawableTint">@color/circle_btn_colorlist</item>
-
+        <item name="android:drawableTint">@color/circle_btn_color_list</item>
     </style>
 
     <declare-styleable name="FloatKeyboard">

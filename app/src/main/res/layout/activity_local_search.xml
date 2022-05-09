@@ -222,7 +222,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tablayout"
+                android:id="@+id/tab_layout"
                 android:visibility="@{showTab?View.VISIBLE:View.GONE}"
                 android:layout_width="wrap_content"
                 android:layout_marginTop="61dp"
@@ -233,7 +233,7 @@
                 app:tabGravity="center"
                 app:tabBackground="@drawable/round_rect_item_2_bg"
                 app:tabRippleColor="@android:color/transparent"
-                app:tabIndicator="@drawable/tabindicator"
+                app:tabIndicator="@drawable/tab_indicator"
                 app:tabPaddingBottom="9dp"
                 app:tabIndicatorColor="@color/main_focus"
                 app:tabTextColor="#FFAAAAAA"
@@ -245,7 +245,7 @@
                 android:id="@+id/rv_search_movies"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/tablayout"
+                android:layout_below="@id/tab_layout"
                 android:layout_marginRight="37dp"
                 android:paddingBottom="20dp"
                 android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />

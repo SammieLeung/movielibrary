@@ -91,8 +91,8 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
             @Override
             public void onBackPress() {
                 ActivityNewHomepageBinding binding = getBaseActivity().getBinding();
-                int pos = binding.tablayout.getSelectedTabPosition();
-                binding.tablayout.getTabAt(pos).view.requestFocus();
+                int pos = binding.tabLayout.getSelectedTabPosition();
+                binding.tabLayout.getTabAt(pos).view.requestFocus();
             }
         });
         mViewModel.getUnknownsFileItemListAdapter().setOnItemClickListener(mActionListener);

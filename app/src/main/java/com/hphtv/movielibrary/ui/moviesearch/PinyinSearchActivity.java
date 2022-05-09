@@ -4,12 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.FocusFinder;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -29,7 +24,6 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.station.kit.util.DensityUtil;
-import com.station.kit.util.LogUtil;
 
 import java.util.ArrayList;
 
@@ -103,7 +97,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepearT9();
+        prepareT9();
         initView();
         mViewModel.init();
     }
@@ -118,7 +112,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         }
     }
 
-    private void prepearT9() {
+    private void prepareT9() {
         mBinding.k0.tvKey1.setOnClickListener(mOnClickListener);
         mBinding.k1.tvKey1.setOnClickListener(mOnClickListener);
         mBinding.k2.tvKey2.setOnClickListener(mOnClickListener);
@@ -193,7 +187,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 int pos = mBinding.rvSearchMovies.getChildLayoutPosition(newFocus);
                 if (pos != RecyclerView.NO_POSITION) {
                     for (int i = 0; i < 3 && i < mMovieAdapter.getItemCount(); i++) {
-                        int id=mBinding.tablayout.getTabAt(mBinding.tablayout.getSelectedTabPosition()).view.getId();
+                        int id=mBinding.tabLayout.getTabAt(mBinding.tabLayout.getSelectedTabPosition()).view.getId();
                         mBinding.rvSearchMovies.getChildAt(i).setNextFocusUpId(id);
                     }
                 }
@@ -206,9 +200,9 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 }
             }
         });
-        TabLayout.Tab tab1 = mBinding.tablayout.newTab();
-        TabLayout.Tab tab2 = mBinding.tablayout.newTab();
-        TabLayout.Tab tab3 = mBinding.tablayout.newTab();
+        TabLayout.Tab tab1 = mBinding.tabLayout.newTab();
+        TabLayout.Tab tab2 = mBinding.tabLayout.newTab();
+        TabLayout.Tab tab3 = mBinding.tabLayout.newTab();
         tab1.view.setId(R.id.pinyinsearch_tab_all);
         tab2.view.setId(R.id.pinyinsearch_tab_movie);
         tab3.view.setId(R.id.pinyinsearch_tab_tv);
@@ -217,12 +211,12 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         tab2.view.setOnFocusChangeListener(mTabFocusChangeListener);
         tab3.view.setOnFocusChangeListener(mTabFocusChangeListener);
 
-        mBinding.tablayout.addTab(tab1);
-        mBinding.tablayout.addTab(tab2);
-        mBinding.tablayout.addTab(tab3);
+        mBinding.tabLayout.addTab(tab1);
+        mBinding.tabLayout.addTab(tab2);
+        mBinding.tabLayout.addTab(tab3);
 
-        mBinding.tablayout.selectTab(mBinding.tablayout.getTabAt(0));
-        mBinding.tablayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mBinding.tabLayout.selectTab(mBinding.tabLayout.getTabAt(0));
+        mBinding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
@@ -253,11 +247,11 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
 
 
     private void setTabs(int a, int b, int c) {
-        mBinding.tablayout.getTabAt(0).setText(getString(R.string.tab_local_search_all, a));
-        mBinding.tablayout.getTabAt(1).setText(getString(R.string.tab_local_search_movie, b));
-        mBinding.tablayout.getTabAt(2).setText(getString(R.string.tab_local_search_tv, c));
+        mBinding.tabLayout.getTabAt(0).setText(getString(R.string.tab_local_search_all, a));
+        mBinding.tabLayout.getTabAt(1).setText(getString(R.string.tab_local_search_movie, b));
+        mBinding.tabLayout.getTabAt(2).setText(getString(R.string.tab_local_search_tv, c));
 
-        mBinding.tablayout.selectTab(mBinding.tablayout.getTabAt(0));
+        mBinding.tabLayout.selectTab(mBinding.tabLayout.getTabAt(0));
     }
 
     private void search(String pinyin) {

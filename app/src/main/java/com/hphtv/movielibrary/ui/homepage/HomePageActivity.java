@@ -128,22 +128,22 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mNewHomePageTabAdapter = new HomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
         mBinding.viewpager.setOffscreenPageLimit(2);
-        mBinding.tablayout.setupWithViewPager(mBinding.viewpager);
-        mBinding.tablayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
-        mBinding.tablayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
-//        mBinding.tablayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
+        mBinding.tabLayout.setupWithViewPager(mBinding.viewpager);
+        mBinding.tabLayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
+        mBinding.tabLayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
+//        mBinding.tabLayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
 
-        for (int i = 0; i < mBinding.tablayout.getTabCount(); i++) {
-            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mBinding.tablayout.getTabAt(i).view.getLayoutParams();//
+        for (int i = 0; i < mBinding.tabLayout.getTabCount(); i++) {
+            LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mBinding.tabLayout.getTabAt(i).view.getLayoutParams();//
             params.rightMargin = DensityUtil.dip2px(this, 32);
-            mBinding.tablayout.getTabAt(i).view.setLayoutParams(params);
+            mBinding.tabLayout.getTabAt(i).view.setLayoutParams(params);
         }
-        mBinding.tablayout.getViewTreeObserver()
+        mBinding.tabLayout.getViewTreeObserver()
                 .addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
                     //实现Tablayout的焦点从其他非子布局到其子布局时，焦点始终在已选的TabView上。
                     if (oldFocus != null && !(oldFocus instanceof TabLayout.TabView) && newFocus != null && newFocus instanceof TabLayout.TabView) {
-                        int pos = mBinding.tablayout.getSelectedTabPosition();
-                        mBinding.tablayout.getTabAt(pos).view.requestFocus();
+                        int pos = mBinding.tabLayout.getSelectedTabPosition();
+                        mBinding.tabLayout.getTabAt(pos).view.requestFocus();
                     }
                     //实现焦点从一个TabView移动到其他TabView时，选中其他TabView。
                     if (oldFocus != null && oldFocus instanceof TabLayout.TabView && newFocus != null && newFocus instanceof TabLayout.TabView) {
@@ -151,7 +151,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                         view.getTab().select();
                     }
                 });
-        mBinding.tablayout.getTabAt(0).view.requestFocus();
+        mBinding.tabLayout.getTabAt(0).view.requestFocus();
     }
 
     /**
