@@ -4,12 +4,13 @@
    >
     <data>
         <import type="android.view.View"/>
+        <import type="androidx.databinding.ObservableBoolean"/>
         <variable
             name="isEmpty"
-            type="boolean" />
+            type="ObservableBoolean" />
         <variable
             name="showTab"
-            type="boolean" />
+            type="ObservableBoolean" />
     </data>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -218,48 +219,56 @@
         </FrameLayout>
 
         <RelativeLayout
-            android:layout_toRightOf="@id/view_t9_group"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tab_layout"
-                android:visibility="@{showTab?View.VISIBLE:View.GONE}"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="61dp"
-                android:layout_marginLeft="35dp"
-                android:layout_height="wrap_content"
-                app:tabTextAppearance="@style/localsearch_tabTextAppearance"
-                app:tabIndicatorHeight="5dp"
-                app:tabGravity="center"
-                app:tabBackground="@drawable/round_rect_item_2_bg"
-                app:tabRippleColor="@android:color/transparent"
-                app:tabIndicator="@drawable/tab_indicator"
-                app:tabPaddingBottom="9dp"
-                app:tabIndicatorColor="@color/main_focus"
-                app:tabTextColor="#FFAAAAAA"
-                app:tabSelectedTextColor="@color/main_focus"
-                />
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_toRightOf="@id/view_t9_group">
 
+            <com.google.android.material.tabs.TabLayout
+              android:id="@+id/tab_layout"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginLeft="35dp"
+              android:layout_marginTop="61dp"
+              android:visibility="@{showTab?View.VISIBLE:View.GONE}"
+              app:tabBackground="@drawable/round_rect_item_2_bg"
+              app:tabGravity="center"
+              app:tabIndicator="@drawable/tab_indicator"
+              app:tabIndicatorColor="@color/main_focus"
+              app:tabIndicatorHeight="5dp"
+              app:tabPaddingBottom="9dp"
+              app:tabRippleColor="@android:color/transparent"
+              app:tabSelectedTextColor="@color/main_focus"
+              app:tabTextAppearance="@style/localsearch_tabTextAppearance"
+              app:tabTextColor="#FFAAAAAA" />
+
+            <com.hphtv.movielibrary.ui.view.CollapseButton
+              android:id="@+id/btn_home"
+              style="@style/homepage_circle_btn_style"
+              android:layout_width="wrap_content"
+              android:layout_alignParentEnd="true"
+              android:layout_marginRight="@dimen/common_activity_margin_lr"
+              android:drawableLeft="@drawable/icon_circle_home"
+              android:text="@string/homepage" />
 
             <com.hphtv.movielibrary.ui.view.RecyclerViewWithMouseScroll
-                android:id="@+id/rv_search_movies"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/tab_layout"
-                android:layout_marginRight="37dp"
-                android:paddingBottom="20dp"
-                android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />
+              android:id="@+id/rv_search_movies"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_below="@id/tab_layout"
+              android:layout_marginRight="37dp"
+              android:paddingBottom="20dp"
+              android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />
 
             <TextView
-                android:id="@+id/tv_empty_tips"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/local_search_empty_tips"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:visibility="@{isEmpty?View.VISIBLE:View.GONE}" />
+              android:id="@+id/tv_empty_tips"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_centerInParent="true"
+              android:text="@string/local_search_empty_tips"
+              android:textColor="@color/white"
+              android:textSize="24sp"
+              android:textStyle="bold"
+              android:visibility="@{isEmpty?View.VISIBLE:View.GONE}" />
         </RelativeLayout>
 
     </RelativeLayout>

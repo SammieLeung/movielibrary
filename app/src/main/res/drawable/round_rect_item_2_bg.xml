@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
-        <shape>
-            <corners android:radius="5dp"/>
-            <gradient android:startColor="@android:color/transparent" android:centerColor="@android:color/transparent" android:endColor="@color/main_focus" android:angle="90" />
-        </shape>
+        <layer-list>
+            <item android:bottom="9dp" >
+                <shape>
+                    <corners android:radius="5dp"/>
+                    <solid android:color="#1AFFFFFF"/>
+                </shape>
+            </item>
+        </layer-list>
+
     </item>
     <item android:state_hovered="true">
-        <shape>
-            <corners android:radius="5dp"/>
-            <gradient android:startColor="@android:color/transparent" android:centerColor="@android:color/transparent" android:endColor="@color/main_focus" android:angle="90" />
-        </shape>
+        <layer-list>
+            <item android:bottom="9dp">
+                <shape>
+                    <corners android:radius="5dp"/>
+                    <solid android:color="#1AFFFFFF"/>
+                </shape>
+            </item>
+        </layer-list>
     </item>
-
 </selector>

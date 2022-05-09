@@ -37,13 +37,13 @@
           android:text="@string/filter" />
 
         <com.hphtv.movielibrary.ui.view.CollapseButton
-            android:id="@+id/btn_home"
-            style="@style/homepage_circle_btn_style"
-            android:layout_width="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="@dimen/common_activity_margin_lr"
-            android:drawableLeft="@drawable/icon_circle_home"
-            android:text="@string/homepage" />
+          android:id="@+id/btn_home"
+          style="@style/homepage_circle_btn_style"
+          android:layout_width="wrap_content"
+          android:layout_alignParentEnd="true"
+          android:layout_marginRight="@dimen/common_activity_margin_lr"
+          android:drawableLeft="@drawable/icon_circle_home"
+          android:text="@string/homepage" />
 
         <TextView
             android:id="@+id/tv_title"

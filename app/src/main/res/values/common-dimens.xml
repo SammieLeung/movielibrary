@@ -13,6 +13,8 @@
     <dimen name="common_edittext_dialog_btn_h">53dp</dimen>
 
     <dimen name="common_activity_margin_lr">72dp</dimen>
-    <dimen name="common_circle_btn_padding">6dp</dimen>
+    <dimen name="common_circle_btn_drawable_padding">6dp</dimen>
+    <dimen name="common_circle_btn_padding">20dp</dimen>
+    <dimen name="common_circle_btn_min_padding">11dp</dimen>
 
 </resources>

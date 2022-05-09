@@ -30,7 +30,7 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
     }
 
     public CollapseButton(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public CollapseButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -54,11 +54,12 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
 
     public void showPresetText() {
         int measureWidth = getMeasuredWidth();
-        int drawPadding=getResources().getDimensionPixelSize(R.dimen.common_circle_btn_padding);
-
+        int drawPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_drawable_padding);
+        int minPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_min_padding);
+        int normalPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_padding);
         if (measureWidth > 0) {
             int textWidth = (int) this.getPaint().measureText(mPresetText);
-            int targetWidth = measureWidth + textWidth+drawPadding;
+            int targetWidth = measureWidth + textWidth + drawPadding - 2 * minPadding + 2 * normalPadding;
             ObjectAnimator objectAnimator = ObjectAnimator.ofInt(this, "wrapperWidth", measureWidth, targetWidth).setDuration(200);
             objectAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -72,6 +73,7 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
                     super.onAnimationEnd(animation);
                     setCompoundDrawablePadding(drawPadding);
                     setText(mPresetText);
+                    setPadding(normalPadding, getPaddingTop(), normalPadding, getPaddingBottom());
                 }
             });
             objectAnimator.start();
@@ -79,15 +81,19 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
         } else if (!mAtomicMeasure.get()) {
             setText(mPresetText);
             setCompoundDrawablePadding(drawPadding);
+            setPadding(normalPadding, getPaddingTop(), normalPadding, getPaddingBottom());
         }
     }
 
     public void hidePresetText() {
         int measureWidth = getMeasuredWidth();
+        int drawPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_drawable_padding);
+        int minPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_min_padding);
+        int normalPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_padding);
         if (measureWidth > 0) {
             int textWidth = (int) this.getPaint().measureText(mPresetText);
-            int drawPadding=getResources().getDimensionPixelSize(R.dimen.common_circle_btn_padding);
-            int targetWidth = measureWidth - textWidth-drawPadding;
+
+            int targetWidth = measureWidth - textWidth - drawPadding - 2 * normalPadding + 2 * minPadding;
             setWrapperWidth(measureWidth);
             ObjectAnimator objectAnimator = ObjectAnimator.ofInt(this, "wrapperWidth", measureWidth, targetWidth).setDuration(200);
             objectAnimator.addListener(new AnimatorListenerAdapter() {
@@ -102,13 +108,15 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
                     super.onAnimationEnd(animation);
                     setCompoundDrawablePadding(0);
                     setText(null);
+                    setPadding(minPadding, getPaddingTop(), minPadding, getPaddingBottom());
                 }
             });
             objectAnimator.start();
-            ObjectAnimator.ofInt(this, "textColor", getResources().getColor(android.R.color.transparent, null)).setDuration(300).start();
+            ObjectAnimator.ofInt(this, "textColor", getResources().getColor(android.R.color.transparent, null)).setDuration(200).start();
         } else if (!mAtomicMeasure.get()) {
             setText(null);
             setCompoundDrawablePadding(0);
+            setPadding(minPadding, getPaddingTop(), minPadding, getPaddingBottom());
         }
     }
 

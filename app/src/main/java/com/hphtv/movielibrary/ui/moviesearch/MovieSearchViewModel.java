@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.ui.moviesearch;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.data.Config;
@@ -31,6 +32,9 @@ public class MovieSearchViewModel extends AndroidViewModel {
     private List<MovieDataView> mMovieDataViewList;
     private String mSource;
 
+    private ObservableBoolean isEmpty=new ObservableBoolean(true);
+    private ObservableBoolean isShowTab=new ObservableBoolean(false);
+
     public MovieSearchViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase database = MovieLibraryRoomDatabase.getDatabase(application);
@@ -46,15 +50,21 @@ public class MovieSearchViewModel extends AndroidViewModel {
 
     public void search(String keyword, Callback<MovieDataView> callback) {
         Observable.just(keyword)
-                .map(s -> {
-                    return PinyinParseAndMatchTools.getInstance().match(mMovieDataViewList, keyword);
-                })
+                .map(s -> PinyinParseAndMatchTools.getInstance().match(mMovieDataViewList, keyword))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(dataViewList -> {
                     if (callback != null)
                         callback.runOnUIThread(dataViewList);
                 });
+    }
+
+    public ObservableBoolean getIsEmpty() {
+        return isEmpty;
+    }
+
+    public ObservableBoolean getIsShowTab() {
+        return isShowTab;
     }
 
     public interface Callback<T> {

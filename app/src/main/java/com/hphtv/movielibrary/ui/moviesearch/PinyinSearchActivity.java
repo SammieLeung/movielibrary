@@ -99,6 +99,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         super.onCreate(savedInstanceState);
         prepareT9();
         initView();
+        bindDatas();
         mViewModel.init();
     }
 
@@ -155,6 +156,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mBinding.btnExit.setOnClickListener(v -> finish());
+        mBinding.btnHome.setOnClickListener(v->finish());
         mBinding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -245,6 +247,10 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
 
     }
 
+    private void bindDatas(){
+        mBinding.setIsEmpty(mViewModel.getIsEmpty());
+        mBinding.setShowTab(mViewModel.getIsShowTab());
+    }
 
     private void setTabs(int a, int b, int c) {
         mBinding.tabLayout.getTabAt(0).setText(getString(R.string.tab_local_search_all, a));
@@ -258,7 +264,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         mViewModel.search(pinyin, data -> {
             if (data.size() > 0) {
                 hideEmptyTips();
-                mBinding.setShowTab(true);
+                showTabLayout();
                 mMovieAdapter.addAll(data);
                 int movie_count = 0;
                 int tv_count = 0;
@@ -271,18 +277,26 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 setTabs(mMovieAdapter.getRealCount(), movie_count, tv_count);
             } else {
                 mMovieAdapter.clearAll();
-                mBinding.setShowTab(false);
+                hideTabLayout();
                 showEmptyTips();
             }
         });
     }
 
     private void showEmptyTips() {
-        mBinding.setIsEmpty(true);
+        mViewModel.getIsEmpty().set(true);
     }
 
     private void hideEmptyTips() {
-        mBinding.setIsEmpty(false);
+        mViewModel.getIsEmpty().set(false);
+    }
+
+    private void showTabLayout(){
+        mViewModel.getIsShowTab().set(true);
+    }
+
+    private void hideTabLayout(){
+        mViewModel.getIsShowTab().set(false);
     }
 
 }
