@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
@@ -55,7 +55,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
     //电影点击监听
-    private BaseApater2.OnRecyclerViewItemActionListener<MovieDataView> mMovieDataViewEventListener = new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+    private BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView> mMovieDataViewEventListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
             mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
@@ -82,7 +82,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     };
 
     //动态主题动作监听
-    private BaseApater2.OnRecyclerViewItemActionListener mGenreItemClickListener = new BaseApater2.OnRecyclerViewItemActionListener() {
+    private BaseAdapter2.OnRecyclerViewItemActionListener mGenreItemClickListener = new BaseAdapter2.OnRecyclerViewItemActionListener() {
         @Override
         public void onItemClick(View view, int postion, Object data) {
             Intent intent = new Intent(getContext(), FilterPageActivity.class);
@@ -96,7 +96,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         }
     };
 
-    private BaseApater2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener = (view, postion, data) -> {
+    private BaseAdapter2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener = (view, postion, data) -> {
         ActivityHelper.showPosterMenuDialog(getChildFragmentManager(), postion, data);
         return false;
     };
@@ -178,7 +178,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
-        mHistoryListAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
+        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
             @Override
             public void onItemClick(View view, int position, HistoryMovieDataView data) {
                 mViewModel.playingVideo(data.path, data.filename, list -> {

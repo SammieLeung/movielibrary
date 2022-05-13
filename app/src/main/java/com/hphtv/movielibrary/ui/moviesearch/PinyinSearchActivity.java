@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieLargeItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityLocalSearchBinding;
@@ -137,7 +137,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     private void initView() {
         mMovieAdapter = new NewMovieLargeItemListAdapter(this, new ArrayList());
         mMovieAdapter.setZoomRatio(1.08f);
-        mMovieAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+        mMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
             @Override
             public void onItemClick(View view, int postion, MovieDataView data) {
                 Intent intent = new Intent(PinyinSearchActivity.this,

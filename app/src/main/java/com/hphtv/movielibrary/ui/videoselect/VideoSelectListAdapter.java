@@ -7,7 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.databinding.RvItemVideosourceBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.util.StringTools;
@@ -20,7 +20,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/1/21
  */
-public class VideoSelectListAdapter extends BaseApater2<RvItemVideosourceBinding, VideoSelectListAdapter.ViewHolder, VideoFile> implements View.OnFocusChangeListener, View.OnHoverListener {
+public class VideoSelectListAdapter extends BaseAdapter2<RvItemVideosourceBinding, VideoSelectListAdapter.ViewHolder, VideoFile> implements View.OnFocusChangeListener, View.OnHoverListener {
 
     public VideoSelectListAdapter(Context context, List<VideoFile> list) {
         super(context, list);
@@ -53,7 +53,7 @@ public class VideoSelectListAdapter extends BaseApater2<RvItemVideosourceBinding
         return false;
     }
 
-    public class ViewHolder extends BaseApater2.ViewHolder {
+    public class ViewHolder extends BaseAdapter2.ViewHolder {
 
         public ViewHolder(ViewDataBinding binding) {
             super(binding);

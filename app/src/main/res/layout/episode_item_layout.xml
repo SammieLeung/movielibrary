@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <variable
+      name="selectPos"
+      type="androidx.databinding.ObservableInt" />
+
+    <variable
+      name="itemPos"
+      type="int" />
+
+    <variable
+      name="text"
+      type="String" />
+  </data>
+
+  <com.hphtv.movielibrary.ui.view.GifTextView
+    android:layout_width="wrap_content"
+    android:layout_height="71dp"
+    android:layout_marginRight="13dp"
+    android:background="@drawable/episode_item_bg"
+    android:minWidth="117dp"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    app:gifTextViewSelected="@{selectPos==itemPos}"
+    app:gifDrawHeight="17dp"
+    app:gifDrawPadding="14dp"
+    app:gifDrawStart="@mipmap/ic_launcher"
+    app:gifDrawWidth="17dp"
+    app:gifPlaceHolder="@mipmap/ic_launcher"
+    app:gifText="@{text}"
+    app:gifTextColor="@color/white"
+    app:gifTextStyle="bold">
+
+  </com.hphtv.movielibrary.ui.view.GifTextView>
+</layout>

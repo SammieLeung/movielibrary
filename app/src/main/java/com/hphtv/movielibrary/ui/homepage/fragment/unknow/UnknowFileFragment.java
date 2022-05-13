@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.unknow;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -9,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
@@ -18,12 +17,10 @@ import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
-import com.hphtv.movielibrary.ui.postermenu.UnknownsFileMenuDialog;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -112,7 +109,7 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
         return true;
     }
 
-    private BaseApater2.OnRecyclerViewItemActionListener mActionListener = new BaseApater2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
+    private BaseAdapter2.OnRecyclerViewItemActionListener mActionListener = new BaseAdapter2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
         @Override
         public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
             mViewModel.playVideo(data.path, data.filename)

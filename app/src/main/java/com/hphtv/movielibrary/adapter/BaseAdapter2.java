@@ -2,14 +2,10 @@ package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.ViewCompat;
-import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,19 +15,17 @@ import com.station.kit.view.mvvm.ViewDataBindingHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.ViewHolder, T> extends RecyclerView.Adapter<VH> implements View.OnClickListener, View.OnKeyListener, View.OnLongClickListener {
+public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.ViewHolder, T> extends RecyclerView.Adapter<VH> implements View.OnClickListener, View.OnKeyListener, View.OnLongClickListener {
     protected Context mContext;
     protected List<T> mList;
 
-    public BaseApater2(Context context, List<T> list) {
+    public BaseAdapter2(Context context, List<T> list) {
         mContext = context;
         mList = list;
     }
@@ -188,9 +182,9 @@ public class BaseApater2<VDB extends ViewDataBinding, VH extends BaseApater2.Vie
         public ViewHolder(ViewDataBinding binding) {
             super(binding.getRoot());
             mBinding = binding;
-            mBinding.getRoot().setOnClickListener(BaseApater2.this);
-            mBinding.getRoot().setOnLongClickListener(BaseApater2.this);
-            mBinding.getRoot().setOnKeyListener(BaseApater2.this);
+            mBinding.getRoot().setOnClickListener(BaseAdapter2.this);
+            mBinding.getRoot().setOnLongClickListener(BaseAdapter2.this);
+            mBinding.getRoot().setOnKeyListener(BaseAdapter2.this);
         }
     }
 }

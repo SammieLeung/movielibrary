@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutMovieDetailBinding;
@@ -150,7 +150,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 15), DensityUtil.dip2px(this, 30)));
         mBinding.rvRecommand.setLayoutManager(linearLayoutManager);
         mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
-        mRecommandMovieAdapter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+        mRecommandMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
             @Override
             public void onItemClick(View view, int position, MovieDataView data) {
                 prepareMovieWrapper(data.id);

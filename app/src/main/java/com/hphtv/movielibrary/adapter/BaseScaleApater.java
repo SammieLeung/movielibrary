@@ -8,7 +8,6 @@ import androidx.core.view.ViewCompat;
 import androidx.databinding.ViewDataBinding;
 
 import com.hphtv.movielibrary.data.Constants;
-import com.station.kit.util.LogUtil;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends BaseApater2.ViewHolder, T> extends BaseApater2<VDB,VH,T> implements View.OnFocusChangeListener , View.OnHoverListener {
+public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends BaseAdapter2.ViewHolder, T> extends BaseAdapter2<VDB,VH,T> implements View.OnFocusChangeListener , View.OnHoverListener {
     protected float mZoomRatio = 1.15f;
 
     public BaseScaleApater(Context context, List<T> list) {
@@ -54,7 +53,7 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
         return false;
     }
 
-    public class ViewHolder extends BaseApater2.ViewHolder {
+    public class ViewHolder extends BaseAdapter2.ViewHolder {
 
         public ViewHolder(ViewDataBinding binding) {
             super(binding);

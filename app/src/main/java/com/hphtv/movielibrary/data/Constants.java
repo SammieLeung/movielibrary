@@ -16,7 +16,7 @@ public class Constants {
     public static final String PACKAGE_FILE_PICKER = "com.firefly.filepicker";
     public static final String ACTION_FILE_PICKER = "com.firefly.FILE_PICKER";
     public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
-    public static final int ANIMATION_DURATION=300;
+    public static final int ANIMATION_DURATION=200;
 
     //--------------HashMap keys------------
     //1.for LeftMenuListAdapter and HomePageActivity

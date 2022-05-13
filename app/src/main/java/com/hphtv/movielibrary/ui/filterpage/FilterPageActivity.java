@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -13,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.databinding.ActivityFilterpageBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
@@ -56,7 +55,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     };
 
 
-    BaseApater2.OnRecyclerViewItemActionListener mActionListener = new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+    BaseAdapter2.OnRecyclerViewItemActionListener mActionListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(FilterPageActivity.this, data);

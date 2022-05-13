@@ -12,6 +12,7 @@ import androidx.databinding.ObservableBoolean;
 
 import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.ui.view.GifTextView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,5 +81,9 @@ public class BindingAdapterHelper {
         view.setSelected(selected);
     }
 
+    @BindingAdapter(value = "gifTextViewSelected")
+    public static void setGifTextViewSelected(GifTextView gifTextView,boolean selected){
+        gifTextView.setSelected(selected);
+    }
 
 }

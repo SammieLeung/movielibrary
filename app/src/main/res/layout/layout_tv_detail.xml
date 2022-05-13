@@ -5,7 +5,7 @@
 
     <data>
 
-        <import type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper"></import>
+        <import type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper" />
 
         <import type="android.text.TextUtils" />
 
@@ -223,16 +223,23 @@
                 <com.hphtv.movielibrary.ui.view.TvRecyclerView
                   android:id="@+id/rv_episode_list"
                   android:layout_width="match_parent"
-                  android:layout_height="81dp"
+                  android:layout_height="87dp"
                   android:layout_below="@id/tv_episodes"
-                  android:layout_marginTop="18dp" />
+                  android:layout_marginTop="15dp" />
+
+                <TableLayout
+                  android:layout_below="@id/rv_episode_list"
+                  android:id="@+id/tab_episode_set"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_marginTop="28dp"/>
 
                 <TextView
                   android:id="@+id/tv_recommand"
                   style="@style/common_content_text_style"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_below="@id/rv_episode_list"
+                  android:layout_below="@id/tab_episode_set"
                   android:layout_alignStart="@id/view_main"
                   android:layout_marginTop="47dp"
                   android:text="@string/label_recommend_video"

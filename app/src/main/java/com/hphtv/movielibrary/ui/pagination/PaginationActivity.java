@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityPaginationBinding;
@@ -22,8 +22,6 @@ import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
-import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
-import com.hphtv.movielibrary.ui.filterpage.FilterPageViewModel;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
@@ -42,7 +40,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
 
-    BaseApater2.OnRecyclerViewItemActionListener mActionListener = new BaseApater2.OnRecyclerViewItemActionListener<MovieDataView>() {
+    BaseAdapter2.OnRecyclerViewItemActionListener mActionListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(PaginationActivity.this, data);

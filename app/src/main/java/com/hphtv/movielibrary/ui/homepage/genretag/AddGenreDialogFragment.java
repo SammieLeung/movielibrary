@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseApater2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
@@ -65,7 +65,7 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         mBinding.rvTheme.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
         mGenreListApter=new GenreListApter(getContext(),new ArrayList<>(),GenreListApter.TYPE_EDIT);
         mBinding.rvTheme.setAdapter(mGenreListApter);
-        mGenreListApter.setOnItemClickListener(new BaseApater2.OnRecyclerViewItemActionListener<GenreTagItem>() {
+        mGenreListApter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<GenreTagItem>() {
             @Override
             public void onItemClick(View view, int postion, GenreTagItem data) {
                 boolean isChecked=data.isChecked().get();
