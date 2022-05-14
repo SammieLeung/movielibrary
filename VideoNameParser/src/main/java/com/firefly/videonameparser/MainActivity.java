@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 //		debug("[dmhy][Macross Delta][21][BIG5][720P_MP4][BS11].mp4");
 //
 //        debug("[dmhy]I lov esd[82][BIG5][720P_MP4][BS11].mp4");
-		
+
 //		Source.parser("Les.Magiciens.1976.VHSRip.XViD.MKO");
 //		Source.parser("The.Boss.Baby.2017.HDCAM.XviD-MrGrey");
 //		Source.parser("Fantastic Beasts and Where to Find Them 2016 Multi 2160p UHD BluRay HEVC HDR Atmos7.1-DDR");
