@@ -4,3 +4,6 @@
 [submodule "stationKit"]
 	path = stationKit
 	url = ssh://git@git.t-firefly.com:8022/stationosapp/stationuniversaldevelopmentkit.git
+[submodule "VideoNameParser"]
+	path = VideoNameParser
+	url = ssh://git@git.t-firefly.com:8022/stationosapp/videonameparser.git
