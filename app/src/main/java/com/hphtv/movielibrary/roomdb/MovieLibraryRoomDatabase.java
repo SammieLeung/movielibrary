@@ -64,7 +64,7 @@ import org.jetbrains.annotations.NotNull;
         ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class,Shortcut.class, GenreTag.class,
         Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
         views = {MovieDataView.class, UnrecognizedFileDataView.class, HistoryMovieDataView.class},
-        version = 1)
+        version = 2)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO
@@ -114,7 +114,7 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
                             .createFromAsset("database/movielibrary_db_v2_version_1.db")
-//                            .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_1_2)
                             .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -126,7 +126,13 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     public static final Migration MIGRATION_1_2=new Migration(1,2) {
         @Override
         public void migrate(@NonNull @NotNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE genre_tag ADD COLUMN weight INTEGER NOT NULL DEFAULT 0;");
+            String tmp="_OLD";
+            database.execSQL("ALTER TABLE "+TABLE.VIDEOFILE+" RENAME TO "+TABLE.VIDEOFILE+tmp);
+            database.execSQL("DROP INDEX index_videofile_path" );
+            database.execSQL("CREATE TABLE IF NOT EXISTS "+TABLE.VIDEOFILE+" (`vid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `path` TEXT NOT NULL, `device_path` TEXT, `dir_path` TEXT, `filename` TEXT, `is_scanned` INTEGER NOT NULL DEFAULT 0, `keyword` TEXT, `add_time` INTEGER NOT NULL DEFAULT 0, `last_playtime` INTEGER NOT NULL DEFAULT 0, `season` INTEGER NOT NULL DEFAULT 0, `episode` INTEGER NOT NULL DEFAULT 0)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_videofile_path` ON "+TABLE.VIDEOFILE+" (`path`)");
+            database.execSQL("INSERT INTO "+TABLE.VIDEOFILE+" SELECT vid,path,device_path,dir_path,filename,is_scanned,keyword,add_time,last_playtime,season,0 FROM "+TABLE.VIDEOFILE+tmp);
+            database.execSQL("DROP TABLE "+TABLE.VIDEOFILE+tmp);
         }
     };
 }
