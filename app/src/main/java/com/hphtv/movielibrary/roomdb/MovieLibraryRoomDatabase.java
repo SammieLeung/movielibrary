@@ -44,6 +44,7 @@ import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.Writer;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.SeasonDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
@@ -63,8 +64,8 @@ import org.jetbrains.annotations.NotNull;
         MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
         ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class,Shortcut.class, GenreTag.class,
         Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
-        views = {MovieDataView.class, UnrecognizedFileDataView.class, HistoryMovieDataView.class},
-        version = 2)
+        views = {MovieDataView.class, UnrecognizedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class},
+        version = 3)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
     //获取DAO
@@ -110,12 +111,13 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         if (sInstance == null) {
             synchronized (MovieLibraryRoomDatabase.class) {
                 if (sInstance == null) {
+                    Migration[] migrations=new Migration[]{MIGRATION_1_2,MIGRATION_2_3};
                     sInstance = Room.databaseBuilder(
                             context.getApplicationContext(),
                             MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
                             .createFromAsset("database/movielibrary_db_v2_version_1.db")
-                            .addMigrations(MIGRATION_1_2)
-                            .fallbackToDestructiveMigration()
+                            .addMigrations(migrations)
+//                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
@@ -133,6 +135,15 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_videofile_path` ON "+TABLE.VIDEOFILE+" (`path`)");
             database.execSQL("INSERT INTO "+TABLE.VIDEOFILE+" SELECT vid,path,device_path,dir_path,filename,is_scanned,keyword,add_time,last_playtime,season,0 FROM "+TABLE.VIDEOFILE+tmp);
             database.execSQL("DROP TABLE "+TABLE.VIDEOFILE+tmp);
+        }
+    };
+
+    public static final Migration MIGRATION_2_3=new Migration(2,3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP VIEW "+ VIEW.MOVIE_DATAVIEW);
+            database.execSQL("CREATE VIEW `"+VIEW.SEASON_DATAVIEW+"` AS SELECT M.id,V.season,SS.name,SS.poster,ss.episode_count FROM videofile AS V JOIN movie_videofile_cross_ref AS MVC ON V.path=MVC.path JOIN movie AS M ON M.id=MVC.id JOIN season AS SS ON SS.movie_id=M.id WHERE V.season=SS.season_number AND V.episode>0");
+            database.execSQL("CREATE VIEW `"+ VIEW.MOVIE_DATAVIEW+"` AS SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.is_watched,VF.path AS file_uri,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,ST.access AS s_ap,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite, SD.season,SD.name AS season_name,SD.poster AS season_poster,SD.episode_count FROM videofile AS VF JOIN shortcut AS ST  ON VF.dir_path=ST.uri JOIN device AS DEV ON DEV.path=ST.device_path OR ST.device_type > 5 JOIN movie_videofile_cross_ref AS MVCF ON MVCF.path=VF.path JOIN movie AS M ON MVCF.id=M.id LEFT OUTER JOIN movie_genre_cross_ref AS MGCF  ON M.id=MGCF.id LEFT OUTER JOIN genre AS G ON MGCF.genre_id = G.genre_id LEFT OUTER JOIN season_dataview AS SD ON SD.id=M.id");
         }
     };
 }

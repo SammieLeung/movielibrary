@@ -21,7 +21,8 @@ import java.util.Objects;
                         "ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ," +
                         "ST.access AS s_ap,"+
                         "G.name AS genre_name," +
-                        "M.add_time,M.last_playtime,M.is_favorite " +
+                        "M.add_time,M.last_playtime,M.is_favorite, " +
+                        "SD.season,SD.name AS season_name,SD.poster AS season_poster,SD.episode_count " +
                         "FROM " + TABLE.VIDEOFILE + " AS VF " +
                         "JOIN " + TABLE.SHORTCUT + " AS ST  " +
                         "ON VF.dir_path=ST.uri " +
@@ -34,7 +35,9 @@ import java.util.Objects;
                         "LEFT OUTER JOIN " + TABLE.MOVIE_GENRE_CROSS_REF + " AS MGCF  " +
                         "ON M.id=MGCF.id " +
                         "LEFT OUTER JOIN " + TABLE.GENRE + " AS G " +
-                        "ON MGCF.genre_id = G.genre_id",
+                        "ON MGCF.genre_id = G.genre_id " +
+                        "LEFT OUTER JOIN "+VIEW.SEASON_DATAVIEW+" AS SD " +
+                        "ON SD.id=M.id",
         viewName = VIEW.MOVIE_DATAVIEW
 )
 public class MovieDataView implements Serializable {
@@ -60,17 +63,22 @@ public class MovieDataView implements Serializable {
     public boolean is_favorite;
     public boolean is_watched;
 
+    public int season;
+    public String season_name;
+    public String season_poster;
+    public int episode_count;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MovieDataView that = (MovieDataView) o;
         return movie_id.equals(that.movie_id) &&
-                source.equals(that.source);
+                source.equals(that.source) && season==that.season;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movie_id, source);
+        return Objects.hash(movie_id, source,season);
     }
 }
