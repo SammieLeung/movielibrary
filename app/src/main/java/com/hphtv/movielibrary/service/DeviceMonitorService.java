@@ -26,6 +26,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
+import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Config;
@@ -497,7 +498,7 @@ public class DeviceMonitorService extends Service {
                                 videoFile.filename = filename;
                                 videoFile.dirPath = dirPath;
                                 videoFile.addTime = System.currentTimeMillis();
-                                VideoNameParser parser = new VideoNameParser();
+                                VideoNameParser2 parser = new VideoNameParser2();
                                 MovieNameInfo info = parser.parseVideoName(videoFile.path);
                                 videoFile.keyword = info.getName();
                                 videoFile.season = info.getSeason();

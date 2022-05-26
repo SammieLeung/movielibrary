@@ -14,7 +14,9 @@
         <variable
           name="wrapper"
           type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper" />
-
+        <variable
+          name="isShowEpisodes"
+          type="boolean" />
         <variable
           name="expand"
           type="boolean" />
@@ -211,6 +213,7 @@
 
                 <TextView
                   android:id="@+id/tv_episodes"
+                  android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}"
                   style="@style/common_content_text_style"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
@@ -222,6 +225,7 @@
 
                 <com.hphtv.movielibrary.ui.view.TvRecyclerView
                   android:id="@+id/rv_episode_list"
+                  android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}"
                   android:layout_width="match_parent"
                   android:layout_height="87dp"
                   android:layout_below="@id/tv_episodes"
@@ -229,6 +233,7 @@
 
                 <TableLayout
                   android:layout_below="@id/rv_episode_list"
+                  android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}"
                   android:id="@+id/tab_episode_set"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -267,7 +272,6 @@
         </androidx.core.widget.NestedScrollView>
 
         <View
-          android:visibility="gone"
           android:id="@+id/bottomMask"
           android:layout_width="match_parent"
           android:layout_height="230dp"

@@ -139,7 +139,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         mMovieAdapter.setZoomRatio(1.08f);
         mMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
             @Override
-            public void onItemClick(View view, int postion, MovieDataView data) {
+            public void onItemClick(View view, int position, MovieDataView data) {
                 Intent intent = new Intent(PinyinSearchActivity.this,
                         MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
@@ -147,6 +147,8 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
                 intent.putExtras(bundle);
                 startActivityForResult(intent);
+
+
             }
 
             @Override
@@ -156,7 +158,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mBinding.btnExit.setOnClickListener(v -> finish());
-        mBinding.btnHome.setOnClickListener(v->finish());
+        mBinding.btnHome.setOnClickListener(v -> finish());
         mBinding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -189,7 +191,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                 int pos = mBinding.rvSearchMovies.getChildLayoutPosition(newFocus);
                 if (pos != RecyclerView.NO_POSITION) {
                     for (int i = 0; i < 3 && i < mMovieAdapter.getItemCount(); i++) {
-                        int id=mBinding.tabLayout.getTabAt(mBinding.tabLayout.getSelectedTabPosition()).view.getId();
+                        int id = mBinding.tabLayout.getTabAt(mBinding.tabLayout.getSelectedTabPosition()).view.getId();
                         mBinding.rvSearchMovies.getChildAt(i).setNextFocusUpId(id);
                     }
                 }
@@ -247,7 +249,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
 
     }
 
-    private void bindDatas(){
+    private void bindDatas() {
         mBinding.setIsEmpty(mViewModel.getIsEmpty());
         mBinding.setShowTab(mViewModel.getIsShowTab());
     }
@@ -291,11 +293,11 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         mViewModel.getIsEmpty().set(false);
     }
 
-    private void showTabLayout(){
+    private void showTabLayout() {
         mViewModel.getIsShowTab().set(true);
     }
 
-    private void hideTabLayout(){
+    private void hideTabLayout() {
         mViewModel.getIsShowTab().set(false);
     }
 

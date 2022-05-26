@@ -21,7 +21,6 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
-import com.hphtv.movielibrary.ui.homepage.genretag.GenreTagItem;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -90,7 +89,7 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
     }
     
     public void startDetailActivity(AppBaseActivity appBaseActivity, MovieDataView movieDataView){
-        Intent intent=new Intent(appBaseActivity, MovieDetailActivity.class);
+        Intent intent=new Intent(appBaseActivity,MovieDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putLong(Constants.Extras.MOVIE_ID, movieDataView.id);
         bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);

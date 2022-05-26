@@ -38,7 +38,6 @@
 
         <activity
             android:name=".ui.detail.MovieDetailActivity"
-            android:label="@string/app_name"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateUnchanged" />
         <activity android:name=".ui.homepage.HomePageActivity"

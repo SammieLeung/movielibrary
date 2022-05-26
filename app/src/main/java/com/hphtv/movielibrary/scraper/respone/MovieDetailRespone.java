@@ -6,17 +6,13 @@ import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
-import com.hphtv.movielibrary.roomdb.entity.Season;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.util.retrofit.ResponeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.hphtv.movielibrary.data.Constants.Scraper.TMDB;
-import static com.hphtv.movielibrary.data.Constants.Scraper.TMDB_EN;
 
 /**
  * author: Sam Leung

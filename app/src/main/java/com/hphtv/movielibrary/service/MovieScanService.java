@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
+import com.firefly.videonameparser.VideoNameParser;
+import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
@@ -148,8 +150,10 @@ public class MovieScanService extends Service {
                         Observable.fromIterable(videoFileList)
                                 .observeOn(Schedulers.from(mNetworkExecutor))
                                 .map(videoFile -> {
-                                    String keyword = videoFile.keyword;
-
+                                    VideoNameParser2 parser=new VideoNameParser2();
+                                    MovieNameInfo nameInfo=parser.parseVideoName(videoFile.path);
+//                                    String keyword = videoFile.keyword;
+                                    String keyword=nameInfo.getName();
                                     //选择搜索api
                                     String api = Constants.Scraper.TMDB_EN;
                                     if (StringUtils.isGB2312(keyword)) {
@@ -168,7 +172,13 @@ public class MovieScanService extends Service {
                                                 tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api);
                                                 break;
                                             default:
-                                                tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api);
+                                                if(MovieNameInfo.TYPE_MOVIE.equals(nameInfo.getType())){
+                                                    tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api);
+                                                }else if(MovieNameInfo.TYPE_SERIES.equals(nameInfo.getType())){
+                                                    tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api);
+                                                }else {
+                                                    tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api);
+                                                }
                                                 break;
                                         }
                                         return Observable.zip(tmdbSearchRespone,

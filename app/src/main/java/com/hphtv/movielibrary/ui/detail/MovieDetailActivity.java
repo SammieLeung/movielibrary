@@ -27,6 +27,7 @@ import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutMovieDetailBinding;
+import com.hphtv.movielibrary.databinding.LayoutTvDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -47,7 +48,7 @@ import java.util.Random;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutMovieDetailBinding> {
+public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutTvDetailBinding> {
     public static final int REMOVE = 1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private NewMovieItemListAdapter mRecommandMovieAdapter;
@@ -106,7 +107,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         refreshParent();
                         stopLoading();
                         finish();
-                        Toast.makeText(MovieDetailActivity.this, getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getBaseContext(), getResources().getString(R.string.toast_del_success), Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -190,6 +191,14 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     @Override
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
+                            Constants.SearchType type=wrapper.movie.type;
+                            switch (type){
+                                case tv:
+                                    mBinding.setIsShowEpisodes(true);
+                                    break;
+                                default:
+                                    mBinding.setIsShowEpisodes(false);
+                            }
                             mBinding.setWrapper(wrapper);
                             String stagePhoto = "";
                             if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {

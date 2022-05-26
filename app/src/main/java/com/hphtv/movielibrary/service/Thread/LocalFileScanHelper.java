@@ -7,6 +7,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser;
+import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -199,7 +200,7 @@ public class LocalFileScanHelper {
                     videoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();
-                    VideoNameParser parser=new VideoNameParser();
+                    VideoNameParser2 parser=new VideoNameParser2();
                     MovieNameInfo info= parser.parseVideoName(videoFile.path);
                     videoFile.keyword = info.getName();;
                     videoFile.season = info.getSeason();
