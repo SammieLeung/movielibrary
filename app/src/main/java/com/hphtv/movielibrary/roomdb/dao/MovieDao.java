@@ -204,7 +204,7 @@ public interface MovieDao {
             " AND (:year IS NULL OR year=:year)" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
             " AND (:vtid IS -1 OR id IN (SELECT id FROM " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " WHERE vtid=:vtid))" +
-            " GROUP BY id " +
+            " GROUP BY id,season " +
             " ORDER BY " +
             "CASE WHEN :order =0 AND :isDesc=0 THEN pinyin END ASC," +
             "CASE WHEN :order =1 AND :isDesc=0 THEN ratings END ASC," +

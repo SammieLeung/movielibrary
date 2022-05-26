@@ -226,4 +226,5 @@
 
   <!--电视剧详情-->
   <string name="detail_episodes_list_title">剧集列表 (%1$d集)</string>
+  <string name="season_name_for_unknow">第%1$d季</string>
 </resources>
