@@ -29,6 +29,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutMovieDetailBinding;
 import com.hphtv.movielibrary.databinding.LayoutTvDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
@@ -53,8 +54,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private NewMovieItemListAdapter mRecommandMovieAdapter;
 
-    private Handler mHandler=new Handler();
+    private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
+    private int mSeason = 0;
 
 
     //TODO 同步系统状态需要一个后台服务绑定
@@ -154,7 +156,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mRecommandMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
             @Override
             public void onItemClick(View view, int position, MovieDataView data) {
-                prepareMovieWrapper(data.id);
+                prepareMovieWrapper(data.id, data.season);
             }
 
             @Override
@@ -170,7 +172,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         super.onNewIntent(intent);
         if (intent != null) {
             long movieId = intent.getLongExtra(Constants.Extras.MOVIE_ID, -1);
-            prepareMovieWrapper(movieId);//1.加载电影数据
+            int season = intent.getIntExtra(Constants.Extras.SEASON, 0);
+            prepareMovieWrapper(movieId, season);//1.加载电影数据
         }
     }
 
@@ -179,7 +182,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      *
      * @param movieId
      */
-    private void prepareMovieWrapper(long movieId) {
+    private void prepareMovieWrapper(long movieId, int season) {
+
         mViewModel.loadMovieWrapper(movieId)
                 .subscribe(new SimpleObserver<MovieWrapper>() {
                     @Override
@@ -191,14 +195,27 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     @Override
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
-                            Constants.SearchType type=wrapper.movie.type;
-                            switch (type){
+                            Constants.SearchType type = wrapper.movie.type;
+                            switch (type) {
                                 case tv:
                                     mBinding.setIsShowEpisodes(true);
+                                    for (Season _season : wrapper.seasons) {
+                                        int num = _season.seasonNumber;
+                                        if (num == season) {
+                                            mViewModel.setSeason(_season);
+                                            mBinding.setSeason(_season);
+                                            mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, _season.episodeCount));
+                                            break;
+                                        }
+                                    }
                                     break;
                                 default:
                                     mBinding.setIsShowEpisodes(false);
+                                    mViewModel.setSeason(null);
+                                    mBinding.setSeason(null);
+                                    mBinding.setEpisodesTitle("");
                             }
+
                             mBinding.setWrapper(wrapper);
                             String stagePhoto = "";
                             if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
@@ -210,9 +227,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
                             if (!TextUtils.isEmpty(stagePhoto)) {
                                 GlideTools.GlideWrapperWithCrossFade(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
-                            } else if(!TextUtils.isEmpty(wrapper.movie.poster)){
+                            } else if (!TextUtils.isEmpty(wrapper.movie.poster)) {
                                 GlideTools.GlideWrapperWithCrossFade(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
-                            } else{
+                            } else {
                                 Glide.with(getBaseContext()).load(R.mipmap.default_poster).into(mBinding.ivStagephoto);
                             }
 
@@ -236,6 +253,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                     }
                                 }
                             });
+
                             mViewModel.loadRecommend()
                                     .subscribe(new SimpleObserver<List<MovieDataView>>() {
                                         @Override
@@ -283,17 +301,17 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     /**
      * 蒙版隱藏動畫
      */
-    private void startBottomMaskAnimate(){
+    private void startBottomMaskAnimate() {
         mHandler.removeCallbacks(mBottomMaskFadeInTask);
-        if(mBinding.bottomMask.getAlpha()>0) {
+        if (mBinding.bottomMask.getAlpha() > 0) {
             ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
             objectAnimator.start();
         }
-        mBottomMaskFadeInTask= () -> {
-            ObjectAnimator objectAnimator=ObjectAnimator.ofFloat(mBinding.bottomMask,"alpha",mBinding.bottomMask.getAlpha(),1).setDuration(500);
+        mBottomMaskFadeInTask = () -> {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 1).setDuration(500);
             objectAnimator.start();
         };
-        mHandler.postDelayed(mBottomMaskFadeInTask,800);
+        mHandler.postDelayed(mBottomMaskFadeInTask, 800);
     }
 
     /**
@@ -311,7 +329,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         @Override
                         public void onAction(MovieWrapper movieWrapper) {
                             if (movieWrapper.movie != null) {
-                                prepareMovieWrapper(movieWrapper.movie.id);
+                                prepareMovieWrapper(movieWrapper.movie.id, mSeason);
                                 refreshParent();
                             } else {
                                 ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));

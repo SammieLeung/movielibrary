@@ -144,7 +144,7 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
                         MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
-                bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+                bundle.putInt(Constants.Extras.SEASON,data.season);
                 intent.putExtras(bundle);
                 startActivityForResult(intent);
 

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.PixelCopy;
 import android.view.View;
@@ -21,6 +22,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory;
 import com.hphtv.movielibrary.adapter.ActorPosterItemListApdater;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailViewmoreBinding;
 import com.hphtv.movielibrary.effect.GlideBlurTransformation;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
@@ -70,7 +72,10 @@ public class MovieDetailPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         mBinding.rvActorList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 62), DensityUtil.dip2px(getContext(), 22), DensityUtil.dip2px(getContext(), 22)));
         mBinding.rvActorList.setAdapter(mActorPosterItemListApdater);
-        mBinding.setPlot(mViewModel.getMovieWrapper().movie.plot);
+        String plot=mViewModel.getMovieWrapper().movie.plot;
+        if(mViewModel.getMovieWrapper().movie.type.equals(Constants.SearchType.tv)&&!TextUtils.isEmpty(mViewModel.getSeason().plot))
+            plot=mViewModel.getSeason().plot;
+        mBinding.setPlot(plot);
         mBinding.btnFold.setOnClickListener(v -> dismiss());
         mViewModel.loadFileList().subscribe(new SimpleObserver<String>() {
             @Override

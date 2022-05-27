@@ -90,6 +90,9 @@ public interface MovieDao {
             "AND id=:id")
     public MovieWrapper queryMovieWrapperById(long id, String source);
 
+    @Transaction
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id=:id AND source=:source")
+    public MovieWrapper queryMovieWrapperById2(long id, String source);
 
     /**
      * 按movie_id查询电影wrapper

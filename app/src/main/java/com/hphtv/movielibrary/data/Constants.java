@@ -144,6 +144,7 @@ public class Constants {
         //详情页
         String MODE = "mode";
         String MOVIE_ID = "movie_id";
+        String SEASON="season";
         String SUCCESS_COUNT ="success_count";
         String SCANNED_COUNT="scanned_count";
         String TOTAL ="total";

@@ -7,8 +7,10 @@ import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.MovieHelper;
@@ -47,6 +49,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     private ExecutorService mSingleThreadPool;
     private MovieWrapper mMovieWrapper;
+    private Season mSeason;
     private List<MovieDataView> mRecommendList = new ArrayList<>();
 
     private String mSource;
@@ -66,6 +69,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     /**
      * 读取MovieWrapper
+     *
      * @param id
      * @return
      */
@@ -82,6 +86,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     /**
      * 获取推荐影片
+     *
      * @return
      */
     public Observable<List<MovieDataView>> loadRecommend() {
@@ -101,6 +106,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     /**
      * 获取影片分类标签
+     *
      * @return
      */
     public Observable<List<String>> loadTags() {
@@ -126,6 +132,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     /**
      * 设置收藏
+     *
      * @param isLike
      * @return
      */
@@ -135,8 +142,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     boolean isFavorite = isLike;
                     String movieId = wrapper.movie.movieId;
                     mMovieDao.updateFavoriteStateByMovieId(isFavorite, movieId);
-                    OnlineDBApiService.updateLike(movieId,isFavorite,ScraperSourceTools.getSource(),wrapper.movie.type.name());
-                    mMovieWrapper.movie.isFavorite=isLike;
+                    OnlineDBApiService.updateLike(movieId, isFavorite, ScraperSourceTools.getSource(), wrapper.movie.type.name());
+                    mMovieWrapper.movie.isFavorite = isLike;
                     return isFavorite;
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());
@@ -145,6 +152,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     /**
      * 切换收藏
+     *
      * @return
      */
     public Observable<Boolean> toggleLike() {
@@ -161,22 +169,21 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     }
 
 
-
     public Observable<MovieWrapper> selectMovie(MovieWrapper wrapper) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
-            if (wrapper != null) {
+                    if (wrapper != null) {
 //                String movie_id=wrapper.movie.movieId;
 //                String last_movie_id = mMovieWrapper.movie.movieId;
 //                boolean is_favoirte = mMovieWrapper.movie.isFavorite;
 //                boolean is_watched = mMovieWrapper.movie.isWatched;
 //                BroadcastHelper.sendBroadcastMovieUpdateSync(getApplication(), last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
-                MovieHelper.saveMatchedMovieWrapper(getApplication(), wrapper, mMovieWrapper.videoFiles);
-            } else {
-                throw new Throwable();
-            }
-            emitter.onNext(wrapper);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.from(mSingleThreadPool))
+                        MovieHelper.saveMatchedMovieWrapper(getApplication(), wrapper, mMovieWrapper.videoFiles);
+                    } else {
+                        throw new Throwable();
+                    }
+                    emitter.onNext(wrapper);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());
 
     }
@@ -199,6 +206,13 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return mMovieWrapper;
     }
 
+    public Season getSeason() {
+        return mSeason;
+    }
+
+    public void setSeason(Season season) {
+        mSeason = season;
+    }
 
     public List<MovieDataView> getRecommendList() {
         return mRecommendList;

@@ -24,6 +24,7 @@ import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -92,7 +93,7 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
         Intent intent=new Intent(appBaseActivity,MovieDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putLong(Constants.Extras.MOVIE_ID, movieDataView.id);
-        bundle.putInt(Constants.Extras.MODE, Constants.MovieDetailMode.MODE_WRAPPER);
+        bundle.putInt(Constants.Extras.SEASON,movieDataView.season);
         intent.putExtras(bundle);
         appBaseActivity.startActivityForResult(intent);
     }
