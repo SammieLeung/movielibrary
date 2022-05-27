@@ -8,61 +8,68 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
       >
-    <LinearLayout
-        android:id="@+id/view_main_dialog"
-        android:layout_width="@dimen/shortcut_scan_dialog_w"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:background="@drawable/new_common_dialog_bg"
-        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/shortcut_scan_dialog_title_textsize"
-            android:layout_marginTop="@dimen/shortcut_scan_dialog_title_m_top"
-            android:layout_marginBottom="@dimen/shortcut_scan_dialog_title_m_bottom"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-            android:text="@{dialogTitle}" />
+        <LinearLayout
+          android:id="@+id/view_main_dialog"
+          android:layout_width="@dimen/shortcut_scan_dialog_w"
+          android:layout_height="wrap_content"
+          android:background="@drawable/new_common_dialog_bg"
+          android:gravity="center_horizontal"
+          android:orientation="vertical">
 
-        <include
-            android:id="@+id/shortcut_type_item"
-            layout="@layout/shortcut_scan_item_layout"
-            style="@style/include_size_shortcut_scan_item"
-            android:layout_marginBottom="@dimen/shortcut_scan_diaolg_item_margin_bottom"
-            app:subTitle="@{typeItem.optionList.get(typeItem.pos)}"
-            app:title="@{typeItem.title}"
-            tools:ignore="IncludeLayoutParam" />
+            <TextView
+              android:layout_width="465dp"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="@dimen/shortcut_scan_dialog_title_m_top"
+              android:layout_marginBottom="@dimen/shortcut_scan_dialog_title_m_bottom"
+              android:gravity="center"
+              android:text="@{dialogTitle}"
+              android:textColor="@color/white"
+              android:textSize="@dimen/shortcut_scan_dialog_title_textsize"
+              android:textStyle="bold"
+              android:maxLines="2"
+              android:ellipsize="end"
+              android:paddingStart="@dimen/shortcut_scan_diaolg_item_padding_lr"
+              android:paddingEnd="@dimen/shortcut_scan_diaolg_item_padding_lr"
+              />
 
-        <include
-            android:id="@+id/shortcut_access_item"
-            layout="@layout/shortcut_scan_item_layout"
-            style="@style/include_size_shortcut_scan_item"
-            android:layout_marginBottom="@dimen/shortcut_scan_diaolg_item_margin_bottom"
-            app:subTitle="@{accessItem.optionList.get(accessItem.pos)}"
-            app:title="@{accessItem.title}"
-            tools:ignore="IncludeLayoutParam" />
+            <include
+              android:id="@+id/shortcut_type_item"
+              style="@style/include_size_shortcut_scan_item"
+              layout="@layout/shortcut_scan_item_layout"
+              android:layout_marginBottom="@dimen/shortcut_scan_diaolg_item_margin_bottom"
+              app:subTitle="@{typeItem.optionList.get(typeItem.pos)}"
+              app:title="@{typeItem.title}"
+              tools:ignore="IncludeLayoutParam" />
 
-        <include
-            android:id="@+id/shortcut_name_item"
-            layout="@layout/shortcut_scan_item_layout"
-            style="@style/include_size_shortcut_scan_item"
-            android:layout_marginBottom="64dp"
-            app:subTitle="@{nameItem.subTitle}"
-            app:title="@{nameItem.title}"
-            tools:ignore="IncludeLayoutParam" />
-        <Button
-            android:id="@+id/btn_scan"
-            android:text="@string/shortcut_scan_dialog_confirm"
-            android:focusedByDefault="true"
-             style="@style/common_dialog_btn_style"
-            android:layout_width="@dimen/shortcut_scan_diaolg_btn_w"
-            android:layout_height="@dimen/shortcut_scan_diaolg_btn_h"
-            android:layout_marginBottom="50dp"/>
+            <include
+              android:id="@+id/shortcut_access_item"
+              style="@style/include_size_shortcut_scan_item"
+              layout="@layout/shortcut_scan_item_layout"
+              android:layout_marginBottom="@dimen/shortcut_scan_diaolg_item_margin_bottom"
+              app:subTitle="@{accessItem.optionList.get(accessItem.pos)}"
+              app:title="@{accessItem.title}"
+              tools:ignore="IncludeLayoutParam" />
 
-    </LinearLayout>
+            <include
+              android:id="@+id/shortcut_name_item"
+              style="@style/include_size_shortcut_scan_item"
+              layout="@layout/shortcut_scan_item_layout"
+              android:layout_marginBottom="64dp"
+              app:subTitle="@{nameItem.subTitle}"
+              app:title="@{nameItem.title}"
+              tools:ignore="IncludeLayoutParam" />
+
+            <Button
+              android:id="@+id/btn_scan"
+              style="@style/common_dialog_btn_style"
+              android:layout_width="@dimen/shortcut_scan_diaolg_btn_w"
+              android:layout_height="@dimen/shortcut_scan_diaolg_btn_h"
+              android:layout_marginBottom="50dp"
+              android:focusedByDefault="true"
+              android:text="@string/shortcut_scan_dialog_confirm" />
+
+        </LinearLayout>
 
     <RelativeLayout
         android:layout_marginLeft="@dimen/shortcut_scan_dialog_margin"

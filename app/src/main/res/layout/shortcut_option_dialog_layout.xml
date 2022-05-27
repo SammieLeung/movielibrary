@@ -9,18 +9,19 @@
         android:layout_height="match_parent"
       >
         <RelativeLayout
-            android:layout_width="@dimen/shortcut_scan_dialog_w"
-            android:layout_height="wrap_content">
+          android:background="@drawable/new_common_dialog_bg"
+          android:layout_width="@dimen/shortcut_scan_dialog_w"
+          android:layout_height="wrap_content">
             <LinearLayout
+                android:layout_below="@id/btn_close"
                 android:id="@+id/view_main_dialog"
                 android:layout_width="@dimen/shortcut_scan_dialog_w"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:background="@drawable/new_common_dialog_bg"
                 android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="@dimen/shortcut_scan_diaolg_btn_w"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/shortcut_scan_dialog_title_textsize"
                     android:layout_marginTop="@dimen/shortcut_scan_dialog_title_m_top"
@@ -28,7 +29,11 @@
                     android:gravity="center"
                     android:textColor="@color/white"
                     android:textStyle="bold"
-                    android:text="@{dialogTitle}" />
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:text="@{dialogTitle}"
+                    android:maxLines="2"
+                    android:ellipsize="middle"/>
 
                 <Button
                     android:id="@+id/btn_quick_scan"
