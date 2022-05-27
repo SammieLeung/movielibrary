@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.roomdb.entity;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -12,6 +13,8 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * author: Sam Leung
  * date:  2022/3/1
@@ -21,8 +24,9 @@ public class VideoTag {
     @PrimaryKey(autoGenerate = true)
     public long vtid;
     public Constants.VideoType tag;
-    @ColumnInfo(name = "tag_name")
-    public String tagName;
+    @NonNull
+    @ColumnInfo(name = "tag_name",defaultValue = "")
+    public String tagName="";
     public int flag;//0-不能删除，1-可以删除
     public int weight = 0;
 

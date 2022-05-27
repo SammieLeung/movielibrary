@@ -55,7 +55,7 @@ public class OnlineDBApiService {
         String movieId = movie.movieId;
         String type = movie.type.name();
         for (VideoFile videoFile : videoFileList) {
-            Device device = deviceDao.querybyMountPath(videoFile.devicePath);
+            Device device = deviceDao.querybyMountPath(videoFile.devicePath);//TODO smb/dlna设备为空，处理。
             String path = videoFile.path;
             String keyword = videoFile.keyword;
             String filename = videoFile.filename;
