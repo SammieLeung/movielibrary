@@ -1,5 +1,7 @@
 package com.hphtv.movielibrary.ui.view;
 
+import static android.util.TypedValue.COMPLEX_UNIT_PX;
+
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
@@ -81,6 +83,7 @@ public class GifTextView extends LinearLayout {
 
     @Override
     public void setSelected(boolean selected) {
+        super.setSelected(selected);
         isSelected = selected;
         if (selected)
             showGif();
@@ -224,9 +227,8 @@ public class GifTextView extends LinearLayout {
                     mTextView.setTypeface(null, gifTextStyle);
                     break;
                 case R.styleable.GifTextView_gifTextSize:
-                    gifTextSize = ta.getDimensionPixelSize(index, gifTextSize);
-                    textUnit = ta.peekValue(index).getComplexUnit();
-                    mTextView.setTextSize(textUnit, gifTextSize);
+                    gifTextSize = ta.getDimensionPixelSize(index, gifTextSize);//获取已经经过转换的px值
+                    mTextView.setTextSize(COMPLEX_UNIT_PX, gifTextSize);//setTextSize默认设置的是SP的值
                     break;
             }
         }

@@ -24,10 +24,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
+import com.hphtv.movielibrary.adapter.EpisodeItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutMovieDetailBinding;
 import com.hphtv.movielibrary.databinding.LayoutTvDetailBinding;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.effect.LinearLayoutItemDecoration;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
@@ -53,7 +56,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public static final int REMOVE = 1;
     public static final String TAG = MovieDetailActivity.class.getSimpleName();
     private NewMovieItemListAdapter mRecommandMovieAdapter;
-
+    private EpisodeItemListAdapter mEpisodeItemListAdapter;
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
     private int mSeason = 0;
@@ -164,6 +167,24 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
             }
         });
+
+        mEpisodeItemListAdapter = new EpisodeItemListAdapter(this, new ArrayList<>());
+        linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
+        mBinding.rvEpisodeList.setLayoutManager(linearLayoutManager);
+        mBinding.rvEpisodeList.setAdapter(mEpisodeItemListAdapter);
+        mBinding.rvEpisodeList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 7), DensityUtil.dip2px(this, 23)));
+        mEpisodeItemListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<String>() {
+            @Override
+            public void onItemClick(View view, int position, String data) {
+
+            }
+
+            @Override
+            public void onItemFocus(View view, int postion, String data) {
+
+            }
+        });
+
         mBinding.nestScrollview.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
     }
 
@@ -198,13 +219,18 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                             Constants.SearchType type = wrapper.movie.type;
                             switch (type) {
                                 case tv:
-                                    mBinding.setIsShowEpisodes(true);
                                     for (Season _season : wrapper.seasons) {
                                         int num = _season.seasonNumber;
                                         if (num == season) {
                                             mViewModel.setSeason(_season);
+                                            ArrayList<String> episodes = new ArrayList<>();
+                                            for (int i = 0; i < _season.episodeCount; i++) {
+                                                episodes.add(String.valueOf(i + 1));
+                                            }
+                                            mEpisodeItemListAdapter.addAll(episodes);
                                             mBinding.setSeason(_season);
                                             mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, _season.episodeCount));
+                                            mBinding.setIsShowEpisodes(true);
                                             break;
                                         }
                                     }

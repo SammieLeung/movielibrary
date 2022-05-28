@@ -235,9 +235,9 @@
                   android:id="@+id/rv_episode_list"
                   android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}"
                   android:layout_width="match_parent"
-                  android:layout_height="87dp"
+                  android:layout_height="wrap_content"
                   android:layout_below="@id/tv_episodes"
-                  android:layout_marginTop="15dp" />
+                  />
 
                 <TableLayout
                   android:layout_below="@id/rv_episode_list"
@@ -245,7 +245,7 @@
                   android:id="@+id/tab_episode_set"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="28dp"/>
+                  android:layout_marginTop="12dp"/>
 
                 <TextView
                   android:id="@+id/tv_recommand"
