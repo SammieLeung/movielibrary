@@ -498,11 +498,6 @@ public class DeviceMonitorService extends Service {
                                 videoFile.filename = filename;
                                 videoFile.dirPath = dirPath;
                                 videoFile.addTime = System.currentTimeMillis();
-                                VideoNameParser2 parser = new VideoNameParser2();
-                                MovieNameInfo info = parser.parseVideoName(videoFile.path);
-                                videoFile.keyword = info.getName();
-                                videoFile.season = info.getSeason();
-                                videoFile.episode = info.toEpisode("0");
                                 long vid = mVideoFileDao.insertOrIgnore(videoFile);
                                 videoFile.vid = vid;
                                 videoFileList.add(videoFile);

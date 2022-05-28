@@ -200,11 +200,6 @@ public class LocalFileScanHelper {
                     videoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();
-                    VideoNameParser2 parser=new VideoNameParser2();
-                    MovieNameInfo info= parser.parseVideoName(videoFile.path);
-                    videoFile.keyword = info.getName();;
-                    videoFile.season = info.getSeason();
-                    videoFile.episode = info.toEpisode("0");
                     long id = videoFileDao.insertOrIgnore(videoFile);
                     videoFile.vid = id;
                 }
