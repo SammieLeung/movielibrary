@@ -101,6 +101,7 @@
   <string name="plot_fold">收起</string>
   <string name="plot_s_empty">暂无简介。</string>
   <string name="btn_play">播放</string>
+  <string name="btn_play_episode">第%1$d集</string>
   <string name="btn_favorite">收藏</string>
   <string name="btn_expand">更多</string>
   <string name="btn_edit">修正</string>

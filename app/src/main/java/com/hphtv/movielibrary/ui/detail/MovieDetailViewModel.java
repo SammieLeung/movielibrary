@@ -4,6 +4,7 @@ import android.app.Application;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
@@ -19,8 +20,6 @@ import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.StringTools;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
-import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
@@ -29,23 +28,13 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -65,12 +54,15 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     private List<List<VideoFile>> mEpisodeVideoFilesList = new ArrayList<>();
     private LinkedHashMap<String, List<List<VideoFile>>> mTabLayoutPaginationMap = new LinkedHashMap<>();
     private String mSource;
-    private ObservableInt mEpisodePlayed=new ObservableInt(-1);
+    private ObservableInt mLastPlayEpisodePos =new ObservableInt(-1);
+    private ObservableField<String> mEpisodePlayBtnText=new ObservableField<>();
+    private VideoFile mLastPlayVideoFile;
 
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSingleThreadPool = Executors.newSingleThreadExecutor();
         mSource = ScraperSourceTools.getSource();
+        mEpisodePlayBtnText.set(application.getString(R.string.btn_play));
         init();
     }
 
@@ -90,7 +82,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
                     mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id, mSource);
-                    mEpisodePlayed.set(-1);
+                    mLastPlayEpisodePos.set(-1);
                     if (Constants.SearchType.tv.equals(mMovieWrapper.movie.type)) {
                         for (Season _season : mMovieWrapper.seasons) {
                             int num = _season.seasonNumber;
@@ -103,8 +95,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         mEpisodeVideoFilesList.clear();
                         ArrayList<VideoFile> tmpVideoFileList = new ArrayList<>();
                         tmpVideoFileList.addAll(mMovieWrapper.videoFiles);
-                        long latestPlayTime=-1;
-                        int latestEpisode=-1;
+
                         //按集数分配视频文件
                         for (int i = 0; i < mMovieWrapper.season.episodeCount + 1; i++) {
                             Iterator<VideoFile> videoFileIterator = tmpVideoFileList.iterator();
@@ -113,9 +104,12 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
                             while (videoFileIterator.hasNext()) {
                                 VideoFile videoFile = videoFileIterator.next();
-                                if(videoFile.lastPlayTime>latestPlayTime) {
-                                    latestPlayTime = videoFile.lastPlayTime;
-                                    latestEpisode=videoFile.episode;
+                                if(videoFile.lastPlayTime>0) {
+                                    if (mLastPlayVideoFile == null)
+                                        mLastPlayVideoFile = videoFile;
+                                    if (videoFile.lastPlayTime > mLastPlayVideoFile.lastPlayTime) {
+                                        mLastPlayVideoFile = videoFile;
+                                    }
                                 }
                                 if (videoFile.episode == i) {
                                     tmpList.add(videoFile);
@@ -123,8 +117,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 }
                             }
                         }
-                        mEpisodePlayed.set(latestEpisode-1);
 
+                        if(mLastPlayVideoFile!=null) {
+                            mLastPlayEpisodePos.set(mLastPlayVideoFile.episode-1);//episode从1开始，所以索引应该是episode-1;
+                            mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayVideoFile.episode));
+                        }
                         //按分页划分视频文件
                         int episodeSize = mEpisodeVideoFilesList.size();
                         if (episodeSize > 1) {
@@ -234,11 +231,33 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return setLike(!mMovieWrapper.movie.isFavorite);
     }
 
-    public ObservableInt getEpisodePlayed() {
-        return mEpisodePlayed;
+    public ObservableInt getLastPlayEpisodePos() {
+        return mLastPlayEpisodePos;
+    }
+
+    public ObservableField<String> getEpisodePlayBtnText() {
+        return mEpisodePlayBtnText;
+    }
+
+    public VideoFile getLastPlayVideoFile() {
+        return mLastPlayVideoFile;
     }
 
     public void playingVideo(String path, String name) {
+        MovieHelper.playingMovie(path, name)
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                    }
+                });
+    }
+
+    public void playingEpisodeVideo(VideoFile videoFile){
+        mLastPlayVideoFile=videoFile;
+        mLastPlayEpisodePos.set(mLastPlayVideoFile.episode-1);//episode从1开始，所以索引应该是episode-1;
+        mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayVideoFile.episode));
+        String path=videoFile.path;
+        String name=videoFile.filename;
         MovieHelper.playingMovie(path, name)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
@@ -291,6 +310,18 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     public List<List<VideoFile>> getEpisodeVideoFilesList() {
         return mEpisodeVideoFilesList;
+    }
+
+    /**
+     * 当没有播放记录时，自动播放第一个文件
+     * @return
+     */
+    public VideoFile getFirstEnableEpisodeVideoFile(){
+        for(List<VideoFile> list:mEpisodeVideoFilesList){
+            if(list.size()>0)
+                return list.get(0);
+        }
+        return null;
     }
 
     public HashMap<String, List<List<VideoFile>>> getTabLayoutPaginationMap() {

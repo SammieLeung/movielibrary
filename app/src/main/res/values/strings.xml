@@ -102,6 +102,7 @@
     <string name="plot_fold">Fold</string>
     <string name="plot_s_empty">No introduction.</string>
     <string name="btn_play">Play</string>
+    <string name="btn_play_episode">Episode %1$d</string>
     <string name="btn_favorite">Like</string>
     <string name="btn_expand">More</string>
     <string name="btn_edit">Update</string>

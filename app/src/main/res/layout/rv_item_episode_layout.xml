@@ -5,7 +5,7 @@
   <data>
 
     <variable
-      name="selectPos"
+      name="lastPlayEpisodePos"
       type="androidx.databinding.ObservableInt" />
 
     <variable
@@ -24,7 +24,7 @@
     android:minWidth="117dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    app:gifTextViewSelected="@{selectPos==itemPos}"
+    app:gifTextViewSelected="@{lastPlayEpisodePos==itemPos}"
     app:gifDrawHeight="17dp"
     app:gifDrawPadding="14dp"
     app:gifDrawStart="@drawable/ic_episode_watching"

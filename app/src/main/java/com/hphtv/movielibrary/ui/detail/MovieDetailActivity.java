@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutTvDetailBinding> {
@@ -94,13 +93,19 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             case R.id.btn_play:
                 if (mBinding.getWrapper() != null) {
                     if (mBinding.getWrapper().videoFiles.size() == 1) {
-                        startLoading();
                         String path = mBinding.getWrapper().videoFiles.get(0).path;
                         String name = mBinding.getWrapper().videoFiles.get(0).filename;
                         playVideo(path, name);
                     } else if (mBinding.getWrapper().videoFiles.size() > 1) {
                         showVideoSelectDialog();
                     }
+                }
+                break;
+            case R.id.btn_play_episode:
+                if (mViewModel.getLastPlayVideoFile() != null) {
+                    playingEpisodeVideo(mViewModel.getLastPlayVideoFile());
+                } else {
+                    playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
                 }
                 break;
             case R.id.btn_remove:
@@ -144,8 +149,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     public void initView() {
         mBinding.setExpand(false);
+        mBinding.setPlayEpisodeBtnText(mViewModel.getEpisodePlayBtnText());
         mBinding.btnEdit.setOnClickListener(mClickListener);
         mBinding.btnPlay.setOnClickListener(mClickListener);
+        mBinding.btnPlayEpisode.setOnClickListener(mClickListener);
         mBinding.btnRemove.setOnClickListener(mClickListener);
         mBinding.btnFavorite.setOnClickListener(mClickListener);
         mBinding.btnExpand.setOnClickListener(mClickListener);
@@ -168,7 +175,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         });
 
         mEpisodeItemListAdapter = new EpisodeItemListAdapter(this, new ArrayList<>());
-        mEpisodeItemListAdapter.setSelectPos(mViewModel.getEpisodePlayed());
+        mEpisodeItemListAdapter.setLastPlayEpisodePos(mViewModel.getLastPlayEpisodePos());
         linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
         mBinding.rvEpisodeList.setLayoutManager(linearLayoutManager);
         mBinding.rvEpisodeList.setAdapter(mEpisodeItemListAdapter);
@@ -179,8 +186,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 LogUtil.v("position " + position);
                 if (data.size() == 1) {
                     startLoading();
-                    VideoFile videoFile=data.get(0);
-                    playVideo(videoFile.path, videoFile.filename);
+                    VideoFile videoFile = data.get(0);
+                    playingEpisodeVideo(videoFile);
                 } else if (data.size() > 1) {
                     showTVEpisodeSelectDialog(data);
                 }
@@ -415,48 +422,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     public void showVideoSelectDialog() {
-        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mBinding.getWrapper());
-        dialogFragment.setPlayingVideo(new VideoSelectDialog.PlayVideoListener() {
-            @Override
-            public void playVideo(Observable<String> observable) {
-                observable.subscribe(new SimpleObserver<String>() {
-
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        startLoading();
-                    }
-
-                    @Override
-                    public void onAction(String s) {
-                        refreshParent();
-                    }
-                });
-            }
+        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mViewModel.getMovieWrapper().videoFiles);
+        dialogFragment.setPlayingVideo((videoFile, position) -> {
+            playVideo(videoFile.path,videoFile.filename);
         });
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
 
     public void showTVEpisodeSelectDialog(List<VideoFile> videoFileList) {
         VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(videoFileList);
-        dialogFragment.setPlayingVideo(new VideoSelectDialog.PlayVideoListener() {
-            @Override
-            public void playVideo(Observable<String> observable) {
-                observable.subscribe(new SimpleObserver<String>() {
-
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        startLoading();
-                    }
-
-                    @Override
-                    public void onAction(String s) {
-                        refreshParent();
-                    }
-                });
-            }
-        });
+        dialogFragment.setPlayingVideo((videoFile, position) -> playingEpisodeVideo(videoFile));
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
 
@@ -471,6 +446,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         refreshParent();
     }
 
+    private void playingEpisodeVideo(VideoFile videoFile) {
+        startLoading();
+        mViewModel.playingEpisodeVideo(videoFile);
+        refreshParent();
+    }
     /**
      * 返回时刷新主页
      */

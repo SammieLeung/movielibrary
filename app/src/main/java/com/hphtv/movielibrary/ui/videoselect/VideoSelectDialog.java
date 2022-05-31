@@ -30,34 +30,16 @@ import io.reactivex.rxjava3.core.Observable;
  */
 
 public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel, DialogSelectVideosourceBinding> {
-    public static final String FILE = "file";
-    public static final String MOVIE_WRAPPER = "movie_wrapper";
     public static final String FILE_LIST = "file_list";
 
     private VideoSelectListAdapter mVideoSelectListAdapter;
     private PlayVideoListener mPlayVideoListener;
 
-    public static VideoSelectDialog newInstance(UnrecognizedFileDataView data) {
-        Bundle args = new Bundle();
-        args.putSerializable(FILE, (UnrecognizedFileDataView) data);
-        return newInstance(args);
-    }
 
-    public static VideoSelectDialog newInstance(MovieWrapper data) {
-        Bundle args = new Bundle();
-        args.putSerializable(MOVIE_WRAPPER, (MovieWrapper) data);
-        return newInstance(args);
-    }
 
     public static VideoSelectDialog newInstance(List<VideoFile> videoFileList) {
         Bundle args = new Bundle();
         args.putSerializable(FILE_LIST, (Serializable) videoFileList);
-        VideoSelectDialog fragment = new VideoSelectDialog();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    private static VideoSelectDialog newInstance(Bundle args) {
         VideoSelectDialog fragment = new VideoSelectDialog();
         fragment.setArguments(args);
         return fragment;
@@ -81,16 +63,9 @@ public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel,
         mBinding.rvSource.setAdapter(mVideoSelectListAdapter);
         mVideoSelectListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<VideoFile>() {
             @Override
-            public void onItemClick(View view, int postion, VideoFile data) {
+            public void onItemClick(View view, int position, VideoFile data) {
                 if (mPlayVideoListener != null) {
-                    mPlayVideoListener.playVideo(mViewModel.playVideo(data.path, data.filename));
-                } else {
-                    mViewModel.playVideo(data.path, data.filename).subscribe(new SimpleObserver<String>() {
-                        @Override
-                        public void onAction(String s) {
-                            dismiss();
-                        }
-                    });
+                    mPlayVideoListener.selectVideo(data,position);
                 }
             }
 
@@ -101,37 +76,16 @@ public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel,
         });
 
 
-        Object obj = getArguments().getSerializable(FILE);
-        if (obj != null && obj instanceof UnrecognizedFileDataView) {
-            UnrecognizedFileDataView file = (UnrecognizedFileDataView) obj;
-            mViewModel.getVideoList(file.keyword).subscribe(new SimpleObserver<List<VideoFile>>() {
-                @Override
-                public void onAction(List<VideoFile> videoFileList) {
-                    mVideoSelectListAdapter.addAll(videoFileList);
-                }
-            });
-            return;
-        }
-
-        obj = getArguments().getSerializable(MOVIE_WRAPPER);
-        if (obj != null && obj instanceof MovieWrapper) {
-            MovieWrapper wrapper = (MovieWrapper) obj;
-            wrapper.videoFiles.sort(Comparator.comparing(o -> o.filename));
-            mVideoSelectListAdapter.addAll(wrapper.videoFiles);
-            return;
-        }
-
-        obj = getArguments().getSerializable(FILE_LIST);
+        Object obj = getArguments().getSerializable(FILE_LIST);
         if (obj != null && obj instanceof List) {
             List<VideoFile> videoFileList = (List<VideoFile>) obj;
             videoFileList.sort(Comparator.comparing(o -> o.filename));
             mVideoSelectListAdapter.addAll(videoFileList);
-            return;
         }
     }
 
     public interface PlayVideoListener {
-        void playVideo(Observable<String> observable);
+        void selectVideo(VideoFile videoFile,int position);
     }
 
     public void setPlayingVideo(PlayVideoListener listener) {

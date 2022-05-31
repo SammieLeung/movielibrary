@@ -26,24 +26,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2022/1/21
  */
 public class VideoSelectViewModel extends BaseAndroidViewModel {
-    private VideoFileDao mVideoFileDao;
 
     public VideoSelectViewModel(@NonNull @NotNull Application application) {
         super(application);
-        mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
-    }
-
-    public Observable<List<VideoFile>> getVideoList(String keyword) {
-        return Observable.just(keyword)
-                .observeOn(Schedulers.io())
-                .map(ky -> {
-                    List<VideoFile> list = new ArrayList<>();
-                    list.addAll(mVideoFileDao.queryVideoFileListByKeyword(ky, ScraperSourceTools.getSource()));
-                    return list;
-                }).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public Observable<String> playVideo(String path,String name){
-        return MovieHelper.playingMovie(path,name);
     }
 }

@@ -10,6 +10,7 @@
         <import type="android.text.TextUtils" />
 
         <import type="android.view.View" />
+        <import type="androidx.databinding.ObservableField"/>
 
         <variable
           name="wrapper"
@@ -30,6 +31,10 @@
         <variable
           name="episodes_title"
           type="String" />
+
+        <variable
+          name="play_episode_btn_text"
+          type="ObservableField&lt;String>" />
     </data>
 
     <RelativeLayout
@@ -156,17 +161,33 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_marginTop="45dp">
-
-                        <Button
-                          android:id="@+id/btn_play"
-                          style="@style/detail_btn_style"
-                          android:drawableLeft="@drawable/ic_btn_play_drawable"
-                          android:focusedByDefault="true"
-                          android:text="@string/btn_play"
+                        <RelativeLayout
+                          android:id="@+id/viewgroup_playbtn"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          app:layout_constraintStart_toStartOf="parent"
+                          app:layout_constraintTop_toTopOf="parent"
                           app:layout_constraintBottom_toBottomOf="parent"
                           app:layout_constraintEnd_toStartOf="@id/btn_favorite"
-                          app:layout_constraintStart_toStartOf="parent"
-                          app:layout_constraintTop_toTopOf="parent" />
+                          >
+                            <Button
+                              android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)?View.GONE:View.VISIBLE}"
+                              android:id="@+id/btn_play"
+                              style="@style/detail_btn_style"
+                              android:drawableLeft="@drawable/ic_btn_play_drawable"
+                              android:focusedByDefault="true"
+                              android:text="@string/btn_play"
+                            />
+
+                            <Button
+                              android:id="@+id/btn_play_episode"
+                              style="@style/detail_btn_style"
+                              android:drawableLeft="@drawable/ic_btn_play_drawable"
+                              android:focusedByDefault="true"
+                              android:text="@{play_episode_btn_text}"
+                              android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)?View.VISIBLE:View.GONE}" />
+                        </RelativeLayout>
+
 
                         <Button
                           android:id="@+id/btn_favorite"
@@ -175,7 +196,7 @@
                           android:text="@string/btn_favorite"
                           app:layout_constraintBottom_toBottomOf="parent"
                           app:layout_constraintEnd_toStartOf="@id/btn_edit"
-                          app:layout_constraintStart_toEndOf="@id/btn_play"
+                          app:layout_constraintStart_toEndOf="@id/viewgroup_playbtn"
                           app:layout_constraintTop_toTopOf="parent" />
 
                         <Button

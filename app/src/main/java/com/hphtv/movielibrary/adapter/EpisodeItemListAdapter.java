@@ -14,9 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.RvItemEpisodeLayoutBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.station.kit.view.mvvm.ViewDataBindingHelper;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -30,7 +27,7 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
     private int mPart = 0;
     private Context mContext;
     protected OnRecyclerViewItemActionListener mOnItemClickListener = null;
-    protected ObservableInt mSelectPos;
+    protected ObservableInt mLastPlayEpisodePos;
 
     public EpisodeItemListAdapter(Context context, List<List<VideoFile>> list) {
         mContext = context;
@@ -49,7 +46,7 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         RvItemEpisodeLayoutBinding binding = RvItemEpisodeLayoutBinding.inflate(LayoutInflater.from(mContext), parent, false);
-        binding.setSelectPos(mSelectPos);
+        binding.setLastPlayEpisodePos(mLastPlayEpisodePos);
         ViewHolder viewHolder = new ViewHolder(binding);
         return viewHolder;
     }
@@ -86,8 +83,8 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
         this.mOnItemClickListener = listener;
     }
 
-    public void setSelectPos(ObservableInt selectPos) {
-        mSelectPos = selectPos;
+    public void setLastPlayEpisodePos(ObservableInt lastPlayEpisodePos) {
+        mLastPlayEpisodePos = lastPlayEpisodePos;
     }
 
     @Override
@@ -95,7 +92,7 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
         if (mOnItemClickListener != null && v.getTag() != null) {
             int position = (int) v.getTag();
             int realPosition=mPart*10+position;
-            mSelectPos.set(realPosition);
+            mLastPlayEpisodePos.set(realPosition);
             List<VideoFile> data = mList.get(position);
             //注意这里使用getTag方法获取数据
             mOnItemClickListener.onItemClick(v, realPosition, data);
