@@ -158,6 +158,7 @@ public class MovieScanService extends Service {
                                                 nameInfo = parser.parseVideoName(videoFile.path);
                                             }
                                             String keyword = nameInfo.getName();
+                                            videoFile.keyword=keyword;
                                             videoFile.season=nameInfo.getSeason();
                                             videoFile.episode= nameInfo.toEpisode();
                                             //选择搜索api
