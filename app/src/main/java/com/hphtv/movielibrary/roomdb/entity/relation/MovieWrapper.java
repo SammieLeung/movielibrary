@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.roomdb.entity.relation;
 
 import androidx.room.Embedded;
+import androidx.room.Ignore;
 import androidx.room.Junction;
 import androidx.room.Relation;
 
@@ -61,6 +62,9 @@ public class MovieWrapper implements Serializable {
     @Relation(parentColumn = "id",
     entityColumn = "movie_id")//分季,一对多
     public List<Season> seasons;
+
+    @Ignore
+    public Season season;
 
     public String toGenreString() {
         StringBuffer sb = new StringBuffer();

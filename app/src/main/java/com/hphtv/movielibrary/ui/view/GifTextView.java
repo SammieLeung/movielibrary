@@ -203,6 +203,7 @@ public class GifTextView extends LinearLayout {
     private void addTextView(TypedArray ta) {
         if (mTextView == null) {
             mTextView = new TextView(getContext());
+            mTextView.setDuplicateParentStateEnabled(true);
             addView(mTextView);
         }
         CharSequence gifText = "";

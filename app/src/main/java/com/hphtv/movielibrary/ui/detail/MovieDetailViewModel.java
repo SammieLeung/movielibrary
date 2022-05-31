@@ -4,8 +4,10 @@ import android.app.Application;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -27,10 +29,23 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -43,16 +58,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class MovieDetailViewModel extends BaseAndroidViewModel {
     private MovieDao mMovieDao;
-    private MovieVideofileCrossRefDao mMovieVideofileCrossRefDao;
-    private VideoFileDao mVideoFileDao;
-
 
     private ExecutorService mSingleThreadPool;
     private MovieWrapper mMovieWrapper;
-    private Season mSeason;
     private List<MovieDataView> mRecommendList = new ArrayList<>();
-
+    private List<List<VideoFile>> mEpisodeVideoFilesList = new ArrayList<>();
+    private LinkedHashMap<String, List<List<VideoFile>>> mTabLayoutPaginationMap = new LinkedHashMap<>();
     private String mSource;
+    private ObservableInt mEpisodePlayed=new ObservableInt(-1);
 
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -63,8 +76,6 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     private void init() {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
-        mMovieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieVideofileCrossRefDao();
-        mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
     }
 
     /**
@@ -73,11 +84,75 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
      * @param id
      * @return
      */
-    public Observable<MovieWrapper> loadMovieWrapper(long id) {
+    public Observable<MovieWrapper> loadMovieWrapper(long id, int season) {
+
         return Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
                     mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id, mSource);
+                    mEpisodePlayed.set(-1);
+                    if (Constants.SearchType.tv.equals(mMovieWrapper.movie.type)) {
+                        for (Season _season : mMovieWrapper.seasons) {
+                            int num = _season.seasonNumber;
+                            if (num == season) {
+                                mMovieWrapper.season = _season;
+                                break;
+                            }
+                        }
+                        mTabLayoutPaginationMap.clear();
+                        mEpisodeVideoFilesList.clear();
+                        ArrayList<VideoFile> tmpVideoFileList = new ArrayList<>();
+                        tmpVideoFileList.addAll(mMovieWrapper.videoFiles);
+                        long latestPlayTime=-1;
+                        int latestEpisode=-1;
+                        //按集数分配视频文件
+                        for (int i = 0; i < mMovieWrapper.season.episodeCount + 1; i++) {
+                            Iterator<VideoFile> videoFileIterator = tmpVideoFileList.iterator();
+                            ArrayList<VideoFile> tmpList = new ArrayList<>();
+                            mEpisodeVideoFilesList.add(tmpList);
+
+                            while (videoFileIterator.hasNext()) {
+                                VideoFile videoFile = videoFileIterator.next();
+                                if(videoFile.lastPlayTime>latestPlayTime) {
+                                    latestPlayTime = videoFile.lastPlayTime;
+                                    latestEpisode=videoFile.episode;
+                                }
+                                if (videoFile.episode == i) {
+                                    tmpList.add(videoFile);
+                                    videoFileIterator.remove();
+                                }
+                            }
+                        }
+                        mEpisodePlayed.set(latestEpisode-1);
+
+                        //按分页划分视频文件
+                        int episodeSize = mEpisodeVideoFilesList.size();
+                        if (episodeSize > 1) {
+                            int part = (episodeSize - 1) / 10;//index 0是不能识别的剧集，所以需要长度-1.
+                            int remaining = (episodeSize - 1) % 10;
+                            if(remaining>0){
+                                part+=1;
+                            }
+                            for (int i = 0; i < part; i++) {
+                                int start = i * 10 + 1;
+                                int end = (i + 1) * 10;
+                                int last=(part - 1) * 10 + remaining;
+                                if(remaining==0)
+                                    last=part*10;
+                                if (end > last)
+                                    end = last;
+                                String name = start + "-" + end;
+                                if (start == end)
+                                    name = String.valueOf(start);
+                                mTabLayoutPaginationMap.put(name, mEpisodeVideoFilesList.subList(start, end + 1));
+                            }
+                            //TODO 暂时不处理更多剧集
+//                            if (mEpisodeVideoFilesList.get(0).size() > 0)
+//                                mTabLayoutPaginationMap.put(getApplication().getString(R.string.episode_pagination_others_title), mEpisodeVideoFilesList.subList(0, 1));
+                        }
+
+                    }
+
                     return mMovieWrapper;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
@@ -159,6 +234,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return setLike(!mMovieWrapper.movie.isFavorite);
     }
 
+    public ObservableInt getEpisodePlayed() {
+        return mEpisodePlayed;
+    }
+
     public void playingVideo(String path, String name) {
         MovieHelper.playingMovie(path, name)
                 .subscribe(new SimpleObserver<String>() {
@@ -206,16 +285,16 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return mMovieWrapper;
     }
 
-    public Season getSeason() {
-        return mSeason;
-    }
-
-    public void setSeason(Season season) {
-        mSeason = season;
-    }
-
     public List<MovieDataView> getRecommendList() {
         return mRecommendList;
+    }
+
+    public List<List<VideoFile>> getEpisodeVideoFilesList() {
+        return mEpisodeVideoFilesList;
+    }
+
+    public HashMap<String, List<List<VideoFile>>> getTabLayoutPaginationMap() {
+        return mTabLayoutPaginationMap;
     }
 
     public interface Callback2 {

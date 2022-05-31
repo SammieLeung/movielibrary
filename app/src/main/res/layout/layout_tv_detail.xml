@@ -14,13 +14,7 @@
         <variable
           name="wrapper"
           type="com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper" />
-        <variable
-          name="season"
-          type="com.hphtv.movielibrary.roomdb.entity.Season" />
 
-        <variable
-          name="isShowEpisodes"
-          type="boolean" />
         <variable
           name="expand"
           type="boolean" />
@@ -71,7 +65,7 @@
                     <TextView
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="@{wrapper.movie.title+(wrapper.movie.type.equals(Constants.SearchType.tv)?(' '+season.name):&quot;&quot;)}"
+                      android:text="@{wrapper.movie.title+(wrapper.movie.type.equals(Constants.SearchType.tv)?(' '+wrapper.season.name):&quot;&quot;)}"
                       android:textColor="@color/white"
                       android:textSize="36sp"
                       android:textStyle="bold" />
@@ -142,7 +136,7 @@
                           android:ellipsize="end"
                           android:maxWidth="466dp"
                           android:maxLines="2"
-                          android:text="@{!TextUtils.isEmpty(season.plot)?season.plot:wrapper.movie.plot}" />
+                          android:text="@{!TextUtils.isEmpty(wrapper.season.plot)?wrapper.season.plot:wrapper.movie.plot}" />
 
                         <TextView
                           android:id="@+id/tv_more"
@@ -229,23 +223,33 @@
                   android:layout_marginTop="45dp"
                   android:text="@{episodes_title}"
                   android:textStyle="bold"
-                  android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}" />
+                  android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)?View.VISIBLE:View.GONE}" />
 
                 <com.hphtv.movielibrary.ui.view.TvRecyclerView
                   android:id="@+id/rv_episode_list"
-                  android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}"
+                  android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)?View.VISIBLE:View.GONE}"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_below="@id/tv_episodes"
                   />
 
-                <TableLayout
+                <com.google.android.material.tabs.TabLayout
                   android:layout_below="@id/rv_episode_list"
-                  android:visibility="@{isShowEpisodes?View.VISIBLE:View.GONE}"
+                  android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)?View.VISIBLE:View.GONE}"
                   android:id="@+id/tab_episode_set"
-                  android:layout_width="match_parent"
+                  android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:layout_marginTop="12dp"/>
+                  android:layout_marginStart="72dp"
+                  android:layout_marginTop="12dp"
+                  app:tabGravity="center"
+                  app:tabIndicator="@drawable/tab_indicator"
+                  app:tabIndicatorHeight="5dp"
+                  app:tabMinWidth="98dp"
+                  app:tabPaddingBottom="7dp"
+                  app:tabSelectedTextColor="@color/white"
+                  app:tabTextAppearance="@style/localsearch_tabTextAppearance"
+                  app:tabTextColor="#8E8E8E"
+                  app:tabIndicatorColor="@color/main_focus"/>
 
                 <TextView
                   android:id="@+id/tv_recommand"

@@ -167,9 +167,9 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
 
 
     public interface OnRecyclerViewItemActionListener<T> {
-        void onItemClick(View view, int postion, T data);
+        void onItemClick(View view, int position, T data);
 
-        void onItemFocus(View view, int postion, T data);
+        void onItemFocus(View view, int position, T data);
     }
 
     public interface OnItemLongClickListener<T> {

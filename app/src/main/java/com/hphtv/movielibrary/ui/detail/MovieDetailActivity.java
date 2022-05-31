@@ -22,17 +22,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.EpisodeItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.databinding.LayoutMovieDetailBinding;
 import com.hphtv.movielibrary.databinding.LayoutTvDetailBinding;
-import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
-import com.hphtv.movielibrary.effect.LinearLayoutItemDecoration;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
-import com.hphtv.movielibrary.roomdb.entity.Season;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
@@ -43,6 +41,7 @@ import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.LogUtil;
 import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -100,7 +99,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         String name = mBinding.getWrapper().videoFiles.get(0).filename;
                         playVideo(path, name);
                     } else if (mBinding.getWrapper().videoFiles.size() > 1) {
-                        showRadioDialog();
+                        showVideoSelectDialog();
                     }
                 }
                 break;
@@ -169,23 +168,53 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         });
 
         mEpisodeItemListAdapter = new EpisodeItemListAdapter(this, new ArrayList<>());
+        mEpisodeItemListAdapter.setSelectPos(mViewModel.getEpisodePlayed());
         linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
         mBinding.rvEpisodeList.setLayoutManager(linearLayoutManager);
         mBinding.rvEpisodeList.setAdapter(mEpisodeItemListAdapter);
         mBinding.rvEpisodeList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 7), DensityUtil.dip2px(this, 23)));
-        mEpisodeItemListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<String>() {
+        mEpisodeItemListAdapter.setOnItemClickListener(new EpisodeItemListAdapter.OnRecyclerViewItemActionListener() {
             @Override
-            public void onItemClick(View view, int position, String data) {
-
+            public void onItemClick(View view, int position, List<VideoFile> data) {
+                LogUtil.v("position " + position);
+                if (data.size() == 1) {
+                    VideoFile videoFile=data.get(0);
+                    playVideo(videoFile.path, videoFile.filename);
+                } else if (data.size() > 1) {
+                    showTVEpisodeSelectDialog(data);
+                }
             }
 
             @Override
-            public void onItemFocus(View view, int postion, String data) {
+            public void onItemFocus(View view, int position, List<VideoFile> data) {
 
             }
         });
-
         mBinding.nestScrollview.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
+        LinearLayout linearLayout = (LinearLayout) mBinding.tabEpisodeSet.getChildAt(0);
+        linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
+        linearLayout.setDividerDrawable(getDrawable(R.drawable.divider_vertical));
+        linearLayout.setDividerPadding(DensityUtil.dip2px(getBaseContext(), 13));
+        mBinding.tabEpisodeSet.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int pos = tab.getPosition();
+                List<String> keySetList = new ArrayList<>(mViewModel.getTabLayoutPaginationMap().keySet());
+                String key = keySetList.get(pos);
+                mEpisodeItemListAdapter.setPart(pos);
+                mEpisodeItemListAdapter.addAll(mViewModel.getTabLayoutPaginationMap().get(key));
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     @Override
@@ -205,7 +234,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void prepareMovieWrapper(long movieId, int season) {
 
-        mViewModel.loadMovieWrapper(movieId)
+        mViewModel.loadMovieWrapper(movieId, season)
                 .subscribe(new SimpleObserver<MovieWrapper>() {
                     @Override
                     public void onSubscribe(Disposable d) {
@@ -216,33 +245,19 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     @Override
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
-                            Constants.SearchType type = wrapper.movie.type;
-                            switch (type) {
-                                case tv:
-                                    for (Season _season : wrapper.seasons) {
-                                        int num = _season.seasonNumber;
-                                        if (num == season) {
-                                            mViewModel.setSeason(_season);
-                                            ArrayList<String> episodes = new ArrayList<>();
-                                            for (int i = 0; i < _season.episodeCount; i++) {
-                                                episodes.add(String.valueOf(i + 1));
-                                            }
-                                            mEpisodeItemListAdapter.addAll(episodes);
-                                            mBinding.setSeason(_season);
-                                            mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, _season.episodeCount));
-                                            mBinding.setIsShowEpisodes(true);
-                                            break;
-                                        }
-                                    }
-                                    break;
-                                default:
-                                    mBinding.setIsShowEpisodes(false);
-                                    mViewModel.setSeason(null);
-                                    mBinding.setSeason(null);
-                                    mBinding.setEpisodesTitle("");
+                            if (Constants.SearchType.tv.equals(wrapper.movie.type)) {
+                                mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
                             }
 
                             mBinding.setWrapper(wrapper);
+                            TabLayout tabLayout = mBinding.tabEpisodeSet;
+                            tabLayout.removeAllTabs();
+
+                            for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
+                                tabLayout.addTab(tabLayout.newTab().setText(name));
+                            }
+                            tabLayout.selectTab(tabLayout.getTabAt(0));
+
                             String stagePhoto = "";
                             if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
                                 Random random = new Random();
@@ -398,8 +413,31 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 });
     }
 
-    public void showRadioDialog() {
+    public void showVideoSelectDialog() {
         VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mBinding.getWrapper());
+        dialogFragment.setPlayingVideo(new VideoSelectDialog.PlayVideoListener() {
+            @Override
+            public void playVideo(Observable<String> observable) {
+                observable.subscribe(new SimpleObserver<String>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        startLoading();
+                    }
+
+                    @Override
+                    public void onAction(String s) {
+                        refreshParent();
+                    }
+                });
+            }
+        });
+        dialogFragment.show(getSupportFragmentManager(), "detail");
+    }
+
+    public void showTVEpisodeSelectDialog(List<VideoFile> videoFileList) {
+        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(videoFileList);
         dialogFragment.setPlayingVideo(new VideoSelectDialog.PlayVideoListener() {
             @Override
             public void playVideo(Observable<String> observable) {

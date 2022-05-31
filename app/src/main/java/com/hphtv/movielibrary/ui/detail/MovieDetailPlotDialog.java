@@ -73,8 +73,8 @@ public class MovieDetailPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 62), DensityUtil.dip2px(getContext(), 22), DensityUtil.dip2px(getContext(), 22)));
         mBinding.rvActorList.setAdapter(mActorPosterItemListApdater);
         String plot=mViewModel.getMovieWrapper().movie.plot;
-        if(mViewModel.getMovieWrapper().movie.type.equals(Constants.SearchType.tv)&&!TextUtils.isEmpty(mViewModel.getSeason().plot))
-            plot=mViewModel.getSeason().plot;
+        if(mViewModel.getMovieWrapper().movie.type.equals(Constants.SearchType.tv)&&!TextUtils.isEmpty(mViewModel.getMovieWrapper().season.plot))
+            plot=mViewModel.getMovieWrapper().season.plot;
         mBinding.setPlot(plot);
         mBinding.btnFold.setOnClickListener(v -> dismiss());
         mViewModel.loadFileList().subscribe(new SimpleObserver<String>() {

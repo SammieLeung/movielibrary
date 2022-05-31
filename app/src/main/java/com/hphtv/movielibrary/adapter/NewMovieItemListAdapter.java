@@ -23,7 +23,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, BaseScaleApater.ViewHolder, MovieDataView> {
+public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, MovieDataView> {
 
     public NewMovieItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {
         super(context, movieDataViewList);
@@ -31,8 +31,8 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
 
     @NonNull
     @Override
-    public BaseScaleApater.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        BaseScaleApater.ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
+    public BaseScaleAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        BaseScaleAdapter.ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
         PosterItemBinding itemBinding= (PosterItemBinding) viewHolder.mBinding;
         itemBinding.setShowConrerMark(Config.getShowCornerMark());
         itemBinding.setShowLike(Config.getShowLike());
@@ -44,7 +44,7 @@ public class NewMovieItemListAdapter extends BaseScaleApater<PosterItemBinding, 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;

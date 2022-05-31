@@ -15,10 +15,10 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends BaseAdapter2.ViewHolder, T> extends BaseAdapter2<VDB,VH,T> implements View.OnFocusChangeListener , View.OnHoverListener {
+public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, VH extends BaseAdapter2.ViewHolder, T> extends BaseAdapter2<VDB,VH,T> implements View.OnFocusChangeListener , View.OnHoverListener {
     protected float mZoomRatio = 1.15f;
 
-    public BaseScaleApater(Context context, List<T> list) {
+    public BaseScaleAdapter(Context context, List<T> list) {
         super(context,list);
         mContext = context;
         mList = list;
@@ -57,8 +57,8 @@ public abstract class BaseScaleApater<VDB extends ViewDataBinding, VH extends Ba
 
         public ViewHolder(ViewDataBinding binding) {
             super(binding);
-            mBinding.getRoot().setOnFocusChangeListener(BaseScaleApater.this);
-            mBinding.getRoot().setOnHoverListener(BaseScaleApater.this);
+            mBinding.getRoot().setOnFocusChangeListener(BaseScaleAdapter.this);
+            mBinding.getRoot().setOnHoverListener(BaseScaleAdapter.this);
         }
     }
 

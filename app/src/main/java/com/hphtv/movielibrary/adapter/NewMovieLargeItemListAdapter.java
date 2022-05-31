@@ -8,9 +8,7 @@ import android.widget.Filterable;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.databinding.PosterItemBinding;
 import com.hphtv.movielibrary.databinding.PosterItemLargeBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.station.kit.util.LogUtil;
@@ -24,7 +22,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/02/10
  */
-public class NewMovieLargeItemListAdapter extends BaseScaleApater<PosterItemLargeBinding, BaseScaleApater.ViewHolder, MovieDataView> implements Filterable {
+public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLargeBinding, BaseScaleAdapter.ViewHolder, MovieDataView> implements Filterable {
     private List<MovieDataView> mFilterMovieDataViewList;
 
     public NewMovieLargeItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {
@@ -33,7 +31,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleApater<PosterItemLarg
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mFilterMovieDataViewList.get(position);
         PosterItemLargeBinding binding = (PosterItemLargeBinding) holder.mBinding;

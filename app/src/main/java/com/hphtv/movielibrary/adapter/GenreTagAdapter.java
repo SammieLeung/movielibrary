@@ -97,7 +97,7 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         holder.mBinding.getRoot().setTag(position);
         RoundRectItemBinding binding = (RoundRectItemBinding) holder.mBinding;
         if (getItemViewType(position) == TYPE_HOME) {

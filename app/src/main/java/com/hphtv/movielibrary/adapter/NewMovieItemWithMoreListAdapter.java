@@ -32,7 +32,7 @@ public class NewMovieItemWithMoreListAdapter extends NewMovieItemListAdapter {
 
     @NonNull
     @Override
-    public BaseScaleApater.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public BaseScaleAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_MORE) {
             PosterMoreItemBinding itemBinding = PosterMoreItemBinding.inflate(LayoutInflater.from(mContext), parent, false);
             ViewHolder holder = new ViewHolder(itemBinding);
@@ -42,7 +42,7 @@ public class NewMovieItemWithMoreListAdapter extends NewMovieItemListAdapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull BaseScaleApater.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_POSTER)
             super.onBindViewHolder(holder, position);
         else
@@ -68,7 +68,7 @@ public class NewMovieItemWithMoreListAdapter extends NewMovieItemListAdapter {
             mOnMoreItemClickListener.onClick(mType);
     }
 
-    public class ViewHolder extends BaseScaleApater.ViewHolder{
+    public class ViewHolder extends BaseScaleAdapter.ViewHolder{
         public ViewHolder(ViewDataBinding binding) {
             super(binding);
             binding.getRoot().setOnClickListener(NewMovieItemWithMoreListAdapter.this::onMoreItemClick);

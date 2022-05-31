@@ -32,7 +32,7 @@
     app:gifPlaceHolder="@drawable/ic_episode_watching"
     app:gifText="@{text}"
     app:gifTextSize="24sp"
-    app:gifTextColor="@color/white"
+    app:gifTextColor="@color/episode_item_textcolor"
     app:gifTextStyle="bold">
 
   </com.hphtv.movielibrary.ui.view.GifTextView>
