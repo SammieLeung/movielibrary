@@ -178,6 +178,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             public void onItemClick(View view, int position, List<VideoFile> data) {
                 LogUtil.v("position " + position);
                 if (data.size() == 1) {
+                    startLoading();
                     VideoFile videoFile=data.get(0);
                     playVideo(videoFile.path, videoFile.filename);
                 } else if (data.size() > 1) {
