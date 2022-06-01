@@ -283,14 +283,15 @@ public class TvRecyclerView extends RecyclerView {
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
                         if (mOnKeyPressListener != null)
                             mOnKeyPressListener.processKeyEvent(event.getKeyCode());
-                        if (!isVertical() && isVisBottom(this)) {
-                            this.smoothScrollToPosition(getLastVisiblePosition());
-                        }
+
                         View rightView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_RIGHT);
                         if (rightView != null) {
                             rightView.requestFocus();
                             int rightOffset = rightView.getLeft() - getWidth() / 2 + rightView.getWidth() / 2;
-                            this.customSmoothScrollBy(rightOffset, 0);
+                            if (!isVertical() && isVisBottom(this)) {
+                                this.smoothScrollToPosition(getLastVisiblePosition());
+                            } else
+                                this.customSmoothScrollBy(rightOffset, 0);
                             return true;
                         } else {
                             if (isVertical())

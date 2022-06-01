@@ -174,13 +174,13 @@ public class MovieScanService extends Service {
                                                         tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api, year);
                                                         break;
                                                     case tv:
-                                                        tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api, year);
+                                                        tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api,year);
                                                         break;
                                                     default:
                                                         if (MovieNameInfo.TYPE_MOVIE.equals(nameInfo.getType())) {
                                                             tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api, year);
                                                         } else if (MovieNameInfo.TYPE_SERIES.equals(nameInfo.getType())) {
-                                                            tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api, year);
+                                                            tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api,year);
                                                         } else {
                                                             tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api, year);
                                                         }
@@ -218,7 +218,7 @@ public class MovieScanService extends Service {
                                                                     } else {
                                                                         OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
                                                                         OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB);
-                                                                        LogUtil.e(Thread.currentThread().getName(), _keyword + " 此关键字无搜索结果");
+                                                                        LogUtil.e(Thread.currentThread().getName(), "["+_keyword + "]["+year+"] 此关键字无搜索结果");
                                                                         videoFile.isScanned = 1;
                                                                         mVideoFileDao.update(videoFile);
                                                                     }
