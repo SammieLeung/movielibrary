@@ -114,7 +114,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
     public Observable<MovieDataView> reMatchMovie(MovieWrapper newWrapper) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
             List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
-            MovieHelper.saveMatchedMovieWrapper(getApplication(), newWrapper, videoFileList);
+            MovieHelper.manualSaveMovie(getApplication(), newWrapper, videoFileList);
             MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId, newWrapper.movie.type.name(), ScraperSourceTools.getSource());
             emitter.onNext(movieDataView);
             emitter.onComplete();

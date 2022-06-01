@@ -41,11 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -89,12 +85,12 @@ public class MovieHelper {
      * @param movieWrapper
      * @param videoFile
      */
-    public static void saveMovieWrapper(Context context, MovieWrapper movieWrapper, VideoFile videoFile) {
-        long movie_id = saveCommonInfos(context, movieWrapper);
+    public static void addNewMovieInfo(Context context, MovieWrapper movieWrapper, VideoFile videoFile) {
+        long movie_id = saveBaseInfo(context, movieWrapper);
         if (movie_id != -1) {
 
             //VideoFile
-            saveMovieVideoFileCrossRef(context, movie_id, videoFile, movieWrapper.movie.source);
+            establishRelationshipBetweenPosterAndVideos(context, movie_id, videoFile, movieWrapper.movie.source);
             OnlineDBApiService.uploadMovie(movieWrapper.movie, videoFile, movieWrapper.movie.source);
             LogUtil.v(Thread.currentThread().getName(), "saveMovie: " + movie_id + "<=>" + videoFile.filename);
         }
@@ -107,11 +103,11 @@ public class MovieHelper {
      * @param movieWrapper
      * @param videoFileList
      */
-    public static void saveMatchedMovieWrapper(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
-        long movie_id = saveCommonInfos(context, movieWrapper);
+    public static void manualSaveMovie(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
+        long movie_id = saveBaseInfo(context, movieWrapper);
         if (movie_id != -1 && movieWrapper.movie != null) {
             //VideoFile
-            saveMovieVideoFileCrossRef(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
+            establishRelationshipBetweenPosterAndVideos(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
             OnlineDBApiService.uploadMovie(movieWrapper, videoFileList, movieWrapper.movie.source);
         }
     }
@@ -123,7 +119,7 @@ public class MovieHelper {
      * @param movieWrapper
      * @return
      */
-    private static long saveCommonInfos(Context context, MovieWrapper movieWrapper) {
+    private static long saveBaseInfo(Context context, MovieWrapper movieWrapper) {
         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
         GenreDao genreDao = MovieLibraryRoomDatabase.getDatabase(context).getGenreDao();
         ActorDao actorDao = MovieLibraryRoomDatabase.getDatabase(context).getActorDao();
@@ -226,7 +222,7 @@ public class MovieHelper {
             }
         }
 
-        saveAutoVideoTag(context, new_movie, genreList);
+        autoClassification(context, new_movie, genreList);
 
         return movie_id;
     }
@@ -239,7 +235,7 @@ public class MovieHelper {
      * @param videoFile
      * @param source
      */
-    private static void saveMovieVideoFileCrossRef(Context context, long movie_id, VideoFile videoFile, String source) {
+    public static void establishRelationshipBetweenPosterAndVideos(Context context, long movie_id, VideoFile videoFile, String source) {
         MovieVideofileCrossRefDao movieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieVideofileCrossRefDao();
         VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
 
@@ -263,7 +259,7 @@ public class MovieHelper {
      * @param videoFileList
      * @param source
      */
-    private static void saveMovieVideoFileCrossRef(Context context, long movie_id, String keyword, List<VideoFile> videoFileList, String source) {
+    public static void establishRelationshipBetweenPosterAndVideos(Context context, long movie_id, String keyword, List<VideoFile> videoFileList, String source) {
         MovieVideofileCrossRefDao movieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieVideofileCrossRefDao();
         VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
 
@@ -289,7 +285,7 @@ public class MovieHelper {
      * @param movie
      * @param genreList
      */
-    private static void saveAutoVideoTag(Context context, Movie movie, List<Genre> genreList) {
+    private static void autoClassification(Context context, Movie movie, List<Genre> genreList) {
         VideoTagDao videoTagDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoTagDao();
         MovieVideoTagCrossRefDao movieVideoTagCrossRefDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieVideoTagCrossRefDao();
 

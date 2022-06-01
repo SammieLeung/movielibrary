@@ -17,6 +17,17 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class TmdbApiService {
     public static final String TAG = TmdbApiService.class.getSimpleName();
+    public static Observable<MovieSearchRespone> unionSearch(String keyword, String api,String year) {
+        return unionSearch(keyword, 1, api,year);
+    }
+
+    public static Observable<MovieSearchRespone> movieSearch(String keyword, String api,String year) {
+        return movieSearch(keyword, 1, api,year);
+    }
+
+    public static Observable<MovieSearchRespone> tvSearch(String keyword, String api,String year) {
+        return tvSearch(keyword, 1, api,year);
+    }
 
     public static Observable<MovieSearchRespone> unionSearch(String keyword, String api) {
         return unionSearch(keyword, 1, api);
@@ -31,11 +42,14 @@ public class TmdbApiService {
     }
 
     public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String api) {
-        return Observable.zip(unionSearch(keyword, pageIndex, api, Constants.SearchType.movie.name(), null).observeOn(Schedulers.newThread()),
-                unionSearch(keyword, pageIndex, api, Constants.SearchType.tv.name(), null).observeOn(Schedulers.newThread()),
-                MovieSearchRespone::combine);
+        return unionSearch(keyword,pageIndex,api,null);
     }
 
+    public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String api,String year) {
+        return Observable.zip(unionSearch(keyword, pageIndex, api, Constants.SearchType.movie.name(), year).observeOn(Schedulers.newThread()),
+                unionSearch(keyword, pageIndex, api, Constants.SearchType.tv.name(), year).observeOn(Schedulers.newThread()),
+                MovieSearchRespone::combine);
+    }
 
     public static Observable<MovieSearchRespone> movieSearch(String keyword, int pageIndex, String api) {
         return movieSearch(keyword, pageIndex, api, null);

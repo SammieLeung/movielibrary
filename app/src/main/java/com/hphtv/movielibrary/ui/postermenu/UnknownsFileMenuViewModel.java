@@ -17,8 +17,6 @@ import com.hphtv.movielibrary.util.ScraperSourceTools;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
@@ -42,7 +40,7 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
     public Observable<MovieDataView> reMatchMovie(MovieWrapper newWrapper){
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
             VideoFile videoFile=mVideoFileDao.queryByVid(mUnrecognizedFileDataView.vid);
-            MovieHelper.saveMovieWrapper(getApplication(),newWrapper,videoFile);
+            MovieHelper.addNewMovieInfo(getApplication(),newWrapper,videoFile);
             MovieDataView movieDataView=mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId,newWrapper.movie.type.name(), ScraperSourceTools.getSource());
             emitter.onNext(movieDataView);
             emitter.onComplete();

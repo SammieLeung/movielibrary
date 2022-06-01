@@ -34,6 +34,9 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source")
     public Movie queryByMovieId(String movie_id, String source);
 
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source AND type=:type")
+    public Movie queryByMovieIdAndType(String movie_id, String source,String type);
+
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
     public List<Movie> queryByMovieId(String movie_id);
 
@@ -136,9 +139,9 @@ public interface MovieDao {
      */
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source AND movie_id=:movie_id " +
-            " AND type=:type "+
+            " AND type=:type " +
             "GROUP BY id")
-    public MovieDataView queryMovieDataViewByMovieId(String movie_id,String type, String source);
+    public MovieDataView queryMovieDataViewByMovieId(String movie_id, String type, String source);
 
     /**
      * @param device_uri 设备id
@@ -294,13 +297,13 @@ public interface MovieDao {
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " GROUP BY id ORDER BY pinyin ASC)")
-    public int countFavoriteMovieDataView(String source,String ap);
+    public int countFavoriteMovieDataView(String source, String ap);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " GROUP BY id ORDER BY pinyin ASC" +
             " LIMIT :offset,:limit")
-    public List<MovieDataView> queryFavoriteMovieDataView(String source,String ap, int offset, int limit);
+    public List<MovieDataView> queryFavoriteMovieDataView(String source, String ap, int offset, int limit);
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);

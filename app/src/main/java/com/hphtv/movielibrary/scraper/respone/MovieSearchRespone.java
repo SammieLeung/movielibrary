@@ -74,6 +74,7 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
                 movie.ratings=rating;
                 movie.plot=plot;
                 movie.poster = poster;
+                movie.year=year.replaceAll("^(19|20[0-9]{2}).*","$1");
                 return movie;
             }
         }

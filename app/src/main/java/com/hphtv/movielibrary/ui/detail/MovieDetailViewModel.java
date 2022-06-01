@@ -275,7 +275,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 //                boolean is_favoirte = mMovieWrapper.movie.isFavorite;
 //                boolean is_watched = mMovieWrapper.movie.isWatched;
 //                BroadcastHelper.sendBroadcastMovieUpdateSync(getApplication(), last_movie_id, movie_id, is_favoirte ? 1 : 0);//向手机助手发送电影更改的广播
-                        MovieHelper.saveMatchedMovieWrapper(getApplication(), wrapper, mMovieWrapper.videoFiles);
+                        MovieHelper.manualSaveMovie(getApplication(), wrapper, mMovieWrapper.videoFiles);
                     } else {
                         throw new Throwable();
                     }

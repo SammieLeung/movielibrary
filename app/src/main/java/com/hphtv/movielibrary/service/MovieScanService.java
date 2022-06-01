@@ -10,10 +10,10 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.firefly.videonameparser.VideoNameParser;
 import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
@@ -24,12 +24,8 @@ import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
-import com.hphtv.movielibrary.util.FileScanUtil;
 import com.hphtv.movielibrary.util.MovieHelper;
-import com.hphtv.movielibrary.util.ScraperSourceTools;
-import com.hphtv.movielibrary.util.ServiceStatusHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
-import com.station.kit.util.AppUtils;
 import com.station.kit.util.EditorDistance;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.StringUtils;
@@ -64,6 +60,7 @@ public class MovieScanService extends Service {
     private ExecutorService mNetwork2Executor;
 
     private ShortcutDao mShortcutDao;
+    private MovieDao mMovieDao;
     private VideoFileDao mVideoFileDao;
 
     private HashSet<Shortcut> mShortcutHashSet = new HashSet<>();
@@ -88,6 +85,7 @@ public class MovieScanService extends Service {
         MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(this);
         mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
         mShortcutDao = movieLibraryRoomDatabase.getShortcutDao();
+        mMovieDao = movieLibraryRoomDatabase.getMovieDao();
     }
 
     private void initThreadPools() {
@@ -158,9 +156,10 @@ public class MovieScanService extends Service {
                                                 nameInfo = parser.parseVideoName(videoFile.path);
                                             }
                                             String keyword = nameInfo.getName();
-                                            videoFile.keyword=keyword;
-                                            videoFile.season=nameInfo.getSeason();
-                                            videoFile.episode= nameInfo.toEpisode();
+                                            String year = nameInfo.getYear() == 0 ? null : String.valueOf(nameInfo.getYear());
+                                            videoFile.keyword = keyword;
+                                            videoFile.season = nameInfo.getSeason();
+                                            videoFile.episode = nameInfo.toEpisode();
                                             //选择搜索api
                                             String api = Constants.Scraper.TMDB_EN;
                                             if (StringUtils.isGB2312(keyword)) {
@@ -170,21 +169,20 @@ public class MovieScanService extends Service {
                                             //keyword不能为空
                                             if (!TextUtils.isEmpty(keyword)) {
                                                 Observable<MovieSearchRespone> tmdbSearchRespone;
-                                                //搜索模式 TODO 需要添加本地匹配
                                                 switch (searchType1) {
                                                     case movie:
-                                                        tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api);
+                                                        tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api, year);
                                                         break;
                                                     case tv:
-                                                        tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api);
+                                                        tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api, year);
                                                         break;
                                                     default:
                                                         if (MovieNameInfo.TYPE_MOVIE.equals(nameInfo.getType())) {
-                                                            tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api);
+                                                            tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api, year);
                                                         } else if (MovieNameInfo.TYPE_SERIES.equals(nameInfo.getType())) {
-                                                            tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api);
+                                                            tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api, year);
                                                         } else {
-                                                            tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api);
+                                                            tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api, year);
                                                         }
                                                         break;
                                                 }
@@ -215,44 +213,8 @@ public class MovieScanService extends Service {
                                                                     String movie_id = mostSimilarMovie == null ? "-1" : mostSimilarMovie.movieId;
                                                                     if (!movie_id.equals("-1")) {
                                                                         String type = mostSimilarMovie.type.name();
-                                                                        MovieDetailRespone respone = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB, type)
-                                                                                .onErrorReturn(throwable -> {
-                                                                                    LogUtil.e(Thread.currentThread().getName(), "onErrorReturn: " + _keyword + " 获取电影" + movie_id + "失败");
-                                                                                    OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB);
-                                                                                    return null;
-                                                                                })
-                                                                                .subscribeOn(Schedulers.io()).blockingFirst();
-                                                                        MovieWrapper wrapper = null, wrapper_en = null;
-                                                                        if (respone != null) {
-                                                                            wrapper = respone.toEntity();
-                                                                            if (wrapper != null) {
-                                                                                wrapper.movie.ap = shortcut1.access;
-                                                                                MovieHelper.saveMovieWrapper(getBaseContext(), wrapper, videoFile);
-                                                                            } else {
-                                                                                OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB);
-                                                                                LogUtil.e(Thread.currentThread().getName(), "wrapper为空 " + _keyword + " 获取电影" + movie_id + "失败");
-                                                                            }
-                                                                        }
-                                                                        MovieDetailRespone respone_en = TmdbApiService.getDetail(movie_id, Constants.Scraper.TMDB_EN, type)
-                                                                                .onErrorReturn(throwable -> {
-                                                                                    LogUtil.e(Thread.currentThread().getName(), "onErrorReturn: " + _keyword + " 获取电影(英)" + movie_id + "失败");
-                                                                                    OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
-                                                                                    return null;
-                                                                                })
-                                                                                .subscribeOn(Schedulers.io()).blockingFirst();
-                                                                        if (respone_en != null) {
-                                                                            wrapper_en = respone_en.toEntity();
-                                                                            if (wrapper_en != null) {
-                                                                                wrapper_en.movie.ap = shortcut1.access;
-                                                                                MovieHelper.saveMovieWrapper(getBaseContext(), wrapper_en, videoFile);
-                                                                            } else {
-                                                                                OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
-                                                                                LogUtil.e(Thread.currentThread().getName(), "wrapper为空 " + _keyword + " 获取电影(英)" + movie_id + "失败");
-                                                                            }
-                                                                        }
-                                                                        if (wrapper == null && wrapper_en == null) {
-                                                                            throw new Throwable(_keyword + "detail respone.toEntity() faild.");
-                                                                        }
+                                                                        getMovieDetail(movie_id,videoFile,shortcut1.access,Constants.Scraper.TMDB, type);
+                                                                        getMovieDetail(movie_id,videoFile,shortcut1.access,Constants.Scraper.TMDB_EN,type);
                                                                     } else {
                                                                         OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB_EN);
                                                                         OnlineDBApiService.uploadFile(videoFile, Constants.Scraper.TMDB);
@@ -386,6 +348,42 @@ public class MovieScanService extends Service {
         intent.putExtra(Constants.Extras.TOTAL, total);
         intent.putExtra(Constants.Extras.SHORTCUT, shortcut);
         LocalBroadcastManager.getInstance(MovieScanService.this).sendBroadcast(intent);
+    }
+
+
+    private void getMovieDetail(String movie_id, VideoFile videoFile, Constants.WatchLimit limit,String source, String type){
+        Movie movie = mMovieDao.queryByMovieIdAndType(movie_id, source, type);
+        if(movie!=null){
+            MovieHelper.establishRelationshipBetweenPosterAndVideos(getBaseContext(),movie.id,videoFile,source);
+            OnlineDBApiService.uploadMovie(movie,videoFile,source);
+        }else {
+            MovieDetailRespone response = TmdbApiService.getDetail(movie_id, source, type)
+                    .onErrorReturn(throwable -> {
+                        LogUtil.e(Thread.currentThread().getName(), "onErrorReturn: " + videoFile.keyword + " 获取电影" + movie_id + "失败");
+                        OnlineDBApiService.uploadFile(videoFile, source);
+                        return null;
+                    })
+                    .subscribeOn(Schedulers.io()).blockingFirst();
+            MovieWrapper wrapper = null;
+            if (response != null) {
+                try {
+                    wrapper = response.toEntity();
+                    if (wrapper != null) {
+                        wrapper.movie.ap = limit;
+                        MovieHelper.addNewMovieInfo(getBaseContext(), wrapper, videoFile);
+                    } else {
+                        OnlineDBApiService.uploadFile(videoFile, source);
+                        LogUtil.e(Thread.currentThread().getName(), source+"：获取电影详情为空[keyword:" + videoFile.keyword + "][movie_id:" + movie_id + "]");
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    OnlineDBApiService.uploadFile(videoFile, source);
+                    LogUtil.e(Thread.currentThread().getName(), source+"：获取电影详情执行toEntity失败[keyword:" + videoFile.keyword + "][movie_id:" + movie_id + "]");
+                }
+            }else{
+                OnlineDBApiService.uploadFile(videoFile, source);
+            }
+        }
     }
 
     public HashSet<Shortcut> getShortcutHashSet() {
