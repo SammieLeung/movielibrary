@@ -34,7 +34,8 @@ public class FormatterTools {
         return name;
     }
 
-    public static String getTypeName(Context context,Device device){
+    public static String getTypeName(Context context,Device device,String dirPath){
+        if(device!=null) {
             switch (device.type) {
                 case Constants.DeviceType.DEVICE_TYPE_INTERNAL_STORAGE:
                     return getString(context, R.string.device_internal_storage);
@@ -51,8 +52,16 @@ public class FormatterTools {
                 case Constants.DeviceType.DEVICE_TYPE_SMB:
                     return getString(context, R.string.device_smb);
             }
-            return getString(context,R.string.unknown);
-    }
+            return getString(context, R.string.unknown);
+        }else{
+            if(dirPath.startsWith("http://")){
+                return getString(context, R.string.device_DLNA);
+            }else if(dirPath.startsWith("smb://")){
+                return getString(context, R.string.device_smb);
+            }else
+                return getString(context, R.string.unknown);
+        }
+    };
 
     public static String getString(Context context, int res, Object... args) {
         return String.format(context.getString(res), args);

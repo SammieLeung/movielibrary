@@ -59,7 +59,7 @@ public class OnlineDBApiService {
             String path = videoFile.path;
             String keyword = videoFile.keyword;
             String filename = videoFile.filename;
-            String storage = FormatterTools.getTypeName(context, device);
+            String storage = FormatterTools.getTypeName(context, device,path);
             String folder = videoFile.dirPath;
             String duration = "0";
             String current_point = "0";
