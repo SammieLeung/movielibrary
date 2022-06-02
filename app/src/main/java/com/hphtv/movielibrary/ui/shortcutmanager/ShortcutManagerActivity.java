@@ -9,6 +9,7 @@ import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
@@ -29,6 +30,7 @@ import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsDialog;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewModel;
 import com.hphtv.movielibrary.ui.shortcutmanager.options.scan.ShortcutScanDialog;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.LogUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -71,20 +73,30 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
         mOptionsViewModel = new ViewModelProvider(this).get(ShortcutOptionsViewModel.class);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mBinding.setIsEmtpy(true);
+        bindService();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService();
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-        mBinding.setIsEmtpy(true);
         registerReceivers();
-        bindService();
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unregisterReceivers();
-        unbindService();
     }
 
 
@@ -95,6 +107,7 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
             final Uri uri = result.getData().getData();
             mViewModel.addShortcut(uri)
                     .subscribe(new SimpleObserver<Shortcut>() {
+
                         @Override
                         public void onAction(Shortcut shortcut) {
                             addShortcut(shortcut);
@@ -131,6 +144,8 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
     }
 
     private void addShortcut(Shortcut shortcut) {
+        startLoading();
+        LogUtil.w("addShortcut "+shortcut.name);
         mFolderItemAdapter.add(shortcut);
         new Thread(() -> {
             ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getShortcutDao();
@@ -139,13 +154,15 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
             OnlineDBApiService.notifyShortcuts(shortcutList, Constants.Scraper.TMDB_EN);
         }).start();
         mOptionsViewModel.setShortcut(shortcut);
-        Observable.timer(100, TimeUnit.MILLISECONDS)
+        Observable.timer(300, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<Long>() {
                     @Override
                     public void onAction(Long aLong) {
+                        stopLoading();
                         ShortcutScanDialog dialog = ShortcutScanDialog.newInstance(true);
                         dialog.show(getSupportFragmentManager(), "");
+                        mBinding.rvAddedFolders.smoothScrollToPosition(0);
                     }
                 });
     }
