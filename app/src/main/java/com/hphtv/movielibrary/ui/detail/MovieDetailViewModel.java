@@ -104,15 +104,19 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
                             while (videoFileIterator.hasNext()) {
                                 VideoFile videoFile = videoFileIterator.next();
-                                if(videoFile.lastPlayTime>0) {
-                                    if (mLastPlayVideoFile == null)
-                                        mLastPlayVideoFile = videoFile;
-                                    if (videoFile.lastPlayTime > mLastPlayVideoFile.lastPlayTime) {
-                                        mLastPlayVideoFile = videoFile;
+                                if(videoFile.season==mMovieWrapper.season.seasonNumber) {
+                                    if (videoFile.lastPlayTime > 0) {
+                                        if (mLastPlayVideoFile == null)
+                                            mLastPlayVideoFile = videoFile;
+                                        if (videoFile.lastPlayTime > mLastPlayVideoFile.lastPlayTime) {
+                                            mLastPlayVideoFile = videoFile;
+                                        }
                                     }
-                                }
-                                if (videoFile.episode == i) {
-                                    tmpList.add(videoFile);
+                                    if (videoFile.episode == i) {
+                                        tmpList.add(videoFile);
+                                        videoFileIterator.remove();
+                                    }
+                                }else{
                                     videoFileIterator.remove();
                                 }
                             }
