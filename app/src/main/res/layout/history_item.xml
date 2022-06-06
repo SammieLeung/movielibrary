@@ -3,12 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
+        <import type="android.text.TextUtils"/>
         <variable
             name="title"
             type="String" />
         <variable
             name="ratings"
             type="String" />
+
+        <variable
+          name="tag"
+          type="String" />
+
+        <variable
+          name="showConrerMark"
+          type="androidx.databinding.ObservableBoolean" />
+        <variable
+          name="showRating"
+          type="androidx.databinding.ObservableBoolean" />
     </data>
 
     <LinearLayout
@@ -32,7 +45,23 @@
                 app:border_width="4dp"
                 app:border_color="@android:color/transparent"
                 app:corner_radius="@dimen/poster_item_1_radius"/>
+
             <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="29dp"
+              android:layout_alignEnd="@id/iv_img"
+              android:layout_marginTop="11dp"
+              android:layout_marginRight="11dp"
+              android:background="@drawable/poster_item_ep_bg"
+              android:gravity="center"
+              android:paddingLeft="11dp"
+              android:paddingRight="11dp"
+              android:text="@{tag}"
+              android:textColor="@color/white"
+              android:textSize="17sp"
+              android:visibility="@{showConrerMark&amp;&amp;!TextUtils.isEmpty(tag)?View.VISIBLE:View.GONE}" />
+            <TextView
+                android:visibility="@{showRating&amp;&amp;!TextUtils.isEmpty(ratings)?View.VISIBLE:View.GONE}"
                 android:text="@{ratings}"
                 android:textSize="18sp"
                 android:layout_alignBottom="@id/iv_img"
@@ -43,10 +72,10 @@
                 android:layout_height="wrap_content"/>
 
             <View
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/history_h"
-                android:background="@drawable/shadowline"
-                android:duplicateParentState="true" />
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/history_h"
+              android:background="@drawable/shadowline"
+              android:duplicateParentState="true" />
 
 
 

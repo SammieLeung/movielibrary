@@ -66,7 +66,7 @@ import org.jetbrains.annotations.NotNull;
         ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
         Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
         views = {MovieDataView.class, UnrecognizedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class},
-        version = 4)
+        version = 5 )
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
 
@@ -113,7 +113,7 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         if (sInstance == null) {
             synchronized (MovieLibraryRoomDatabase.class) {
                 if (sInstance == null) {
-                    Migration[] migrations = new Migration[]{MIGRATION_1_2, MIGRATION_2_3,MIGRATION_3_4};
+                    Migration[] migrations = new Migration[]{MIGRATION_1_2, MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5};
                     sInstance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
@@ -177,6 +177,14 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_videotag_tag_tag_name` ON `"+TABLE.VIDEO_TAG+"` (`tag`, `tag_name`)");
             database.execSQL("INSERT INTO " + TABLE.VIDEO_TAG + " SELECT vtid,tag,tag_name,flag,weight FROM " + TABLE.VIDEO_TAG + tmp);
             database.execSQL("DROP TABLE " + TABLE.VIDEO_TAG + tmp);
+        }
+    };
+
+    public static final Migration MIGRATION_4_5=new Migration(4,5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP VIEW "+VIEW.HISTORY_MOVIE_DATAVIEW);
+            database.execSQL("CREATE VIEW `"+VIEW.HISTORY_MOVIE_DATAVIEW+"` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode,m.poster,m.source,m.title,m.ratings,m.ap,st.access AS s_ap,m.season,m.season_name,m.season_poster,sp.img_url AS stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS m ON u.path=m.file_uri LEFT OUTER JOIN stagephoto AS sp ON sp.movie_id=m.id LEFT OUTER JOIN shortcut AS st ON st.uri=u.dir_uri WHERE u.last_playtime!=0 GROUP BY u.path,m.source ORDER BY u.last_playtime DESC");
         }
     };
 }
