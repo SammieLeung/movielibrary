@@ -229,4 +229,5 @@
   <string name="detail_episodes_list_title">剧集列表 (%1$d集)</string>
   <string name="season_name_for_unknow">第%1$d季</string>
   <string name="episode_pagination_others_title">更多剧集</string>
+  <string name="total_episodes">%1$d集</string>
 </resources>

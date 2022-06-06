@@ -64,7 +64,13 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                 title+=" "+ movieDataView.season_name;
             else if(movieDataView.season!=-1)
                 title+=" "+ mContext.getResources().getString(R.string.season_name_for_unknow,movieDataView.season);
+            if(movieDataView.episode_count!=0){
+                binding.setTag(mContext.getString(R.string.total_episodes,movieDataView.episode_count));
+            }
+        }else{
+
         }
+        binding.setType(movieDataView.type);
         binding.setTitle(title);
         binding.setRating(movieDataView.ratings);
         binding.setLike(movieDataView.is_favorite);
