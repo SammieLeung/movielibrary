@@ -95,6 +95,13 @@ public class MigrationTest {
         db = helper.runMigrationsAndValidate(TEST_DB, 6, true,MIGRATION_5_6);
     }
 
+    @Test
+    public void migrate6_7() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 6);
+
+        db = helper.runMigrationsAndValidate(TEST_DB, 7, true,MIGRATION_6_7);
+    }
+
 
     public Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -165,6 +172,14 @@ public class MigrationTest {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE "+TABLE.VIDEOFILE+" ADD  `resolution` TEXT");
             database.execSQL("ALTER TABLE "+TABLE.VIDEOFILE+" ADD  `video_source` TEXT");
+        }
+    };
+
+    public Migration MIGRATION_6_7=new Migration(6,7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP VIEW "+VIEW.MOVIE_DATAVIEW);
+            database.execSQL("CREATE VIEW `"+VIEW.MOVIE_DATAVIEW+"` AS SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.is_watched,VF.path AS file_uri,VF.video_source,VF.resolution,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,ST.access AS s_ap,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite, SD.season,SD.name AS season_name,SD.poster AS season_poster,SD.episode_count FROM videofile AS VF JOIN shortcut AS ST  ON VF.dir_path=ST.uri JOIN device AS DEV ON DEV.path=ST.device_path OR ST.device_type > 5 JOIN movie_videofile_cross_ref AS MVCF ON MVCF.path=VF.path JOIN movie AS M ON MVCF.id=M.id LEFT OUTER JOIN movie_genre_cross_ref AS MGCF  ON M.id=MGCF.id LEFT OUTER JOIN genre AS G ON MGCF.genre_id = G.genre_id LEFT OUTER JOIN season_dataview AS SD ON SD.id=M.id");
         }
     };
 }

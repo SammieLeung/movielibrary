@@ -17,7 +17,7 @@ import java.util.Objects;
 @DatabaseView(
         value =
                 "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.is_watched," +
-                        "VF.path AS file_uri," +
+                        "VF.path AS file_uri,VF.video_source,VF.resolution," +
                         "ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ," +
                         "ST.access AS s_ap,"+
                         "G.name AS genre_name," +
@@ -67,6 +67,9 @@ public class MovieDataView implements Serializable {
     public String season_name;
     public String season_poster;
     public int episode_count;
+
+    public String resolution;
+    public String video_source;
 
     @Override
     public boolean equals(Object o) {

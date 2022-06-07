@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -8,9 +9,12 @@ import android.widget.Filterable;
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
+import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.PosterItemLargeBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.util.GlideTools;
 import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +39,32 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mFilterMovieDataViewList.get(position);
         PosterItemLargeBinding binding = (PosterItemLargeBinding) holder.mBinding;
-        Glide.with(mContext).load(movieDataView.poster)
-                .into(binding.rvPoster);
-        binding.setTitle(movieDataView.title);
+        if (movieDataView.type.equals(Constants.SearchType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
+            GlideTools.GlideWrapper(mContext, movieDataView.season_poster)
+                    .into(binding.rvPoster);
+        } else {
+            GlideTools.GlideWrapper(mContext, movieDataView.poster)
+                    .into(binding.rvPoster);
+        }
+        String title = movieDataView.title;
+        if (movieDataView.type.equals(Constants.SearchType.tv)) {
+            if (!TextUtils.isEmpty(movieDataView.season_name))
+                title += " " + movieDataView.season_name;
+            else if (movieDataView.season != -1)
+                title += " " + mContext.getResources().getString(R.string.season_name_for_unknow, movieDataView.season);
+            if (movieDataView.episode_count != 0) {
+                binding.setTag(mContext.getString(R.string.total_episodes, movieDataView.episode_count));
+            }
+        } else {
+            if (!TextUtils.isEmpty(movieDataView.video_source)) {
+                binding.setTag(movieDataView.video_source);
+            } else if (!TextUtils.isEmpty(movieDataView.resolution)) {
+                binding.setTag(movieDataView.resolution);
+            }
+        }
+        binding.setType(movieDataView.type);
+        binding.setTitle(title);
+        binding.setRating(movieDataView.ratings);
     }
 
     @Override
@@ -75,7 +102,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
                         }
                     }
                 }
-                LogUtil.v("filter "+filterDatas.size());
+                LogUtil.v("filter " + filterDatas.size());
                 FilterResults f = new FilterResults();
                 f.values = filterDatas;
                 return f;

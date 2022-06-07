@@ -68,7 +68,11 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                 binding.setTag(mContext.getString(R.string.total_episodes,movieDataView.episode_count));
             }
         }else{
-
+            if(!TextUtils.isEmpty(movieDataView.video_source)){
+                binding.setTag(movieDataView.video_source);
+            }else if(!TextUtils.isEmpty(movieDataView.resolution)){
+                binding.setTag(movieDataView.resolution);
+            }
         }
         binding.setType(movieDataView.type);
         binding.setTitle(title);
