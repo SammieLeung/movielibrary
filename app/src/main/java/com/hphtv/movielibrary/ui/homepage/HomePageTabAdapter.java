@@ -5,7 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
+import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknowFileFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,13 +23,11 @@ public class HomePageTabAdapter extends FragmentStatePagerAdapter {
     protected List<Fragment> mList=new ArrayList<>();
     public HomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
         super(fm);
-//        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,0);
-//        mNewPageFragment=NewPageFragment.newInstance(autofitHeight,1);
 
         mList.add(HomePageFragment.newInstance(autofitHeight,0));
-        mList.add(UnknowFileFragment.newInstance(autofitHeight,1));
-//        mList.add(NewPageFragment.newInstance(autofitHeight,1));
-//        mList.add(NewPageFragment.newInstance(autofitHeight,2));
+        mList.add(ThemeFragment.newInstance(autofitHeight,1, Constants.SearchType.movie));
+        mList.add(ThemeFragment.newInstance(autofitHeight,2, Constants.SearchType.tv));
+        mList.add(UnknowFileFragment.newInstance(autofitHeight,3));
 
     }
 

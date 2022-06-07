@@ -35,7 +35,7 @@ public interface MovieDao {
     public Movie queryByMovieId(String movie_id, String source);
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source AND type=:type")
-    public Movie queryByMovieIdAndType(String movie_id, String source,String type);
+    public Movie queryByMovieIdAndType(String movie_id, String source, String type);
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
     public List<Movie> queryByMovieId(String movie_id);
@@ -93,10 +93,6 @@ public interface MovieDao {
             "AND id=:id")
     public MovieWrapper queryMovieWrapperById(long id, String source);
 
-    @Transaction
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id=:id AND source=:source")
-    public MovieWrapper queryMovieWrapperById2(long id, String source);
-
     /**
      * 按movie_id查询电影wrapper
      *
@@ -143,33 +139,6 @@ public interface MovieDao {
             "GROUP BY id")
     public MovieDataView queryMovieDataViewByMovieId(String movie_id, String type, String source);
 
-    /**
-     * @param device_uri 设备id
-     * @param year       年份
-     * @param genre_name 类型
-     * @param order      排序方式
-     * @param isDesc     是否倒序
-     * @return
-     */
-    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
-            + " WHERE source=:source" +
-            " AND (:device_uri IS NULL OR device_uri=:device_uri)" +
-            " AND (:year IS NULL OR year=:year)" +
-            " AND (:genre_name IS NULL OR genre_name=:genre_name)" +
-            " GROUP BY id " +
-            " ORDER BY " +
-            "CASE WHEN :order =0 AND :isDesc=0 THEN pinyin END ASC," +
-            "CASE WHEN :order =1 AND :isDesc=0 THEN ratings END ASC," +
-            "CASE WHEN :order =2 AND :isDesc=0 THEN year END ASC," +
-            "CASE WHEN :order =3 AND :isDesc=0 THEN add_time END ASC," +
-            "CASE WHEN :order =0 AND :isDesc=1 THEN pinyin END DESC," +
-            "CASE WHEN :order =1 AND :isDesc=1 THEN ratings END DESC," +
-            "CASE WHEN :order =2 AND :isDesc=1 THEN year END DESC," +
-            "CASE WHEN :order =3 AND :isDesc=1 THEN add_time END DESC," +
-            "CASE WHEN :order =4 THEN last_playtime END ASC," +
-            "CASE WHEN :order =5 THEN is_favorite END ASC"
-    )
-    public List<MovieDataView> queryMovieDataView(@Nullable String device_uri, @Nullable String year, @Nullable String genre_name, int order, String source, @Nullable boolean isDesc);
 
     /**
      * 根据条件返回符合条件电影数量。
@@ -254,6 +223,16 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source, String ap, int offset, int limit);
 
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap))) " +
+            " AND type=:type " +
+            " GROUP BY id " +
+            " ORDER BY add_time DESC" +
+            " LIMIT :offset,:limit"
+    )
+    public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source, Constants.SearchType type, String ap, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
@@ -277,6 +256,18 @@ public interface MovieDao {
             " LIMIT :offset,:limit"
     )
     public List<MovieDataView> queryRecommand(String source, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            " AND genre_name in (:genre_name) " +
+            " AND id NOT IN (:ids) " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND type=:type"+
+            " GROUP BY id " +
+            " ORDER BY add_time DESC " +
+            " LIMIT :offset,:limit"
+    )
+    public List<MovieDataView> queryRecommand(String source, Constants.SearchType type,String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
@@ -304,6 +295,13 @@ public interface MovieDao {
             " GROUP BY id ORDER BY pinyin ASC" +
             " LIMIT :offset,:limit")
     public List<MovieDataView> queryFavoriteMovieDataView(String source, String ap, int offset, int limit);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND type=:type "+
+            " GROUP BY id ORDER BY pinyin ASC" +
+            " LIMIT :offset,:limit")
+    public List<MovieDataView> queryFavoriteMovieDataView(String source, Constants.SearchType type, String ap, int offset, int limit);
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);

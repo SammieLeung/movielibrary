@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
@@ -79,6 +80,17 @@ public interface VideoFileDao {
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " LIMIT :offset,:limit")
     public List<HistoryMovieDataView> queryHistoryMovieDataView(String source, @Nullable String ap, int offset, int limit);
+
+    @Query("SELECT HMD.* FROM "+VIEW.HISTORY_MOVIE_DATAVIEW+" AS HMD " +
+            "JOIN "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" AS MVCF " +
+            "ON HMD.path=MVCF.path " +
+            "JOIN "+TABLE.MOVIE+" AS M " +
+            "ON M.type=:type AND M.id=MVCF.id " +
+            "WHERE (HMD.source=:source OR HMD.source IS NULL) " +
+            "AND (:ap IS NULL OR (HMD.ap=:ap OR (HMD.ap IS NULL AND HMD.s_ap=:ap))) " +
+            "GROUP BY HMD.last_playtime ORDER BY HMD.last_playtime DESC " +
+            "LIMIT :offset,:limit")
+    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source, Constants.SearchType type, @Nullable String ap, int offset, int limit);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
     public void deleteByDevice(String devicePath, List<String> paths);

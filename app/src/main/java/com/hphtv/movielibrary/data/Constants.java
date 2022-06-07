@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.data;
 
 import com.hphtv.movielibrary.roomdb.entity.Device;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,7 +72,7 @@ public class Constants {
         int DEVICE_TYPE_SMB = 7;
     }
 
-    public enum SearchType {
+    public enum SearchType implements Serializable {
         auto,//智能匹配
         movie,//电影
         tv,//电视节目
