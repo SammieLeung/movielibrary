@@ -46,7 +46,8 @@ public class MigrationTest {
                 MIGRATION_1_2,
                 MIGRATION_2_3,
                 MIGRATION_3_4,
-                MIGRATION_4_5
+                MIGRATION_4_5,
+                MIGRATION_5_6
         };
         SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 1);
         db.execSQL("insert or ignore into " + TABLE.VIDEOFILE + " (vid,path,filename,episode,season) values (1,\"storage/emulate/0/\",\"测试数据\",\"01-08\",0)");
@@ -59,7 +60,7 @@ public class MigrationTest {
 
         // Re-open the database with version 2 and provide
         // MIGRATION_1_2 as the migration process.
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, migrations);
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, migrations);
 
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.
@@ -85,6 +86,13 @@ public class MigrationTest {
         db.execSQL("insert into movie_videotag_cross_ref (vtid,id) values (6,5)");
         db.close();
         db = helper.runMigrationsAndValidate(TEST_DB, 4, true, MIGRATION_3_4);
+    }
+
+    @Test
+    public void migrate5_6() throws IOException {
+        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 5);
+
+        db = helper.runMigrationsAndValidate(TEST_DB, 6, true,MIGRATION_5_6);
     }
 
 
@@ -149,6 +157,14 @@ public class MigrationTest {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("DROP VIEW "+VIEW.HISTORY_MOVIE_DATAVIEW);
             database.execSQL("CREATE VIEW `"+VIEW.HISTORY_MOVIE_DATAVIEW+"` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode,m.poster,m.source,m.title,m.ratings,m.ap,st.access AS s_ap,m.season,m.season_name,m.season_poster,sp.img_url AS stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS m ON u.path=m.file_uri LEFT OUTER JOIN stagephoto AS sp ON sp.movie_id=m.id LEFT OUTER JOIN shortcut AS st ON st.uri=u.dir_uri WHERE u.last_playtime!=0 GROUP BY u.path,m.source ORDER BY u.last_playtime DESC");
+        }
+    };
+
+    public Migration MIGRATION_5_6=new Migration(5,6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE "+TABLE.VIDEOFILE+" ADD  `resolution` TEXT");
+            database.execSQL("ALTER TABLE "+TABLE.VIDEOFILE+" ADD  `video_source` TEXT");
         }
     };
 }

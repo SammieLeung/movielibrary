@@ -160,6 +160,12 @@ public class MovieScanService extends Service {
                                             videoFile.keyword = keyword;
                                             videoFile.season = nameInfo.getSeason();
                                             videoFile.episode = nameInfo.toEpisode();
+                                            if(nameInfo.getResolution()!=null){
+                                                videoFile.resolution=nameInfo.getResolution();
+                                            }
+                                            if(nameInfo.getVideoSource()!=null){
+                                                videoFile.videoSource=nameInfo.getVideoSource();
+                                            }
                                             //选择搜索api
                                             String api = Constants.Scraper.TMDB_EN;
                                             if (StringUtils.isGB2312(keyword)) {

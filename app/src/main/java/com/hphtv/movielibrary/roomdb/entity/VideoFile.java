@@ -45,6 +45,10 @@ public class VideoFile implements Serializable {
     @ColumnInfo(defaultValue = "0")
     public int episode=0;
 
+    public String resolution;
+    @ColumnInfo(name = "video_source")
+    public String videoSource;
+
     public VideoFile(){
 
     }
