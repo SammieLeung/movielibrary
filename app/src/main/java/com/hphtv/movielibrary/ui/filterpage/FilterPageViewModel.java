@@ -15,6 +15,7 @@ import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -42,6 +44,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     public static final int LIMIT = 15;
     private AtomicInteger mPage = new AtomicInteger();
     private MovieDao mMovieDao;
+    private VideoTagDao mVideoTagDao;
     private Shortcut mShortcut;
     private int mTotal;
     private int mTotalRow;
@@ -62,6 +65,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     public FilterPageViewModel(@NonNull @NotNull Application application) {
         super(application);
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
+        mVideoTagDao=MovieLibraryRoomDatabase.getDatabase(application).getVideoTagDao();
     }
 
     public void reloadMoiveDataViews() {
@@ -190,6 +194,13 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
             mConditionStr.set(mGenre);
     }
 
+    private void refreshGenreAndVideoTag(){
+        if(mGenre==null)
+            mConditionStr.set(getString(R.string.all)+" ("+mVideoTag.toTagName(getApplication())+")");
+        else
+            mConditionStr.set(mGenre+" ("+mVideoTag.toTagName(getApplication())+")");
+    }
+
     private void refreshResultStr(int total) {
         char l_quote = '“';
         char r_quote = '”';
@@ -230,10 +241,30 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
         refreshGenre();
     }
 
+    public void setGenreAndVideoTag(String genre,String tag){
+        Observable.just("")
+                .subscribeOn(Schedulers.newThread())
+                .doOnNext(s -> {
+                    mGenre=genre;
+                    mVideoTag=mVideoTagDao.queryVtidByNormalTag(tag);
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                        refreshGenreAndVideoTag();
+                        reloadMoiveDataViews();
+                    }
+                });
+    }
+
     public String getGenre() {
         return mGenre;
     }
 
+    public VideoTag getVideoTag() {
+        return mVideoTag;
+    }
 
     public ObservableInt getEmptyType() {
         return mEmptyType;

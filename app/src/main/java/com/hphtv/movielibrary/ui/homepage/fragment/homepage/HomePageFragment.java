@@ -24,6 +24,7 @@ import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
+import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
@@ -40,7 +41,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentViewModel, FragmentHomepageBinding> {
+public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentViewModel, FragmentHomepageBinding> implements IRefreshGenre {
     public static final String TAG = HomePageFragment.class.getSimpleName();
 
     private HistoryListAdapter mHistoryListAdapter;
@@ -71,6 +72,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         @Override
         public void addGenre() {
             AddGenreDialogFragment fragment = AddGenreDialogFragment.newInstance();
+            fragment.addAllIRefreshGenreList(getBaseActivity().getAllRefreshGenreList());
             fragment.show(getChildFragmentManager(), "Add Genres");
         }
 
@@ -102,9 +104,9 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     };
 
     private NewMovieItemWithMoreListAdapter.OnMoreItemClickListener mOnMoreItemClickListener = type -> {
-        LogUtil.v("mOnMoreItemClickListener click "+type);
-        Intent intent=new Intent(getBaseActivity(), PaginationActivity.class);
-        intent.putExtra(Constants.Extras.TYPE,type);
+        LogUtil.v("mOnMoreItemClickListener click " + type);
+        Intent intent = new Intent(getBaseActivity(), PaginationActivity.class);
+        intent.putExtra(PaginationActivity.EXTRA_PAGE_TYPE, type);
         startActivityForResult(intent);
     };
 
@@ -314,4 +316,9 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         prepareAll();
     }
 
+    @Override
+    public void refreshGenreUI() {
+        if (mViewModel != null)
+            mViewModel.prepareGenreList();
+    }
 }

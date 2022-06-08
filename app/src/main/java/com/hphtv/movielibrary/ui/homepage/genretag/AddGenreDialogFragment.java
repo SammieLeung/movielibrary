@@ -16,10 +16,12 @@ import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.recyclerview.ItemDragCallback;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * author: Sam Leung
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogViewModel, DialogCustomGenreTagLayoutBinding> implements View.OnClickListener {
     private GenreListApter mGenreListApter;
     private GenreListApter mGenreSortListApter;
-    private HomeFragmentViewModel mNewPageFragmentViewModel;
+    private List<IRefreshGenre> mIRefreshGenreList = new ArrayList<>();
 
     public static AddGenreDialogFragment newInstance() {
 
@@ -47,7 +49,6 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mNewPageFragmentViewModel=new ViewModelProvider(getParentFragment()).get(HomeFragmentViewModel.class);
     }
 
     @Override
@@ -59,25 +60,25 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
 
     }
 
-    public void initView(){
+    public void initView() {
         mBinding.cbtvGenre.setOnClickListener(this);
         mBinding.cbtvSort.setOnClickListener(this);
-        mBinding.rvTheme.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
-        mGenreListApter=new GenreListApter(getContext(),new ArrayList<>(),GenreListApter.TYPE_EDIT);
+        mBinding.rvTheme.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mGenreListApter = new GenreListApter(getContext(), new ArrayList<>(), GenreListApter.TYPE_EDIT);
         mBinding.rvTheme.setAdapter(mGenreListApter);
         mGenreListApter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<GenreTagItem>() {
             @Override
             public void onItemClick(View view, int postion, GenreTagItem data) {
-                boolean isChecked=data.isChecked().get();
+                boolean isChecked = data.isChecked().get();
                 data.setChecked(!isChecked);
-                if(!isChecked){
+                if (!isChecked) {
                     mGenreSortListApter.getDatas().add(data);
                     mGenreSortListApter.notifyDataSetChanged();
                     mBinding.cbtvSort.setEnabled(true);
-                }else{
+                } else {
                     mGenreSortListApter.getDatas().remove(data);
                     mGenreSortListApter.notifyDataSetChanged();
-                    if(mGenreSortListApter.getItemCount()==0){
+                    if (mGenreSortListApter.getItemCount() == 0) {
                         mBinding.cbtvSort.setEnabled(false);
                     }
                 }
@@ -89,16 +90,16 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
             }
         });
 
-        mBinding.rvThemeSort.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
-        mGenreSortListApter=new GenreListApter(getContext(),mViewModel.getGenreTagItemSortList(),GenreListApter.TYPE_SORT);
+        mBinding.rvThemeSort.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mGenreSortListApter = new GenreListApter(getContext(), mViewModel.getGenreTagItemSortList(), GenreListApter.TYPE_SORT);
         mGenreSortListApter.setSortPos(mBinding.rvThemeSort.getSelectPos());
         mBinding.rvThemeSort.setAdapter(mGenreSortListApter);
-        ItemDragCallback callback=new ItemDragCallback();
-        ItemTouchHelper helper=new ItemTouchHelper(callback);
+        ItemDragCallback callback = new ItemDragCallback();
+        ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(mBinding.rvThemeSort);
     }
 
-    public void prepare(){
+    public void prepare() {
         mViewModel.prepareGenreList()
                 .subscribe(genreTagItems -> {
                     mGenreListApter.addAll(genreTagItems);
@@ -106,10 +107,14 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
                 });
     }
 
+    public void addAllIRefreshGenreList(List<IRefreshGenre> iRefreshGenreList) {
+        mIRefreshGenreList.clear();
+        mIRefreshGenreList.addAll(iRefreshGenreList);
+    }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.cbtv_genre:
                 mViewModel.mCheckPos.set(0);
                 break;
@@ -122,6 +127,14 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        mNewPageFragmentViewModel.updateGenreTagList(mViewModel.toGenreTagList());
+        mViewModel.saveGenreTagList()
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                        for (IRefreshGenre refreshGenre : mIRefreshGenreList) {
+                            refreshGenre.refreshGenreUI();
+                        }
+                    }
+                });
     }
 }

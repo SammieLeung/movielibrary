@@ -23,6 +23,7 @@ import java.util.List;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -45,26 +46,26 @@ public class AddGenreDialogViewModel extends BaseAndroidViewModel {
 
     public Observable<List<GenreTagItem>> prepareGenreList() {
         return Observable.create((ObservableOnSubscribe<List<GenreTagItem>>) emitter -> {
-            mGenreTagItemList.clear();
-            String source = ScraperSourceTools.getSource();
-            List<GenreTag> genreTags = mGenreDao.queryGenreTagBySource(source);
-            int count = 0;
-            for (GenreTag tag : genreTags) {
-                GenreTagItem item = new GenreTagItem(tag.name, true);
-                mGenreTagItemSortList.add(item);
-                mGenreTagItemList.add(item);
-            }
-            for (String genre_name : mAllGenres) {
-                GenreTagItem item = new GenreTagItem(genre_name, false);
-                if (!mGenreTagItemSortList.contains(item)) {
-                    mGenreTagItemList.add(item);
-                }
-            }
+                    mGenreTagItemList.clear();
+                    String source = ScraperSourceTools.getSource();
+                    List<GenreTag> genreTags = mGenreDao.queryGenreTagBySource(source);
+                    int count = 0;
+                    for (GenreTag tag : genreTags) {
+                        GenreTagItem item = new GenreTagItem(tag.name, true);
+                        mGenreTagItemSortList.add(item);
+                        mGenreTagItemList.add(item);
+                    }
+                    for (String genre_name : mAllGenres) {
+                        GenreTagItem item = new GenreTagItem(genre_name, false);
+                        if (!mGenreTagItemSortList.contains(item)) {
+                            mGenreTagItemList.add(item);
+                        }
+                    }
 
 
-            emitter.onNext(mGenreTagItemList);
-            emitter.onComplete();
-        })
+                    emitter.onNext(mGenreTagItemList);
+                    emitter.onComplete();
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -76,6 +77,16 @@ public class AddGenreDialogViewModel extends BaseAndroidViewModel {
 
     public List<GenreTagItem> getGenreTagItemSortList() {
         return mGenreTagItemSortList;
+    }
+
+    public Observable<String> saveGenreTagList() {
+        return Observable.just("")
+                .subscribeOn(Schedulers.newThread())
+                .doOnNext(s -> {
+                    mGenreDao.deleteAllGenreTags();
+                    mGenreDao.insertGenreTags(toGenreTagList());
+                })
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public List<GenreTag> toGenreTagList() {

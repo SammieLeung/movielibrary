@@ -26,6 +26,7 @@ import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
+import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
@@ -42,7 +43,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/6/7
  */
-public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewModel, FragmentHomepageBinding> {
+public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewModel, FragmentHomepageBinding> implements IRefreshGenre {
     public static final String TAG = ThemeFragment.class.getSimpleName();
 
     private HistoryListAdapter mHistoryListAdapter;
@@ -73,12 +74,14 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         @Override
         public void addGenre() {
             AddGenreDialogFragment fragment = AddGenreDialogFragment.newInstance();
+            fragment.addAllIRefreshGenreList(getBaseActivity().getAllRefreshGenreList());
             fragment.show(getChildFragmentManager(), "Add Genres");
         }
 
         @Override
         public void browseAll() {
             Intent intent = new Intent(getContext(), FilterPageActivity.class);
+            intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, mViewModel.getSearchType().name());
             startActivityForResult(intent);
         }
     };
@@ -89,6 +92,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         public void onItemClick(View view, int postion, Object data) {
             Intent intent = new Intent(getContext(), FilterPageActivity.class);
             intent.putExtra(FilterPageActivity.EXTRA_GENRE, data.toString());
+            intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, mViewModel.getSearchType().name());
             startActivityForResult(intent);
         }
 
@@ -104,9 +108,10 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     };
 
     private NewMovieItemWithMoreListAdapter.OnMoreItemClickListener mOnMoreItemClickListener = type -> {
-        LogUtil.v("mOnMoreItemClickListener click "+type);
-        Intent intent=new Intent(getBaseActivity(), PaginationActivity.class);
-        intent.putExtra(Constants.Extras.TYPE,type);
+        LogUtil.v("mOnMoreItemClickListener click " + type);
+        Intent intent = new Intent(getBaseActivity(), PaginationActivity.class);
+        intent.putExtra(PaginationActivity.EXTRA_PAGE_TYPE, type);
+        intent.putExtra(PaginationActivity.EXTRA_VIDEO_TAG,mViewModel.getSearchType());
         startActivityForResult(intent);
     };
 
@@ -129,7 +134,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     public static ThemeFragment newInstance(IAutofitHeight autofitHeight, int position, Constants.SearchType type) {
         Bundle args = new Bundle();
         ThemeFragment fragment = new ThemeFragment(autofitHeight, position);
-        args.putSerializable("type",type);
+        args.putSerializable("type", type);
         fragment.setArguments(args);
         return fragment;
     }
@@ -323,4 +328,9 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         prepareAll();
     }
 
+    @Override
+    public void refreshGenreUI() {
+        if (mViewModel != null)
+            mViewModel.prepareGenreList();
+    }
 }

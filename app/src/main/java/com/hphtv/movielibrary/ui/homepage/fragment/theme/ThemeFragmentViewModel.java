@@ -99,7 +99,7 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
         appBaseActivity.startActivityForResult(intent);
     }
 
-    public void prepareGenreList() {
+    public void  prepareGenreList() {
         Observable.just(3)
                 .subscribeOn(Schedulers.io())
                 .map(defalut_count -> {
@@ -107,7 +107,7 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
                     List<String> newCustomTags = new ArrayList<>();
                     List<String> customGenreTags = mGenreDao.queryGenreTagNameBySource(ScraperSourceTools.getSource());
                     if (customGenreTags.size() == 0) {
-                        List<String> allMovieGenres = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource());
+                        List<String> allMovieGenres = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource(),mSearchType);
                         //已有电影分类数量不足
                         if (allMovieGenres.size() < defalut_count) {
                             List<String> genreArr = Arrays.asList(getApplication().getResources().getStringArray(R.array.genre_tags).clone());
@@ -138,14 +138,6 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
                             mGenreCallback.runOnUIThread(genreTags);
                     }
                 });
-    }
-
-    public void updateGenreTagList(List<GenreTag> genreTagItems){
-        new Thread(() -> {
-            mGenreDao.deleteAllGenreTags();
-            mGenreDao.insertGenreTags(genreTagItems);
-            prepareGenreList();
-        }).start();
     }
 
     public void prepareRecentlyAddedMovie(HomeFragmentViewModel.Callback callback) {

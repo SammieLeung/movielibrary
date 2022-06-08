@@ -213,6 +213,16 @@ public interface MovieDao {
     )
     public int countMovieDataViewForRecentlyAdded(String source, String ap);
 
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND type=:type" +
+            " GROUP BY id " +
+            " ORDER BY add_time DESC)"
+    )
+    public int countMovieDataViewForRecentlyAdded(String source, Constants.SearchType type, String ap);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
             " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
@@ -262,12 +272,12 @@ public interface MovieDao {
             " AND genre_name in (:genre_name) " +
             " AND id NOT IN (:ids) " +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
-            " AND type=:type"+
+            " AND type=:type" +
             " GROUP BY id " +
             " ORDER BY add_time DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source, Constants.SearchType type,String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+    public List<MovieDataView> queryRecommand(String source, Constants.SearchType type, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
@@ -290,6 +300,12 @@ public interface MovieDao {
             " GROUP BY id ORDER BY pinyin ASC)")
     public int countFavoriteMovieDataView(String source, String ap);
 
+    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND type=:type " +
+            " GROUP BY id ORDER BY pinyin ASC)")
+    public int countFavoriteMovieDataView(String source, Constants.SearchType type, String ap);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " GROUP BY id ORDER BY pinyin ASC" +
@@ -298,7 +314,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
-            " AND type=:type "+
+            " AND type=:type " +
             " GROUP BY id ORDER BY pinyin ASC" +
             " LIMIT :offset,:limit")
     public List<MovieDataView> queryFavoriteMovieDataView(String source, Constants.SearchType type, String ap, int offset, int limit);

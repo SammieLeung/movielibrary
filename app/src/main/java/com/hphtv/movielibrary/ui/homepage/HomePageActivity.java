@@ -27,6 +27,7 @@ import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.ui.PermissionActivity;
+import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
@@ -37,6 +38,8 @@ import com.station.kit.util.AppUtils;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.PackageTools;
+
+import java.util.List;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
@@ -337,6 +340,9 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         passwordDialogFragment.show(getSupportFragmentManager(), "");
     }
 
+    public List<IRefreshGenre> getAllRefreshGenreList(){
+        return mNewHomePageTabAdapter.getIRefreshGenreList();
+    }
     @Override
     public void OnRematchPoster(MovieDataView movieDataView, int pos) {
         updateFragments();

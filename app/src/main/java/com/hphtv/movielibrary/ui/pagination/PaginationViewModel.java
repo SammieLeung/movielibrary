@@ -8,6 +8,7 @@ import androidx.databinding.ObservableField;
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -40,6 +41,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
     private int mType;
+    private Constants.SearchType mSearchType;
     private ObservableField<String> mTitle = new ObservableField<>();
     private AtomicInteger mPage = new AtomicInteger(0);
     private AtomicInteger mTotal = new AtomicInteger(0);
@@ -64,12 +66,16 @@ public class PaginationViewModel extends BaseAndroidViewModel {
         }
     }
 
+    public void setSearchType(Constants.SearchType searchType) {
+        mSearchType = searchType;
+    }
+
     public ObservableField<String> getTitle() {
         return mTitle;
     }
 
-    public void reload(){
-        switch (mType){
+    public void reload() {
+        switch (mType) {
             case OPEN_RECENTLY_ADD:
                 reloadRecentlyAddedMovie();
                 break;
@@ -79,8 +85,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
         }
     }
 
-    public void loadMore(){
-        switch (mType){
+    public void loadMore() {
+        switch (mType) {
             case OPEN_RECENTLY_ADD:
                 loadRecentlyAddedMovie();
                 break;
@@ -92,13 +98,20 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
     private void reloadRecentlyAddedMovie() {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            mPage.set(0);
-            int count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode());
-            mTotal.set(count);
-            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
-            emitter.onNext(movieDataViewList);
-            emitter.onComplete();
-        })
+                    mPage.set(0);
+                    int count = 0;
+                    List<MovieDataView> movieDataViewList;
+                    if (mSearchType != null) {
+                        count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
+                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
+                    } else {
+                        count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode());
+                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
+                    }
+                    mTotal.set(count);
+                    emitter.onNext(movieDataViewList);
+                    emitter.onComplete();
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<MovieDataView>>() {
@@ -113,13 +126,18 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
     private void loadRecentlyAddedMovie() {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
-                int offset = mPage.incrementAndGet() * LIMIT;
-                List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                emitter.onNext(movieDataViewList);
-            }
-            emitter.onComplete();
-        })
+                    if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
+                        int offset = mPage.incrementAndGet() * LIMIT;
+                        List<MovieDataView> movieDataViewList;
+                        if (mSearchType != null) {
+                            movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        } else {
+                            movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        }
+                        emitter.onNext(movieDataViewList);
+                    }
+                    emitter.onComplete();
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<MovieDataView>>() {
@@ -133,13 +151,20 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
     private void reloadFavoriteMovie() {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            mPage.set(0);
-            int count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode());
-            mTotal.set(count);
-            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),Config.getSqlConditionOfChildMode(),0,LIMIT);
-            emitter.onNext(movieDataViewList);
-            emitter.onComplete();
-        })
+                    mPage.set(0);
+                    int count;
+                    List<MovieDataView> movieDataViewList;
+                    if (mSearchType != null) {
+                        count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
+                        movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    } else {
+                        count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode());
+                        movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    }
+                    mTotal.set(count);
+                    emitter.onNext(movieDataViewList);
+                    emitter.onComplete();
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<MovieDataView>>() {
@@ -154,13 +179,17 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
     private void loadFavoriteMovie() {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
-                int offset = mPage.incrementAndGet() * LIMIT;
-                List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                emitter.onNext(movieDataViewList);
-            }
-            emitter.onComplete();
-        })
+                    if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
+                        int offset = mPage.incrementAndGet() * LIMIT;
+                        List<MovieDataView> movieDataViewList;
+                        if (mSearchType != null)
+                            movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        else
+                            movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        emitter.onNext(movieDataViewList);
+                    }
+                    emitter.onComplete();
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<MovieDataView>>() {

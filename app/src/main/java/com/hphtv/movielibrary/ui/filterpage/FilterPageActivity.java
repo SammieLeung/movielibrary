@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -35,6 +36,7 @@ import java.util.List;
  */
 public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, ActivityFilterpageBinding> implements OnMovieChangeListener {
     public static final String EXTRA_GENRE = "extra_genre";
+    public static final String EXTRA_VIDEO_TYPE = "extra_video_type";
 
     private NewMovieItemListAdapter mMovieItemListAdapter;
     private HomeFragmentViewModel mNewpageViewModel;
@@ -94,8 +96,13 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String genreName = getIntent().getStringExtra(EXTRA_GENRE);
-        mViewModel.setGenre(genreName);
-        reloadMoiveDataViews();
+        String videoType=getIntent().getStringExtra(EXTRA_VIDEO_TYPE);
+        if(!TextUtils.isEmpty(videoType)){
+            mViewModel.setGenreAndVideoTag(genreName,videoType);
+        }else{
+            mViewModel.setGenre(genreName);
+            reloadMoiveDataViews();
+        }
     }
 
     private void initView() {

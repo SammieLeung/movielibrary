@@ -9,6 +9,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknowFileFragment;
+import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,14 +21,26 @@ import java.util.List;
  * date:  2022/1/14
  */
 public class HomePageTabAdapter extends FragmentStatePagerAdapter {
-    protected List<Fragment> mList=new ArrayList<>();
+    protected List<Fragment> mList = new ArrayList<>();
+    protected List<IRefreshGenre> mIRefreshGenreList=new ArrayList<>();
+
     public HomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
         super(fm);
 
-        mList.add(HomePageFragment.newInstance(autofitHeight,0));
-        mList.add(ThemeFragment.newInstance(autofitHeight,1, Constants.SearchType.movie));
-        mList.add(ThemeFragment.newInstance(autofitHeight,2, Constants.SearchType.tv));
-        mList.add(UnknowFileFragment.newInstance(autofitHeight,3));
+
+        HomePageFragment homePageFragment = HomePageFragment.newInstance(autofitHeight, 0);
+        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(autofitHeight, 1, Constants.SearchType.movie);
+        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(autofitHeight, 2, Constants.SearchType.tv);
+        UnknowFileFragment unknowFileFragment = UnknowFileFragment.newInstance(autofitHeight, 3);
+
+        mList.add(homePageFragment);
+        mList.add(movieThemeFragment);
+        mList.add(tvThemeFragment);
+        mList.add(unknowFileFragment);
+
+        mIRefreshGenreList.add(homePageFragment);
+        mIRefreshGenreList.add(movieThemeFragment);
+        mIRefreshGenreList.add(tvThemeFragment);
 
     }
 
@@ -43,12 +56,16 @@ public class HomePageTabAdapter extends FragmentStatePagerAdapter {
         return mList.size();
     }
 
-    public void refreshFragments(){
-        for(Fragment fragment:mList){
-            if(fragment instanceof IActivityResult){
-                IActivityResult activityResult= (IActivityResult) fragment;
+    public void refreshFragments() {
+        for (Fragment fragment : mList) {
+            if (fragment instanceof IActivityResult) {
+                IActivityResult activityResult = (IActivityResult) fragment;
                 activityResult.forceRefresh();
             }
         }
+    }
+
+    public List<IRefreshGenre> getIRefreshGenreList() {
+        return mIRefreshGenreList;
     }
 }

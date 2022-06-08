@@ -15,6 +15,8 @@ import com.hphtv.movielibrary.roomdb.TABLE;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * author: Sam Leung
  * date:  2022/3/1
@@ -67,5 +69,18 @@ public class VideoTag {
                 return tagName;
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VideoTag videoTag = (VideoTag) o;
+        return vtid == videoTag.vtid;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(vtid);
     }
 }

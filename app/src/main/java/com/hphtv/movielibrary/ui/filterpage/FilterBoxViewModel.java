@@ -50,6 +50,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private List<String> mOrderList;
     private List<VideoTag> mVideoTagsList;
     private String mPresetGenreName;
+    private VideoTag mPresetVideoTag;
 
     private ObservableInt mDevicePos = new ObservableInt(), mVideoTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt();
     private ObservableBoolean mDesFlag = new ObservableBoolean();
@@ -108,6 +109,10 @@ public class FilterBoxViewModel extends AndroidViewModel {
                     @Override
                     public void onAction(List<VideoTag> list) {
                         adapter.addAll(list);
+                        if(mPresetVideoTag!=null) {
+                            adapter.setCheckValue(mPresetVideoTag);
+                            mPresetVideoTag=null;
+                        }
                     }
                 });
     }
@@ -222,4 +227,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         return getApplication().getString(resId);
     }
 
+    public void setPresetVideoTag(VideoTag videoTag) {
+        mPresetVideoTag=videoTag;
+    }
 }

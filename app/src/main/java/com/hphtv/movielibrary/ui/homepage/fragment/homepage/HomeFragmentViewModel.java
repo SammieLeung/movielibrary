@@ -139,13 +139,6 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
                 });
     }
 
-    public void updateGenreTagList(List<GenreTag> genreTagItems){
-        new Thread(() -> {
-            mGenreDao.deleteAllGenreTags();
-            mGenreDao.insertGenreTags(genreTagItems);
-            prepareGenreList();
-        }).start();
-    }
 
     public void prepareRecentlyAddedMovie(Callback callback) {
         Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {

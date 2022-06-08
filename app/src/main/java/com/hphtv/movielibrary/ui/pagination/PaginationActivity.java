@@ -35,6 +35,8 @@ import java.util.List;
  * date:  2022/4/22
  */
 public class PaginationActivity extends AppBaseActivity<PaginationViewModel, ActivityPaginationBinding> implements OnMovieChangeListener {
+    public static final String EXTRA_PAGE_TYPE = "extra_page_type";
+    public static final String EXTRA_VIDEO_TAG = "extra_video_tag";
     private NewMovieItemListAdapter mMovieItemListAdapter;
     private HomeFragmentViewModel mNewpageViewModel;
     private Handler mHandler = new Handler();
@@ -93,8 +95,12 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        int type = getIntent().getIntExtra(Constants.Extras.TYPE,-1);
+        int type = getIntent().getIntExtra(EXTRA_PAGE_TYPE, -1);
         mViewModel.setType(type);
+        if (getIntent().getSerializableExtra(EXTRA_VIDEO_TAG) != null) {
+            Constants.SearchType searchType = (Constants.SearchType) getIntent().getSerializableExtra(EXTRA_VIDEO_TAG);
+            mViewModel.setSearchType(searchType);
+        }
         reload();
     }
 
@@ -171,7 +177,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
     @Override
     public void OnRematchPoster(MovieDataView movieDataView, int pos) {
-        mMovieItemListAdapter.replace(movieDataView,pos);
+        mMovieItemListAdapter.replace(movieDataView, pos);
     }
 
     @Override

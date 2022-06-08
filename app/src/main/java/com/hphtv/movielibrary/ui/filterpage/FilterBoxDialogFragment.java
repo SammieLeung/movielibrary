@@ -64,7 +64,9 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
         if (mFilterPageViewModel == null) {
             mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
             String genre = mFilterPageViewModel.getGenre();
+            VideoTag videoTag=mFilterPageViewModel.getVideoTag();
             mViewModel.setPresetGenreName(genre);
+            mViewModel.setPresetVideoTag(videoTag);
         }
         return mViewModel;
     }

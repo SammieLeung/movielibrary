@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -83,6 +84,13 @@ public class FilterBoxVideoTagAdapter extends RecyclerView.Adapter<FilterBoxVide
     public void setCurrentPos(int pos) {
         if (mCheckPos != null)
             mCheckPos.set(pos);
+    }
+
+    public void setCheckValue(VideoTag videoTag){
+        if(videoTag!=null){
+            int pos=mDataList.indexOf(videoTag)+1;
+            mCheckPos.set(pos);
+        }
     }
 
     public void setOnFilterBoxItemClickListener(OnFilterBoxItemClickListener onFilterBoxItemClickListener) {
