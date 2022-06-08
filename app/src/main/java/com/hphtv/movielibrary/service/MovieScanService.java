@@ -317,7 +317,7 @@ public class MovieScanService extends Service {
                                                     }
                                                     if (mGlobalTaskCount.decrementAndGet() == 0) {
                                                         LogUtil.v(TAG, "All finish");
-                                                        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
+                                                        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH));
                                                     }
                                                 }
                                             }

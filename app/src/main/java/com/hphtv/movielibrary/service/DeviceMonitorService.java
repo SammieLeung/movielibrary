@@ -189,6 +189,7 @@ public class DeviceMonitorService extends Service {
                         ServiceStatusHelper.addView(getString(R.string.scanning_in_background), getBaseContext());
                     break;
                 case Constants.ACTION.MOVIE_SCRAP_STOP:
+                case Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH:
                     isScanning.set(false);
                     ServiceStatusHelper.removeView(context);
                     break;
@@ -324,6 +325,8 @@ public class DeviceMonitorService extends Service {
         localFilter.addAction(Constants.ACTION.ADD_NETWORK_SHORTCUT);
         localFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
         localFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP);
+        localFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(mDeviceMountReceiver, localFilter);
     }
 

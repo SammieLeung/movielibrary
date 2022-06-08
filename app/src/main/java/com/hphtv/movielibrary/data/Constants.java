@@ -202,6 +202,7 @@ public class Constants {
 
         String MOVIE_SCRAP_START= "action.movie.scrap.start";
         String MOVIE_SCRAP_STOP = "action.movie.scrap.stop";
+        String MOVIE_SCRAP_STOP_AND_REFRESH="action.movie.scrap.stop.and.refresh";
         String SHORTCUT_SCRAP_START="action.shortcut.scrap.start";
         String SHORTCUT_SCRAP_STOP="action.shortcut.scrap.finish";
         String SHORTCUT_INFO_UPDATE="action.shortcut.info_update";
@@ -211,9 +212,6 @@ public class Constants {
         String MATCHED_MOVIE_FAILED="action.movie.matched.failed";
 
 
-        String FOLDER_REFRESH = "action.movie.folder.refresh";
-        String START_LOADING = "action.home.startloading";
-        String STOP_LOADING = "action.home.stoploading";
     }
 
 

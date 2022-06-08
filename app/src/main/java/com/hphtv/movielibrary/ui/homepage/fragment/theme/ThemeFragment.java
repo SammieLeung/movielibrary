@@ -111,7 +111,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         LogUtil.v("mOnMoreItemClickListener click " + type);
         Intent intent = new Intent(getBaseActivity(), PaginationActivity.class);
         intent.putExtra(PaginationActivity.EXTRA_PAGE_TYPE, type);
-        intent.putExtra(PaginationActivity.EXTRA_VIDEO_TAG,mViewModel.getSearchType());
+        intent.putExtra(PaginationActivity.EXTRA_VIDEO_TAG, mViewModel.getSearchType());
         startActivityForResult(intent);
     };
 
@@ -149,6 +149,16 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews();
+        Log.e(TAG, "onViewCreated " + mViewModel.getSearchType().name());
+
+//        prepareAll();
+    }
+
+    @Override
+    public void onResume() {
+        Log.e(TAG, "onResume " + mViewModel.getSearchType().name());
+
+        super.onResume();
         prepareAll();
     }
 
@@ -325,7 +335,9 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
 
     @Override
     public void forceRefresh() {
-        prepareAll();
+        Log.e(TAG,"forceRefresh ");
+        if (mViewModel != null)
+            prepareAll();
     }
 
     @Override

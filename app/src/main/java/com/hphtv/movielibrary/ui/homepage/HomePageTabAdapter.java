@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.ui.homepage;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.hphtv.movielibrary.data.Constants;
@@ -20,12 +21,12 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/1/14
  */
-public class HomePageTabAdapter extends FragmentStatePagerAdapter {
+public class HomePageTabAdapter extends FragmentPagerAdapter {
     protected List<Fragment> mList = new ArrayList<>();
     protected List<IRefreshGenre> mIRefreshGenreList=new ArrayList<>();
 
     public HomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
-        super(fm);
+        super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
 
         HomePageFragment homePageFragment = HomePageFragment.newInstance(autofitHeight, 0);

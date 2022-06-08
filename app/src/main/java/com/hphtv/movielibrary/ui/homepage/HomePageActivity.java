@@ -18,7 +18,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
@@ -34,18 +33,11 @@ import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
-import com.station.kit.util.AppUtils;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.PackageTools;
 
 import java.util.List;
-
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * author: Sam Leung
@@ -100,8 +92,8 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      * 后台搜索结束后调用.
      */
     @Override
-    protected void movieScarpFinish() {
-        super.movieScarpFinish();
+    protected void movieScrapeFinish() {
+        super.movieScrapeFinish();
         updateFragments();
     }
 

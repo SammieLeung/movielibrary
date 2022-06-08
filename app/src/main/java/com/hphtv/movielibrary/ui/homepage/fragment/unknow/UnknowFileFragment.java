@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.unknow;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -29,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
  * date:  2022/4/2
  */
 public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> {
-    public static final String TAG=UnknowFileFragment.class.getSimpleName();
+    public static final String TAG = UnknowFileFragment.class.getSimpleName();
+
     public UnknowFileFragment(IAutofitHeight autofitHeight, int position) {
         super(autofitHeight, position);
     }
@@ -48,13 +50,24 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
 
     @Override
     public void forceRefresh() {
-        mViewModel.reLoadUnknowFiles();
+        Log.e(TAG,"forceRefresh");
+        if (mViewModel != null)
+            mViewModel.reLoadUnknowFiles();
     }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.e(TAG, "onViewCreated");
+
         initViews();
+//        mViewModel.reLoadUnknowFiles();
+    }
+
+    @Override
+    public void onResume() {
+        Log.e(TAG, "onResume");
+        super.onResume();
         mViewModel.reLoadUnknowFiles();
     }
 
@@ -117,6 +130,9 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
                         @Override
                         public void onAction(String s) {
                             getBaseActivity().refreshFragment(0);//主页刷新历史播放
+                            getBaseActivity().refreshFragment(1);//主页刷新历史播放
+                            getBaseActivity().refreshFragment(2);//主页刷新历史播放
+
                         }
                     });
         }

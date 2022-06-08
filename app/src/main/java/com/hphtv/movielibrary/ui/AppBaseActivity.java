@@ -18,10 +18,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.hphtv.movielibrary.MovieApplication;
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.util.ServiceStatusHelper;
-import com.station.kit.util.AppUtils;
 import com.station.kit.util.LogUtil;
 import com.station.kit.view.mvvm.activity.BaseInflateActivity;
 
@@ -69,7 +67,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         mHanlder.postDelayed(() -> ServiceStatusHelper.resumeView(),100);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
-        intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP);
+        intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
@@ -107,12 +105,12 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
             switch (action){
                 case Constants.ACTION.MOVIE_SCRAP_START:
                     break;
-                case Constants.ACTION.MOVIE_SCRAP_STOP:
-                    movieScarpFinish();
+                case Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH:
+                    movieScrapeFinish();
                     break;
             }
         }
     };
 
-    protected void movieScarpFinish(){};
+    protected void movieScrapeFinish(){};
 }
