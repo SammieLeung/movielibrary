@@ -60,10 +60,10 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         initView();
         autoScrollListener(mBinding.nsv);
         new Thread(() -> {
-            if(!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())){
+            if (!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())) {
                 Intent service = new Intent(this, DeviceMonitorService.class);
                 this.startService(service);
-            }else {
+            } else {
                 autoSearch();
             }
 
@@ -78,10 +78,10 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         autoScrollListener(mBinding.nsv);
         //自动搜索文件夹
         new Thread(() -> {
-            if(!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())){
+            if (!PackageTools.isServiceRunning(this, DeviceMonitorService.class.getName())) {
                 Intent service = new Intent(this, DeviceMonitorService.class);
                 this.startService(service);
-            }else {
+            } else {
                 autoSearch();
             }
 
@@ -134,6 +134,25 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mBinding.tabLayout.getTabAt(i).view.getLayoutParams();//
             params.rightMargin = DensityUtil.dip2px(this, 32);
             mBinding.tabLayout.getTabAt(i).view.setLayoutParams(params);
+
+//            //设定tabview的左右焦点 （主页、电影、电视剧、...）
+            if (mBinding.tabLayout.getTabCount() > 1) {
+                View view=mBinding.tabLayout.getTabAt(i).view;
+                if (i == 0) {
+                    view.setId(View.generateViewId());
+                    int nextRightId=View.generateViewId();
+                    mBinding.tabLayout.getTabAt(i + 1).view.setId(nextRightId);
+                    view.setNextFocusRightId(nextRightId);
+                } else if (i == mBinding.tabLayout.getTabCount() - 1) {
+                    view.setNextFocusLeftId(mBinding.tabLayout.getTabAt(i - 1).view.getId());
+                } else {
+                    view.setId(View.generateViewId());
+                    int nextRightId=View.generateViewId();
+                    mBinding.tabLayout.getTabAt(i + 1).view.setId(nextRightId);
+                    view.setNextFocusRightId(nextRightId);
+                    view.setNextFocusLeftId(mBinding.tabLayout.getTabAt(i - 1).view.getId());
+                }
+            }
         }
         mBinding.tabLayout.getViewTreeObserver()
                 .addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
@@ -332,9 +351,10 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         passwordDialogFragment.show(getSupportFragmentManager(), "");
     }
 
-    public List<IRefreshGenre> getAllRefreshGenreList(){
+    public List<IRefreshGenre> getAllRefreshGenreList() {
         return mNewHomePageTabAdapter.getIRefreshGenreList();
     }
+
     @Override
     public void OnRematchPoster(MovieDataView movieDataView, int pos) {
         updateFragments();
