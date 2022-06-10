@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="180dp"
-    android:layout_height="180dp"
-    android:gravity="center"
-    android:orientation="vertical">
-    <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/spin_kit"
-        style="@style/SpinKitView.Large.FadingCircle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:SpinKit_Color="@color/white_light" />
+  android:layout_width="180dp"
+  android:layout_height="180dp"
+  android:gravity="center"
+  android:orientation="vertical">
+
+  <com.github.ybq.android.spinkit.SpinKitView xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/spin_kit"
+    style="@style/SpinKitView.Circle"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="30dp"
+    android:maxWidth="60dp"
+    android:minWidth="60dp"
+    android:maxHeight="60dp"
+    android:minHeight="60dp"
+    android:layout_gravity="center"
+    android:background="@drawable/loading_view_bg"
+    app:SpinKit_Color="@color/white_light" />
 </LinearLayout>

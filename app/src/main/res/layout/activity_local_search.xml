@@ -65,35 +65,35 @@
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:layout_toEndOf="@id/k1"
-                        android:background="@color/divier_line" />
+                        android:background="@color/t9_keyboard_divider_line" />
 
                     <View
                         android:id="@+id/divider_2"
                         android:layout_width="1dp"
                         android:layout_height="match_parent"
                         android:layout_toEndOf="@id/k2"
-                        android:background="@color/divier_line" />
+                        android:background="@color/t9_keyboard_divider_line" />
 
                     <View
                         android:id="@+id/divider_3"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_below="@id/k1"
-                        android:background="@color/divier_line" />
+                        android:background="@color/t9_keyboard_divider_line" />
 
                     <View
                         android:id="@+id/divider_4"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_below="@id/k4"
-                        android:background="@color/divier_line" />
+                        android:background="@color/t9_keyboard_divider_line" />
 
                     <View
                         android:id="@+id/divider_5"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_below="@id/k7"
-                        android:background="@color/divier_line" />
+                        android:background="@color/t9_keyboard_divider_line" />
 
                     <include
                         android:id="@+id/k1"

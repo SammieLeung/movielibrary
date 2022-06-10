@@ -23,7 +23,9 @@ import com.hphtv.movielibrary.util.ServiceStatusHelper;
 import com.station.kit.util.LogUtil;
 import com.station.kit.view.mvvm.activity.BaseInflateActivity;
 
-/**
+import java.util.concurrent.atomic.AtomicInteger;
+
+ /**
  * @author lxp
  * @date 19-3-26
  */
@@ -33,6 +35,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     public final String TAG = this.getClass().getSimpleName();
     LoadingDialogFragment mLoadingDialogFragment;
     private ActivityResultLauncher mActivityResultLauncher;
+
+    private AtomicInteger mAtomicLoading=new AtomicInteger();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +81,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     }
 
     public void startLoading() {
-        LogUtil.v(TAG, "startLoading");
+        int i=mAtomicLoading.incrementAndGet();
+        LogUtil.v(TAG, "startLoading "+i);
         if (mLoadingDialogFragment == null) {
             mLoadingDialogFragment = new LoadingDialogFragment();
             mLoadingDialogFragment.show(getSupportFragmentManager(), TAG);
@@ -85,10 +90,13 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     }
 
     public void stopLoading() {
-        if (mLoadingDialogFragment != null) {
-            LogUtil.v(TAG, "stopLoading");
-            mLoadingDialogFragment.dismiss();
-            mLoadingDialogFragment = null;
+        if(mAtomicLoading.decrementAndGet()<=0) {
+            if (mLoadingDialogFragment != null) {
+                LogUtil.v(TAG, "stopLoading");
+                mLoadingDialogFragment.dismiss();
+                mLoadingDialogFragment = null;
+                mAtomicLoading.set(0);
+            }
         }
     }
 

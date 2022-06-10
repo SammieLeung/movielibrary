@@ -37,7 +37,6 @@ public class UnknowFileViewModel extends BaseAndroidViewModel {
     private ExecutorService mSingleThreadPool;
     private AtomicInteger mPage = new AtomicInteger();
     private AtomicInteger mTotal = new AtomicInteger();
-    private UnknowFileItemListAdapter mUnknowsFileItemListAdapter;
 
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViews;
 
@@ -46,64 +45,33 @@ public class UnknowFileViewModel extends BaseAndroidViewModel {
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
         mSingleThreadPool = Executors.newSingleThreadExecutor();
         mUnrecognizedFileDataViews = new ArrayList<>();
-        initRvAdapter();
 
     }
 
-    private void initRvAdapter() {
-        mUnknowsFileItemListAdapter = new UnknowFileItemListAdapter(getApplication(), mUnrecognizedFileDataViews);
+    public Observable<List<UnrecognizedFileDataView>> reLoadUnknownFiles() {
+        return Observable.create((ObservableOnSubscribe<List<UnrecognizedFileDataView>>) emitter -> {
+                    mPage.set(0);
+                    mTotal.set(mVideoFileDao.countUnrecognizedFiles(ScraperSourceTools.getSource()));
+                    List<UnrecognizedFileDataView> list = mVideoFileDao.queryUnrecognizedFiles(ScraperSourceTools.getSource(), 0, LIMIT);
+                    emitter.onNext(list);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.from(mSingleThreadPool))
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void reLoadUnknowFiles() {
-        Observable.create((ObservableOnSubscribe<List<UnrecognizedFileDataView>>) emitter -> {
-            mPage.set(0);
-            mTotal.set(mVideoFileDao.countUnrecognizedFiles(ScraperSourceTools.getSource()));
-            List<UnrecognizedFileDataView> list = mVideoFileDao.queryUnrecognizedFiles(ScraperSourceTools.getSource(), 0, LIMIT);
-            emitter.onNext(list);
+    public Observable<List<UnrecognizedFileDataView>> loadMoreUnknowFiles() {
+      return  Observable.create((ObservableOnSubscribe<List<UnrecognizedFileDataView>>) emitter -> {
+            if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
+                int offset = mPage.incrementAndGet() * LIMIT;
+                emitter.onNext(mVideoFileDao.queryUnrecognizedFiles(ScraperSourceTools.getSource(), offset, LIMIT));
+            }
             emitter.onComplete();
         }).subscribeOn(Schedulers.from(mSingleThreadPool))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<UnrecognizedFileDataView>>() {
-                    @Override
-                    public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
-                        mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
-                    }
-                });
-
-
-    }
-
-    public void loadMoreUnknowFiles() {
-        Observable.create(new ObservableOnSubscribe<List<UnrecognizedFileDataView>>() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull ObservableEmitter<List<UnrecognizedFileDataView>> emitter) throws Throwable {
-                if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
-                    int offset = mPage.incrementAndGet() * LIMIT;
-                    emitter.onNext(mVideoFileDao.queryUnrecognizedFiles(ScraperSourceTools.getSource(), offset, LIMIT));
-                }
-                emitter.onComplete();
-            }
-        }).subscribeOn(Schedulers.from(mSingleThreadPool))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(unrecognizedFileDataViews -> {
-                    mUnknowsFileItemListAdapter.appendAll(unrecognizedFileDataViews);
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<String> playVideo(String path, String name) {
-        return MovieHelper.playingMovie(path,name);
-    }
-
-    public int increaseTotal() {
-        return mTotal.incrementAndGet();
-    }
-
-    public int decreaseTotal() {
-        return mTotal.decrementAndGet();
-    }
-
-    public UnknowFileItemListAdapter getUnknownsFileItemListAdapter() {
-        return mUnknowsFileItemListAdapter;
+        return MovieHelper.playingMovie(path, name);
     }
 
     public List<UnrecognizedFileDataView> getUnrecognizedFileDataViewList() {

@@ -42,11 +42,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2021/6/1
  */
 public class HomeFragmentViewModel extends BaseAndroidViewModel {
-    public static final int LIMIT=10;
+    public static final int LIMIT = 10;
     private GenreDao mGenreDao;
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
-    private Callback mGenreCallback;
 
     public HomeFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -65,18 +64,15 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
         mMovieDao = movieLibraryRoomDatabase.getMovieDao();
     }
 
-    public void prepareHistory(Callback callback) {
-        Observable.just("")
+
+    public Observable<List<HistoryMovieDataView>> prepareHistory() {
+        return Observable.just("")
                 .map(s -> {
-                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(),0,LIMIT);
+                    List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(dataViewList -> {
-                    if (callback != null)
-                        callback.runOnUIThread(dataViewList);
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public void playingVideo(String path, String name, Callback callback) {
@@ -84,22 +80,26 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
-                        prepareHistory(callback);
+                        prepareHistory()
+                                .subscribe(historyMovieDataViews -> {
+                                    if (callback != null)
+                                        callback.runOnUIThread(historyMovieDataViews);
+                                });
                     }
                 });
     }
-    
-    public void startDetailActivity(AppBaseActivity appBaseActivity, MovieDataView movieDataView){
-        Intent intent=new Intent(appBaseActivity,MovieDetailActivity.class);
+
+    public void startDetailActivity(AppBaseActivity appBaseActivity, MovieDataView movieDataView) {
+        Intent intent = new Intent(appBaseActivity, MovieDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putLong(Constants.Extras.MOVIE_ID, movieDataView.id);
-        bundle.putInt(Constants.Extras.SEASON,movieDataView.season);
+        bundle.putInt(Constants.Extras.SEASON, movieDataView.season);
         intent.putExtras(bundle);
         appBaseActivity.startActivityForResult(intent);
     }
 
-    public void prepareGenreList() {
-        Observable.just(3)
+    public Observable<List<String>> prepareGenreList() {
+        return Observable.just(3)
                 .subscribeOn(Schedulers.io())
                 .map(defalut_count -> {
                     //优先顺序 自定义>已有电影>固定排序
@@ -129,84 +129,53 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
                     }
                     return newCustomTags;
                 })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<String>>() {
-                    @Override
-                    public void onAction(List<String> genreTags) {
-                        if (mGenreCallback != null)
-                            mGenreCallback.runOnUIThread(genreTags);
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 
-    public void prepareRecentlyAddedMovie(Callback callback) {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(),Config.getSqlConditionOfChildMode(),0,LIMIT);
-            emitter.onNext(movieDataViewList);
-            emitter.onComplete();
-        })
+    public Observable<List<MovieDataView>> prepareRecentlyAddedMovie() {
+        return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+                    List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    emitter.onNext(movieDataViewList);
+                    emitter.onComplete();
+                })
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (callback != null)
-                            callback.runOnUIThread(movieDataViewList);
-                    }
-                });
+                .observeOn(AndroidSchedulers.mainThread());
 
     }
 
-    public void prepareFavorite(Callback callback) {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),Config.getSqlConditionOfChildMode(),0,LIMIT);
-            emitter.onNext(movieDataViewList);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (callback != null)
-                            callback.runOnUIThread(movieDataViewList);
-                    }
-                });
+    public Observable<List<MovieDataView>> prepareFavorite() {
+       return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+                    List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    emitter.onNext(movieDataViewList);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void prepareRecommand(Callback callback) {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-            String source = ScraperSourceTools.getSource();
-            List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source,Config.getSqlConditionOfChildMode(),0,LIMIT);
-            List<String> genreList = new ArrayList<>();
-            List<Long> idList = new ArrayList<>();
-            for (int i = 0;idList.size()<3&& i < history.size(); i++) {
-                MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
-                if(wrapper!=null) {
-                    for (Genre genre : wrapper.genres) {
-                        if (genre.source.equals(source) && !genreList.contains(genre.name)) {
-                            genreList.add(genre.name);
+    public Observable<List<MovieDataView>> prepareRecommand() {
+       return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+                    String source = ScraperSourceTools.getSource();
+                    List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    List<String> genreList = new ArrayList<>();
+                    List<Long> idList = new ArrayList<>();
+                    for (int i = 0; idList.size() < 3 && i < history.size(); i++) {
+                        MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
+                        if (wrapper != null) {
+                            for (Genre genre : wrapper.genres) {
+                                if (genre.source.equals(source) && !genreList.contains(genre.name)) {
+                                    genreList.add(genre.name);
+                                }
+                            }
+                            idList.add(wrapper.movie.id);
                         }
                     }
-                    idList.add(wrapper.movie.id);
-                }
-            }
-            emitter.onNext(mMovieDao.queryRecommand(source,Config.getSqlConditionOfChildMode(), genreList, idList,0,LIMIT));
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (callback != null)
-                            callback.runOnUIThread(movieDataViewList);
-                    }
-                });
+                    emitter.onNext(mMovieDao.queryRecommand(source, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public void setGenreCallback(Callback genreCallback) {
-        mGenreCallback = genreCallback;
-    }
 
     public interface Callback {
         void runOnUIThread(List<?> list);

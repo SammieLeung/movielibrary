@@ -15,12 +15,12 @@
             android:layout_marginRight="45dp"
             android:layout_marginBottom="-5dp"
             android:paddingBottom="5dp"
-            android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />
+            android:visibility="@{isLoading?View.GONE:!isEmpty?View.VISIBLE:View.GONE}" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{isEmpty?View.VISIBLE:View.GONE}">
+            android:visibility="@{isLoading?View.GONE:isEmpty?View.VISIBLE:View.GONE}">
 
             <ImageView
                 android:id="@+id/iv_empty"
@@ -51,6 +51,26 @@
                 android:layout_marginTop="13dp"
                 android:text="@string/unknowfile_empty" />
         </RelativeLayout>
+
+        <RelativeLayout
+          android:visibility="@{isLoading?View.VISIBLE:View.GONE}"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+            <com.github.ybq.android.spinkit.SpinKitView
+              android:id="@+id/spin_kit"
+              style="@style/SpinKitView.Circle"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="250dp"
+              android:padding="30dp"
+              android:maxWidth="60dp"
+              android:minWidth="60dp"
+              android:maxHeight="60dp"
+              android:minHeight="60dp"
+              android:layout_centerHorizontal="true"
+              android:background="@drawable/loading_view_bg"
+              app:SpinKit_Color="@color/white_light" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <data>
@@ -58,5 +78,8 @@
         <variable
             name="isEmpty"
             type="boolean" />
+        <variable
+          name="isLoading"
+          type="boolean" />
     </data>
 </layout>

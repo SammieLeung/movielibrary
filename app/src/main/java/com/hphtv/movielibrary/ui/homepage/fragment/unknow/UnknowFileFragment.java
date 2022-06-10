@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
+import com.hphtv.movielibrary.adapter.UnknowFileItemListAdapter;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
@@ -18,19 +19,25 @@ import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
+import com.hphtv.movielibrary.ui.homepage.fragment.ILoadingState;
+import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * author: Sam Leung
  * date:  2022/4/2
  */
-public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> {
+public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
     public static final String TAG = UnknowFileFragment.class.getSimpleName();
+    private UnknowFileItemListAdapter mUnknowsFileItemListAdapter;
 
     public UnknowFileFragment(IAutofitHeight autofitHeight, int position) {
         super(autofitHeight, position);
@@ -50,9 +57,8 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
 
     @Override
     public void forceRefresh() {
-        Log.e(TAG,"forceRefresh");
-        if (mViewModel != null)
-            mViewModel.reLoadUnknowFiles();
+        Log.e(TAG, "forceRefresh");
+        reloadUnknownFiles();
     }
 
     @Override
@@ -61,27 +67,34 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
         Log.e(TAG, "onViewCreated");
 
         initViews();
-//        mViewModel.reLoadUnknowFiles();
     }
 
     @Override
     public void onResume() {
         Log.e(TAG, "onResume");
         super.onResume();
-        mViewModel.reLoadUnknowFiles();
+        reloadUnknownFiles();
     }
 
     /**
      * 初始化UI
      */
     private void initViews() {
+        mUnknowsFileItemListAdapter = new UnknowFileItemListAdapter(getContext(), mViewModel.getUnrecognizedFileDataViewList());
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false);
         mBinding.rvUnknowsfile.setLayoutManager(gridLayoutManager);
-        mBinding.rvUnknowsfile.setAdapter(mViewModel.getUnknownsFileItemListAdapter());
+        mBinding.rvUnknowsfile.setAdapter(mUnknowsFileItemListAdapter);
         mBinding.rvUnknowsfile.addOnScrollListener(new OnMovieLoadListener() {
             @Override
             protected void onLoading(int countItem, int lastItem) {
-                mViewModel.loadMoreUnknowFiles();
+                if(mViewModel!=null)
+                mViewModel.loadMoreUnknowFiles()
+                        .subscribe(new  SimpleObserver<List<UnrecognizedFileDataView>>() {
+                            @Override
+                            public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
+                                mUnknowsFileItemListAdapter.appendAll(unrecognizedFileDataViews);
+                            }
+                        });
             }
         });
         mBinding.rvUnknowsfile.addItemDecoration(new GridSpacingItemDecorationVertical(
@@ -105,8 +118,8 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
                 binding.tabLayout.getTabAt(pos).view.requestFocus();
             }
         });
-        mViewModel.getUnknownsFileItemListAdapter().setOnItemClickListener(mActionListener);
-        mViewModel.getUnknownsFileItemListAdapter().setOnItemLongClickListener(this::showUnknowsFileMenuDialog);
+        mUnknowsFileItemListAdapter.setOnItemClickListener(mActionListener);
+        mUnknowsFileItemListAdapter.setOnItemLongClickListener(this::showUnknowsFileMenuDialog);
     }
 
     /**
@@ -143,4 +156,32 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
         }
     };
 
+    private void reloadUnknownFiles() {
+        if (mViewModel != null) {
+            mViewModel.reLoadUnknownFiles()
+                    .subscribe(new  SimpleObserver<List<UnrecognizedFileDataView>>() {
+                        @Override
+                        public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
+                            mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
+                        }
+                    });
+        }
+
+    }
+
+    @Override
+    public void startLoading() {
+        int i=atomicState.incrementAndGet();
+        LogUtil.v(TAG, "startLoading "+i);
+        mBinding.setIsLoading(true);
+    }
+
+    @Override
+    public void finishLoading() {
+        if(atomicState.decrementAndGet()<=0) {
+            LogUtil.v(TAG, "finishLoading ");
+            mBinding.setIsLoading(false);
+            atomicState.set(0);
+        }
+    }
 }

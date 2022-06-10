@@ -20,15 +20,19 @@ import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.LoadingDialogFragment;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
+import com.hphtv.movielibrary.ui.homepage.fragment.ILoadingState;
+import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 
@@ -37,11 +41,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.rxjava3.disposables.Disposable;
+
 /**
  * author: Sam Leung
  * date:  2021/11/5
  */
-public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentViewModel, FragmentHomepageBinding> implements IRefreshGenre {
+public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentViewModel, FragmentHomepageBinding> implements IRefreshGenre, ILoadingState {
     public static final String TAG = HomePageFragment.class.getSimpleName();
 
     private HistoryListAdapter mHistoryListAdapter;
@@ -217,7 +223,6 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
         mGenreTagAdapter.setOnGenreListener(mGenreListener);
         mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
-        mViewModel.setGenreCallback(list -> mGenreTagAdapter.addAll(list));
     }
 
     /**
@@ -270,7 +275,13 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
      * 读取历史记录数据
      */
     public void prepareHistoryData() {
-        mViewModel.prepareHistory(list -> updateRecentlyPlayed((List<HistoryMovieDataView>) list));
+        mViewModel.prepareHistory()
+                .subscribe(new SimpleLoadingObserver<List<HistoryMovieDataView>>(this) {
+                    @Override
+                    public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
+                        updateRecentlyPlayed(historyMovieDataViews);
+                    }
+                });
     }
 
     private void updateRecentlyPlayed(List<HistoryMovieDataView> historyList) {
@@ -285,52 +296,86 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     }
 
     private void prepareMovieGenreTagData() {
-        mViewModel.prepareGenreList();
+        if (mViewModel != null)
+            mViewModel.prepareGenreList()
+                    .subscribe(new SimpleLoadingObserver<List<String>>(this) {
+                        @Override
+                        public void onAction(List<String> list) {
+                            mGenreTagAdapter.addAll(list);
+                        }
+                    });
     }
 
     private void prepareRecentlyAddedMovie() {
-        mViewModel.prepareRecentlyAddedMovie(list -> {
-            if (list.size() > 0) {
-                mRecentlyAddListAdapter.addAll(list);
-                mBinding.setRecentAdd(true);
-            } else {
-                mBinding.setRecentAdd(false);
-            }
-        });
+        mViewModel.prepareRecentlyAddedMovie()
+                .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
+                    @Override
+                    public void onAction(List<MovieDataView> movieDataViews) {
+                        if (movieDataViews.size() > 0) {
+                            mRecentlyAddListAdapter.addAll(movieDataViews);
+                            mBinding.setRecentAdd(true);
+                        } else {
+                            mBinding.setRecentAdd(false);
+                        }
+                    }
+                });
     }
 
     public void prepareFavorite() {
-        mViewModel.prepareFavorite(list -> {
-            if (list.size() > 0) {
-                mFavoriteListAdapter.addAll(list);
-                mBinding.setFavorite(true);
-            } else {
-                mBinding.setFavorite(false);
-            }
-        });
+        mViewModel.prepareFavorite()
+                .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
+                    @Override
+                    public void onAction(List<MovieDataView> movieDataViews) {
+                        if (movieDataViews.size() > 0) {
+                            mFavoriteListAdapter.addAll(movieDataViews);
+                            mBinding.setFavorite(true);
+                        } else {
+                            mBinding.setFavorite(false);
+                        }
+                    }
+                });
     }
 
     private void prepareRecommand() {
-        mViewModel.prepareRecommand(list -> {
-            if (list.size() > 0) {
-                mRecommendListAdapter.addAll(list);
-                mBinding.setRecommand(true);
-            } else {
-                mBinding.setRecommand(false);
-            }
-        });
+        mViewModel.prepareRecommand()
+                .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
+                    @Override
+                    public void onAction(List<MovieDataView> movieDataViews) {
+                        if (movieDataViews.size() > 0) {
+                            mRecommendListAdapter.addAll(movieDataViews);
+                            mBinding.setRecommand(true);
+                        } else {
+                            mBinding.setRecommand(false);
+                        }
+                    }
+                });
     }
 
     @Override
     public void forceRefresh() {
-        Log.e(TAG,"forceRefresh");
+        Log.e(TAG, "forceRefresh");
         if (mViewModel != null)
             prepareAll();
     }
 
     @Override
     public void refreshGenreUI() {
-        if (mViewModel != null)
-            mViewModel.prepareGenreList();
+        prepareMovieGenreTagData();
+    }
+
+    @Override
+    public void startLoading() {
+        int i=atomicState.incrementAndGet();
+        LogUtil.v(TAG, "startLoading "+i);
+        mBinding.setIsLoading(true);
+    }
+
+    @Override
+    public void finishLoading() {
+        if(atomicState.decrementAndGet()<=0) {
+             LogUtil.v(TAG, "finishLoading ");
+             mBinding.setIsLoading(false);
+             atomicState.set(0);
+        }
     }
 }

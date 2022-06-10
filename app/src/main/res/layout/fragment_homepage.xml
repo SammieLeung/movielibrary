@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:visibility="@{recentAdd||favorite||recommand?View.VISIBLE:View.GONE}"
+            android:visibility="@{isLoading?View.GONE:recentAdd||favorite||recommand?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -88,7 +88,7 @@
                 android:layout_height="@dimen/recently_added_container_h"/>
         </LinearLayout>
         <RelativeLayout
-            android:visibility="@{!(recentAdd||favorite||recommand)?View.VISIBLE:View.GONE}"
+            android:visibility="@{isLoading?View.GONE:!(recentAdd||favorite||recommand)?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
@@ -124,6 +124,25 @@
                 android:padding="15dp"
                 android:text="@string/homepage_goto_add_shortcut" />
         </RelativeLayout>
+        <RelativeLayout
+          android:visibility="@{isLoading?View.VISIBLE:View.GONE}"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent">
+            <com.github.ybq.android.spinkit.SpinKitView
+              android:id="@+id/spin_kit"
+              style="@style/SpinKitView.Circle"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="250dp"
+              android:padding="30dp"
+              android:maxWidth="60dp"
+              android:minWidth="60dp"
+              android:maxHeight="60dp"
+              android:minHeight="60dp"
+              android:layout_centerHorizontal="true"
+              android:background="@drawable/loading_view_bg"
+              app:SpinKit_Color="@color/white_light" />
+        </RelativeLayout>
     </RelativeLayout>
 
     <data>
@@ -137,5 +156,8 @@
         <variable
             name="recommand"
             type="boolean" />
+        <variable
+          name="isLoading"
+          type="boolean" />
     </data>
 </layout>
