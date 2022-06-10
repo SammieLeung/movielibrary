@@ -38,6 +38,8 @@ public class UnknowFileViewModel extends BaseAndroidViewModel {
     private AtomicInteger mPage = new AtomicInteger();
     private AtomicInteger mTotal = new AtomicInteger();
 
+    private boolean isPlayingVideo=false;
+
     private List<UnrecognizedFileDataView> mUnrecognizedFileDataViews;
 
     public UnknowFileViewModel(@NonNull @NotNull Application application) {
@@ -76,5 +78,13 @@ public class UnknowFileViewModel extends BaseAndroidViewModel {
 
     public List<UnrecognizedFileDataView> getUnrecognizedFileDataViewList() {
         return mUnrecognizedFileDataViews;
+    }
+
+    public boolean isPlayingVideo() {
+        return isPlayingVideo;
+    }
+
+    public void setPlayingVideo(boolean playingVideo) {
+        isPlayingVideo = playingVideo;
     }
 }

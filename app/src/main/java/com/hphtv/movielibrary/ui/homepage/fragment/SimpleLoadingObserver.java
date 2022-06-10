@@ -1,7 +1,7 @@
 package com.hphtv.movielibrary.ui.homepage.fragment;
 
 
-import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 
 import io.reactivex.rxjava3.core.Observer;
@@ -36,6 +36,8 @@ public abstract class SimpleLoadingObserver<T> implements Observer<T> {
     @Override
     public void onError(Throwable e) {
         e.printStackTrace();
+        if(mLoadingState!=null)
+            mLoadingState.finishLoading();
     }
 
     @Override

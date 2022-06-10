@@ -14,17 +14,15 @@ import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemWithMoreListAdapter;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FragmentHomepageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
-import com.hphtv.movielibrary.ui.LoadingDialogFragment;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
-import com.hphtv.movielibrary.ui.homepage.fragment.ILoadingState;
+import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
@@ -32,7 +30,6 @@ import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 
@@ -40,8 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.rxjava3.disposables.Disposable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * author: Sam Leung
@@ -61,6 +57,9 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
+
+    public AtomicInteger atomicState=new AtomicInteger();
+
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView> mMovieDataViewEventListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
@@ -366,13 +365,15 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     @Override
     public void startLoading() {
         int i=atomicState.incrementAndGet();
-        LogUtil.v(TAG, "startLoading "+i);
+        LogUtil.v(TAG, "start-Loading "+i);
         mBinding.setIsLoading(true);
     }
 
     @Override
     public void finishLoading() {
-        if(atomicState.decrementAndGet()<=0) {
+        int i=atomicState.decrementAndGet();
+        LogUtil.v(TAG, "stop-Loading "+i);
+        if(i<=0) {
              LogUtil.v(TAG, "finishLoading ");
              mBinding.setIsLoading(false);
              atomicState.set(0);

@@ -13,7 +13,9 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
+import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
@@ -29,8 +31,8 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
     public static UnknownsFileMenuDialog newInstance(int pos, UnrecognizedFileDataView unrecognizedFileDataView) {
 
         Bundle args = new Bundle();
-        args.putInt("pos",pos);
-        args.putSerializable("unknows",unrecognizedFileDataView);
+        args.putInt("pos", pos);
+        args.putSerializable("unknows", unrecognizedFileDataView);
         UnknownsFileMenuDialog fragment = new UnknownsFileMenuDialog();
         fragment.setArguments(args);
         return fragment;
@@ -48,24 +50,23 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
         bindDatas();
     }
 
-    private void initView(){
+    private void initView() {
         mBinding.includePlaymovie.view.setOnClickListener(this::playVideo);
         mBinding.includeSelectPoster.view.setOnClickListener(this::showSelectPoster);
     }
 
 
-    private void bindDatas(){
-        UnrecognizedFileDataView dataView= (UnrecognizedFileDataView) getArguments().getSerializable("unknows");
-        int pos=getArguments().getInt("pos");
+    private void bindDatas() {
+        UnrecognizedFileDataView dataView = (UnrecognizedFileDataView) getArguments().getSerializable("unknows");
+        int pos = getArguments().getInt("pos");
         mViewModel.setItemPosition(pos);
         mViewModel.setUnrecognizedFileDataView(dataView);
         mBinding.setFilename(mViewModel.getUnrecognizedFileDataView().filename);
     }
 
-    private void playVideo(View view)
-    {
-        UnrecognizedFileDataView unrecognizedFileDataView= mViewModel.getUnrecognizedFileDataView();
-        MovieHelper.playingMovie(unrecognizedFileDataView.path,unrecognizedFileDataView.filename)
+    private void playVideo(View view) {
+        UnrecognizedFileDataView unrecognizedFileDataView = mViewModel.getUnrecognizedFileDataView();
+        MovieHelper.playingMovie(unrecognizedFileDataView.path, unrecognizedFileDataView.filename)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
@@ -74,11 +75,14 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
                 });
     }
 
-    private void showSelectPoster(View v){
+    private void showSelectPoster(View v) {
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(mViewModel.getUnrecognizedFileDataView().keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
+            ILoadingState loadingState = null;
+            if (getParentFragment() instanceof ILoadingState)
+                loadingState = (ILoadingState) getParentFragment();
             mViewModel.reMatchMovie(wrapper)
-                    .subscribe(new SimpleObserver<MovieDataView>() {
+                    .subscribe(new SimpleLoadingObserver<MovieDataView>(loadingState) {
                         @Override
                         public void onAction(MovieDataView movieDataView) {
                             if (getActivity() instanceof OnMovieChangeListener) {
@@ -90,8 +94,8 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
                         @Override
                         public void onComplete() {
                             super.onComplete();
-                            if(getActivity() instanceof AppBaseActivity)
-                                ((AppBaseActivity)getActivity()).stopLoading();
+                            if (getActivity() instanceof AppBaseActivity)
+                                ((AppBaseActivity) getActivity()).stopLoading();
                             getDialog().dismiss();
 
                         }
@@ -99,8 +103,8 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
                         @Override
                         public void onError(Throwable e) {
                             super.onError(e);
-                            if(getActivity() instanceof AppBaseActivity)
-                                ((AppBaseActivity)getActivity()).stopLoading();
+                            if (getActivity() instanceof AppBaseActivity)
+                                ((AppBaseActivity) getActivity()).stopLoading();
                             ToastUtil.newInstance(getContext()).toast(getString(R.string.toast_selectmovie_faild));
                         }
                     });

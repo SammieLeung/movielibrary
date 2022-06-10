@@ -23,7 +23,7 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
-import com.hphtv.movielibrary.ui.homepage.fragment.ILoadingState;
+import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
@@ -38,6 +38,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * author: Sam Leung
@@ -57,6 +58,9 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
+
+    public AtomicInteger atomicState=new AtomicInteger();
+
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView> mMovieDataViewEventListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
         @Override
@@ -189,7 +193,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
         prepareFavorite();
-        prepareRecommand();
+        prepareRecommend();
     }
 
     /**
@@ -342,7 +346,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
                 });
     }
 
-    private void prepareRecommand() {
+    private void prepareRecommend() {
         mViewModel.prepareRecommend()
                 .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
                     @Override
@@ -372,13 +376,15 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     @Override
     public void startLoading() {
         int i = atomicState.incrementAndGet();
-        LogUtil.v(TAG, "startLoading " + i);
+        LogUtil.v(TAG, "start-Loading " + i);
         mBinding.setIsLoading(true);
     }
 
     @Override
     public void finishLoading() {
-        if (atomicState.decrementAndGet() <= 0) {
+        int i=atomicState.decrementAndGet();
+        LogUtil.v(TAG, "stop-Loading "+i);
+        if(i<=0) {
             LogUtil.v(TAG, "finishLoading ");
             mBinding.setIsLoading(false);
             atomicState.set(0);

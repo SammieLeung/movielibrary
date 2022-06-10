@@ -27,7 +27,7 @@ public class ActivityHelper {
         dialog.show(fragmentManager, "");
     }
 
-    public static void showUnknowsFileMenuDialog(FragmentManager fragmentManager, int pos, UnrecognizedFileDataView unrecognizedFileDataView){
+    public static void showUnknownsFileMenuDialog(FragmentManager fragmentManager, int pos, UnrecognizedFileDataView unrecognizedFileDataView){
         UnknownsFileMenuDialog dialog=UnknownsFileMenuDialog.newInstance(pos,unrecognizedFileDataView);
         dialog.show(fragmentManager, "");
 

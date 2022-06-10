@@ -19,7 +19,7 @@ import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
-import com.hphtv.movielibrary.ui.homepage.fragment.ILoadingState;
+import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
@@ -30,6 +30,9 @@ import com.station.kit.util.LogUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import io.reactivex.rxjava3.disposables.Disposable;
 
 /**
  * author: Sam Leung
@@ -38,6 +41,7 @@ import java.util.List;
 public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
     public static final String TAG = UnknowFileFragment.class.getSimpleName();
     private UnknowFileItemListAdapter mUnknowsFileItemListAdapter;
+    public AtomicInteger atomicState = new AtomicInteger();
 
     public UnknowFileFragment(IAutofitHeight autofitHeight, int position) {
         super(autofitHeight, position);
@@ -87,14 +91,14 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
         mBinding.rvUnknowsfile.addOnScrollListener(new OnMovieLoadListener() {
             @Override
             protected void onLoading(int countItem, int lastItem) {
-                if(mViewModel!=null)
-                mViewModel.loadMoreUnknowFiles()
-                        .subscribe(new  SimpleObserver<List<UnrecognizedFileDataView>>() {
-                            @Override
-                            public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
-                                mUnknowsFileItemListAdapter.appendAll(unrecognizedFileDataViews);
-                            }
-                        });
+                if (mViewModel != null)
+                    mViewModel.loadMoreUnknowFiles()
+                            .subscribe(new SimpleObserver<List<UnrecognizedFileDataView>>() {
+                                @Override
+                                public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
+                                    mUnknowsFileItemListAdapter.appendAll(unrecognizedFileDataViews);
+                                }
+                            });
             }
         });
         mBinding.rvUnknowsfile.addItemDecoration(new GridSpacingItemDecorationVertical(
@@ -119,19 +123,19 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
             }
         });
         mUnknowsFileItemListAdapter.setOnItemClickListener(mActionListener);
-        mUnknowsFileItemListAdapter.setOnItemLongClickListener(this::showUnknowsFileMenuDialog);
+        mUnknowsFileItemListAdapter.setOnItemLongClickListener(this::showUnknownsFileMenuDialog);
     }
 
     /**
      * 显示菜单
      *
      * @param view
-     * @param postion
+     * @param position
      * @param data
      * @return
      */
-    private boolean showUnknowsFileMenuDialog(View view, int postion, UnrecognizedFileDataView data) {
-        ActivityHelper.showUnknowsFileMenuDialog(getChildFragmentManager(), postion, data);
+    private boolean showUnknownsFileMenuDialog(View view, int position, UnrecognizedFileDataView data) {
+        ActivityHelper.showUnknownsFileMenuDialog(getChildFragmentManager(), position, data);
         return true;
     }
 
@@ -141,11 +145,20 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
             mViewModel.playVideo(data.path, data.filename)
                     .subscribe(new SimpleObserver<String>() {
                         @Override
-                        public void onAction(String s) {
-                            getBaseActivity().refreshFragment(0);//主页刷新历史播放
-                            getBaseActivity().refreshFragment(1);//主页刷新历史播放
-                            getBaseActivity().refreshFragment(2);//主页刷新历史播放
+                        public void onSubscribe(Disposable d) {
+                            mViewModel.setPlayingVideo(true);
+                            super.onSubscribe(d);
+                            getBaseActivity().startLoading();
+                        }
 
+                        @Override
+                        public void onAction(String s) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            getBaseActivity().stopLoading();
                         }
                     });
         }
@@ -157,9 +170,13 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
     };
 
     private void reloadUnknownFiles() {
+        if (mViewModel.isPlayingVideo()) {
+            mViewModel.setPlayingVideo(false);
+            return;
+        }
         if (mViewModel != null) {
             mViewModel.reLoadUnknownFiles()
-                    .subscribe(new  SimpleObserver<List<UnrecognizedFileDataView>>() {
+                    .subscribe(new SimpleLoadingObserver<List<UnrecognizedFileDataView>>(this) {
                         @Override
                         public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
                             mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
@@ -171,14 +188,16 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
 
     @Override
     public void startLoading() {
-        int i=atomicState.incrementAndGet();
-        LogUtil.v(TAG, "startLoading "+i);
+        int i = atomicState.incrementAndGet();
+        LogUtil.v(TAG, "start-Loading " + i);
         mBinding.setIsLoading(true);
     }
 
     @Override
     public void finishLoading() {
-        if(atomicState.decrementAndGet()<=0) {
+        int i = atomicState.decrementAndGet();
+        LogUtil.v(TAG, "stop-Loading " + i);
+        if (i <= 0) {
             LogUtil.v(TAG, "finishLoading ");
             mBinding.setIsLoading(false);
             atomicState.set(0);

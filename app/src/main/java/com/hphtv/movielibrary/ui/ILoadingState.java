@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage.fragment;
+package com.hphtv.movielibrary.ui;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * date:  2022/6/10
  */
 public interface ILoadingState {
-    public AtomicInteger atomicState=new AtomicInteger();
     void startLoading();
     void finishLoading();
 }
