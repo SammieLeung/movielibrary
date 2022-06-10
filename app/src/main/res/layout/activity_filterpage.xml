@@ -30,6 +30,7 @@
 
         <com.hphtv.movielibrary.ui.view.CollapseButton
           android:id="@+id/btn_filter"
+          android:nextFocusLeft="@id/tv_title"
           style="@style/homepage_circle_btn_style"
           android:layout_width="wrap_content"
           android:layout_toStartOf="@id/btn_home"
@@ -46,6 +47,7 @@
           android:text="@string/homepage" />
 
         <TextView
+          android:nextFocusRight="@id/btn_filter"
             android:id="@+id/tv_title"
             style="@style/title_style"
             android:layout_marginTop="23dp"

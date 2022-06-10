@@ -100,6 +100,15 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         }
     }
 
+    public void forceStopLoading(){
+        if (mLoadingDialogFragment != null) {
+            LogUtil.v(TAG, "stopLoading");
+            mLoadingDialogFragment.dismiss();
+            mLoadingDialogFragment = null;
+            mAtomicLoading.set(0);
+        }
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

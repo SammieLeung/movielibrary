@@ -57,7 +57,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private EpisodeItemListAdapter mEpisodeItemListAdapter;
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
-    private int mSeason = 0;
 
 
     //TODO 同步系统状态需要一个后台服务绑定
@@ -337,7 +336,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     @Override
     protected void onPause() {
-        stopLoading();
+        forceStopLoading();
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
@@ -378,7 +377,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         @Override
                         public void onAction(MovieWrapper movieWrapper) {
                             if (movieWrapper.movie != null) {
-                                prepareMovieWrapper(movieWrapper.movie.id, mSeason);
+                                prepareMovieWrapper(movieWrapper.movie.id, mViewModel.getSeason());
                                 refreshParent();
                             } else {
                                 ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
@@ -443,13 +442,13 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private void playVideo(String path, String name) {
         startLoading();
         mViewModel.playingVideo(path, name);
-        refreshParent();
+//        refreshParent();
     }
 
     private void playingEpisodeVideo(VideoFile videoFile) {
         startLoading();
         mViewModel.playingEpisodeVideo(videoFile);
-        refreshParent();
+//        refreshParent();
     }
     /**
      * 返回时刷新主页

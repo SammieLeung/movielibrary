@@ -58,6 +58,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     private ObservableField<String> mEpisodePlayBtnText=new ObservableField<>();
     private VideoFile mLastPlayVideoFile;
 
+    private int mSeason;
+
     public MovieDetailViewModel(@NonNull @NotNull Application application) {
         super(application);
         mSingleThreadPool = Executors.newSingleThreadExecutor();
@@ -77,7 +79,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
      * @return
      */
     public Observable<MovieWrapper> loadMovieWrapper(long id, int season) {
-
+        mSeason=season;
         return Observable.just(id)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(movie_id -> {
@@ -86,7 +88,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     if (Constants.SearchType.tv.equals(mMovieWrapper.movie.type)) {
                         for (Season _season : mMovieWrapper.seasons) {
                             int num = _season.seasonNumber;
-                            if (num == season) {
+                            if (num == mSeason) {
                                 mMovieWrapper.season = _season;
                                 break;
                             }
@@ -330,6 +332,14 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     public HashMap<String, List<List<VideoFile>>> getTabLayoutPaginationMap() {
         return mTabLayoutPaginationMap;
+    }
+
+    public int getSeason() {
+        return mSeason;
+    }
+
+    public void setSeason(int season) {
+        mSeason = season;
     }
 
     public interface Callback2 {

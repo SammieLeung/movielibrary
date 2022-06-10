@@ -35,7 +35,6 @@
             android:id="@+id/image"
             android:layout_width="380dp"
             android:layout_height="529dp"
-            android:src="@mipmap/default_poster"
             app:corner_radius="8dp"
             app:border_color="@android:color/transparent"
             app:border_width="0dp"/>

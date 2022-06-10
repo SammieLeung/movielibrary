@@ -138,7 +138,6 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
         mViewModel.loadMovieProperty(dataView)
                 .subscribe(movieDataView ->
                         GlideTools.GlideWrapper(getContext(), movieDataView.poster)
-                                .placeholder(R.mipmap.default_poster)
                                 .into(mBinding.image));
     }
 
