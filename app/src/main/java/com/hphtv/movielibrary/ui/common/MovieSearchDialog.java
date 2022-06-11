@@ -25,6 +25,7 @@ import com.hphtv.movielibrary.databinding.FLayoutUnionsearchBinding;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,29 @@ public class MovieSearchDialog extends DialogFragment {
     private MovieSearchDialogViewModel mViewModel;
     private MovieSearchAdapter mAdapter;
     private ArrayAdapter<String> mSpinnerAdapter;
+
+    private TvRecyclerView.OnNoNextFocusListener mOnNoNextFocusListener=new TvRecyclerView.OnNoNextFocusListener() {
+        @Override
+        public boolean forceFocusLeft(View currentFocus) {
+            return false;
+        }
+
+        @Override
+        public boolean forceFocusRight(View currentFocus) {
+            return false;
+        }
+
+        @Override
+        public boolean forceFocusUp(View currentFocus) {
+            mBinding.etBoxName.requestFocus();
+            return true;
+        }
+
+        @Override
+        public boolean forceFocusDown(View currentFocus) {
+            return false;
+        }
+    };
 
     public static MovieSearchDialog newInstance(String keyword) {
         Bundle args = new Bundle();
@@ -101,6 +125,7 @@ public class MovieSearchDialog extends DialogFragment {
                 mViewModel.loading(mAdapter);
             }
         });
+        mBinding.recyclerviewSearchResult.setOnNoNextFocusListener(mOnNoNextFocusListener);
         mBinding.etBoxName.setOnEditorActionListener((v, actionId, event) -> {
             if(actionId== EditorInfo.IME_ACTION_SEARCH){
                 reSearch();
@@ -151,6 +176,7 @@ public class MovieSearchDialog extends DialogFragment {
         String keyword = mBinding.etBoxName.getText().toString();
         mViewModel.refresh(keyword, mAdapter);
     }
+
 
     private OnSelectPosterListener mOnSelectPosterListener;
 
