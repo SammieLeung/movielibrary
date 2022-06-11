@@ -116,10 +116,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     };
 
     //TvRecyclerView的按键处理(按键均被监听)
-    private TvRecyclerView.OnKeyPressListener mOnKeyPressListener = new TvRecyclerView.OnKeyPressListener() {
-        @Override
-        public void processKeyEvent(int keyCode) {
-        }
+    private TvRecyclerView.OnBackPressListener mOnBackPressListener = new TvRecyclerView.OnBackPressListener() {
 
         @Override
         public void onBackPress() {
@@ -191,7 +188,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private void initRecentlyPlayedList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvHistoryList.setLayoutManager(mLayoutManager);
-        mBinding.rvHistoryList.setOnKeyPressListener(mOnKeyPressListener);
+        mBinding.rvHistoryList.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
@@ -216,7 +213,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private void initGenreList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvGenreList.setLayoutManager(mLayoutManager);
-        mBinding.rvGenreList.setOnKeyPressListener(mOnKeyPressListener);
+        mBinding.rvGenreList.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
         mGenreTagAdapter = new GenreTagAdapter(getContext(), mGenreTagList);
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
@@ -230,7 +227,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private void initRecentlyAddedList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
-        mBinding.rvRecentlyAdded.setOnKeyPressListener(mOnKeyPressListener);
+        mBinding.rvRecentlyAdded.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecentlyAddListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mRecentlyAddedList, PaginationViewModel.OPEN_RECENTLY_ADD);
         mRecentlyAddListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
@@ -246,7 +243,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private void initFavoriteList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvFavorite.setLayoutManager(mLayoutManager);
-        mBinding.rvFavorite.setOnKeyPressListener(mOnKeyPressListener);
+        mBinding.rvFavorite.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mFavoriteListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mFavoriteList, PaginationViewModel.OPEN_FAVORITE);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
@@ -260,7 +257,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private void initRecommandList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecommand.setLayoutManager(mLayoutManager);
-        mBinding.rvRecommand.setOnKeyPressListener(mOnKeyPressListener);
+        mBinding.rvRecommand.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
         mRecommendListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
         mBinding.rvRecommand.setAdapter(mRecommendListAdapter);

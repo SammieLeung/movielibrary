@@ -109,11 +109,7 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
                 DensityUtil.dip2px(getContext(), 28),
                 5)
         );
-        mBinding.rvUnknowsfile.setOnKeyPressListener(new TvRecyclerView.OnKeyPressListener() {
-            @Override
-            public void processKeyEvent(int keyCode) {
-
-            }
+        mBinding.rvUnknowsfile.setOnBackPressListener(new TvRecyclerView.OnBackPressListener() {
 
             @Override
             public void onBackPress() {

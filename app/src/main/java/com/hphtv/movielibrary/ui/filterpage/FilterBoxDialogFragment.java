@@ -2,7 +2,6 @@ package com.hphtv.movielibrary.ui.filterpage;
 
 import android.os.Bundle;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * author: Sam Leung
  * date:  2021/12/6
  */
-public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener, TvRecyclerView.OnKeyPressListener, TvRecyclerView.OnForceFocusListener {
+public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener, TvRecyclerView.OnBackPressListener, TvRecyclerView.OnNoNextFocusListener {
     private static final String TAG = FilterBoxDialogFragment.class.getSimpleName();
 
     private FilterBoxAdapter mGenreAdapter, mYearsApdater;
@@ -64,7 +63,7 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
         if (mFilterPageViewModel == null) {
             mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
             String genre = mFilterPageViewModel.getGenre();
-            VideoTag videoTag=mFilterPageViewModel.getVideoTag();
+            VideoTag videoTag = mFilterPageViewModel.getVideoTag();
             mViewModel.setPresetGenreName(genre);
             mViewModel.setPresetVideoTag(videoTag);
         }
@@ -104,8 +103,8 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
     private void prepareRecyclerView(TvRecyclerView recyclerView, RecyclerView.Adapter adapter) {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(adapter);
-        recyclerView.setOnKeyPressListener(this);
-        recyclerView.setOnForceFocusListener(this);
+        recyclerView.setOnBackPressListener(this);
+        recyclerView.setOnNoNextFocusListener(this);
     }
 
     private void prepareDevices() {
@@ -148,74 +147,77 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
     }
 
     @Override
-    public void processKeyEvent(int keyCode) {
-    }
-
-    @Override
     public void onBackPress() {
         dismiss();
     }
 
-    private void requestNextRightFocus(View currentFocusView) {
+    /**
+     * 让当前获取焦点的View所在列的右列中适合获取焦点的view获取到焦点
+     *
+     * @param currentFocusView
+     */
+    private boolean requestNextRightFocus(View currentFocusView) {
         int id = ((View) currentFocusView.getParent()).getId();
         switch (id) {
             case R.id.view_sortby_device:
-                requestChildFocus(mBinding.viewSortbyType);
-                break;
+                return requestChildFocus(mBinding.viewSortbyType);
             case R.id.view_sortby_type:
-                requestChildFocus(mBinding.viewSortbyGenres);
-                break;
+                return requestChildFocus(mBinding.viewSortbyGenres);
             case R.id.view_sortby_genres:
-                requestChildFocus(mBinding.viewSortbyYear);
-                break;
+                return requestChildFocus(mBinding.viewSortbyYear);
             case R.id.view_sortby_year:
-                requestChildFocus(mBinding.viewOrder);
-                break;
+                return requestChildFocus(mBinding.viewOrder);
         }
+        return false;
     }
 
-    private void requestNextLeftFocus(View currentFocusView) {
+    /**
+     * 让当前获取焦点的View所在列的左列中适合获取焦点的view获取到焦点
+     *
+     * @param currentFocusView
+     */
+    private boolean requestNextLeftFocus(View currentFocusView) {
         int id = ((View) currentFocusView.getParent()).getId();
         switch (id) {
             case R.id.view_sortby_type:
-                requestChildFocus(mBinding.viewSortbyDevice);
-                break;
+                return requestChildFocus(mBinding.viewSortbyDevice);
             case R.id.view_sortby_genres:
-                requestChildFocus(mBinding.viewSortbyType);
-                break;
+                return requestChildFocus(mBinding.viewSortbyType);
             case R.id.view_sortby_year:
-                requestChildFocus(mBinding.viewSortbyGenres);
-                break;
+                return requestChildFocus(mBinding.viewSortbyGenres);
             case R.id.view_order:
-                requestChildFocus(mBinding.viewSortbyYear);
-                break;
+                return requestChildFocus(mBinding.viewSortbyYear);
         }
+        return false;
     }
 
-    private void requestChildFocus(TvRecyclerView recyclerView) {
+    private boolean requestChildFocus(TvRecyclerView recyclerView) {
         int viewChildCount = recyclerView.getChildCount();
         for (int i = 0; i < viewChildCount; i++) {
             View childView = recyclerView.getChildAt(i);
             if (childView.isSelected()) {
                 childView.requestFocus();
-                return;
+                return true;
             }
         }
-        int pos= (int) Math.floor(viewChildCount/2);
-        recyclerView.getChildAt(pos).requestFocus();
+        int pos = (int) Math.floor(viewChildCount / 2);
+        View view = recyclerView.getChildAt(pos);
+        if (view.isFocusable()) {
+            view.requestFocus();
+            return true;
+        }
+        return false;
     }
 
 
     @Override
     public boolean forceFocusLeft(View currentFocus) {
-        requestNextLeftFocus(currentFocus);
-        return true;
+       return requestNextLeftFocus(currentFocus);
     }
 
     @Override
     public boolean forceFocusRight(View currentFocus) {
-        requestNextRightFocus(currentFocus);
-        return true;
+        return requestNextRightFocus(currentFocus);
     }
 
     @Override

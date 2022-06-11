@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.ui.BaseFragment2;
-import com.station.kit.util.LogUtil;
 
 /**
  * author: Sam Leung
@@ -281,30 +280,26 @@ public class TvRecyclerView extends RecyclerView {
             } else {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
-                        if (mOnKeyPressListener != null)
-                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
-
                         View rightView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_RIGHT);
                         if (rightView != null) {
                             rightView.requestFocus();
                             int rightOffset = rightView.getLeft() - getWidth() / 2 + rightView.getWidth() / 2;
-                            if (!isVertical() && isVisBottom(this)) {
-                                this.smoothScrollToPosition(getLastVisiblePosition());
-                            } else
-                                this.customSmoothScrollBy(rightOffset, 0);
+                            this.customSmoothScrollBy(rightOffset, 0);
                             return true;
                         } else {
-                            if (isVertical())
-                                if (mOnForceFocusListener != null)
-                                    return mOnForceFocusListener.forceFocusRight(focusView);
-                                else
-                                    return false;
-                            else
+                            boolean focusResult = false;
+                            if (mOnNoNextFocusListener != null)
+                                focusResult = mOnNoNextFocusListener.forceFocusRight(focusView);
+                            if (focusResult) {
                                 return true;
+                            } else {
+                                if (isVertical())
+                                    return false;
+                                else
+                                    return true;//横向 最右一项，不响应
+                            }
                         }
                     case KeyEvent.KEYCODE_DPAD_LEFT:
-                        if (mOnKeyPressListener != null)
-                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
                         View leftView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_LEFT);
                         if (leftView != null) {
                             leftView.requestFocus();
@@ -312,20 +307,20 @@ public class TvRecyclerView extends RecyclerView {
                             this.customSmoothScrollBy(-leftOffset, 0);
                             return true;
                         } else {
-                            if (isVertical())
-                                if (mOnForceFocusListener != null)
-                                    return mOnForceFocusListener.forceFocusLeft(focusView);
-                                else
-                                    return false;
-                            else
+                            boolean focusResult = false;
+                            if (mOnNoNextFocusListener != null)
+                                focusResult = mOnNoNextFocusListener.forceFocusLeft(focusView);
+                            if (focusResult) {
                                 return true;
+                            } else {
+                                if (isVertical())
+                                    return false;
+                                else
+                                    return true;//横向 最左一项，不响应
+                            }
                         }
                     case KeyEvent.KEYCODE_DPAD_DOWN:
-                        if (mOnKeyPressListener != null)
-                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
-                        if (isVertical() && isVisBottom(this)) {
-                            this.smoothScrollToPosition(getLastVisiblePosition());
-                        }
+
                         View downView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_DOWN);
                         if (downView != null) {
                             downView.requestFocus();
@@ -333,44 +328,47 @@ public class TvRecyclerView extends RecyclerView {
                             this.customSmoothScrollBy(0, downOffset);
                             return true;
                         } else {
-                            //防止长按向下键丢失焦点
-                            if (isVertical())
+                            boolean focusResult = false;
+                            if (mOnNoNextFocusListener != null)
+                                focusResult = mOnNoNextFocusListener.forceFocusDown(focusView);
+                            if (focusResult) {
                                 return true;
-                            else if (mOnForceFocusListener != null)
-                                return mOnForceFocusListener.forceFocusDown(focusView);
-                            else
-                                return false;
+                            } else {
+                                if (isVertical())
+                                    return true;//垂直最下一项 ，不响应
+                                else
+                                    return false;
+                            }
                         }
                     case KeyEvent.KEYCODE_DPAD_UP:
-                        if (mOnKeyPressListener != null)
-                            mOnKeyPressListener.processKeyEvent(event.getKeyCode());
                         View upView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_UP);
                         if (upView != null) {
                             upView.requestFocus();
                             int upOffset = getHeight() / 2 - (upView.getBottom() - upView.getHeight() / 2);
                             this.customSmoothScrollBy(0, -upOffset);
                             return true;
+                        } else {
+                            boolean focusResult = false;
+                            if (mOnNoNextFocusListener != null)
+                                focusResult = mOnNoNextFocusListener.forceFocusUp(focusView);
+                            if (focusResult) {
+                                return true;
+                            } else {
+                                if (isVertical()) {
+                                    if (getLayoutManager() instanceof GridLayoutManager)
+                                        return false;
+                                    else
+                                        return true;
+                                } else
+                                    return false;
+                            }
                         }
-                        //防止顶层
-                        if (getLayoutManager() instanceof FilterGridLayoutManager && isVertical())
-                            return false;
-                        else if (isVertical())
-                            return true;
-                        else if (mOnForceFocusListener != null)
-                            return mOnForceFocusListener.forceFocusUp(focusView);
-                        else
-                            return false;
-//                        return false;
-//                        } else {
-//                            if (isVertical())
-//                                return true;
-//                            else
-//                                return false;
-//                        }
                     case KeyEvent.KEYCODE_BACK:
-                        if (mOnKeyPressListener != null)
-                            mOnKeyPressListener.onBackPress();
-                        return true;
+                        if (mOnBackPressListener != null) {
+                            mOnBackPressListener.onBackPress();
+                            return true;
+                        }
+                        return false;
                 }
             }
         }
@@ -586,13 +584,7 @@ public class TvRecyclerView extends RecyclerView {
         this.smoothScrollBy(dx, dy, null, 100);
     }
 
-    public interface OnKeyPressListener {
-        /**
-         * 其他按键
-         *
-         * @param keyCode
-         */
-        void processKeyEvent(int keyCode);
+    public interface OnBackPressListener {
 
         /**
          * 返回
@@ -600,7 +592,7 @@ public class TvRecyclerView extends RecyclerView {
         void onBackPress();
     }
 
-    public interface OnForceFocusListener {
+    public interface OnNoNextFocusListener {
         boolean forceFocusLeft(View currentFocus);
 
         boolean forceFocusRight(View currentFocus);
@@ -611,16 +603,16 @@ public class TvRecyclerView extends RecyclerView {
 
     }
 
-    private OnForceFocusListener mOnForceFocusListener;
+    private OnNoNextFocusListener mOnNoNextFocusListener;
 
 
-    public void setOnForceFocusListener(OnForceFocusListener onForceFocusListener) {
-        mOnForceFocusListener = onForceFocusListener;
+    public void setOnNoNextFocusListener(OnNoNextFocusListener onNoNextFocusListener) {
+        mOnNoNextFocusListener = onNoNextFocusListener;
     }
 
-    private OnKeyPressListener mOnKeyPressListener;
+    private OnBackPressListener mOnBackPressListener;
 
-    public void setOnKeyPressListener(OnKeyPressListener onKeyPressListener) {
-        mOnKeyPressListener = onKeyPressListener;
+    public void setOnBackPressListener(OnBackPressListener onBackPressListener) {
+        mOnBackPressListener = onBackPressListener;
     }
 }

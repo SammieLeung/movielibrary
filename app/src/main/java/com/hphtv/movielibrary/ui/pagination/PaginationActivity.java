@@ -70,11 +70,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         }
     };
 
-    TvRecyclerView.OnKeyPressListener mOnKeyPressListener = new TvRecyclerView.OnKeyPressListener() {
-        @Override
-        public void processKeyEvent(int keyCode) {
-
-        }
+    TvRecyclerView.OnBackPressListener mOnBackPressListener = new TvRecyclerView.OnBackPressListener() {
 
         @Override
         public void onBackPress() {
@@ -151,7 +147,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
                 mHandler.postDelayed(mBottomMaskFadeInTask, 800);
             }
         });
-        mBinding.recyclerview.setOnKeyPressListener(mOnKeyPressListener);
+        mBinding.recyclerview.setOnBackPressListener(mOnBackPressListener);
     }
 
     private void bindData() {
