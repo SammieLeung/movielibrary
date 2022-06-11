@@ -62,24 +62,14 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     public AtomicInteger atomicState=new AtomicInteger();
 
     //电影点击监听
-    private BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView> mMovieDataViewEventListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
-        @Override
-        public void onItemClick(View view, int postion, MovieDataView data) {
-            mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
-        }
-
-        @Override
-        public void onItemFocus(View view, int postion, MovieDataView data) {
-
-        }
-    };
+    private BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mMovieDataViewEventListener = (view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
     //固定主题动作监听
     private GenreTagAdapter.GenreListener mGenreListener = new GenreTagAdapter.GenreListener() {
         @Override
         public void addGenre() {
             AddGenreDialogFragment fragment = AddGenreDialogFragment.newInstance();
             fragment.addAllIRefreshGenreList(getBaseActivity().getAllRefreshGenreList());
-            fragment.show(getChildFragmentManager(), "Add Genres");
+            fragment.show(getChildFragmentManager(), AddGenreDialogFragment.TAG);
         }
 
         @Override
@@ -91,19 +81,11 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     };
 
     //动态主题动作监听
-    private BaseAdapter2.OnRecyclerViewItemActionListener mGenreItemClickListener = new BaseAdapter2.OnRecyclerViewItemActionListener() {
-        @Override
-        public void onItemClick(View view, int postion, Object data) {
-            Intent intent = new Intent(getContext(), FilterPageActivity.class);
-            intent.putExtra(FilterPageActivity.EXTRA_GENRE, data.toString());
-            intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, mViewModel.getSearchType().name());
-            startActivityForResult(intent);
-        }
-
-        @Override
-        public void onItemFocus(View view, int postion, Object data) {
-
-        }
+    private BaseAdapter2.OnRecyclerViewItemClickListener mGenreItemClickListener = (view, postion, data) -> {
+        Intent intent = new Intent(getContext(), FilterPageActivity.class);
+        intent.putExtra(FilterPageActivity.EXTRA_GENRE, data.toString());
+        intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, mViewModel.getSearchType().name());
+        startActivityForResult(intent);
     };
 
     private BaseAdapter2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener = (view, postion, data) -> {
@@ -120,13 +102,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     };
 
     //TvRecyclerView的按键处理(按键均被监听)
-    private TvRecyclerView.OnBackPressListener mOnBackPressListener = new TvRecyclerView.OnBackPressListener() {
-
-        @Override
-        public void onBackPress() {
-            getActivity().finish();
-        }
-    };
+    private TvRecyclerView.OnBackPressListener mOnBackPressListener = () -> getActivity().finish();
 
     public ThemeFragment(IAutofitHeight autofitHeight, int position) {
         super(autofitHeight, position);
@@ -203,19 +179,9 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
-        mHistoryListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<HistoryMovieDataView>() {
-            @Override
-            public void onItemClick(View view, int position, HistoryMovieDataView data) {
-                mViewModel.playingVideo(data.path, data.filename, list -> {
-                    mHistoryListAdapter.addAll(list);
-                });
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, HistoryMovieDataView data) {
-
-            }
-        });
+        mHistoryListAdapter.setOnItemClickListener((view, position, data) -> mViewModel.playingVideo(data.path, data.filename, list -> {
+            mHistoryListAdapter.addAll(list);
+        }));
     }
 
     /**

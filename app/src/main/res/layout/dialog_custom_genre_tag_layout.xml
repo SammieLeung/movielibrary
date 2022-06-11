@@ -6,9 +6,17 @@
     <data>
         <import type="android.view.View"/>
         <import type="androidx.databinding.ObservableInt"/>
+        <import type="androidx.databinding.ObservableBoolean"/>
+
         <variable
             name="checkPos"
             type="ObservableInt" />
+        <variable
+          name="btnSortEnable"
+          type="ObservableBoolean" />
+        <variable
+          name="sortTips"
+          type="androidx.databinding.ObservableField&lt;String>" />
     </data>
 
     <RelativeLayout
@@ -16,6 +24,7 @@
         android:layout_height="match_parent">
 
         <RelativeLayout
+            android:id="@+id/view_dialog"
             android:layout_width="583dp"
             android:layout_height="411dp"
             android:layout_centerInParent="true"
@@ -49,19 +58,19 @@
                 android:textSize="23sp" />
 
             <TextView
-                android:id="@+id/cbtv_sort"
-                android:layout_width="120dp"
-                android:layout_height="57dp"
-                android:layout_below="@id/cbtv_genre"
-                android:layout_marginTop="18dp"
-                android:gravity="center_vertical"
-                android:paddingStart="23dp"
-                android:text="@string/lb_sort_by"
-                android:background="@drawable/new_common_tab_bg_2"
-                app:textViewSelect="@{checkPos==1?true:false}"
-                android:textColor="@drawable/textcolor_homepage_genre_sort_title"
-                android:textSize="23sp"
-                 />
+              android:id="@+id/cbtv_sort"
+              android:layout_width="120dp"
+              android:layout_height="57dp"
+              android:layout_below="@id/cbtv_genre"
+              android:layout_marginTop="18dp"
+              android:background="@drawable/new_common_tab_bg_2"
+              android:enabled="@{btnSortEnable}"
+              android:gravity="center_vertical"
+              android:paddingStart="23dp"
+              android:text="@string/lb_sort_by"
+              android:textColor="@drawable/textcolor_homepage_genre_sort_title"
+              android:textSize="23sp"
+              app:textViewSelect="@{checkPos==1?true:false}" />
 
             <View
                 android:id="@+id/view_divider"
@@ -86,17 +95,40 @@
                 android:scrollbars="vertical" />
 
             <com.hphtv.movielibrary.ui.view.recyclerview.DraggableRecyclerView
-                android:visibility="@{checkPos==1?View.VISIBLE:View.GONE}"
-                android:id="@+id/rv_theme_sort"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignTop="@id/cbtv_genre"
-                android:layout_alignBottom="@id/view_divider"
-                android:layout_marginRight="8dp"
-                android:layout_toEndOf="@id/view_divider"
-                android:scrollbarSize="5dp"
-                android:scrollbarThumbVertical="@color/scroller_bar_color"
-                android:scrollbars="vertical" />
+              android:id="@+id/rv_theme_sort"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_alignTop="@id/cbtv_genre"
+              android:layout_above="@id/sort_mode_tips"
+              android:layout_marginRight="8dp"
+              android:layout_marginBottom="24dp"
+              android:layout_toEndOf="@id/view_divider"
+              android:scrollbarSize="5dp"
+              android:scrollbarThumbVertical="@color/scroller_bar_color"
+              android:scrollbars="vertical"
+              android:visibility="@{checkPos==1?View.VISIBLE:View.GONE}" />
+
+            <TextView
+              android:id="@+id/sort_mode_tips"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="-17dp"
+              android:layout_below="@id/view_divider"
+              android:paddingLeft="12dp"
+              android:paddingRight="12dp"
+              android:paddingTop="10dp"
+              android:autoSizeMaxTextSize="18sp"
+              android:autoSizeTextType="uniform"
+              android:paddingBottom="10dp"
+              android:layout_toRightOf="@id/view_divider"
+              android:layout_alignParentRight="true"
+              android:gravity="center"
+              android:text="@{sortTips}"
+              android:textColor="#FF888888"
+              android:textSize="18sp"
+              android:visibility="@{checkPos==1?View.VISIBLE:View.GONE}" />
         </RelativeLayout>
+
+
     </RelativeLayout>
 </layout>

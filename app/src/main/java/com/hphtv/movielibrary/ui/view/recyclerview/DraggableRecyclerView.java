@@ -7,9 +7,12 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.Observable;
+import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 
 import java.util.Collections;
@@ -19,25 +22,35 @@ import java.util.Collections;
  * date:  2022/3/9
  */
 public class DraggableRecyclerView extends RecyclerView {
-    private boolean isDraggable;
+    private ObservableBoolean isDraggable = new ObservableBoolean(false);
     private ObservableInt mSelectPos = new ObservableInt(-1);
 
     public DraggableRecyclerView(@NonNull Context context) {
-        super(context);
+        this(context, null);
     }
 
     public DraggableRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, -1);
     }
 
     public DraggableRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        isDraggable.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                if (mOnDraggableCallback != null) {
+                    ObservableBoolean observable = (ObservableBoolean) sender;
+                    boolean isDraggable = observable.get();
+                    mOnDraggableCallback.onDraggableStateChange(isDraggable);
+                }
+            }
+        });
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (isDraggable) {
+            if (isDraggable.get()) {
                 switch (event.getKeyCode()) {
                     case KeyEvent.KEYCODE_DPAD_UP:
                         onItemMoveUp();
@@ -47,21 +60,20 @@ public class DraggableRecyclerView extends RecyclerView {
                         return true;
                     case KeyEvent.KEYCODE_BACK:
                     case KeyEvent.KEYCODE_ESCAPE:
-                        isDraggable = false;
-                        mSelectPos.set(-1);
+                    case KeyEvent.KEYCODE_DPAD_LEFT:
+                        exitSortMode();
                         return true;
                     default:
                         return true;
                 }
-            }
-            else {
+            } else {
                 if (event.getRepeatCount() > 0) {//如果是长按
                     switch (event.getKeyCode()) {
                         case KeyEvent.KEYCODE_DPAD_CENTER:
                         case KeyEvent.KEYCODE_ENTER:
-                            isDraggable = true;
+                            isDraggable.set(true);
                             View child = getFocusedChild();
-                            int pos =  getLayoutManager().getPosition(child);
+                            int pos = getLayoutManager().getPosition(child);
                             mSelectPos.set(pos);
                             return true;
                         default:
@@ -112,4 +124,23 @@ public class DraggableRecyclerView extends RecyclerView {
         }
     }
 
+
+    public void exitSortMode() {
+        isDraggable.set(false);
+        mSelectPos.set(-1);
+    }
+
+    public boolean isDraggable(){
+        return isDraggable.get();
+    }
+
+    private OnDraggableCallback mOnDraggableCallback;
+
+    public interface OnDraggableCallback {
+        void onDraggableStateChange(boolean isDraggable);
+    }
+
+    public void setOnDraggableCallback(OnDraggableCallback onDraggableCallback) {
+        mOnDraggableCallback = onDraggableCallback;
+    }
 }

@@ -42,14 +42,10 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
 
-    BaseAdapter2.OnRecyclerViewItemActionListener mActionListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
+    BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView>() {
         @Override
-        public void onItemClick(View view, int postion, MovieDataView data) {
+        public void onItemClick(View view, int position, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(PaginationActivity.this, data);
-        }
-
-        @Override
-        public void onItemFocus(View view, int position, MovieDataView data) {
         }
     };
 

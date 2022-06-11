@@ -10,6 +10,9 @@
     <!--    主页-->
     <string name="homepage_custom_genre_tag_title">Custom Genre</string>
     <string name="homepage_custom_genre_tag_title_2">Genre Sort</string>
+    <string name="genre_tag_sortmode_tips_mouse">Hold down the left mouse button and drag the theme to adjust the sorting</string>
+    <string name="genre_tag_enter_sortmode_tips_dpad">Long press OK to enter sorting mode</string>
+    <string name="genre_tag_exit_sortmode_tips_dpad">Press Back to exit sort mode</string>
 
     <!--    历史播放-->
     <string name="history_list_title">Recently Played</string>

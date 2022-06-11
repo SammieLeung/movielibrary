@@ -11,10 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.databinding.DialogSelectVideosourceBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,8 +19,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import io.reactivex.rxjava3.core.Observable;
 
 /**
  * Created by tchip on 17-11-23.
@@ -61,17 +56,9 @@ public class VideoSelectDialog extends BaseDialogFragment2<VideoSelectViewModel,
         mVideoSelectListAdapter = new VideoSelectListAdapter(getContext(), new ArrayList<>());
         mBinding.rvSource.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
         mBinding.rvSource.setAdapter(mVideoSelectListAdapter);
-        mVideoSelectListAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<VideoFile>() {
-            @Override
-            public void onItemClick(View view, int position, VideoFile data) {
-                if (mPlayVideoListener != null) {
-                    mPlayVideoListener.selectVideo(data,position);
-                }
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, VideoFile data) {
-
+        mVideoSelectListAdapter.setOnItemClickListener((view, position, data) -> {
+            if (mPlayVideoListener != null) {
+                mPlayVideoListener.selectVideo(data,position);
             }
         });
 

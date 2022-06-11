@@ -3,6 +3,8 @@ package com.hphtv.movielibrary.ui.homepage.genretag;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableBoolean;
+import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
@@ -36,12 +38,15 @@ public class AddGenreDialogViewModel extends BaseAndroidViewModel {
     private List<GenreTagItem> mGenreTagItemSortList = new ArrayList<>();
 
     private List<String> mAllGenres;
-    ObservableInt mCheckPos = new ObservableInt();
+    private ObservableInt mCheckPos = new ObservableInt();
+    private ObservableBoolean mSortEnable=new ObservableBoolean(true);
+    private ObservableField<String> mSortModeTips=new ObservableField<>();
 
     public AddGenreDialogViewModel(@NonNull @NotNull Application application) {
         super(application);
         mGenreDao = MovieLibraryRoomDatabase.getDatabase(application).getGenreDao();
         mAllGenres = Arrays.asList(getApplication().getResources().getStringArray(R.array.genre_tags).clone());
+        mSortModeTips.set(getString(R.string.genre_tag_enter_sortmode_tips_dpad));
     }
 
     public Observable<List<GenreTagItem>> prepareGenreList() {
@@ -62,7 +67,11 @@ public class AddGenreDialogViewModel extends BaseAndroidViewModel {
                         }
                     }
 
-
+                    if(mGenreTagItemSortList.size()>0){
+                        mSortEnable.set(true);
+                    }else{
+                        mSortEnable.set(false);
+                    }
                     emitter.onNext(mGenreTagItemList);
                     emitter.onComplete();
                 })
@@ -104,4 +113,15 @@ public class AddGenreDialogViewModel extends BaseAndroidViewModel {
         return genreTags;
     }
 
+    public ObservableInt getCheckPos() {
+        return mCheckPos;
+    }
+
+    public ObservableBoolean getSortEnable() {
+        return mSortEnable;
+    }
+
+    public ObservableField<String> getSortModeTips() {
+        return mSortModeTips;
+    }
 }

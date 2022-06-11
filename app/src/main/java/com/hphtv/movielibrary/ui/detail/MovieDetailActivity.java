@@ -161,17 +161,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 15), DensityUtil.dip2px(this, 30)));
         mBinding.rvRecommand.setLayoutManager(linearLayoutManager);
         mBinding.rvRecommand.setAdapter(mRecommandMovieAdapter);
-        mRecommandMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
-            @Override
-            public void onItemClick(View view, int position, MovieDataView data) {
-                prepareMovieWrapper(data.id, data.season);
-            }
-
-            @Override
-            public void onItemFocus(View view, int position, MovieDataView data) {
-
-            }
-        });
+        mRecommandMovieAdapter.setOnItemClickListener((view, position, data) -> prepareMovieWrapper(data.id, data.season));
 
         mEpisodeItemListAdapter = new EpisodeItemListAdapter(this, new ArrayList<>());
         mEpisodeItemListAdapter.setLastPlayEpisodePos(mViewModel.getLastPlayEpisodePos());

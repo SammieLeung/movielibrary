@@ -57,15 +57,10 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     };
 
 
-    BaseAdapter2.OnRecyclerViewItemActionListener mActionListener = new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
+    BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int postion, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(FilterPageActivity.this, data);
-        }
-
-        @Override
-        public void onItemFocus(View view, int position, MovieDataView data) {
-//            mViewModel.refreshRowStr(position);
         }
     };
 

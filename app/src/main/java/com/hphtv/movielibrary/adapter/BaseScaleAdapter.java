@@ -28,10 +28,10 @@ public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, VH extends B
     public void onFocusChange(View v, boolean hasFocus) {
         if (hasFocus) {
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
-            if(mOnItemClickListener!=null) {
+            if(mOnItemFocusListener!=null) {
                 int pos= (int) v.getTag();
                 T data= mList.get(pos);
-                mOnItemClickListener.onItemFocus(v, pos,data);
+                mOnItemFocusListener.onItemFocus(v, pos,data);
             }
         } else {
             ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
@@ -42,10 +42,10 @@ public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, VH extends B
     public boolean onHover(View v, MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
-            if(mOnItemClickListener!=null) {
+            if(mOnItemFocusListener!=null) {
                 int pos= (int) v.getTag();
                 T data= mList.get(pos);
-                mOnItemClickListener.onItemFocus(v, pos,data);
+                mOnItemFocusListener.onItemFocus(v, pos,data);
             }
         } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
             ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();

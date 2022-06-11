@@ -135,9 +135,9 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
         return true;
     }
 
-    private BaseAdapter2.OnRecyclerViewItemActionListener mActionListener = new BaseAdapter2.OnRecyclerViewItemActionListener<UnrecognizedFileDataView>() {
+    private BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<UnrecognizedFileDataView>() {
         @Override
-        public void onItemClick(View view, int postion, UnrecognizedFileDataView data) {
+        public void onItemClick(View view, int position, UnrecognizedFileDataView data) {
             mViewModel.playVideo(data.path, data.filename)
                     .subscribe(new SimpleObserver<String>() {
                         @Override
@@ -157,11 +157,6 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
                             getBaseActivity().stopLoading();
                         }
                     });
-        }
-
-        @Override
-        public void onItemFocus(View view, int postion, UnrecognizedFileDataView data) {
-
         }
     };
 

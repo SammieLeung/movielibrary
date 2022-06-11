@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.ui.homepage.genretag;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -43,6 +44,15 @@ public class GenreListApter extends BaseAdapter2<RvItemGenreTagCheckableBinding,
         } else {
             RvItemGenreTagSortBinding binding = RvItemGenreTagSortBinding.inflate(LayoutInflater.from(mContext), parent, false);
             ViewHolder viewHolder = new ViewHolder(binding);
+            binding.getRoot().setOnFocusChangeListener((v, hasFocus) -> {
+                if(hasFocus){
+                    if(mOnItemFocusListener!=null) {
+                        int pos = (int) v.getTag();
+                        GenreTagItem data = mList.get(pos);
+                        mOnItemFocusListener.onItemFocus(v, pos, data);
+                    }
+                }
+            });
             if (mSortPos != null) {
                 binding.setSortPos(mSortPos);
             }

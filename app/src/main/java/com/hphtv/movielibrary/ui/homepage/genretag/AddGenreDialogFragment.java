@@ -2,11 +2,11 @@ package com.hphtv.movielibrary.ui.homepage.genretag;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.InputDevice;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -14,7 +14,6 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
-import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.recyclerview.ItemDragCallback;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -28,9 +27,24 @@ import java.util.List;
  * date:  2022/3/7
  */
 public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogViewModel, DialogCustomGenreTagLayoutBinding> implements View.OnClickListener {
+    public static final String TAG = AddGenreDialogFragment.class.getName();
     private GenreListApter mGenreListApter;
     private GenreListApter mGenreSortListApter;
     private List<IRefreshGenre> mIRefreshGenreList = new ArrayList<>();
+
+
+    private View.OnGenericMotionListener mOnGenericMotionListener = (v, event) -> {
+        if (event.getSource() == InputDevice.SOURCE_MOUSE) {
+            mViewModel.getSortModeTips().set(getString(R.string.genre_tag_sortmode_tips_mouse));
+            mBinding.rvThemeSort.exitSortMode();
+        }
+        return false;
+    };
+
+    private View.OnFocusChangeListener mOnFocusChangeListener= (v, hasFocus) -> {
+        if(hasFocus)
+            refreshSortTips();
+    };
 
     public static AddGenreDialogFragment newInstance() {
 
@@ -54,19 +68,28 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.setCheckPos(mViewModel.mCheckPos);
+
         initView();
         prepare();
 
     }
 
     public void initView() {
+        mBinding.getRoot().setOnGenericMotionListener(mOnGenericMotionListener);
+
+        mBinding.setCheckPos(mViewModel.getCheckPos());
+        mBinding.setBtnSortEnable(mViewModel.getSortEnable());
+        mBinding.setSortTips(mViewModel.getSortModeTips());
+
         mBinding.cbtvGenre.setOnClickListener(this);
         mBinding.cbtvSort.setOnClickListener(this);
+        mBinding.cbtvGenre.setOnFocusChangeListener(mOnFocusChangeListener);
+        mBinding.cbtvSort.setOnFocusChangeListener(mOnFocusChangeListener);
+
         mBinding.rvTheme.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mGenreListApter = new GenreListApter(getContext(), new ArrayList<>(), GenreListApter.TYPE_EDIT);
         mBinding.rvTheme.setAdapter(mGenreListApter);
-        mGenreListApter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<GenreTagItem>() {
+        mGenreListApter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemClickListener<GenreTagItem>() {
             @Override
             public void onItemClick(View view, int postion, GenreTagItem data) {
                 boolean isChecked = data.isChecked().get();
@@ -74,29 +97,33 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
                 if (!isChecked) {
                     mGenreSortListApter.getDatas().add(data);
                     mGenreSortListApter.notifyDataSetChanged();
-                    mBinding.cbtvSort.setEnabled(true);
+                    mViewModel.getSortEnable().set(true);
                 } else {
                     mGenreSortListApter.getDatas().remove(data);
                     mGenreSortListApter.notifyDataSetChanged();
                     if (mGenreSortListApter.getItemCount() == 0) {
-                        mBinding.cbtvSort.setEnabled(false);
+                        mViewModel.getSortEnable().set(false);
                     }
                 }
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, GenreTagItem data) {
-
             }
         });
 
         mBinding.rvThemeSort.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mGenreSortListApter = new GenreListApter(getContext(), mViewModel.getGenreTagItemSortList(), GenreListApter.TYPE_SORT);
         mGenreSortListApter.setSortPos(mBinding.rvThemeSort.getSelectPos());
+        mGenreSortListApter.setOnItemFocusListener((view, position, data) -> {
+                refreshSortTips();
+        });
         mBinding.rvThemeSort.setAdapter(mGenreSortListApter);
-        ItemDragCallback callback = new ItemDragCallback();
-        ItemTouchHelper helper = new ItemTouchHelper(callback);
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemDragCallback());
         helper.attachToRecyclerView(mBinding.rvThemeSort);
+        mBinding.rvThemeSort.setOnDraggableCallback(isDraggable -> {
+            if (isDraggable) {
+                mViewModel.getSortModeTips().set(getString(R.string.genre_tag_exit_sortmode_tips_dpad));
+            } else {
+                mViewModel.getSortModeTips().set(getString(R.string.genre_tag_enter_sortmode_tips_dpad));
+            }
+        });
     }
 
     public void prepare() {
@@ -112,14 +139,22 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         mIRefreshGenreList.addAll(iRefreshGenreList);
     }
 
+    public void refreshSortTips() {
+        if (mBinding.rvThemeSort.isDraggable()) {
+            mViewModel.getSortModeTips().set(getString(R.string.genre_tag_exit_sortmode_tips_dpad));
+        } else {
+            mViewModel.getSortModeTips().set(getString(R.string.genre_tag_enter_sortmode_tips_dpad));
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.cbtv_genre:
-                mViewModel.mCheckPos.set(0);
+                mViewModel.getCheckPos().set(0);
                 break;
             case R.id.cbtv_sort:
-                mViewModel.mCheckPos.set(1);
+                mViewModel.getCheckPos().set(1);
                 break;
         }
     }
@@ -137,4 +172,5 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
                     }
                 });
     }
+
 }

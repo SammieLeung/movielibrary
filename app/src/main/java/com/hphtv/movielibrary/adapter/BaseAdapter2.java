@@ -57,7 +57,7 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
 
     @Override
     public void onClick(View v) {
-        if (mOnItemClickListener != null&&v.getTag()!=null) {
+        if (mOnItemClickListener != null && v.getTag() != null) {
             int position = (int) v.getTag();
             T data = mList.get(position);
             //注意这里使用getTag方法获取数据
@@ -69,7 +69,7 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
     public boolean onKey(View v, int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_UP) {
             if (keyCode == KeyEvent.KEYCODE_MENU || keyCode == KeyEvent.KEYCODE_BUTTON_START) {
-                if(v.getTag()!=null) {
+                if (v.getTag() != null) {
                     int pos = (int) v.getTag();
                     if (mOnItemLongClickListener != null)
                         mOnItemLongClickListener.onItemLongClick(v, pos, mList.get(pos));
@@ -82,7 +82,7 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
 
     @Override
     public boolean onLongClick(View v) {
-        if (mOnItemLongClickListener != null&&v.getTag()!=null) {
+        if (mOnItemLongClickListener != null && v.getTag() != null) {
             int position = (int) v.getTag();
             T data = mList.get(position);
             return mOnItemLongClickListener.onItemLongClick(v, position, data);
@@ -154,22 +154,28 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
     }
 
 
-    protected OnRecyclerViewItemActionListener<T> mOnItemClickListener = null;
+    protected OnRecyclerViewItemClickListener<T> mOnItemClickListener = null;
+    protected OnRecyclerViewItemFocusListener<T> mOnItemFocusListener = null;
     protected OnItemLongClickListener<T> mOnItemLongClickListener;
 
-    public void setOnItemClickListener(OnRecyclerViewItemActionListener<T> listener) {
+    public void setOnItemClickListener(OnRecyclerViewItemClickListener<T> listener) {
         this.mOnItemClickListener = listener;
+    }
+
+    public void setOnItemFocusListener(OnRecyclerViewItemFocusListener<T> listener) {
+        this.mOnItemFocusListener = listener;
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener<T> onItemLongClickListener) {
         mOnItemLongClickListener = onItemLongClickListener;
     }
 
-
-    public interface OnRecyclerViewItemActionListener<T> {
-        void onItemClick(View view, int position, T data);
-
+    public interface OnRecyclerViewItemFocusListener<T> {
         void onItemFocus(View view, int position, T data);
+    }
+
+    public interface OnRecyclerViewItemClickListener<T> {
+        void onItemClick(View view, int position, T data);
     }
 
     public interface OnItemLongClickListener<T> {

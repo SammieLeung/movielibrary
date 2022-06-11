@@ -137,24 +137,14 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
     private void initView() {
         mMovieAdapter = new NewMovieLargeItemListAdapter(this, new ArrayList());
         mMovieAdapter.setZoomRatio(1.08f);
-        mMovieAdapter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemActionListener<MovieDataView>() {
-            @Override
-            public void onItemClick(View view, int position, MovieDataView data) {
-                Intent intent = new Intent(PinyinSearchActivity.this,
-                        MovieDetailActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
-                bundle.putInt(Constants.Extras.SEASON,data.season);
-                intent.putExtras(bundle);
-                startActivityForResult(intent);
-
-
-            }
-
-            @Override
-            public void onItemFocus(View view, int postion, MovieDataView data) {
-
-            }
+        mMovieAdapter.setOnItemClickListener((view, position, data) -> {
+            Intent intent = new Intent(PinyinSearchActivity.this,
+                    MovieDetailActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putLong(Constants.Extras.MOVIE_ID, data.id);
+            bundle.putInt(Constants.Extras.SEASON,data.season);
+            intent.putExtras(bundle);
+            startActivityForResult(intent);
         });
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mBinding.btnExit.setOnClickListener(v -> finish());
