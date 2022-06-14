@@ -52,7 +52,7 @@ public class SambaAuthHelper {
         List<Credential> persistentCredentials = mCredentialDao.queryAllCredentials();
         mCredentials.clear();
         for (Credential cred : persistentCredentials) {
-            cred.isTemporary=false;
+            cred.isTemporary = false;
             mCredentials.put(getCredentialKey(cred), cred);
         }
     }
@@ -72,7 +72,7 @@ public class SambaAuthHelper {
         String server = smbFile.getServer();
         String share = smbFile.getShare();
         mCredentialDao.deleteCredential(server, share);
-        mCredentials.remove(getCredentialKey(server,share));
+        mCredentials.remove(getCredentialKey(server, share));
     }
 
     public List<Credential> getAllPersistentCredentials() {
@@ -130,13 +130,16 @@ public class SambaAuthHelper {
         if (credential == null || (TextUtils.isEmpty(credential.getUsername()) && TextUtils.isEmpty(credential.getPassword()))) {
             cifsContext = JcifsUtils.getBaseContext(true).withAnonymousCredentials();
         } else {
-            cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(credential.getDomain(), credential.getUsername(), credential.getPassword()));
+            if (credential.getUsername().equalsIgnoreCase("guest"))
+                cifsContext=JcifsUtils.getBaseContext(true).withGuestCrendentials();
+            else
+                cifsContext = JcifsUtils.getBaseContext(true).withCredentials(new NtlmPasswordAuthenticator(credential.getDomain(), credential.getUsername(), credential.getPassword()));
         }
         return cifsContext;
     }
 
     public void saveCIFSContext(SmbFile smbFile, CIFSContext cifsContext) {
-        Credential credential = getCredential(getCredentialKey(smbFile.getServer(),smbFile.getShare()));
+        Credential credential = getCredential(getCredentialKey(smbFile.getServer(), smbFile.getShare()));
         if (credential == null) {
             NtlmPasswordAuthenticator auth = (NtlmPasswordAuthenticator) cifsContext.getCredentials();
             credential = new Credential(smbFile.getServer(), smbFile.getShare(), auth.getUserDomain(), auth.getUsername(), auth.getPassword());
@@ -155,11 +158,11 @@ public class SambaAuthHelper {
 
     public String getCredentialKey(Credential credential) {
 
-        return "smb://" + credential.getServer() + "/" + (TextUtils.isEmpty(credential.getShare())?"":credential.getShare());
+        return "smb://" + credential.getServer() + "/" + (TextUtils.isEmpty(credential.getShare()) ? "" : credential.getShare());
     }
 
     public String getCredentialKey(String server, String share) {
-        return "smb://" + server + "/" +(TextUtils.isEmpty(share)?"":share);
+        return "smb://" + server + "/" + (TextUtils.isEmpty(share) ? "" : share);
     }
 
 //    public static void save(Context context, Map<String, CIFSContext> maps) {
