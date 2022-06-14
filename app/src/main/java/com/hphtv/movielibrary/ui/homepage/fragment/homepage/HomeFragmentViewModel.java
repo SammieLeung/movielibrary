@@ -145,7 +145,7 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
     }
 
     public Observable<List<MovieDataView>> prepareFavorite() {
-       return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+        return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
                     List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -153,24 +153,28 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<List<MovieDataView>> prepareRecommand() {
-       return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+    public Observable<List<MovieDataView>> prepareRecommend() {
+        return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
                     String source = ScraperSourceTools.getSource();
                     List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source, Config.getSqlConditionOfChildMode(), 0, LIMIT);
-                    List<String> genreList = new ArrayList<>();
-                    List<Long> idList = new ArrayList<>();
-                    for (int i = 0; idList.size() < 3 && i < history.size(); i++) {
-                        MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
-                        if (wrapper != null) {
-                            for (Genre genre : wrapper.genres) {
-                                if (genre.source.equals(source) && !genreList.contains(genre.name)) {
-                                    genreList.add(genre.name);
+                    if (history.size() > 0) {
+                        List<String> genreList = new ArrayList<>();
+                        List<Long> idList = new ArrayList<>();
+                        for (int i = 0; idList.size() < 3 && i < history.size(); i++) {
+                            MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
+                            if (wrapper != null) {
+                                for (Genre genre : wrapper.genres) {
+                                    if (genre.source.equals(source) && !genreList.contains(genre.name)) {
+                                        genreList.add(genre.name);
+                                    }
                                 }
+                                idList.add(wrapper.movie.id);
                             }
-                            idList.add(wrapper.movie.id);
                         }
+                        emitter.onNext(mMovieDao.queryRecommand(source, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
+                    } else {
+                        emitter.onNext(mMovieDao.queryMovieDataView(null, -1, null, null, 1, Config.getSqlConditionOfChildMode(), true, ScraperSourceTools.getSource(), 0, LIMIT));
                     }
-                    emitter.onNext(mMovieDao.queryRecommand(source, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());

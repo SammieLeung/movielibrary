@@ -299,7 +299,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     }
 
     private void prepareRecommand() {
-        mViewModel.prepareRecommand()
+        mViewModel.prepareRecommend()
                 .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
                     @Override
                     public void onAction(List<MovieDataView> movieDataViews) {
