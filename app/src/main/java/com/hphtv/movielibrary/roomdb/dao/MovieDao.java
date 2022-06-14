@@ -147,6 +147,7 @@ public interface MovieDao {
      * @param vtid
      * @param genre_name
      * @param year
+     * @param year_2
      * @param source
      * @return
      */
@@ -155,18 +156,27 @@ public interface MovieDao {
             + " WHERE source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
-            " AND (:year IS NULL OR year=:year)" +
+            " AND ((:year IS NULL AND :year_2 IS NULL)" +
+            " OR (:year_2 IS NULL AND year=:year ) " +
+            " OR (:year IS NULL AND year <= :year_2)"+
+            " OR (year>=:year AND year <=:year_2))"+
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
             " AND (:vtid IS -1 OR id IN (SELECT id FROM " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " WHERE vtid=:vtid))" +
             " GROUP BY id " +
             ")")
-    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, String ap, String source);
+    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year,@Nullable String year_2, String ap, String source);
 
     /**
      * 根据条件返回符合条件电影
      *
+     * ① year和year2为空 : 全部
+     * ② year2为空 : year为具体年份
+     * ③ year为空 : year2为 更早
+     * ④ year 和 year2不为空 : year <= 年份 <= year2
+     *
      * @param dir_uri    设备id
-     * @param year       年份
+     * @param year       起始年份
+     * @param year_2     最高年份
      * @param genre_name 类型
      * @param order      排序方式
      * @param isDesc     是否倒序
@@ -176,7 +186,10 @@ public interface MovieDao {
             + " WHERE source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
-            " AND (:year IS NULL OR year=:year)" +
+            " AND ((:year IS NULL AND :year_2 IS NULL)" +
+            " OR (:year_2 IS NULL AND year=:year ) " +
+            " OR (:year IS NULL AND year <= :year_2)"+
+            " OR (year>=:year AND year <=:year_2))"+
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
             " AND (:vtid IS -1 OR id IN (SELECT id FROM " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " WHERE vtid=:vtid))" +
             " GROUP BY id,season " +
@@ -194,7 +207,7 @@ public interface MovieDao {
             "CASE WHEN :order =5 THEN is_favorite END ASC " +
             "LIMIT :offset,:limit "
     )
-    public List<MovieDataView> queryMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
+    public List<MovieDataView> queryMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year,@Nullable String year_2, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +

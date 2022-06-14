@@ -24,6 +24,8 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -140,7 +142,27 @@ public class FilterBoxViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mYearsList = mMovieDao.queryYearsGroup();
+                    mYearsList=new ArrayList<>();
+
+                    Calendar calendar=Calendar.getInstance();
+                    int year=calendar.get(Calendar.YEAR);
+
+                    //
+                    for(int i=0,j=year;i<5;i++,j--){
+                        mYearsList.add(String.valueOf(j));
+                    }
+
+                    String year_x_2011= "2011-"+(year - 5)  ;
+                    String year_2010_2000= getString(R.string.year_2000_2011);
+                    String year_90s= getString(R.string.year_90s);
+                    String year_80s= getString(R.string.year_80s);
+                    String year_earlier= getString(R.string.year_earlier);
+                    mYearsList.add(year_x_2011);
+                    mYearsList.add(year_2010_2000);
+                    mYearsList.add(year_90s);
+                    mYearsList.add(year_80s);
+                    mYearsList.add(year_earlier);
+
                     return mYearsList;
                 }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<String>>() {
