@@ -12,6 +12,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:visibility="@{hasHistory?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="75dp"
                 style="@style/homepage_head_title"
                 android:id="@+id/tv_history_title"
@@ -19,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <RelativeLayout
+                android:visibility="@{hasHistory?View.VISIBLE:View.GONE}"
                 android:id="@+id/view_history"
                 android:layout_width="match_parent"
                 android:layout_marginTop="13dp"
@@ -156,6 +158,9 @@
         <variable
             name="recommand"
             type="boolean" />
+        <variable
+          name="hasHistory"
+          type="boolean" />
         <variable
           name="isLoading"
           type="boolean" />

@@ -252,16 +252,18 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
                 .subscribe(new SimpleLoadingObserver<List<HistoryMovieDataView>>(this) {
                     @Override
                     public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
-                        updateRecentlyPlayed((List<HistoryMovieDataView>) historyMovieDataViews);
+                        updateRecentlyPlayed(historyMovieDataViews);
                     }
                 });
     }
 
     private void updateRecentlyPlayed(List<HistoryMovieDataView> historyList) {
         if (historyList.size() > 0) {
+            mBinding.setHasHistory(true);
             mBinding.rvHistoryList.setVisibility(View.VISIBLE);
             mBinding.tvHistoryEmptyTips.setVisibility(View.GONE);
         } else {
+            mBinding.setHasHistory(false);
             mBinding.tvHistoryEmptyTips.setVisibility(View.VISIBLE);
             mBinding.rvHistoryList.setVisibility(View.GONE);
         }
