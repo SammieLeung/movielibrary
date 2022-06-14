@@ -34,9 +34,9 @@
                     android:text="@string/history_list_empty"/>
 
                 <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                    android:id="@+id/rv_history_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                  android:id="@+id/rv_history_list"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent" />
             </RelativeLayout>
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView

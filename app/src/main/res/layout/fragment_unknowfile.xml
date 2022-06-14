@@ -23,12 +23,12 @@
             android:visibility="@{isLoading?View.GONE:isEmpty?View.VISIBLE:View.GONE}">
 
             <ImageView
-                android:id="@+id/iv_empty"
-                android:layout_width="158dp"
-                android:layout_height="131dp"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="165dp"
-                android:src="@mipmap/empty_img" />
+              android:id="@+id/iv_empty"
+              android:layout_width="158dp"
+              android:layout_height="131dp"
+              android:layout_centerHorizontal="true"
+              android:layout_marginTop="165dp"
+              android:src="@mipmap/empty_img" />
 
             <TextView
                 android:id="@+id/tv_empty_tips_1"
@@ -53,22 +53,23 @@
         </RelativeLayout>
 
         <RelativeLayout
-          android:visibility="@{isLoading?View.VISIBLE:View.GONE}"
           android:layout_width="match_parent"
-          android:layout_height="match_parent">
+          android:layout_height="match_parent"
+          android:visibility="@{isLoading?View.VISIBLE:View.GONE}">
+
             <com.github.ybq.android.spinkit.SpinKitView
               android:id="@+id/spin_kit"
               style="@style/SpinKitView.Circle"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_marginTop="250dp"
-              android:padding="30dp"
-              android:maxWidth="60dp"
-              android:minWidth="60dp"
-              android:maxHeight="60dp"
-              android:minHeight="60dp"
               android:layout_centerHorizontal="true"
+              android:layout_marginTop="250dp"
               android:background="@drawable/loading_view_bg"
+              android:maxWidth="60dp"
+              android:maxHeight="60dp"
+              android:minWidth="60dp"
+              android:minHeight="60dp"
+              android:padding="30dp"
               app:SpinKit_Color="@color/white_light" />
         </RelativeLayout>
     </RelativeLayout>

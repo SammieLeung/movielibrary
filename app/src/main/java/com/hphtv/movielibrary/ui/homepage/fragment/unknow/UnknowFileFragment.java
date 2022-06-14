@@ -170,7 +170,13 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
                     .subscribe(new SimpleLoadingObserver<List<UnrecognizedFileDataView>>(this) {
                         @Override
                         public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
-                            mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
+                            if(unrecognizedFileDataViews.size()>0) {
+                                mBinding.setIsEmpty(false);
+                                mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
+                            }else{
+                                mBinding.setIsEmpty(true);
+                                mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
+                            }
                         }
                     });
         }
