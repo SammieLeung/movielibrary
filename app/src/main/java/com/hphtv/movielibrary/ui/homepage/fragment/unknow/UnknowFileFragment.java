@@ -61,21 +61,18 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
 
     @Override
     public void forceRefresh() {
-        Log.e(TAG, "forceRefresh");
         reloadUnknownFiles();
     }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.e(TAG, "onViewCreated");
 
         initViews();
     }
 
     @Override
     public void onResume() {
-        Log.e(TAG, "onResume");
         super.onResume();
         reloadUnknownFiles();
     }
@@ -186,16 +183,13 @@ public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileView
     @Override
     public void startLoading() {
         int i = atomicState.incrementAndGet();
-        LogUtil.v(TAG, "start-Loading " + i);
         mBinding.setIsLoading(true);
     }
 
     @Override
     public void finishLoading() {
         int i = atomicState.decrementAndGet();
-        LogUtil.v(TAG, "stop-Loading " + i);
         if (i <= 0) {
-            LogUtil.v(TAG, "finishLoading ");
             mBinding.setIsLoading(false);
             atomicState.set(0);
         }

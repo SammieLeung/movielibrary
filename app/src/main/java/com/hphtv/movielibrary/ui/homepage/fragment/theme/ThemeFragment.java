@@ -126,15 +126,10 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initViews();
-        Log.e(TAG, "onViewCreated " + mViewModel.getSearchType().name());
-
-//        prepareAll();
     }
 
     @Override
     public void onResume() {
-        Log.e(TAG, "onResume " + mViewModel.getSearchType().name());
-
         super.onResume();
         prepareAll();
     }
@@ -328,7 +323,6 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
 
     @Override
     public void forceRefresh() {
-        Log.e(TAG, "forceRefresh ");
         if (mViewModel != null)
             prepareAll();
     }
@@ -341,16 +335,13 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     @Override
     public void startLoading() {
         int i = atomicState.incrementAndGet();
-        LogUtil.v(TAG, "start-Loading " + i);
         mBinding.setIsLoading(true);
     }
 
     @Override
     public void finishLoading() {
         int i=atomicState.decrementAndGet();
-        LogUtil.v(TAG, "stop-Loading "+i);
         if(i<=0) {
-            LogUtil.v(TAG, "finishLoading ");
             mBinding.setIsLoading(false);
             atomicState.set(0);
         }
