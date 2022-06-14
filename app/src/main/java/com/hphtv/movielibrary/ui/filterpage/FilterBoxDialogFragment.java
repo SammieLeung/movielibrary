@@ -135,7 +135,7 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
         String genre = mViewModel.getRealGenre();
         String year = mViewModel.getRealYear();
         mFilterPageViewModel.onFilterChange(shortcut, videoTag, genre, year);
-        mFilterPageViewModel.reloadMoiveDataViews();
+        mFilterPageViewModel.reloadMovieDataViews();
     }
 
     @Override

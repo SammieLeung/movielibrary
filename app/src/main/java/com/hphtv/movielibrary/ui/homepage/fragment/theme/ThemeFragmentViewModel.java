@@ -15,7 +15,6 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
-import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -176,9 +175,9 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
                                 idList.add(wrapper.movie.id);
                             }
                         }
-                        emitter.onNext(mMovieDao.queryRecommand(source, mSearchType, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
+                        emitter.onNext(mMovieDao.queryRecommend(source, mSearchType, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
                     } else {
-                        emitter.onNext(mMovieDao.queryMovieDataView(null, -1, null, null, 1, Config.getSqlConditionOfChildMode(), true, ScraperSourceTools.getSource(), 0, LIMIT));
+                        emitter.onNext(mMovieDao.queryRecommend(source, mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT));
                     }
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.io())

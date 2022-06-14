@@ -172,7 +172,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     }
 
     private void reloadMoiveDataViews() {
-        mViewModel.reloadMoiveDataViews();
+        mViewModel.reloadMovieDataViews();
     }
 
     private void loadAMoreAllMovies() {

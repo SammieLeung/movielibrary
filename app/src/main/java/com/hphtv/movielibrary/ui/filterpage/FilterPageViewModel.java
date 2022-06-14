@@ -4,9 +4,7 @@ import android.app.Application;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableField;
-import androidx.databinding.ObservableFloat;
 import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
@@ -30,7 +28,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -68,7 +65,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
         mVideoTagDao=MovieLibraryRoomDatabase.getDatabase(application).getVideoTagDao();
     }
 
-    public void reloadMoiveDataViews() {
+    public void reloadMovieDataViews() {
         Observable.just("")
                 .map(_offset -> {
                     mPage.set(0);
@@ -253,7 +250,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                     @Override
                     public void onAction(String s) {
                         refreshGenreAndVideoTag();
-                        reloadMoiveDataViews();
+                        reloadMovieDataViews();
                     }
                 });
     }

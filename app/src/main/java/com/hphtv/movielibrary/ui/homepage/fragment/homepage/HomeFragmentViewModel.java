@@ -15,7 +15,6 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
-import com.hphtv.movielibrary.roomdb.entity.GenreTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -24,7 +23,6 @@ import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -171,9 +169,9 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
                                 idList.add(wrapper.movie.id);
                             }
                         }
-                        emitter.onNext(mMovieDao.queryRecommand(source, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
+                        emitter.onNext(mMovieDao.queryRecommend(source, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT));
                     } else {
-                        emitter.onNext(mMovieDao.queryMovieDataView(null, -1, null, null, 1, Config.getSqlConditionOfChildMode(), true, ScraperSourceTools.getSource(), 0, LIMIT));
+                        emitter.onNext(mMovieDao.queryRecommend(source, Config.getSqlConditionOfChildMode(),0, LIMIT));
                     }
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.io())

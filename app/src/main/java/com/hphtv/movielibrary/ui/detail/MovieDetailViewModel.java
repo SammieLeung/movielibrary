@@ -176,7 +176,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         genreName.add(genre.name);
                     }
                     List<MovieDataView> dataViewList = new ArrayList<>();
-                    dataViewList.addAll(mMovieDao.queryRecommand(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), genreName, mMovieWrapper.movie.id, 0, 10));
+                    dataViewList.addAll(mMovieDao.queryRecommend(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), genreName, mMovieWrapper.movie.id, 0, 10));
                     return dataViewList;
                 })
                 .observeOn(AndroidSchedulers.mainThread());

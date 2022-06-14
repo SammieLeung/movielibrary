@@ -253,7 +253,7 @@ public interface MovieDao {
             " ORDER BY add_time DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source, String ap, List<String> genre_name, long id, int offset, int limit);
+    public List<MovieDataView> queryRecommend(String source, String ap, List<String> genre_name, long id, int offset, int limit);
 
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
@@ -265,7 +265,16 @@ public interface MovieDao {
             " ORDER BY add_time DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+    public List<MovieDataView> queryRecommend(String source, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " GROUP BY id " +
+            " ORDER BY ratings DESC " +
+            " LIMIT :offset,:limit"
+    )
+    public List<MovieDataView> queryRecommend(String source, String ap, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
@@ -277,7 +286,17 @@ public interface MovieDao {
             " ORDER BY add_time DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommand(String source, Constants.SearchType type, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+    public List<MovieDataView> queryRecommend(String source, Constants.SearchType type, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
+            + " WHERE source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND type=:type" +
+            " GROUP BY id " +
+            " ORDER BY ratings DESC " +
+            " LIMIT :offset,:limit"
+    )
+    public List<MovieDataView> queryRecommend(String source, Constants.SearchType type, String ap, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
