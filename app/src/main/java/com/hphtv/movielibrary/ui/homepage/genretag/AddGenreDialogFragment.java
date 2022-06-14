@@ -16,6 +16,7 @@ import com.hphtv.movielibrary.databinding.DialogCustomGenreTagLayoutBinding;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.view.recyclerview.ItemDragCallback;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,8 +42,8 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         return false;
     };
 
-    private View.OnFocusChangeListener mOnFocusChangeListener= (v, hasFocus) -> {
-        if(hasFocus)
+    private View.OnFocusChangeListener mOnFocusChangeListener = (v, hasFocus) -> {
+        if (hasFocus)
             refreshSortTips();
     };
 
@@ -89,21 +90,25 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         mBinding.rvTheme.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mGenreListApter = new GenreListApter(getContext(), new ArrayList<>(), GenreListApter.TYPE_EDIT);
         mBinding.rvTheme.setAdapter(mGenreListApter);
-        mGenreListApter.setOnItemClickListener(new BaseAdapter2.OnRecyclerViewItemClickListener<GenreTagItem>() {
-            @Override
-            public void onItemClick(View view, int postion, GenreTagItem data) {
-                boolean isChecked = data.isChecked().get();
-                data.setChecked(!isChecked);
-                if (!isChecked) {
-                    mGenreSortListApter.getDatas().add(data);
-                    mGenreSortListApter.notifyDataSetChanged();
-                    mViewModel.getSortEnable().set(true);
-                } else {
-                    mGenreSortListApter.getDatas().remove(data);
-                    mGenreSortListApter.notifyDataSetChanged();
-                    if (mGenreSortListApter.getItemCount() == 0) {
-                        mViewModel.getSortEnable().set(false);
-                    }
+        mGenreListApter.setOnItemClickListener((view, position, data) -> {
+            boolean isChecked = data.isChecked().get();
+            if (!isChecked) {
+                int count = mGenreSortListApter.getDatas().size();
+                if (count >= 9) {
+                    ToastUtil.newInstance(getContext()).toast(getString(R.string.added_genretags_reached_upper_limit));
+                    return;
+                }
+            }
+            data.setChecked(!isChecked);
+            if (!isChecked) {
+                mGenreSortListApter.getDatas().add(data);
+                mGenreSortListApter.notifyDataSetChanged();
+                mViewModel.getSortEnable().set(true);
+            } else {
+                mGenreSortListApter.getDatas().remove(data);
+                mGenreSortListApter.notifyDataSetChanged();
+                if (mGenreSortListApter.getItemCount() == 0) {
+                    mViewModel.getSortEnable().set(false);
                 }
             }
         });
@@ -112,7 +117,7 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
         mGenreSortListApter = new GenreListApter(getContext(), mViewModel.getGenreTagItemSortList(), GenreListApter.TYPE_SORT);
         mGenreSortListApter.setSortPos(mBinding.rvThemeSort.getSelectPos());
         mGenreSortListApter.setOnItemFocusListener((view, position, data) -> {
-                refreshSortTips();
+            refreshSortTips();
         });
         mBinding.rvThemeSort.setAdapter(mGenreSortListApter);
         ItemTouchHelper helper = new ItemTouchHelper(new ItemDragCallback());

@@ -12,6 +12,7 @@
   <string name="genre_tag_sortmode_tips_mouse">按住鼠标左键拖拽主题可以调整排序</string>
   <string name="genre_tag_enter_sortmode_tips_dpad">长按OK键进入排序模式</string>
   <string name="genre_tag_exit_sortmode_tips_dpad">按“返回”键退出排序模式</string>
+  <string name="added_genretags_reached_upper_limit">添加主题上限已满，无法继续添加！</string>
 
   <!--    历史播放-->
   <string name="history_list_title">最近播放</string>
