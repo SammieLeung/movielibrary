@@ -11,7 +11,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  * date:  2022/2/22
  */
 @DatabaseView(
-        value = "SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode," +
+        value = "SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode,u.aired," +
                 "m.poster,m.source,m.title,m.ratings,m.ap,st.access AS s_ap,m.season,m.season_name,m.season_poster," +
                 "sp.img_url AS stage_photo " +
                 "FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" AS u " +
@@ -44,6 +44,7 @@ public class HistoryMovieDataView {
     public String season_name;
     public String season_poster;
 
-    public int episode=0;
+    public int episode=-1;
+    public String aired;
 
 }

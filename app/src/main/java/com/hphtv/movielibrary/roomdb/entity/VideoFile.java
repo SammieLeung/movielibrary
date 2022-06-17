@@ -32,24 +32,25 @@ public class VideoFile implements Serializable {
     @ColumnInfo(name = "dir_path")
     public String dirPath;
     public String filename;
-    @ColumnInfo(name = "is_scanned",defaultValue = "0")
-    public int isScanned=0;
+    @ColumnInfo(name = "is_scanned", defaultValue = "0")
+    public int isScanned = 0;
 
     public String keyword;
-    @ColumnInfo(name = "add_time",defaultValue = "0")
+    @ColumnInfo(name = "add_time", defaultValue = "0")
     public long addTime;//文件添加时间
-    @ColumnInfo(name = "last_playtime",defaultValue = "0")
+    @ColumnInfo(name = "last_playtime", defaultValue = "0")
     public long lastPlayTime;//上次播放时间
-    @ColumnInfo(defaultValue = "0")
-    public int season=0;
-    @ColumnInfo(defaultValue = "0")
-    public int episode=0;
-
+    @ColumnInfo(defaultValue = "-1")
+    public int season = -1;
+    @ColumnInfo(defaultValue = "-1")
+    public int episode = -1;
+    public String aired;
     public String resolution;
     @ColumnInfo(name = "video_source")
     public String videoSource;
 
-    public VideoFile(){
+
+    public VideoFile() {
 
     }
 

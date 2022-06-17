@@ -17,7 +17,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "ON M.id=MVC.id " +
                 "JOIN season AS SS " +
                 "ON SS.movie_id=M.id " +
-                "WHERE V.season=SS.season_number AND V.episode>0 ",
+                "WHERE V.season=SS.season_number AND ( V.episode >= 0 OR V.aired!='' ) ",
 
         viewName = VIEW.SEASON_DATAVIEW
 )
