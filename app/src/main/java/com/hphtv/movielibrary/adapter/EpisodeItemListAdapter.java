@@ -28,6 +28,7 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
     private Context mContext;
     protected OnRecyclerViewItemActionListener mOnItemClickListener = null;
     protected ObservableInt mLastPlayEpisodePos;
+    private boolean isVarietyShow=false;
 
     public EpisodeItemListAdapter(Context context, List<List<VideoFile>> list) {
         mContext = context;
@@ -55,13 +56,25 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RvItemEpisodeLayoutBinding binding = holder.mBinding;
         binding.getRoot().setTag(position);
-        binding.setText(String.valueOf(mPart * 10 + position + 1));
-        binding.setItemPos(mPart * 10 + position );
-        if(mList.get(position).size()==0){
-            binding.getRoot().setEnabled(false);
+        if(!isVarietyShow) {
+            binding.setText(String.valueOf(mPart * 10 + position + 1));
+            binding.setItemPos(mPart * 10 + position);
+            if (mList.get(position).size() == 0) {
+                binding.getRoot().setEnabled(false);
+            } else {
+                binding.getRoot().setEnabled(true);
+            }
         }else{
-            binding.getRoot().setEnabled(true);
+            if(mList.size()>0&&mList.get(0).size()>0) {
+                VideoFile videoFile = mList.get(0).get(0);
+                if (videoFile != null) {
+                    binding.getRoot().setEnabled(true);
+                    binding.setText(videoFile.aired);
+                    binding.setItemPos(position);
+                }
+            }
         }
+
     }
 
     @Override
@@ -85,6 +98,10 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
 
     public void setLastPlayEpisodePos(ObservableInt lastPlayEpisodePos) {
         mLastPlayEpisodePos = lastPlayEpisodePos;
+    }
+
+    public void setVarietyShow(boolean varietyShow) {
+        isVarietyShow = varietyShow;
     }
 
     @Override

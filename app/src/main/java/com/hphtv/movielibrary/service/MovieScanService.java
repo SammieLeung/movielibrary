@@ -160,6 +160,8 @@ public class MovieScanService extends Service {
                                             videoFile.keyword = keyword;
                                             videoFile.season = nameInfo.getSeason();
                                             videoFile.episode = nameInfo.toEpisode();
+                                            videoFile.aired=nameInfo.getAired();
+
                                             if(nameInfo.getResolution()!=null){
                                                 videoFile.resolution=nameInfo.getResolution();
                                             }
@@ -180,13 +182,13 @@ public class MovieScanService extends Service {
                                                         tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api, year);
                                                         break;
                                                     case tv:
-                                                        tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api,year);
+                                                        tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api);
                                                         break;
                                                     default:
-                                                        if (MovieNameInfo.TYPE_MOVIE.equals(nameInfo.getType())) {
+                                                        if (MovieNameInfo.TYPE_MOVIE.equals(nameInfo.getType())||MovieNameInfo.TYPE_EXTRAS.equals(nameInfo.getType())) {
                                                             tmdbSearchRespone = TmdbApiService.movieSearch(keyword, api, year);
                                                         } else if (MovieNameInfo.TYPE_SERIES.equals(nameInfo.getType())) {
-                                                            tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api,year);
+                                                            tmdbSearchRespone = TmdbApiService.tvSearch(keyword, api);
                                                         } else {
                                                             tmdbSearchRespone = TmdbApiService.unionSearch(keyword, api, year);
                                                         }

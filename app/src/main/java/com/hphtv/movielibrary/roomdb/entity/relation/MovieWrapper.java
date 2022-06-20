@@ -5,6 +5,7 @@ import androidx.room.Ignore;
 import androidx.room.Junction;
 import androidx.room.Relation;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.entity.Actor;
 import com.hphtv.movielibrary.roomdb.entity.Director;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
@@ -13,10 +14,12 @@ import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.Trailer;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 
 import java.io.Serializable;
 import java.util.List;
@@ -60,8 +63,13 @@ public class MovieWrapper implements Serializable {
     public List<StagePhoto> stagePhotos;//剧照，一对多
 
     @Relation(parentColumn = "id",
-    entityColumn = "movie_id")//分季,一对多
+            entityColumn = "movie_id")//分季,一对多
     public List<Season> seasons;
+
+    @Relation(parentColumn = "id",
+            entityColumn = "vtid",
+            associateBy = @Junction(MovieVideoTagCrossRef.class))
+    public List<VideoTag> videoTags;//视频标签 ，多堆垛
 
     @Ignore
     public Season season;
@@ -77,9 +85,10 @@ public class MovieWrapper implements Serializable {
         }
         return sb.toString();
     }
+
     public String toDirectorString() {
         StringBuffer sb = new StringBuffer();
-        if(directors!=null) {
+        if (directors != null) {
             int i = 0;
             for (Director director : directors) {
                 if (i >= 3)
@@ -92,9 +101,10 @@ public class MovieWrapper implements Serializable {
         }
         return sb.toString();
     }
+
     public String toActorString() {
         StringBuffer sb = new StringBuffer();
-        if(actors!=null) {
+        if (actors != null) {
             int i = 0;
             for (Actor actor : actors) {
                 if (i >= 3)
@@ -106,6 +116,16 @@ public class MovieWrapper implements Serializable {
                 sb.replace(sb.lastIndexOf(" | "), sb.length(), "");
         }
         return sb.toString();
+    }
+
+    public boolean containVideoTags(Constants.VideoType type) {
+        if (videoTags != null && videoTags.size() > 0) {
+            for (VideoTag videoTag : videoTags) {
+                if (videoTag.tag.equals(type))
+                    return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -243,18 +243,24 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
                             if (Constants.SearchType.tv.equals(wrapper.movie.type)) {
-                                mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
+                                if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
+                                    mEpisodeItemListAdapter.setVarietyShow(true);
+                                    mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
+                                    mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeVideoFilesList());
+                                } else {
+                                    mEpisodeItemListAdapter.setVarietyShow(false);
+                                    mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
+                                    TabLayout tabLayout = mBinding.tabEpisodeSet;
+                                    tabLayout.removeAllTabs();
+
+                                    for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
+                                        tabLayout.addTab(tabLayout.newTab().setText(name));
+                                    }
+                                    tabLayout.selectTab(tabLayout.getTabAt(0));
+                                }
                             }
 
                             mBinding.setWrapper(wrapper);
-                            TabLayout tabLayout = mBinding.tabEpisodeSet;
-                            tabLayout.removeAllTabs();
-
-                            for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
-                                tabLayout.addTab(tabLayout.newTab().setText(name));
-                            }
-                            tabLayout.selectTab(tabLayout.getTabAt(0));
-
                             String stagePhoto = "";
                             if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
                                 Random random = new Random();
@@ -413,7 +419,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public void showVideoSelectDialog() {
         VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mViewModel.getMovieWrapper().videoFiles);
         dialogFragment.setPlayingVideo((videoFile, position) -> {
-            playVideo(videoFile.path,videoFile.filename);
+            playVideo(videoFile.path, videoFile.filename);
         });
         dialogFragment.show(getSupportFragmentManager(), "detail");
     }
@@ -440,6 +446,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mViewModel.playingEpisodeVideo(videoFile);
 //        refreshParent();
     }
+
     /**
      * 返回时刷新主页
      */

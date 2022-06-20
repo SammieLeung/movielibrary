@@ -312,10 +312,13 @@ public class MovieHelper {
         String animation = context.getString(R.string.animation);
         String comedy = context.getString(R.string.comedy);
         String family = context.getString(R.string.family);
+        String talk=context.getString(R.string.talk);
+        String reality=context.getString(R.string.reality);
         boolean isKids = false;
         boolean isComedy = false;
         boolean isFamily = false;
         boolean isAnimation = false;
+        boolean isShow=false;
 
         for (Genre genre : genreList) {
             String name = genre.name;
@@ -327,6 +330,8 @@ public class MovieHelper {
                 isComedy = true;
             if (name.equals(family))
                 isFamily = true;
+            if(name.equals(talk)||name.equals(reality))
+                isShow=true;
         }
 
         if (isKids || (isAnimation && (isFamily || isComedy))) {
@@ -348,6 +353,26 @@ public class MovieHelper {
                 movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
             }
 
+        }
+
+        if(isShow){
+            VideoTag showTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.variety_show);
+            if (showTag == null) {
+                showTag = new VideoTag(Constants.VideoType.variety_show);
+                showTag.flag = 0;
+                long vtid = videoTagDao.insertOrIgnore(showTag);
+                if (vtid > -1) {
+                    showTag.vtid = vtid;
+                } else {
+                    LogUtil.e("setVideoTag: insert error " + showTag.tag);
+                }
+            }
+            if (showTag != null) {
+                MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
+                movieVideoTagCrossRef.id = movie.id;
+                movieVideoTagCrossRef.vtid = showTag.vtid;
+                movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
+            }
         }
 
     }
