@@ -107,7 +107,7 @@
     <string name="plot_s_empty">No introduction.</string>
     <string name="btn_play">Play</string>
     <string name="btn_play_episode">Episode %1$d</string>
-    <string name="btn_play_episode_2">Episode %1$s</string>
+    <string name="btn_play_episode_2">No. %1$s</string>
 
     <string name="btn_favorite">Like</string>
     <string name="btn_expand">More</string>
