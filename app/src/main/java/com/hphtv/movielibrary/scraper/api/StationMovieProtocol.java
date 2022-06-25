@@ -2,7 +2,7 @@ package com.hphtv.movielibrary.scraper.api;
 
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.DeviceConfigRequestBody;
-import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
+import com.hphtv.movielibrary.scraper.postbody.PostDetailRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
@@ -25,7 +25,7 @@ public interface StationMovieProtocol {
     Observable<MovieSearchRespone> createSearch(@Body PostSearchRequetBody body);
 
     @POST("movie/movie/detail")
-    Observable<MovieDetailRespone> createDetail(@Body PostDetailRequetBody body);
+    Observable<MovieDetailRespone> createDetail(@Body PostDetailRequestBody body);
 
     @POST("movie/file/save")
     Observable<BaseRespone> updateMovie(@Body UpdateMovieRequestBody body);

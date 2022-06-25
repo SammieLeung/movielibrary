@@ -58,32 +58,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
 
-
-    //TODO 同步系统状态需要一个后台服务绑定
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Constants.ACTION_FAVORITE_MOVIE_CHANGE)) {
-                String movie_id = intent.getStringExtra("movie_id");
-                String curMovieId = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.movieId : "";
-                if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
-                    boolean is_favorite = intent.getBooleanExtra("is_favorite", false);
-                    mViewModel.setLike(is_favorite)
-                            .subscribe(new SimpleObserver<Boolean>() {
-                                @Override
-                                public void onAction(Boolean isFavorite) {
-                                    MovieWrapper wrapper = mViewModel.getMovieWrapper();
-                                    BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
-                                    mBinding.btnFavorite.setSelected(isFavorite);
-                                    refreshParent();
-                                }
-                            });
-                }
-            }
-        }
-    };
-
-
     public OnClickListener mClickListener = view -> {
         switch (view.getId()) {
             case R.id.btn_edit:
@@ -324,22 +298,42 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     @Override
     protected void onResume() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, intentFilter);
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         forceStopLoading();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+        String curMovieId = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.movieId : "";
+        if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
+            mViewModel.setLike(isFavorite)
+                    .subscribe(new SimpleObserver<Boolean>() {
+                        @Override
+                        public void onAction(Boolean isFavorite) {
+                            MovieWrapper wrapper = mViewModel.getMovieWrapper();
+                            BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
+                            mBinding.btnFavorite.setSelected(isFavorite);
+                            refreshParent();
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+        long cur_id = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.id : -1;
+        if (o_id != -1 && o_id == cur_id)
+            prepareMovieWrapper(n_id, mViewModel.getSeason());
     }
 
     /**

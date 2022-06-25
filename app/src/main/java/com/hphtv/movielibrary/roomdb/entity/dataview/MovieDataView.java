@@ -77,7 +77,7 @@ public class MovieDataView implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         MovieDataView that = (MovieDataView) o;
         return movie_id.equals(that.movie_id) &&
-                source.equals(that.source) && season==that.season;
+                source.equals(that.source) && season==that.season;//TODO 添加type比较
     }
 
     @Override

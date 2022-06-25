@@ -185,6 +185,15 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
 
     }
 
+    public Observable<MovieDataView> getUpdatingFavorite(String movie_id) {
+        return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+                    MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(movie_id, mSearchType.name(), ScraperSourceTools.getSource());
+                    emitter.onNext(movieDataView);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     public Constants.SearchType getSearchType() {
         return mSearchType;

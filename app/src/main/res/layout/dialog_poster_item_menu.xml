@@ -40,78 +40,82 @@
             app:border_width="0dp"/>
 
         <LinearLayout
-            android:layout_marginLeft="14dp"
-            android:id="@+id/view_content"
-            android:layout_width="518dp"
-            android:layout_height="529dp"
-            android:layout_toRightOf="@id/image"
-            android:background="@drawable/poster_item_menu_bg"
-            android:gravity="center"
-            android:orientation="vertical">
+          android:id="@+id/view_content"
+          android:layout_width="518dp"
+          android:layout_height="529dp"
+          android:layout_marginLeft="14dp"
+          android:layout_toRightOf="@id/image"
+          android:background="@drawable/poster_item_menu_bg"
+          android:gravity="center"
+          android:orientation="vertical">
 
             <TextView
-                style="@style/common_content_text_style"
-                android:visibility="@{!isMatched?View.VISIBLE:View.GONE}"
-                android:text="@{keyword}"
-                android:layout_width="481dp"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
-                android:paddingRight="@dimen/postermenu_subitem_padding_lr"
-                android:layout_marginBottom="70dp"/>
-            <include
-                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
-                android:id="@+id/include_ap"
-                layout="@layout/postermenu_options_item"
-                style="@style/poster_menu_sub_item_size"
-                app:title="@{@string/shortcut_scan_dialog_item_shortcut_access}"
-                app:stateText="@{ap}"
-                android:layout_marginBottom="17dp"
-                tools:ignore="IncludeLayoutParam" />
+              style="@style/common_content_text_style"
+              android:layout_width="481dp"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="70dp"
+              android:gravity="center"
+              android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
+              android:paddingRight="@dimen/postermenu_subitem_padding_lr"
+              android:text="@{keyword}"
+              android:visibility="@{!isMatched?View.VISIBLE:View.GONE}" />
 
             <include
-                app:title="@{@string/postermenu_reselect_poster}"
-                android:id="@+id/include_select_poster"
-                layout="@layout/postermenu_more_item"
-                style="@style/poster_menu_sub_item_size"
-                android:layout_marginBottom="17dp"
-                tools:ignore="IncludeLayoutParam" />
-            <include
-                android:visibility="gone"
-                app:checkstate="@{watchedState}"
-                app:title="@{@string/postermenu_mark_as_watched}"
-                android:id="@+id/include_mark_watched"
-                layout="@layout/postermenu_checkbtn_item"
-                style="@style/poster_menu_sub_item_size"
-                android:layout_marginBottom="17dp"
-                tools:ignore="IncludeLayoutParam" />
-            <include
-                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
-                app:checkstate="@{likeState}"
-                app:title="@{@string/postermenu_mark_as_like}"
-                android:id="@+id/include_favorite"
-                layout="@layout/postermenu_checkbtn_item"
-                style="@style/poster_menu_sub_item_size"
-                android:layout_marginBottom="17dp"
-                tools:ignore="IncludeLayoutParam" />
-            <include
-                android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
-                app:title="@{@string/postermenu_clear_poster}"
-                android:id="@+id/include_clear_poster"
-                layout="@layout/postermenu_more_item"
-                style="@style/poster_menu_sub_item_size"
-                android:layout_marginBottom="17dp"
-                tools:ignore="IncludeLayoutParam" />
+              android:id="@+id/include_ap"
+              style="@style/poster_menu_sub_item_size"
+              layout="@layout/postermenu_options_item"
+              android:layout_marginBottom="17dp"
+              android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
+              app:stateText="@{ap}"
+              app:title="@{@string/shortcut_scan_dialog_item_shortcut_access}"
+              tools:ignore="IncludeLayoutParam" />
 
             <include
-                android:visibility="gone"
-                app:title="@{@string/postermenu_add_to_videotag}"
-                app:stateText="@{tags}"
-                android:id="@+id/include_add_videotag"
-                layout="@layout/postermenu_more_item"
-                style="@style/poster_menu_sub_item_size"
-                android:layout_marginBottom="17dp"
-                tools:ignore="IncludeLayoutParam" />
+              android:id="@+id/include_select_poster"
+              style="@style/poster_menu_sub_item_size"
+              layout="@layout/postermenu_more_item"
+              android:layout_marginBottom="17dp"
+              app:title="@{@string/postermenu_reselect_poster}"
+              tools:ignore="IncludeLayoutParam" />
+
+            <include
+              android:id="@+id/include_mark_watched"
+              style="@style/poster_menu_sub_item_size"
+              layout="@layout/postermenu_checkbtn_item"
+              android:layout_marginBottom="17dp"
+              android:visibility="gone"
+              app:checkstate="@{watchedState}"
+              app:title="@{@string/postermenu_mark_as_watched}"
+              tools:ignore="IncludeLayoutParam" />
+
+            <include
+              android:id="@+id/include_favorite"
+              style="@style/poster_menu_sub_item_size"
+              layout="@layout/postermenu_checkbtn_item"
+              android:layout_marginBottom="17dp"
+              android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
+              app:checkstate="@{likeState}"
+              app:title="@{@string/postermenu_mark_as_like}"
+              tools:ignore="IncludeLayoutParam" />
+
+            <include
+              android:id="@+id/include_clear_poster"
+              style="@style/poster_menu_sub_item_size"
+              layout="@layout/postermenu_more_item"
+              android:layout_marginBottom="17dp"
+              android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
+              app:title="@{@string/postermenu_clear_poster}"
+              tools:ignore="IncludeLayoutParam" />
+
+            <include
+              android:id="@+id/include_add_videotag"
+              style="@style/poster_menu_sub_item_size"
+              layout="@layout/postermenu_more_item"
+              android:layout_marginBottom="17dp"
+              android:visibility="gone"
+              app:stateText="@{tags}"
+              app:title="@{@string/postermenu_add_to_videotag}"
+              tools:ignore="IncludeLayoutParam" />
         </LinearLayout>
     </RelativeLayout>
 </layout>

@@ -12,13 +12,14 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseFragment2;
+import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
 /**
  * author: Sam Leung
  * date:  2021/11/5
  */
-public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IAutofitHeight, IActivityResult {
+public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IAutofitHeight, IActivityResult, IRemoteRefresh {
     private IAutofitHeight mIAutofitHeight;
     private int mPostion;
 
@@ -45,6 +46,21 @@ public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB
     public void startActivityForResult(Intent data) {
         if (getActivity() instanceof AppBaseActivity)
             ((AppBaseActivity) getActivity()).startActivityForResult(data);
+    }
+
+    @Override
+    public void forceRefresh() {
+
+    }
+
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+
+    }
+
+    @Override
+    public void remoteUpdateFavorite(String movie_id,String type, boolean isFavorite) {
+
     }
 
     public HomePageActivity getBaseActivity(){

@@ -31,14 +31,15 @@ public interface MovieDao {
     @Update
     public int update(Movie movie);
 
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source")
-    public Movie queryByMovieId(String movie_id, String source);
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
+    public List<Movie> queryByMovieId(String movie_id);
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source AND type=:type")
     public Movie queryByMovieIdAndType(String movie_id, String source, String type);
 
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id")
-    public List<Movie> queryByMovieId(String movie_id);
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id  AND type=:type")
+    public List<Movie> queryByMovieIdAndType(String movie_id, String type);
+
 
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id=(SELECT id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE path=:path AND source=:source)")
     public Movie queryByFilePath(String path, String source);
@@ -47,6 +48,12 @@ public interface MovieDao {
             "SET is_favorite=:isFavorite " +
             "WHERE movie_id=:movie_id")
     public int updateFavoriteStateByMovieId(boolean isFavorite, String movie_id);
+
+    @Query("UPDATE " + TABLE.MOVIE + " " +
+            "SET is_favorite=:isFavorite " +
+            "WHERE movie_id=:movie_id " +
+            "AND type=:type")
+    public int updateFavoriteStateByMovieId(String movie_id, String type, boolean isFavorite);
 
     @Query("UPDATE " + TABLE.MOVIE +
             " SET last_playtime=:last_playtime" +
@@ -135,7 +142,7 @@ public interface MovieDao {
      */
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source AND movie_id=:movie_id " +
-            " AND type=:type " +
+            " AND (:type IS NULL OR type=:type) " +
             "GROUP BY id")
     public MovieDataView queryMovieDataViewByMovieId(String movie_id, String type, String source);
 
@@ -158,17 +165,17 @@ public interface MovieDao {
             " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
             " AND ((:year IS NULL AND :year_2 IS NULL)" +
             " OR (:year_2 IS NULL AND year=:year ) " +
-            " OR (:year IS NULL AND year <= :year_2)"+
-            " OR (year>=:year AND year <=:year_2))"+
+            " OR (:year IS NULL AND year <= :year_2)" +
+            " OR (year>=:year AND year <=:year_2))" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
             " AND (:vtid IS -1 OR id IN (SELECT id FROM " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " WHERE vtid=:vtid))" +
             " GROUP BY id " +
             ")")
-    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year,@Nullable String year_2, String ap, String source);
+    public int countMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, @Nullable String year_2, String ap, String source);
 
     /**
      * 根据条件返回符合条件电影
-     *
+     * <p>
      * ① year和year2为空 : 全部
      * ② year2为空 : year为具体年份
      * ③ year为空 : year2为 更早
@@ -188,8 +195,8 @@ public interface MovieDao {
             " AND (:dir_uri IS NULL OR dir_uri=:dir_uri)" +
             " AND ((:year IS NULL AND :year_2 IS NULL)" +
             " OR (:year_2 IS NULL AND year=:year ) " +
-            " OR (:year IS NULL AND year <= :year_2)"+
-            " OR (year>=:year AND year <=:year_2))"+
+            " OR (:year IS NULL AND year <= :year_2)" +
+            " OR (year>=:year AND year <=:year_2))" +
             " AND (:genre_name IS NULL OR genre_name=:genre_name) " +
             " AND (:vtid IS -1 OR id IN (SELECT id FROM " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " WHERE vtid=:vtid))" +
             " GROUP BY id,season " +
@@ -207,7 +214,7 @@ public interface MovieDao {
             "CASE WHEN :order =5 THEN is_favorite END ASC " +
             "LIMIT :offset,:limit "
     )
-    public List<MovieDataView> queryMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year,@Nullable String year_2, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
+    public List<MovieDataView> queryMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, @Nullable String year_2, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +

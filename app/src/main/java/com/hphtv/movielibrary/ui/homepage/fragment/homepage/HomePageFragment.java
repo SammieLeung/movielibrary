@@ -30,6 +30,7 @@ import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 
@@ -58,7 +59,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
     private List<MovieDataView> mRecommandList = new ArrayList<>();
 
-    public AtomicInteger atomicState=new AtomicInteger();
+    public AtomicInteger atomicState = new AtomicInteger();
 
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mMovieDataViewEventListener = (view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
@@ -237,7 +238,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
                 .subscribe(new SimpleLoadingObserver<List<HistoryMovieDataView>>(this) {
                     @Override
                     public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
-                            updateRecentlyPlayed(historyMovieDataViews);
+                        updateRecentlyPlayed(historyMovieDataViews);
                     }
                 });
     }
@@ -318,22 +319,57 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     }
 
     @Override
+    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+        if (mViewModel != null) {
+            mViewModel.getUpdatingFavorite(movie_id, type)
+                    .subscribe(new SimpleObserver<MovieDataView>() {
+                        @Override
+                        public void onAction(MovieDataView movieDataView) {
+                            if (isFavorite) {
+                                if (!mFavoriteListAdapter.getDatas().contains(movieDataView)) {
+                                    mFavoriteListAdapter.add(movieDataView);
+                                    mBinding.setFavorite(true);
+                                }
+                            } else {
+                                mFavoriteListAdapter.remove(movieDataView);
+                                if(mFavoriteListAdapter.getItemCount()==0){
+                                    mBinding.setFavorite(false);
+                                }
+                            }
+                            if (mRecentlyAddListAdapter.getDatas().contains(movieDataView)) {
+                                mRecentlyAddListAdapter.updateStatus(movieDataView);
+                            }
+                            if (mRecommendListAdapter.getDatas().contains(movieDataView)) {
+                                mRecommendListAdapter.updateStatus(movieDataView);
+                            }
+
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+        super.remoteUpdateMovie(o_id, n_id);
+    }
+
+    @Override
     public void refreshGenreUI() {
         prepareMovieGenreTagData();
     }
 
     @Override
     public void startLoading() {
-        int i=atomicState.incrementAndGet();
+        int i = atomicState.incrementAndGet();
         mBinding.setIsLoading(true);
     }
 
     @Override
     public void finishLoading() {
-        int i=atomicState.decrementAndGet();
-        if(i<=0) {
-             mBinding.setIsLoading(false);
-             atomicState.set(0);
+        int i = atomicState.decrementAndGet();
+        if (i <= 0) {
+            mBinding.setIsLoading(false);
+            atomicState.set(0);
         }
     }
 }

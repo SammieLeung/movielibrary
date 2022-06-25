@@ -96,6 +96,10 @@ public class MovieHelper {
         }
     }
 
+    public static void manualSaveMovie(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
+        manualSaveMovie(context,movieWrapper,videoFileList,true);
+    }
+
     /**
      * 保存手动选择电影信息，并且与对应文件建立数据库关系，并且更新文件的关键词
      *
@@ -103,12 +107,13 @@ public class MovieHelper {
      * @param movieWrapper
      * @param videoFileList
      */
-    public static void manualSaveMovie(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
+    public static void manualSaveMovie(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList, boolean notifyServer) {
         long movie_id = saveBaseInfo(context, movieWrapper);
         if (movie_id != -1 && movieWrapper.movie != null) {
             //VideoFile
             establishRelationshipBetweenPosterAndVideos(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
-            OnlineDBApiService.uploadMovie(movieWrapper, videoFileList, movieWrapper.movie.source);
+            if (notifyServer)
+                OnlineDBApiService.uploadMovie(movieWrapper, videoFileList, movieWrapper.movie.source);
         }
     }
 
@@ -135,7 +140,7 @@ public class MovieHelper {
         }
 
         Movie new_movie = movieWrapper.movie;
-        Movie old_movie = movieDao.queryByMovieId(new_movie.movieId, new_movie.source);
+        Movie old_movie = movieDao.queryByMovieIdAndType(new_movie.movieId, new_movie.source, new_movie.type.name());
         if (old_movie != null) {
             new_movie.id = old_movie.id;
             new_movie.addTime = old_movie.addTime;
@@ -312,13 +317,13 @@ public class MovieHelper {
         String animation = context.getString(R.string.animation);
         String comedy = context.getString(R.string.comedy);
         String family = context.getString(R.string.family);
-        String talk=context.getString(R.string.talk);
-        String reality=context.getString(R.string.reality);
+        String talk = context.getString(R.string.talk);
+        String reality = context.getString(R.string.reality);
         boolean isKids = false;
         boolean isComedy = false;
         boolean isFamily = false;
         boolean isAnimation = false;
-        boolean isShow=false;
+        boolean isShow = false;
 
         for (Genre genre : genreList) {
             String name = genre.name;
@@ -330,8 +335,8 @@ public class MovieHelper {
                 isComedy = true;
             if (name.equals(family))
                 isFamily = true;
-            if(name.equals(talk)||name.equals(reality))
-                isShow=true;
+            if (name.equals(talk) || name.equals(reality))
+                isShow = true;
         }
 
         if (isKids || (isAnimation && (isFamily || isComedy))) {
@@ -355,7 +360,7 @@ public class MovieHelper {
 
         }
 
-        if(isShow){
+        if (isShow) {
             VideoTag showTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.variety_show);
             if (showTag == null) {
                 showTag = new VideoTag(Constants.VideoType.variety_show);

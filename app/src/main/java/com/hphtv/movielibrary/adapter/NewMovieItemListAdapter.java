@@ -12,6 +12,7 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.PosterItemBinding;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.util.GlideTools;
 
@@ -33,7 +34,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
     @Override
     public BaseScaleAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         BaseScaleAdapter.ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
-        PosterItemBinding itemBinding= (PosterItemBinding) viewHolder.mBinding;
+        PosterItemBinding itemBinding = (PosterItemBinding) viewHolder.mBinding;
         itemBinding.setShowConrerMark(Config.getShowCornerMark());
         itemBinding.setShowLike(Config.getShowLike());
         itemBinding.setShowRating(Config.getShowRating());
@@ -49,32 +50,32 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
         MovieDataView movieDataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
         if (Config.getShowPoster().get())
-            if(movieDataView.type.equals(Constants.SearchType.tv)&&!TextUtils.isEmpty(movieDataView.season_poster)){
+            if (movieDataView.type.equals(Constants.SearchType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
                 GlideTools.GlideWrapper(mContext, movieDataView.season_poster)
                         .into(binding.rvPoster);
-            }else {
+            } else {
                 GlideTools.GlideWrapper(mContext, movieDataView.poster)
                         .into(binding.rvPoster);
             }
         else
             Glide.with(mContext).load(R.mipmap.default_poster).into(binding.rvPoster);
-        String title=movieDataView.title;
-        if(movieDataView.type.equals(Constants.SearchType.tv)){
-            if(!TextUtils.isEmpty(movieDataView.season_name))
-                title+=" "+ movieDataView.season_name;
-            else if(movieDataView.season!=-1)
-                title+=" "+ mContext.getResources().getString(R.string.season_name_for_unknow,movieDataView.season);
-            if(movieDataView.episode_count!=0){
-                binding.setTag(mContext.getString(R.string.total_episodes,movieDataView.episode_count));
-            }else{
+        String title = movieDataView.title;
+        if (movieDataView.type.equals(Constants.SearchType.tv)) {
+            if (!TextUtils.isEmpty(movieDataView.season_name))
+                title += " " + movieDataView.season_name;
+            else if (movieDataView.season != -1)
+                title += " " + mContext.getResources().getString(R.string.season_name_for_unknow, movieDataView.season);
+            if (movieDataView.episode_count != 0) {
+                binding.setTag(mContext.getString(R.string.total_episodes, movieDataView.episode_count));
+            } else {
                 binding.setTag(null);
             }
-        }else{
-            if(!TextUtils.isEmpty(movieDataView.video_source)){
+        } else {
+            if (!TextUtils.isEmpty(movieDataView.video_source)) {
                 binding.setTag(movieDataView.video_source);
-            }else if(!TextUtils.isEmpty(movieDataView.resolution)){
+            } else if (!TextUtils.isEmpty(movieDataView.resolution)) {
                 binding.setTag(movieDataView.resolution);
-            }else {
+            } else {
                 binding.setTag(null);
             }
         }
@@ -84,11 +85,40 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
         binding.setLike(movieDataView.is_favorite);
     }
 
-    public void remove(String movie_id,int pos){
-        if(mList.get(pos).movie_id.equals(movie_id)){
-            super.remove(mList.get(pos),pos);
+    public void remove(String movie_id, int pos) {
+        if (mList.get(pos).movie_id.equals(movie_id)) {
+            super.remove(mList.get(pos), pos);
         }
     }
+
+    public void remove(MovieDataView movieDataView) {
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i) instanceof MovieDataView) {
+                if (mList.get(i).equals(movieDataView)) {
+                    mList.remove(i);
+                    notifyItemRemoved(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 适用于更改影片的收藏状态，可视状态之类
+     * @param movieDataView
+     */
+    public void updateStatus(MovieDataView movieDataView) {
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i) instanceof MovieDataView) {
+                if (mList.get(i).equals(movieDataView)) {
+                    mList.set(i,movieDataView);
+                    notifyItemChanged(i);
+                    break;
+                }
+            }
+        }
+    }
+
 
 
 }

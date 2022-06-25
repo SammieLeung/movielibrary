@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -25,6 +27,7 @@ import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
+import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.moviesearch.PinyinSearchActivity;
@@ -223,7 +226,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
-    public void refreshFragment(int pos) {
+    public void forceRefreshFragment(int pos) {
         if (pos < mNewHomePageTabAdapter.mList.size()) {
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IActivityResult) {
@@ -232,6 +235,27 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             }
         }
     }
+
+    public void remoteUpdateFavoriteForFragment(int pos,String movie_id,String type,boolean is_favorite ) {
+        if (pos < mNewHomePageTabAdapter.mList.size()) {
+            Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
+            if (fragment instanceof IRemoteRefresh) {
+                IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
+                activityResult.remoteUpdateFavorite(movie_id,type,is_favorite);
+            }
+        }
+    }
+
+    public void remoteUpdateMovieForFragment(int pos,long o_id,long n_id) {
+        if (pos < mNewHomePageTabAdapter.mList.size()) {
+            Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
+            if (fragment instanceof IRemoteRefresh) {
+                IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
+                activityResult.remoteUpdateMovie(o_id,n_id);
+            }
+        }
+    }
+
 
     /**
      * 获取NoScrollAutofitHeightViewPager
@@ -243,6 +267,13 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         return mBinding.viewpager;
     }
 
+    @Override
+    public boolean onGenericMotionEvent(MotionEvent event) {
+        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0){
+            startBottomMaskAnimate();
+        }
+            return super.onGenericMotionEvent(event);
+    }
 
     /**
      * 创建Tabview
@@ -370,5 +401,17 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public void OnMovieInsert(MovieDataView movieDataView, int pos) {
+    }
+
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+        int pos = mBinding.tabLayout.getSelectedTabPosition();
+        remoteUpdateMovieForFragment(pos,o_id,n_id);
+    }
+
+    @Override
+    public void remoteUpdateFavorite(String movie_id,String type, boolean isFavorite) {
+        int pos = mBinding.tabLayout.getSelectedTabPosition();
+        remoteUpdateFavoriteForFragment(pos,movie_id,type,isFavorite);
     }
 }

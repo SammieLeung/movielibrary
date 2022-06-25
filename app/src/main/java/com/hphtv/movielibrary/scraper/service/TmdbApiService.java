@@ -2,7 +2,7 @@ package com.hphtv.movielibrary.scraper.service;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
-import com.hphtv.movielibrary.scraper.postbody.PostDetailRequetBody;
+import com.hphtv.movielibrary.scraper.postbody.PostDetailRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
@@ -93,7 +93,7 @@ public class TmdbApiService {
                 request = RetrofiTools.createENRequest();
                 break;
         }
-        PostDetailRequetBody body = new PostDetailRequetBody(movieId,type);
+        PostDetailRequestBody body = new PostDetailRequestBody(movieId,type);
         Observable<MovieDetailRespone> detailResponeObservable = request.createDetail(body);
         return detailResponeObservable;
     }

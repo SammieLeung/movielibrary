@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author lxp
  * @date 19-3-26
  */
-public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseInflateActivity<VM, VDB> {
+public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseInflateActivity<VM, VDB> implements IRemoteRefresh{
 
     private static Handler mHanlder=new Handler(Looper.getMainLooper());
     public final String TAG = this.getClass().getSimpleName();
@@ -72,6 +72,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH);
+        intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
+        intentFilter.addAction(Constants.ACTION_APP_UPDATE_MOVIE);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
@@ -125,9 +127,30 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
                 case Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH:
                     movieScrapeFinish();
                     break;
+                case Constants.ACTION_FAVORITE_MOVIE_CHANGE:
+                    String movie_id=intent.getStringExtra("movie_id");
+                    boolean isFavorite=intent.getBooleanExtra("is_favorite",false);
+                    String type=intent.getStringExtra("type");
+                    remoteUpdateFavorite(movie_id,type,isFavorite);
+                    break;
+                case Constants.ACTION_APP_UPDATE_MOVIE:
+                    long n_id=intent.getLongExtra("new",-1);
+                    long o_id=intent.getLongExtra("old",-1);
+                    remoteUpdateMovie(o_id,n_id);
+                    break;
             }
         }
     };
 
     protected void movieScrapeFinish(){};
-}
+
+     @Override
+     public void remoteUpdateFavorite(String movie_id, String type,boolean isFavorite) {
+
+     }
+
+     @Override
+     public void remoteUpdateMovie(long o_id, long n_id) {
+
+     }
+ }
