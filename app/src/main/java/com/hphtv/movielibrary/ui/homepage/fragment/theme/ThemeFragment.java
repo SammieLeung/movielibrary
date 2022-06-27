@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
@@ -34,6 +35,7 @@ import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
+import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -171,8 +173,17 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
                             if (mRecommendListAdapter.getDatas().contains(movieDataView)) {
                                 mRecommendListAdapter.updateStatus(movieDataView);
                             }
+                            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_movie_sync_tips));
                         }
                     });
+        }
+    }
+
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+        if(mViewModel!=null) {
+            prepareAll();
+            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_movie_sync_tips));
         }
     }
 

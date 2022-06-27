@@ -146,7 +146,9 @@ public interface MovieDao {
             "GROUP BY id")
     public MovieDataView queryMovieDataViewByMovieId(String movie_id, String type, String source);
 
-
+    @Query("SELECT * FROM "+VIEW.MOVIE_DATAVIEW+
+    " WHERE id=:id")
+    public MovieDataView queryMovieDataView(long id);
     /**
      * 根据条件返回符合条件电影数量。
      *

@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -142,6 +143,15 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                             mOnRefresh.newSearch(movieDataViews);
                     }
                 });
+    }
+
+    public Observable<MovieDataView> getUpdatingFavorite(String movie_id, String type) {
+        return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+                    MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(movie_id, type, ScraperSourceTools.getSource());
+                    emitter.onNext(movieDataView);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 

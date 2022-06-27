@@ -1,10 +1,8 @@
 package com.hphtv.movielibrary.ui.detail;
 
 import android.animation.ObjectAnimator;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,14 +15,12 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.EpisodeItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
@@ -324,6 +320,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                             BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
                             mBinding.btnFavorite.setSelected(isFavorite);
                             refreshParent();
+                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
                         }
                     });
         }
@@ -332,8 +329,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     @Override
     public void remoteUpdateMovie(long o_id, long n_id) {
         long cur_id = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.id : -1;
-        if (o_id != -1 && o_id == cur_id)
+        if (o_id != -1 && o_id == cur_id) {
             prepareMovieWrapper(n_id, mViewModel.getSeason());
+            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
+        }
     }
 
     /**

@@ -188,6 +188,15 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public Observable<MovieDataView> getMovieDataView(long n_id){
+        return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+            MovieDataView movieDataView=mMovieDao.queryMovieDataView(n_id);
+                    emitter.onNext(movieDataView);
+                    emitter.onComplete();
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     public interface Callback {
         void runOnUIThread(List<?> list);

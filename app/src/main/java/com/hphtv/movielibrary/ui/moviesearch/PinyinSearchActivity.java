@@ -15,15 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieLargeItemListAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityLocalSearchBinding;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
-import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
 
@@ -291,4 +290,9 @@ public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, 
         mViewModel.getIsShowTab().set(false);
     }
 
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+        mBinding.etSearch.getText().clear();
+        ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
+    }
 }

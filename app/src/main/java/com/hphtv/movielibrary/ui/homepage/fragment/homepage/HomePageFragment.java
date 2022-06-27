@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
@@ -33,6 +34,7 @@ import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
+import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -342,6 +344,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
                             if (mRecommendListAdapter.getDatas().contains(movieDataView)) {
                                 mRecommendListAdapter.updateStatus(movieDataView);
                             }
+                            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_movie_sync_tips));
 
                         }
                     });
@@ -350,7 +353,33 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
 
     @Override
     public void remoteUpdateMovie(long o_id, long n_id) {
-        super.remoteUpdateMovie(o_id, n_id);
+        if (mViewModel != null) {
+//            mViewModel.getMovieDataView(n_id)
+//                    .subscribe(new SimpleObserver<MovieDataView>() {
+//                        @Override
+//                        public void onAction(MovieDataView movieDataView) {
+//                            updateSpecifiedVideo(mRecentlyAddListAdapter,movieDataView,o_id);
+//                            updateSpecifiedVideo(mRecommendListAdapter,movieDataView,o_id);
+//                            for(int i=0;i<mFavoriteListAdapter.getDatas().size();i++){
+//                                if(mFavoriteListAdapter.getDatas().get(i) instanceof  MovieDataView){
+//                                    MovieDataView view=mFavoriteListAdapter.getDatas().get(i);
+//                                    if(view.id==o_id){
+//                                        mFavoriteListAdapter.remove(movieDataView);
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                            if(mFavoriteListAdapter.getItemCount()==0){
+//                                mBinding.setFavorite(false);
+//                            }else{
+//                                mBinding.setFavorite(true);
+//                            }
+//                        }
+//                    });
+            prepareAll();
+            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_movie_sync_tips));
+
+        }
     }
 
     @Override
@@ -370,6 +399,18 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         if (i <= 0) {
             mBinding.setIsLoading(false);
             atomicState.set(0);
+        }
+    }
+
+    private void updateSpecifiedVideo(NewMovieItemListAdapter adapter,MovieDataView movieDataView,long o_id){
+        for(int i=0;i<adapter.getDatas().size();i++){
+            if(adapter.getDatas().get(i) instanceof  MovieDataView){
+                MovieDataView view=adapter.getDatas().get(i);
+                if(view.id==o_id){
+                    adapter.replace(movieDataView,i);
+                    break;
+                }
+            }
         }
     }
 }

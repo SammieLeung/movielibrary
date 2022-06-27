@@ -153,6 +153,8 @@
     <string name="tab_local_search_movie">Movie (%d)</string>
     <string name="tab_local_search_tv">TV Series (%d)</string>
 
+    <string name="remote_movie_sync_tips">The data has been modified</string>
+
     <!--设置-->
     <string name="settings_childmode">Child Mode</string>
     <string name="settings_poster">Poster</string>

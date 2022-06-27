@@ -25,6 +25,7 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             mViewModel.setGenreAndVideoTag(genreName,videoType);
         }else{
             mViewModel.setGenre(genreName);
-            reloadMoiveDataViews();
+            reloadMovieDataViews();
         }
     }
 
@@ -167,11 +168,11 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         super.onActivityResultCallback(result);
         if (result.getResultCode() == RESULT_OK) {
             setResult(RESULT_OK);
-            reloadMoiveDataViews();
+            reloadMovieDataViews();
         }
     }
 
-    private void reloadMoiveDataViews() {
+    private void reloadMovieDataViews() {
         mViewModel.reloadMovieDataViews();
     }
 
@@ -195,6 +196,25 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
                 mMovieItemListAdapter.appendAll(movieDataViews);
         }
     };
+
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+        super.remoteUpdateMovie(o_id, n_id);
+        reloadMovieDataViews();
+    }
+
+    @Override
+    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+        mViewModel.getUpdatingFavorite(movie_id,type)
+                .subscribe(new SimpleObserver<MovieDataView>() {
+                    @Override
+                    public void onAction(MovieDataView movieDataView) {
+                        if(mMovieItemListAdapter.getDatas().contains(movieDataView)){
+                            mMovieItemListAdapter.updateStatus(movieDataView);
+                        }
+                    }
+                });
+    }
 
     @Override
     public void OnRematchPoster(MovieDataView dataView, int pos) {
