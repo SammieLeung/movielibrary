@@ -33,6 +33,7 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
 import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -137,6 +138,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mEpisodeItemListAdapter.setLastPlayEpisodePos(mViewModel.getLastPlayEpisodePos());
         linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
         mBinding.rvEpisodeList.setLayoutManager(linearLayoutManager);
+        mBinding.rvEpisodeList.setOnBackPressListener(() -> onBackPressed());
         mBinding.rvEpisodeList.setAdapter(mEpisodeItemListAdapter);
         mBinding.rvEpisodeList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 7), DensityUtil.dip2px(this, 23)));
         mEpisodeItemListAdapter.setOnItemClickListener(new EpisodeItemListAdapter.OnRecyclerViewItemActionListener() {
