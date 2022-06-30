@@ -363,6 +363,7 @@ public class MovieScanService extends Service {
         Movie movie = mMovieDao.queryByMovieIdAndType(movie_id, source, type);
         if(movie!=null){
             MovieHelper.establishRelationshipBetweenPosterAndVideos(getBaseContext(),movie.id,videoFile,source);
+            MovieHelper.quickAutoClassification(getBaseContext(),movie_id,source);
             OnlineDBApiService.uploadMovie(movie,videoFile,source);
         }else {
             MovieDetailRespone response = TmdbApiService.getDetail(movie_id, source, type)

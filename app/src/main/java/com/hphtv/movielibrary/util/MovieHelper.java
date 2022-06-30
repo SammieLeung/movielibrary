@@ -1,6 +1,8 @@
 package com.hphtv.movielibrary.util;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
@@ -39,6 +41,7 @@ import com.station.kit.util.SharePreferencesTools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -282,6 +285,12 @@ public class MovieHelper {
         }
     }
 
+    public static void quickAutoClassification(Context context,String movie_id,String source){
+        MovieDao movieDao=MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
+        MovieWrapper wrapper=movieDao.queryMovieWrapperByMovieId(movie_id,source);
+        autoClassification(context,wrapper.movie,wrapper.genres);
+    }
+
     /**
      * 自动帮助影片归类
      * 当前自动区分电影、电视、儿童
@@ -313,12 +322,17 @@ public class MovieHelper {
                 movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
             }
         }
-        String kids = context.getString(R.string.kids);
-        String animation = context.getString(R.string.animation);
-        String comedy = context.getString(R.string.comedy);
-        String family = context.getString(R.string.family);
-        String talk = context.getString(R.string.talk);
-        String reality = context.getString(R.string.reality);
+        Locale locale= Constants.Scraper.TMDB.equals(movie.source)?Locale.CHINESE:Locale.ENGLISH;
+        Configuration configuration=new Configuration(context.getResources().getConfiguration());
+        configuration.setLocale(locale);
+        Context context_2=context.createConfigurationContext(configuration);
+
+        String kids = context_2.getString(R.string.kids);
+        String animation = context_2.getString(R.string.animation);
+        String comedy = context_2.getString(R.string.comedy);
+        String family = context_2.getString(R.string.family);
+        String talk = context_2.getString(R.string.talk);
+        String reality = context_2.getString(R.string.reality);
         boolean isKids = false;
         boolean isComedy = false;
         boolean isFamily = false;

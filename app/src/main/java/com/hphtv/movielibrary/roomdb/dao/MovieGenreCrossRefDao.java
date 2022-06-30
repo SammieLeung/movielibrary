@@ -14,4 +14,5 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
 public interface MovieGenreCrossRefDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertMovieGenreCrossRef(MovieGenreCrossRef movieGenreCrossRef);
+
 }
