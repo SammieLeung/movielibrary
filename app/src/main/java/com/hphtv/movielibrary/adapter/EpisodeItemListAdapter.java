@@ -65,8 +65,8 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
                 binding.getRoot().setEnabled(true);
             }
         }else{
-            if(mList.size()>0&&mList.get(0).size()>0) {
-                VideoFile videoFile = mList.get(0).get(0);
+            if(mList.size()>0&&mList.get(position).size()>0) {
+                VideoFile videoFile = mList.get(position).get(0);
                 if (videoFile != null) {
                     binding.getRoot().setEnabled(true);
                     binding.setText(videoFile.aired);

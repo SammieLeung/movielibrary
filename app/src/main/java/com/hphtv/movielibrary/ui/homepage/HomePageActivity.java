@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -269,12 +270,21 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     }
 
     @Override
-    public boolean onGenericMotionEvent(MotionEvent event) {
-        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) {
-            isMouseEvent=true;
-            startBottomMaskAnimate();
-        }
-        return super.onGenericMotionEvent(event);
+    public boolean dispatchGenericMotionEvent(MotionEvent ev) {
+        startBottomMaskAnimate();
+        return super.dispatchGenericMotionEvent(ev);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        startBottomMaskAnimate();
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        startBottomMaskAnimate();
+        return super.dispatchTouchEvent(ev);
     }
 
     /**
@@ -324,10 +334,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      */
     private void pageScroll(int offset) {
         LogUtil.v("pageScroll");
-        if (!isMouseEvent)
             mBinding.nsv.smoothScrollBy(0, offset);
-        else
-            isMouseEvent=false;
     }
 
     /**

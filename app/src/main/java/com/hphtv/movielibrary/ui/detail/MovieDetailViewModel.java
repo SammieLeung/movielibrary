@@ -28,6 +28,8 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -100,8 +102,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         mLastPlayVideoFile=null;
                         ArrayList<VideoFile> tmpVideoFileList = new ArrayList<>();
                         tmpVideoFileList.addAll(mMovieWrapper.videoFiles);
-                        if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
 
+                        if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
+                            Collections.sort(tmpVideoFileList, Comparator.comparing(o -> o.aired));
                             //按集数分配视频文件，如 720P Ep1--->  第一集
                             //                  1080p EP1-↑
                             int lastPlayPos = -1;
