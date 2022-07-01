@@ -193,10 +193,13 @@ public class LocalFileScanHelper {
                     videoFile.vid = tVideoFile.vid;
                     videoFile.isScanned = tVideoFile.isScanned;
                     videoFile.keyword = tVideoFile.keyword;
-                    videoFile.addTime = System.currentTimeMillis();
+                    videoFile.addTime = tVideoFile.addTime;
                     videoFile.lastPlayTime = tVideoFile.lastPlayTime;
                     videoFile.season=tVideoFile.season;
                     videoFile.episode=tVideoFile.episode;
+                    videoFile.aired=tVideoFile.aired;
+                    videoFile.videoSource=tVideoFile.videoSource;
+                    videoFile.resolution=tVideoFile.resolution;
                     videoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();
