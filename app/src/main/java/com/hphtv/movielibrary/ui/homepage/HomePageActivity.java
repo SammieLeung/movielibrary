@@ -50,6 +50,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     private HomePageTabAdapter mNewHomePageTabAdapter;
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
+    private boolean isMouseEvent = false;
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -140,17 +141,17 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
 //            //设定tabview的左右焦点 （主页、电影、电视剧、...）
             if (mBinding.tabLayout.getTabCount() > 1) {
-                View view=mBinding.tabLayout.getTabAt(i).view;
+                View view = mBinding.tabLayout.getTabAt(i).view;
                 if (i == 0) {
                     view.setId(View.generateViewId());
-                    int nextRightId=View.generateViewId();
+                    int nextRightId = View.generateViewId();
                     mBinding.tabLayout.getTabAt(i + 1).view.setId(nextRightId);
                     view.setNextFocusRightId(nextRightId);
                 } else if (i == mBinding.tabLayout.getTabCount() - 1) {
                     view.setNextFocusLeftId(mBinding.tabLayout.getTabAt(i - 1).view.getId());
                 } else {
                     view.setId(View.generateViewId());
-                    int nextRightId=View.generateViewId();
+                    int nextRightId = View.generateViewId();
                     mBinding.tabLayout.getTabAt(i + 1).view.setId(nextRightId);
                     view.setNextFocusRightId(nextRightId);
                     view.setNextFocusLeftId(mBinding.tabLayout.getTabAt(i - 1).view.getId());
@@ -236,22 +237,22 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
-    public void remoteUpdateFavoriteForFragment(int pos,String movie_id,String type,boolean is_favorite ) {
+    public void remoteUpdateFavoriteForFragment(int pos, String movie_id, String type, boolean is_favorite) {
         if (pos < mNewHomePageTabAdapter.mList.size()) {
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IRemoteRefresh) {
                 IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteUpdateFavorite(movie_id,type,is_favorite);
+                activityResult.remoteUpdateFavorite(movie_id, type, is_favorite);
             }
         }
     }
 
-    public void remoteUpdateMovieForFragment(int pos,long o_id,long n_id) {
+    public void remoteUpdateMovieForFragment(int pos, long o_id, long n_id) {
         if (pos < mNewHomePageTabAdapter.mList.size()) {
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IRemoteRefresh) {
                 IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteUpdateMovie(o_id,n_id);
+                activityResult.remoteUpdateMovie(o_id, n_id);
             }
         }
     }
@@ -269,10 +270,11 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
-        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0){
+        if ((event.getSource() & InputDevice.SOURCE_CLASS_POINTER) != 0) {
+            isMouseEvent=true;
             startBottomMaskAnimate();
         }
-            return super.onGenericMotionEvent(event);
+        return super.onGenericMotionEvent(event);
     }
 
     /**
@@ -298,6 +300,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         view.getViewTreeObserver()
                 .addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
                     if (newFocus != null) {
+                        LogUtil.v("newFocus " + newFocus.toString());
                         int[] ints = new int[2];
                         newFocus.getLocationInWindow(ints);
 
@@ -321,8 +324,10 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      */
     private void pageScroll(int offset) {
         LogUtil.v("pageScroll");
-
-        mBinding.nsv.smoothScrollBy(0, offset);
+        if (!isMouseEvent)
+            mBinding.nsv.smoothScrollBy(0, offset);
+        else
+            isMouseEvent=false;
     }
 
     /**
@@ -406,12 +411,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     @Override
     public void remoteUpdateMovie(long o_id, long n_id) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
-        remoteUpdateMovieForFragment(pos,o_id,n_id);
+        remoteUpdateMovieForFragment(pos, o_id, n_id);
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id,String type, boolean isFavorite) {
+    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
-        remoteUpdateFavoriteForFragment(pos,movie_id,type,isFavorite);
+        remoteUpdateFavoriteForFragment(pos, movie_id, type, isFavorite);
     }
 }
