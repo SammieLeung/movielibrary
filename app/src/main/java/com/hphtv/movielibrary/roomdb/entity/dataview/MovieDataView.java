@@ -22,7 +22,9 @@ import java.util.Objects;
                         "ST.access AS s_ap,"+
                         "G.name AS genre_name," +
                         "M.add_time,M.last_playtime,M.is_favorite, " +
-                        "SD.season,SD.name AS season_name,SD.poster AS season_poster,SD.episode_count " +
+                        "CASE WHEN SD.season IS NOT NULL THEN SD.season " +
+                        "ELSE -1 END AS season," +
+                        "SD.name AS season_name,SD.poster AS season_poster,SD.episode_count " +
                         "FROM " + TABLE.VIDEOFILE + " AS VF " +
                         "JOIN " + TABLE.SHORTCUT + " AS ST  " +
                         "ON VF.dir_path=ST.uri " +
@@ -63,7 +65,7 @@ public class MovieDataView implements Serializable {
     public boolean is_favorite;
     public boolean is_watched;
 
-    public int season;
+    public int season=-1;
     public String season_name;
     public String season_poster;
     public int episode_count;

@@ -61,21 +61,31 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 editVideoInfo();
                 break;
             case R.id.btn_play:
-                if (mBinding.getWrapper() != null) {
-                    if (mBinding.getWrapper().videoFiles.size() == 1) {
-                        String path = mBinding.getWrapper().videoFiles.get(0).path;
-                        String name = mBinding.getWrapper().videoFiles.get(0).filename;
+                if (mViewModel.getMovieWrapper() != null) {
+                    if (mViewModel.getMovieWrapper().videoFiles.size() == 1) {
+                        String path = mViewModel.getMovieWrapper().videoFiles.get(0).path;
+                        String name = mViewModel.getMovieWrapper().videoFiles.get(0).filename;
                         playVideo(path, name);
-                    } else if (mBinding.getWrapper().videoFiles.size() > 1) {
+                    } else if (mViewModel.getMovieWrapper().videoFiles.size() > 1) {
                         showVideoSelectDialog();
                     }
                 }
                 break;
             case R.id.btn_play_episode:
-                if (mViewModel.getLastPlayVideoFile() != null) {
-                    playingEpisodeVideo(mViewModel.getLastPlayVideoFile());
+                if (mViewModel.getMovieWrapper().season != null) {
+                    if (mViewModel.getLastPlayVideoFile() != null) {
+                        playingEpisodeVideo(mViewModel.getLastPlayVideoFile());
+                    } else {
+                        playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
+                    }
                 } else {
-                    playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
+                    if (mViewModel.getMovieWrapper().videoFiles.size() == 1) {
+                        String path = mViewModel.getMovieWrapper().videoFiles.get(0).path;
+                        String name = mViewModel.getMovieWrapper().videoFiles.get(0).filename;
+                        playVideo(path, name);
+                    } else if (mViewModel.getMovieWrapper().videoFiles.size() > 1) {
+                        showVideoSelectDialog();
+                    }
                 }
                 break;
             case R.id.btn_remove:
@@ -214,7 +224,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     @Override
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
-                            if (Constants.SearchType.tv.equals(wrapper.movie.type)) {
+                            if (Constants.SearchType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
                                 if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
                                     mEpisodeItemListAdapter.setVarietyShow(true);
                                     mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
@@ -357,7 +367,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 编辑封面信息
      */
     private void editVideoInfo() {
-        String keyword = mBinding.getWrapper().videoFiles.get(0).keyword;
+        String keyword = mViewModel.getMovieWrapper().videoFiles.get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             startLoading();

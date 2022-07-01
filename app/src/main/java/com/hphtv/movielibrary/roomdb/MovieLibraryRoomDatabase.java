@@ -66,7 +66,7 @@ import org.jetbrains.annotations.NotNull;
         ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
         Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
         views = {MovieDataView.class, UnrecognizedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class},
-        version = 8)
+        version = 9)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
 
@@ -120,7 +120,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                             MIGRATION_4_5,
                             MIGRATION_5_6,
                             MIGRATION_6_7,
-                            MIGRATION_7_8,};
+                            MIGRATION_7_8,
+                            MIGRATION_8_9};
                     sInstance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
@@ -233,6 +234,16 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE VIEW `"+VIEW.SEASON_DATAVIEW+"` AS SELECT M.id,V.season,SS.name,SS.poster,ss.episode_count FROM videofile AS V JOIN movie_videofile_cross_ref AS MVC ON V.path=MVC.path JOIN movie AS M ON M.id=MVC.id JOIN season AS SS ON SS.movie_id=M.id WHERE V.season=SS.season_number AND ( V.episode >= 0 OR V.aired!='' )");
             database.execSQL("CREATE VIEW `"+VIEW.UNRECOGNIZEDFILE_DATAVIEW+"` AS SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.uri AS dir_uri,ST.access AS s_ap,DEV.path AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired FROM videofile AS VF JOIN shortcut AS ST ON VF.dir_path=ST.uri JOIN device AS DEV ON DEV.path=ST.device_path UNION SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.uri AS dir_uri,ST.access AS s_ap,NULL AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired FROM videofile AS VF JOIN shortcut AS ST ON VF.dir_path=ST.uri WHERE ST.device_type>5");
             database.execSQL("CREATE VIEW `"+VIEW.HISTORY_MOVIE_DATAVIEW+"` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode,u.aired,m.poster,m.source,m.title,m.ratings,m.ap,st.access AS s_ap,m.season,m.season_name,m.season_poster,sp.img_url AS stage_photo FROM unrecognizedfile_dataview AS u LEFT OUTER JOIN movie_dataview AS m ON u.path=m.file_uri LEFT OUTER JOIN stagephoto AS sp ON sp.movie_id=m.id LEFT OUTER JOIN shortcut AS st ON st.uri=u.dir_uri WHERE u.last_playtime!=0 GROUP BY u.path,m.source ORDER BY u.last_playtime DESC");
+        }
+    };
+
+    public static final Migration MIGRATION_8_9=new Migration(8,9) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP VIEW "+VIEW.MOVIE_DATAVIEW);
+            database.execSQL("CREATE VIEW `"+VIEW.MOVIE_DATAVIEW+"` AS SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.is_watched,VF.path AS file_uri,VF.video_source,VF.resolution,ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ,ST.access AS s_ap,G.name AS genre_name,M.add_time,M.last_playtime,M.is_favorite, CASE WHEN SD.season IS NOT NULL THEN SD.season ELSE -1 END AS season,SD.name AS season_name,SD.poster AS season_poster,SD.episode_count FROM videofile AS VF JOIN shortcut AS ST  ON VF.dir_path=ST.uri JOIN device AS DEV ON DEV.path=ST.device_path OR ST.device_type > 5 JOIN movie_videofile_cross_ref AS MVCF ON MVCF.path=VF.path JOIN movie AS M ON MVCF.id=M.id LEFT OUTER JOIN movie_genre_cross_ref AS MGCF  ON M.id=MGCF.id LEFT OUTER JOIN genre AS G ON MGCF.genre_id = G.genre_id LEFT OUTER JOIN season_dataview AS SD ON SD.id=M.id");
+
+//            database.execSQL("DELETE FROM "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" WHERE vtid = (SELECT vtid FROM "+ TABLE.VIDEO_TAG +" WHERE tag='variety_show')");
         }
     };
 }

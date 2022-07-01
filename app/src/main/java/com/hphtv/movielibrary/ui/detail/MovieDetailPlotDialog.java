@@ -26,6 +26,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutNewDetailViewmoreBinding;
 import com.hphtv.movielibrary.effect.GlideBlurTransformation;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
@@ -68,13 +69,14 @@ public class MovieDetailPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        mActorPosterItemListApdater = new ActorPosterItemListApdater(getContext(), mViewModel.getMovieWrapper().actors);
+        MovieWrapper movieWrapper= mViewModel.getMovieWrapper();
+        mActorPosterItemListApdater = new ActorPosterItemListApdater(getContext(), movieWrapper.actors);
         mBinding.rvActorList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false));
         mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 62), DensityUtil.dip2px(getContext(), 22), DensityUtil.dip2px(getContext(), 22)));
         mBinding.rvActorList.setAdapter(mActorPosterItemListApdater);
-        String plot=mViewModel.getMovieWrapper().movie.plot;
-        if(mViewModel.getMovieWrapper().movie.type.equals(Constants.SearchType.tv)&&!TextUtils.isEmpty(mViewModel.getMovieWrapper().season.plot))
-            plot=mViewModel.getMovieWrapper().season.plot;
+        String plot=movieWrapper.movie.plot;
+        if(movieWrapper.movie.type.equals(Constants.SearchType.tv)&&movieWrapper.season!=null&&!TextUtils.isEmpty(movieWrapper.season.plot))
+            plot=movieWrapper.season.plot;
         mBinding.setPlot(plot);
         mBinding.btnFold.setOnClickListener(v -> dismiss());
         mViewModel.loadFileList().subscribe(new SimpleObserver<String>() {

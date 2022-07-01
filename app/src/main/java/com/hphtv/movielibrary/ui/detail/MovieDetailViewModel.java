@@ -93,6 +93,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 break;
                             }
                         }
+                        if(mMovieWrapper.season==null)
+                            return mMovieWrapper;
                         mTabLayoutPaginationMap.clear();
                         mEpisodeVideoFilesList.clear();
                         mLastPlayVideoFile=null;
