@@ -362,6 +362,8 @@ public class DeviceMonitorService extends Service {
     private void startScanLocalDevices(String devicePath) {
         Observable.create((ObservableOnSubscribe<Object[]>) emitter -> {
             List<Shortcut> shortcutList = LocalFileScanHelper.scanDevice(getApplication(), devicePath);
+            if(shortcutList.size()==0)
+                emitter.onNext(new Object[0]);
             for (Shortcut shortcut : shortcutList) {
                 List<VideoFile> videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut.uri);
                 Object[] data = new Object[2];
@@ -373,6 +375,7 @@ public class DeviceMonitorService extends Service {
         }).subscribeOn(Schedulers.newThread())
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
+                    LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                     return new Object[0];
                 })//TODO 切换成主线程?
                 .subscribe(new SimpleObserver<Object[]>() {
@@ -409,6 +412,7 @@ public class DeviceMonitorService extends Service {
                         super.onSubscribe(d);
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_START));
                     }
+
 
 
                 });
