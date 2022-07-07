@@ -6,7 +6,7 @@ import com.hphtv.movielibrary.scraper.postbody.PostDetailRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
-import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
+import com.hphtv.movielibrary.util.retrofit.RetrofitTools;
 
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -69,13 +69,13 @@ public class TmdbApiService {
 
     public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String api, String type, String year) {
         keyword = keyword.trim();
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (api) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         PostSearchRequetBody body = new PostSearchRequetBody(keyword, pageIndex, type, year);
@@ -84,13 +84,13 @@ public class TmdbApiService {
     }
 
     public static Observable<MovieDetailRespone> getDetail(String movieId, String api, String type) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (api) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         PostDetailRequestBody body = new PostDetailRequestBody(movieId,type);

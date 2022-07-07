@@ -22,7 +22,7 @@ import com.hphtv.movielibrary.scraper.postbody.UpdateLikeRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateMovieRequestBody;
 import com.hphtv.movielibrary.scraper.respone.BaseRespone;
 import com.hphtv.movielibrary.util.FormatterTools;
-import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
+import com.hphtv.movielibrary.util.retrofit.RetrofitTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.device.StationDeviceTool;
 import com.station.kit.util.LogUtil;
@@ -41,13 +41,13 @@ public class OnlineDBApiService {
 
     public static void uploadMovie(MovieWrapper movieWrapper, List<VideoFile> videoFileList, String source) {
         Context context = MovieApplication.getInstance();
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         DeviceDao deviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
@@ -76,13 +76,13 @@ public class OnlineDBApiService {
     }
 
     public static void uploadMovie(Movie movie, VideoFile videoFile, String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
 
@@ -107,13 +107,13 @@ public class OnlineDBApiService {
     }
 
     public static void uploadFile(VideoFile videoFile, String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         String path = videoFile.path;
@@ -135,13 +135,13 @@ public class OnlineDBApiService {
     }
 
     public static void uploadWatchLimit(String path, Constants.WatchLimit watchLimit, String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         String watch_limit = watchLimit.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
@@ -156,13 +156,13 @@ public class OnlineDBApiService {
     }
 
     public static void deleteMovie(String movie_id, String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
 
@@ -177,13 +177,13 @@ public class OnlineDBApiService {
     }
 
     public static void updateHistory(String path, String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
 
@@ -198,13 +198,13 @@ public class OnlineDBApiService {
     }
 
     public static void updateLike(String movie_id, boolean isFavorite, String source, String type) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         UpdateLikeRequestBody body = new UpdateLikeRequestBody(movie_id, isFavorite ? "1" : "0", type);
@@ -218,13 +218,13 @@ public class OnlineDBApiService {
     }
 
     public static void removeFolder(String dir_path, String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         RemoveFolderRequestBody body = new RemoveFolderRequestBody(dir_path);
@@ -238,13 +238,13 @@ public class OnlineDBApiService {
     }
 
     public static void notifyChildMode(String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         DeviceConfigRequestBody body = new DeviceConfigRequestBody();
@@ -258,13 +258,13 @@ public class OnlineDBApiService {
     }
 
     public static void notifyShortcuts(List<Shortcut> shortcutList,String source) {
-        StationMovieProtocol request = RetrofiTools.createRequest();
+        StationMovieProtocol request = RetrofitTools.createRequest();
         switch (source) {
             case Constants.Scraper.TMDB:
-                request = RetrofiTools.createRequest();
+                request = RetrofitTools.createRequest();
                 break;
             case Constants.Scraper.TMDB_EN:
-                request = RetrofiTools.createENRequest();
+                request = RetrofitTools.createENRequest();
                 break;
         }
         DeviceConfigRequestBody body = new DeviceConfigRequestBody();

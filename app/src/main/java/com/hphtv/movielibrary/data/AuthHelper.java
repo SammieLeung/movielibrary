@@ -1,6 +1,6 @@
 package com.hphtv.movielibrary.data;
 
-import com.hphtv.movielibrary.util.retrofit.RetrofiTools;
+import com.hphtv.movielibrary.util.retrofit.RetrofitTools;
 import com.station.device.TokenHelper;
 
 /**
@@ -8,44 +8,27 @@ import com.station.device.TokenHelper;
  * date:  2022/3/28
  */
 public class AuthHelper {
-    public static String sToken = "";
+    public static String sTokenCN = "";
     public static String sTokenEN = "";
-    public static String sPreToken = "";
-    public static String sPreTokenEN = "";
-    public static String sTestToken = "";
-    static {
-        init();
-    }
-
     public static synchronized boolean init() {
-        switch (RetrofiTools.mode) {
-            case RetrofiTools.TEST:
+        switch (RetrofitTools.mode) {
+            case RetrofitTools.PRE:
                 try {
-                    sTestToken = TokenHelper.getToken(TokenHelper.TEST);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    return false;
-                }
-                break;
-            case RetrofiTools.PRE:
-                try {
-                    sPreToken = TokenHelper.getToken(TokenHelper.PRE_CN);
+                    sTokenCN = TokenHelper.getToken(TokenHelper.PRE_CN);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
                 }
                 try {
-                    sPreTokenEN = TokenHelper.getToken(TokenHelper.PRE_EN);
+                    sTokenEN = TokenHelper.getToken(TokenHelper.PRE_EN);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
                 }
                 break;
-            case RetrofiTools.RELEASE:
+            case RetrofitTools.RELEASE:
                 try {
-                    sToken = TokenHelper.getToken(TokenHelper.CN);
+                    sTokenCN = TokenHelper.getToken(TokenHelper.CN);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return false;
