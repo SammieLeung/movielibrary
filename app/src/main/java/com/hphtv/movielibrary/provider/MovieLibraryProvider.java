@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -201,16 +202,19 @@ public class MovieLibraryProvider extends ContentProvider {
                     tmpRef.timeStamp=timeStamp;
                     mMovieVideofileCrossRefDao.update(tmpRef);
                 }
+                if (source.equals(ScraperSourceTools.getSource()))
+                    sendRefreshMovie(old_id, new_movie.id);
 
             } else {
                 MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type)
                         .blockingFirst().toEntity();
                 //被动更新无需通知
                 MovieHelper.manualSaveMovie(getContext(), wrapper, videoFileList, false);
+                if (source.equals(ScraperSourceTools.getSource()))
+                    sendRefreshMovie(old_id, wrapper.movie.id);
             }
 
-            if (source.equals(ScraperSourceTools.getSource()))
-                sendRefreshMovie(old_id, new_movie.id);
+
         } else {
             //2 未匹配电影匹配
             if(new_movie!=null){
@@ -220,16 +224,18 @@ public class MovieLibraryProvider extends ContentProvider {
                 tmpRef.path=path;
                 tmpRef.timeStamp=timeStamp;
                 mMovieVideofileCrossRefDao.insertOrReplace(tmpRef);
-
+                if (source.equals(ScraperSourceTools.getSource()))
+                    sendRefreshMovie(-1, new_movie.id);
             }else{
                 List<VideoFile> videoFileList=mVideoFileDao.queryByPaths(path);
                 MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type)
                         .blockingFirst().toEntity();
                 //被动更新无需通知
                 MovieHelper.manualSaveMovie(getContext(), wrapper, videoFileList, false);
+                if (source.equals(ScraperSourceTools.getSource()))
+                    sendRefreshMovie(-1, wrapper.movie.id);
             }
-            if (source.equals(ScraperSourceTools.getSource()))
-                sendRefreshMovie(-1, new_movie.id);
+
         }
 
 
