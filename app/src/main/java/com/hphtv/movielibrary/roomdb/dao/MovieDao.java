@@ -110,6 +110,15 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE source=:source and movie_id=:movie_id")
     public MovieWrapper queryMovieWrapperByMovieId(String movie_id, String source);
 
+    /**
+     * 按movie_id查询电影wrapper
+     *
+     * @param movie_id
+     * @return
+     */
+    @Transaction
+    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE source=:source and movie_id=:movie_id and type=:type")
+    public MovieWrapper queryMovieWrapperByMovieIdAndType(String movie_id, String source,String type);
 
     @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id=(SELECT id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE path=:path AND source=:source)")

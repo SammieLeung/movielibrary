@@ -9,6 +9,8 @@ import androidx.lifecycle.AndroidViewModel;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
@@ -149,13 +151,22 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
 
     public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.SearchType type) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
-            MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
-                    .blockingFirst().toEntity();
-            if(wrapper!=null) {
-                wrapper.movie.ap = Constants.WatchLimit.ALL_AGE;
+            //1.获取本地数据
+            MovieDao movieDao= MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+            MovieWrapper wrapper=movieDao.queryMovieWrapperByMovieIdAndType(movie_id,source,type.name());
+            if(wrapper!=null){
+                wrapper.movie.ap=Constants.WatchLimit.ALL_AGE;
                 emitter.onNext(wrapper);
             }else{
-                emitter.onError(new Throwable(getApplication().getString(R.string.toast_selectmovie_faild)));
+                //2.从接口获取数据
+                wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
+                        .blockingFirst().toEntity();
+                if(wrapper!=null) {
+                    wrapper.movie.ap = Constants.WatchLimit.ALL_AGE;
+                    emitter.onNext(wrapper);
+                }else{
+                    emitter.onError(new Throwable(getApplication().getString(R.string.toast_selectmovie_faild)));
+                }
             }
             emitter.onComplete();
 

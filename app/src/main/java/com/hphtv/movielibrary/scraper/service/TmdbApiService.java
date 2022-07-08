@@ -67,15 +67,15 @@ public class TmdbApiService {
         return unionSearch(keyword, pageIndex, api, Constants.SearchType.tv.name(), year);
     }
 
-    public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String api, String type, String year) {
+    public static Observable<MovieSearchRespone> unionSearch(String keyword, int pageIndex, String source, String type, String year) {
         keyword = keyword.trim();
-        StationMovieProtocol request = RetrofitTools.createRequest();
-        switch (api) {
-            case Constants.Scraper.TMDB:
-                request = RetrofitTools.createRequest();
-                break;
+        StationMovieProtocol request;
+        switch (source) {
             case Constants.Scraper.TMDB_EN:
                 request = RetrofitTools.createENRequest();
+                break;
+            default:
+                request = RetrofitTools.createRequest();
                 break;
         }
         PostSearchRequetBody body = new PostSearchRequetBody(keyword, pageIndex, type, year);
@@ -83,19 +83,19 @@ public class TmdbApiService {
         return searchObservable;
     }
 
-    public static Observable<MovieDetailRespone> getDetail(String movieId, String api, String type) {
-        StationMovieProtocol request = RetrofitTools.createRequest();
-        switch (api) {
-            case Constants.Scraper.TMDB:
-                request = RetrofitTools.createRequest();
-                break;
+    public static Observable<MovieDetailRespone> getDetail(String movieId, String source, String type) {
+        StationMovieProtocol request;
+        switch (source) {
             case Constants.Scraper.TMDB_EN:
                 request = RetrofitTools.createENRequest();
                 break;
+            default:
+                request = RetrofitTools.createRequest();
+                break;
         }
         PostDetailRequestBody body = new PostDetailRequestBody(movieId,type);
-        Observable<MovieDetailRespone> detailResponeObservable = request.createDetail(body);
-        return detailResponeObservable;
+        Observable<MovieDetailRespone> detailResponseObservable = request.createDetail(body);
+        return detailResponseObservable;
     }
 
 
