@@ -27,6 +27,7 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -112,6 +113,12 @@ public class MovieSearchDialog extends DialogFragment {
                             if (mOnSelectPosterListener != null) {
                                 mOnSelectPosterListener.OnSelect(movieWrapper);
                             }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            ToastUtil.newInstance(getContext()).toast(getString(R.string.toast_selectmovie_getdetial_faild));
                         }
                     });
             dismiss();

@@ -151,9 +151,14 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
             MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
                     .blockingFirst().toEntity();
-            wrapper.movie.ap=Constants.WatchLimit.ALL_AGE;
-            emitter.onNext(wrapper);
+            if(wrapper!=null) {
+                wrapper.movie.ap = Constants.WatchLimit.ALL_AGE;
+                emitter.onNext(wrapper);
+            }else{
+                emitter.onError(new Throwable(getApplication().getString(R.string.toast_selectmovie_faild)));
+            }
             emitter.onComplete();
+
         }).subscribeOn(Schedulers.newThread());
     }
 

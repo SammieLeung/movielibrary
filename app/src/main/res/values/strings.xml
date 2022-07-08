@@ -127,6 +127,7 @@
     <string name="toast_newsearh_notfound">Sorry,no results were found.Please check your input or try other keywords</string>
     <string name="toast_loadmore_end">No more results found.</string>
     <string name="toast_selectmovie_faild">Sorry, failed to match this poster!</string>
+    <string name="toast_selectmovie_getdetial_faild">Sorry, failed to get the details of this movie!</string>
 
     <string name="remove_confirm">Are you sure about cleaning up the poster info?</string>
 
