@@ -31,18 +31,18 @@ public class ConfirmDeleteViewModel extends BaseAndroidViewModel {
     }
 
 
-    public Observable<String> removeMovieWrapper(String movie_id) {
+    public Observable<String> removeMovieWrapper(String movie_id,String type) {
         MovieDao movieDao= MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
         MovieVideofileCrossRefDao movieVideofileCrossRefDao= MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieVideofileCrossRefDao();
-        return Observable.just(movie_id)
+        return Observable.just("")
                 .subscribeOn(Schedulers.newThread())
-                .map(movieId -> {
-                    List<Movie> movieList = movieDao.queryByMovieId(movieId);
+                .map(str -> {
+                    List<Movie> movieList = movieDao.queryByMovieId(movie_id);
                     for (Movie movie : movieList) {
                         movieVideofileCrossRefDao.deleteById(movie.id);
                     }
                     movieDao.updateFavoriteStateByMovieId(false, movie_id);//电影的收藏状态在删除时要设置为false
-                    new Thread(() -> OnlineDBApiService.deleteMovie(movie_id, ScraperSourceTools.getSource())).start();
+                    OnlineDBApiService.deleteMovie(movie_id,type, ScraperSourceTools.getSource());
                     return movie_id;
                 })
                 .observeOn(AndroidSchedulers.mainThread());

@@ -78,7 +78,7 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     }
 
     private void showDeleteConfirmDialog() {
-        ConfirmDeleteDialog confirmDeleteDialog = ConfirmDeleteDialog.newInstance(mViewModel.getMovieDataView().movie_id);
+        ConfirmDeleteDialog confirmDeleteDialog = ConfirmDeleteDialog.newInstance(mViewModel.getMovieDataView().movie_id,mViewModel.getMovieDataView().type);
         confirmDeleteDialog.setMessage(getString(R.string.remove_confirm));
         confirmDeleteDialog.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
             @Override

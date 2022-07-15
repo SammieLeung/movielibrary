@@ -155,7 +155,7 @@ public class OnlineDBApiService {
         });
     }
 
-    public static void deleteMovie(String movie_id, String source) {
+    public static void deleteMovie(String movie_id,String type, String source) {
         StationMovieProtocol request;
         switch (source) {
             case Constants.Scraper.TMDB_EN:
@@ -166,12 +166,12 @@ public class OnlineDBApiService {
                 break;
         }
 
-        DeleteMovieRequestBody body = new DeleteMovieRequestBody(movie_id);
-        Observable<BaseRespone> deleteMovieRequest = request.deleteMovie(body);
+        DeleteMovieRequestBody body = new DeleteMovieRequestBody(movie_id,type);
+        Observable<BaseRespone> deleteMovieRequest = request.removeRelation(body);
         deleteMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{deleteMovie} " + baseRespone.code + ": " + movie_id);
+                LogUtil.w("{deleteMovie} " + baseRespone.code + ": " + movie_id +"<"+type+">");
             }
         });
     }

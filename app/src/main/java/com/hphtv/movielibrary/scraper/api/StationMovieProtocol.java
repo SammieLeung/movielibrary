@@ -33,6 +33,9 @@ public interface StationMovieProtocol {
     @POST("device/movie/deleteInfo")
     Observable<BaseRespone> deleteMovie(@Body DeleteMovieRequestBody body);
 
+    @POST("movie/movie/removeRelation")
+    Observable<BaseRespone> removeRelation(@Body DeleteMovieRequestBody body);
+
     @POST("movie/history/save")
     Observable<BaseRespone> updateHistory(@Body UpdateHistoryRequestBody body);
 

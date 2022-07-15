@@ -89,7 +89,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 }
                 break;
             case R.id.btn_remove:
-                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mViewModel.getMovieWrapper().movie.movieId);
+                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mViewModel.getMovieWrapper().movie.movieId,mViewModel.getMovieWrapper().movie.type);
                 confirmDialogFragment.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
                     @Override
                     public void confirmDelete(String movie_id) {

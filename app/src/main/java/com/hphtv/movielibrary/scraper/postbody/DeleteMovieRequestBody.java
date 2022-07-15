@@ -6,8 +6,10 @@ package com.hphtv.movielibrary.scraper.postbody;
  */
 public class DeleteMovieRequestBody {
     public String movie_id;
+    public String type;
 
-    public DeleteMovieRequestBody(String movie_id) {
+    public DeleteMovieRequestBody(String movie_id,String type) {
         this.movie_id = movie_id;
+        this.type=type;
     }
 }

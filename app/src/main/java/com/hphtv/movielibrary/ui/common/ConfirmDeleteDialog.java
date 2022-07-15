@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.detail.MovieDetailViewModel;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -24,13 +25,15 @@ public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
 
     private String mMessage;
     private String movieId;
+    private String mType;
 
-    public static ConfirmDeleteDialog newInstance(String movie_id) {
+    public static ConfirmDeleteDialog newInstance(String movie_id, Constants.SearchType searchType) {
 
         Bundle args = new Bundle();
 
         ConfirmDeleteDialog fragment = new ConfirmDeleteDialog();
         args.putString("movie_id",movie_id);
+        args.putString("type",searchType.name());
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,6 +42,7 @@ public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.movieId=getArguments().getString("movie_id");
+        this.mType=getArguments().getString("type");
     }
 
     @Override
@@ -59,7 +63,7 @@ public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
 
     @Override
     public void confirm(View v) {
-        mViewModel.removeMovieWrapper(this.movieId)
+        mViewModel.removeMovieWrapper(this.movieId,mType)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String movie_id) {
