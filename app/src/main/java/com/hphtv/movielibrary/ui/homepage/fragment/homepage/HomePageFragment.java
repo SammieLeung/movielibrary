@@ -383,6 +383,15 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     }
 
     @Override
+    public void remoteRemoveMovie(String movie_id, String type) {
+        if(mViewModel!=null){
+            prepareAll();
+            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_remove_movie_sync_tips));
+        }
+    }
+
+
+    @Override
     public void refreshGenreUI() {
         prepareMovieGenreTagData();
     }

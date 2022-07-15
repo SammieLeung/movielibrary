@@ -67,9 +67,9 @@ public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String movie_id) {
-                        BroadcastHelper.sendBroadcastMovieRemoveSync(getContext(),movie_id);
+//                        BroadcastHelper.sendBroadcastMovieRemoveSync(getContext(),movie_id);
                         if(mConfirmDeleteListener!=null)
-                            mConfirmDeleteListener.confirmDelete(movie_id);
+                            mConfirmDeleteListener.confirmDelete(movieId,mType);
                         dismiss();
                     }
                 });
@@ -87,7 +87,7 @@ public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
     }
 
     public interface ConfirmDeleteListener{
-        void confirmDelete(String movie_id);
+        void confirmDelete(String movie_id,String type);
         void onDismiss();
     }
 }

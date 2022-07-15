@@ -178,7 +178,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
     }
 
     @Override
-    public void OnMovieRemove(String movie_id, int pos) {
+    public void OnMovieRemove(String movie_id, String type, int pos) {
 
     }
 

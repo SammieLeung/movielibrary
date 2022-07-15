@@ -88,10 +88,10 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String genreName = getIntent().getStringExtra(EXTRA_GENRE);
-        String videoType=getIntent().getStringExtra(EXTRA_VIDEO_TYPE);
-        if(!TextUtils.isEmpty(videoType)){
-            mViewModel.setGenreAndVideoTag(genreName,videoType);
-        }else{
+        String videoType = getIntent().getStringExtra(EXTRA_VIDEO_TYPE);
+        if (!TextUtils.isEmpty(videoType)) {
+            mViewModel.setGenreAndVideoTag(genreName, videoType);
+        } else {
             mViewModel.setGenre(genreName);
             reloadMovieDataViews();
         }
@@ -205,15 +205,20 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
     @Override
     public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
-        mViewModel.getUpdatingFavorite(movie_id,type)
+        mViewModel.getUpdatingFavorite(movie_id, type)
                 .subscribe(new SimpleObserver<MovieDataView>() {
                     @Override
                     public void onAction(MovieDataView movieDataView) {
-                        if(mMovieItemListAdapter.getDatas().contains(movieDataView)){
+                        if (mMovieItemListAdapter.getDatas().contains(movieDataView)) {
                             mMovieItemListAdapter.updateStatus(movieDataView);
                         }
                     }
                 });
+    }
+
+    @Override
+    public void remoteRemoveMovie(String movie_id, String type) {
+        mMovieItemListAdapter.remove(movie_id,type);
     }
 
     @Override
@@ -230,8 +235,8 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
 
     @Override
-    public void OnMovieRemove(String movieId, int pos) {
-        mMovieItemListAdapter.remove(movieId, pos);
+    public void OnMovieRemove(String movieId, String type, int pos) {
+        mMovieItemListAdapter.remove(movieId, type, pos);
         mViewModel.checkEmpty(mViewModel.decreaseTotal());
         setResult(RESULT_OK);
     }

@@ -82,11 +82,11 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
         confirmDeleteDialog.setMessage(getString(R.string.remove_confirm));
         confirmDeleteDialog.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
             @Override
-            public void confirmDelete(String movie_id) {
+            public void confirmDelete(String movie_id,String type) {
                 PosterMenuDialog.this.dismiss();
                 if (getActivity() instanceof OnMovieChangeListener) {
                     OnMovieChangeListener listener = (OnMovieChangeListener) getActivity();
-                    listener.OnMovieRemove(movie_id, getArguments().getInt("position"));
+                    listener.OnMovieRemove(movie_id, type,getArguments().getInt("position"));
                 }
             }
 

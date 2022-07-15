@@ -18,6 +18,7 @@ public class Constants {
     public static final String ACTION_FILE_PICKER = "com.firefly.FILE_PICKER";
     public static final String ACTION_FAVORITE_MOVIE_CHANGE = "action.favorite.movie.change";
     public static final String ACTION_APP_UPDATE_MOVIE = "action.app.update.movie";
+    public static final String ACTION_APP_REMOVE_MOVIE = "action.app.remove.movie";
 
     public static final int ANIMATION_DURATION=200;
 

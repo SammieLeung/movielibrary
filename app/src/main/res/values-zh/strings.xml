@@ -152,7 +152,9 @@
   <string name="tab_local_search_movie">电影 (%d)</string>
   <string name="tab_local_search_tv">电视剧 (%d)</string>
 
-  <string name="remote_movie_sync_tips">数据已发生修改</string>
+  <string name="remote_movie_sync_tips">已完成数据刷新！</string>
+  <string name="remote_remove_movie_sync_tips">解除了海报和文件的关系！</string>
+
   <!--设置-->
   <string name="settings_childmode">儿童模式</string>
   <string name="settings_poster">影片海报</string>

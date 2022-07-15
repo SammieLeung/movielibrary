@@ -26,6 +26,7 @@ import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
@@ -34,6 +35,10 @@ import com.station.kit.util.RegexMatcher;
 
 import java.util.List;
 import java.util.regex.Matcher;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * Created by tchip on 18-5-15.
@@ -47,6 +52,7 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int MOVIE_TOTAL = 3;
     public static final int FAVORITE = 4;
     public static final int APP_UPDATE_MOVIE = 5;
+    public static final int APP_REMOVE_MOVIE=6;
 
     MovieDao mMovieDao;
     VideoFileDao mVideoFileDao;
@@ -68,6 +74,7 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(AUTHORITY, "count", MOVIE_TOTAL);
         matcher.addURI(AUTHORITY, "favorite", FAVORITE);
         matcher.addURI(AUTHORITY, "app_update_movie", APP_UPDATE_MOVIE);
+        matcher.addURI(AUTHORITY,"app_remove_movie",APP_REMOVE_MOVIE);
 
         return false;
     }
@@ -146,6 +153,25 @@ public class MovieLibraryProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+        int code = matcher.match(uri);
+        switch (code) {
+            case APP_REMOVE_MOVIE:
+                LogUtil.w("APP_REMOVE_MOVIE "+Thread.currentThread().getName());
+                if(selectionArgs!=null&&selectionArgs.length==2){
+                    String movie_id=selectionArgs[0];
+                    String type=selectionArgs[1];
+                    MovieDao movieDao= MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieDao();
+                    MovieVideofileCrossRefDao movieVideofileCrossRefDao= MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieVideofileCrossRefDao();
+                    List<Movie> movieList = movieDao.queryByMovieIdAndType(movie_id,type);
+                    for (Movie movie : movieList) {
+                        movieVideofileCrossRefDao.deleteById(movie.id);
+                    }
+                    movieDao.updateFavoriteStateByMovieId(movie_id,type,false);//电影的收藏状态在删除时要设置为false
+                    sendRemoveMovie(movie_id,type);
+                    return 1;
+                }
+                break;
+        }
         return 0;
     }
 
@@ -162,6 +188,7 @@ public class MovieLibraryProvider extends ContentProvider {
                     sendRefreshFavoriteBroadcast(movie_id,type,is_favorite);
                     return res;
                 }
+                break;
             case APP_UPDATE_MOVIE:
                 if (selectionArgs != null && selectionArgs.length > 0) {
                     String path = selectionArgs[0];
@@ -179,6 +206,8 @@ public class MovieLibraryProvider extends ContentProvider {
                     appUpdateMovie(path, movie_id, type, Constants.Scraper.TMDB_EN,timeStamp);
                     return 1;
                 }
+                break;
+
         }
         return -1;
     }
@@ -257,6 +286,15 @@ public class MovieLibraryProvider extends ContentProvider {
         intent.setAction(Constants.ACTION_APP_UPDATE_MOVIE);
         intent.putExtra("old", old_id);
         intent.putExtra("new", new_id);
+        LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
+    }
+
+    private void sendRemoveMovie(String movie_id,String type){
+        LogUtil.v(TAG, "Broadcast:" + Constants.ACTION_APP_REMOVE_MOVIE +" :"+ movie_id + " ->" + type);
+        Intent intent = new Intent();
+        intent.setAction(Constants.ACTION_APP_REMOVE_MOVIE);
+        intent.putExtra("movie_id", movie_id);
+        intent.putExtra("type", type);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 }

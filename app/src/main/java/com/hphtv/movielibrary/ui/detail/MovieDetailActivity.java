@@ -92,7 +92,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mViewModel.getMovieWrapper().movie.movieId,mViewModel.getMovieWrapper().movie.type);
                 confirmDialogFragment.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
                     @Override
-                    public void confirmDelete(String movie_id) {
+                    public void confirmDelete(String movie_id,String type) {
                         refreshParent();
                         stopLoading();
                         finish();
@@ -345,6 +345,14 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             prepareMovieWrapper(n_id, mViewModel.getSeason());
             ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
         }
+    }
+
+    @Override
+    public void remoteRemoveMovie(String movie_id, String type) {
+        refreshParent();
+        stopLoading();
+        finish();
+        ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_remove_movie_sync_tips));
     }
 
     /**

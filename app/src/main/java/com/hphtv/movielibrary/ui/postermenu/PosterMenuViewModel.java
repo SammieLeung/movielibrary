@@ -144,7 +144,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
             } else {
                 watchLimit = Constants.WatchLimit.ADULT;
                 if (childMode)
-                    listener.OnMovieRemove(mMovieDataView.movie_id, mItemPosition);
+                    listener.OnMovieRemove(mMovieDataView.movie_id,mMovieDataView.type.name(), mItemPosition);
             }
             mMovieDataView.ap = watchLimit;
             mMovieDao.updateAccessPermission(mMovieDataView.movie_id, mMovieDataView.ap);

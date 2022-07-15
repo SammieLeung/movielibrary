@@ -85,9 +85,22 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
         binding.setLike(movieDataView.is_favorite);
     }
 
-    public void remove(String movie_id, int pos) {
-        if (mList.get(pos).movie_id.equals(movie_id)) {
+    public void remove(String movie_id, String type, int pos) {
+        if (mList.get(pos).movie_id.equals(movie_id)
+                && type.equals(mList.get(pos).type.name())) {
             super.remove(mList.get(pos), pos);
+        }
+    }
+
+
+    public void remove(String movie_id, String type) {
+        for(int i=0;i<mList.size();i++){
+            MovieDataView dataView=mList.get(i);
+            if(dataView.movie_id.equals(movie_id)
+                    &&dataView.type.name().equals(type)){
+                mList.remove(i);
+                notifyItemRemoved(i);
+            }
         }
     }
 
@@ -105,20 +118,20 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
 
     /**
      * 适用于更改影片的收藏状态，可视状态之类
+     *
      * @param movieDataView
      */
     public void updateStatus(MovieDataView movieDataView) {
         for (int i = 0; i < mList.size(); i++) {
             if (mList.get(i) instanceof MovieDataView) {
                 if (mList.get(i).equals(movieDataView)) {
-                    mList.set(i,movieDataView);
+                    mList.set(i, movieDataView);
                     notifyItemChanged(i);
                     break;
                 }
             }
         }
     }
-
 
 
 }

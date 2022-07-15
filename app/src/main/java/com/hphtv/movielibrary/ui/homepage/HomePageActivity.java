@@ -258,6 +258,16 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
+    public void remoteRemoveMovieForFragment(int pos,String movie_id,String type){
+        if (pos < mNewHomePageTabAdapter.mList.size()) {
+            Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
+            if (fragment instanceof IRemoteRefresh) {
+                IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
+                activityResult.remoteRemoveMovie(movie_id,type);
+            }
+        }
+    }
+
 
     /**
      * 获取NoScrollAutofitHeightViewPager
@@ -408,7 +418,8 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     }
 
     @Override
-    public void OnMovieRemove(String movie_id, int pos) {
+    public void OnMovieRemove(String movie_id, String type, int pos) {
+
     }
 
     @Override
@@ -425,5 +436,11 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
         remoteUpdateFavoriteForFragment(pos, movie_id, type, isFavorite);
+    }
+
+    @Override
+    public void remoteRemoveMovie(String movie_id, String type) {
+        int pos = mBinding.tabLayout.getSelectedTabPosition();
+        remoteRemoveMovieForFragment(pos,movie_id,type);
     }
 }

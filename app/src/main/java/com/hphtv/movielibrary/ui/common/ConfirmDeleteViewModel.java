@@ -37,11 +37,11 @@ public class ConfirmDeleteViewModel extends BaseAndroidViewModel {
         return Observable.just("")
                 .subscribeOn(Schedulers.newThread())
                 .map(str -> {
-                    List<Movie> movieList = movieDao.queryByMovieId(movie_id);
+                    List<Movie> movieList = movieDao.queryByMovieIdAndType(movie_id,type);
                     for (Movie movie : movieList) {
                         movieVideofileCrossRefDao.deleteById(movie.id);
                     }
-                    movieDao.updateFavoriteStateByMovieId(false, movie_id);//电影的收藏状态在删除时要设置为false
+                    movieDao.updateFavoriteStateByMovieId(movie_id,type,false);//电影的收藏状态在删除时要设置为false
                     OnlineDBApiService.deleteMovie(movie_id,type, ScraperSourceTools.getSource());
                     return movie_id;
                 })

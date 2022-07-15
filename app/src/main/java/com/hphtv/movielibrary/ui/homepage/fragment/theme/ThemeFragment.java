@@ -187,6 +187,15 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         }
     }
 
+    @Override
+    public void remoteRemoveMovie(String movie_id, String type) {
+        super.remoteRemoveMovie(movie_id, type);
+        if(mViewModel!=null){
+            prepareAll();
+            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_remove_movie_sync_tips));
+        }
+    }
+
     private void initViews() {
         mBinding.btnQuickAddShortcut.setOnClickListener(getBaseActivity()::startShortcutManager);
         initRecentlyPlayedList();

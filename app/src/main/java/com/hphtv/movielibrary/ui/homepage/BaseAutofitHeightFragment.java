@@ -63,6 +63,11 @@ public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB
 
     }
 
+    @Override
+    public void remoteRemoveMovie(String movie_id,String type){
+
+    }
+
     public HomePageActivity getBaseActivity(){
         return (HomePageActivity) getActivity();
     }

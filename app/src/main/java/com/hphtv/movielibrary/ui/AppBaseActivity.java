@@ -1,4 +1,4 @@
- package com.hphtv.movielibrary.ui;
+package com.hphtv.movielibrary.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -25,18 +25,18 @@ import com.station.kit.view.mvvm.activity.BaseInflateActivity;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
- /**
+/**
  * @author lxp
  * @date 19-3-26
  */
-public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseInflateActivity<VM, VDB> implements IRemoteRefresh{
+public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseInflateActivity<VM, VDB> implements IRemoteRefresh {
 
-    private static Handler mHanlder=new Handler(Looper.getMainLooper());
+    private static Handler mHanlder = new Handler(Looper.getMainLooper());
     public final String TAG = this.getClass().getSimpleName();
     LoadingDialogFragment mLoadingDialogFragment;
     private ActivityResultLauncher mActivityResultLauncher;
 
-    private AtomicInteger mAtomicLoading=new AtomicInteger();
+    private AtomicInteger mAtomicLoading = new AtomicInteger();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,12 +68,13 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     @Override
     protected void onResume() {
         super.onResume();
-        mHanlder.postDelayed(() -> ServiceStatusHelper.resumeView(),100);
+        mHanlder.postDelayed(() -> ServiceStatusHelper.resumeView(), 100);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH);
         intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
         intentFilter.addAction(Constants.ACTION_APP_UPDATE_MOVIE);
+        intentFilter.addAction(Constants.ACTION_APP_REMOVE_MOVIE);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(mReceiver, intentFilter);
     }
@@ -83,8 +84,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     }
 
     public void startLoading() {
-        int i=mAtomicLoading.incrementAndGet();
-        LogUtil.v(TAG, "startLoading "+i);
+        int i = mAtomicLoading.incrementAndGet();
+        LogUtil.v(TAG, "startLoading " + i);
         if (mLoadingDialogFragment == null) {
             mLoadingDialogFragment = new LoadingDialogFragment();
             mLoadingDialogFragment.show(getSupportFragmentManager(), TAG);
@@ -92,7 +93,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     }
 
     public void stopLoading() {
-        if(mAtomicLoading.decrementAndGet()<=0) {
+        if (mAtomicLoading.decrementAndGet() <= 0) {
             if (mLoadingDialogFragment != null) {
                 LogUtil.v(TAG, "stopLoading");
                 mLoadingDialogFragment.dismiss();
@@ -102,7 +103,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         }
     }
 
-    public void forceStopLoading(){
+    public void forceStopLoading() {
         if (mLoadingDialogFragment != null) {
             LogUtil.v(TAG, "stopLoading");
             mLoadingDialogFragment.dismiss();
@@ -117,40 +118,54 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         stopLoading();
     }
 
-    BroadcastReceiver mReceiver=new BroadcastReceiver() {
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action=intent.getAction();
-            switch (action){
+            String action = intent.getAction();
+            switch (action) {
                 case Constants.ACTION.MOVIE_SCRAP_START:
                     break;
                 case Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH:
                     movieScrapeFinish();
                     break;
                 case Constants.ACTION_FAVORITE_MOVIE_CHANGE:
-                    String movie_id=intent.getStringExtra("movie_id");
-                    boolean isFavorite=intent.getBooleanExtra("is_favorite",false);
-                    String type=intent.getStringExtra("type");
-                    remoteUpdateFavorite(movie_id,type,isFavorite);
+                    remoteUpdateFavorite(
+                            intent.getStringExtra("movie_id"),
+                            intent.getStringExtra("type"),
+                            intent.getBooleanExtra("is_favorite", false));
                     break;
                 case Constants.ACTION_APP_UPDATE_MOVIE:
-                    long n_id=intent.getLongExtra("new",-1);
-                    long o_id=intent.getLongExtra("old",-1);
-                    remoteUpdateMovie(o_id,n_id);
+                    remoteUpdateMovie(
+                            intent.getLongExtra("new", -1),
+                            intent.getLongExtra("old", -1));
                     break;
+                case Constants.ACTION_APP_REMOVE_MOVIE:
+                    remoteRemoveMovie(
+                            intent.getStringExtra("movie_id"),
+                            intent.getStringExtra("type"));
+                    break;
+
             }
         }
     };
 
-    protected void movieScrapeFinish(){};
+    protected void movieScrapeFinish() {
+    }
 
-     @Override
-     public void remoteUpdateFavorite(String movie_id, String type,boolean isFavorite) {
+    ;
 
-     }
+    @Override
+    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
 
-     @Override
-     public void remoteUpdateMovie(long o_id, long n_id) {
+    }
 
-     }
- }
+    @Override
+    public void remoteUpdateMovie(long o_id, long n_id) {
+
+    }
+
+    @Override
+    public void remoteRemoveMovie(String movie_id, String type) {
+
+    }
+}

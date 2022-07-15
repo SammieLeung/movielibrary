@@ -11,6 +11,6 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 public interface OnMovieChangeListener {
     void OnRematchPoster(MovieDataView movieDataView, int pos);
     void OnMovieChange(MovieDataView movieDataView,int pos);
-    void OnMovieRemove( String movie_id,int pos);
+    void OnMovieRemove( String movie_id,String type,int pos);
     void OnMovieInsert(MovieDataView movieDataView,int pos);
 }

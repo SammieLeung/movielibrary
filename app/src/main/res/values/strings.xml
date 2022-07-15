@@ -155,6 +155,8 @@
     <string name="tab_local_search_tv">TV Series (%d)</string>
 
     <string name="remote_movie_sync_tips">The data has been modified</string>
+    <string name="remote_remove_movie_sync_tips">Removed the relationship between posters and files!</string>
+
 
     <!--设置-->
     <string name="settings_childmode">Child Mode</string>
