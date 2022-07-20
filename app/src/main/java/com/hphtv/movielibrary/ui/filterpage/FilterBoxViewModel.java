@@ -54,7 +54,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
     private String mPresetGenreName;
     private VideoTag mPresetVideoTag;
 
-    private ObservableInt mDevicePos = new ObservableInt(), mVideoTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt();
+    private ObservableInt mDevicePos = new ObservableInt(), mVideoTypePos = new ObservableInt(), mGenresPos = new ObservableInt(), mYearPos = new ObservableInt(), mFilterOrderPos = new ObservableInt(FilterPageViewModel.DEFAULT_ORDER);
     private ObservableBoolean mDesFlag = new ObservableBoolean();
 
     public FilterBoxViewModel(@NonNull @NotNull Application application) {
