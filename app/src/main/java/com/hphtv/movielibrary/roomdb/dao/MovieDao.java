@@ -229,7 +229,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+//            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
             " GROUP BY id " +
             " ORDER BY add_time DESC "
     )
@@ -237,7 +237,7 @@ public interface MovieDao {
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+//            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " GROUP BY id " +
             " ORDER BY add_time DESC)"
@@ -246,7 +246,7 @@ public interface MovieDao {
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+//            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND type=:type" +
             " GROUP BY id " +
@@ -256,7 +256,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+//            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " GROUP BY id " +
             " ORDER BY add_time DESC" +
@@ -266,7 +266,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
+//            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap))) " +
             " AND type=:type " +
             " GROUP BY id " +
