@@ -215,12 +215,12 @@ public interface MovieDao {
             "CASE WHEN :order =0 AND :isDesc=0 THEN pinyin END ASC," +
             "CASE WHEN :order =1 AND :isDesc=0 THEN ratings END ASC," +
             "CASE WHEN :order =2 AND :isDesc=0 THEN year END ASC," +
-            "CASE WHEN :order =3 AND :isDesc=0 THEN add_time END ASC," +
+            "CASE WHEN :order =3 AND :isDesc=0 THEN add_time END DESC," +
             "CASE WHEN :order =4 AND :isDesc=0 THEN last_playtime END ASC," +
             "CASE WHEN :order =0 AND :isDesc=1 THEN pinyin END DESC," +
             "CASE WHEN :order =1 AND :isDesc=1 THEN ratings END DESC," +
             "CASE WHEN :order =2 AND :isDesc=1 THEN year END DESC," +
-            "CASE WHEN :order =3 AND :isDesc=1 THEN add_time END DESC," +
+            "CASE WHEN :order =3 AND :isDesc=1 THEN add_time END ASC," +
             "CASE WHEN :order =4 AND :isDesc=1 THEN last_playtime END DESC," +
             "CASE WHEN :order =5 THEN is_favorite END ASC " +
             "LIMIT :offset,:limit "

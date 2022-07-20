@@ -43,6 +43,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     public static final int EP_NO_MOVIE = 1;
     public static final int EP_NO_RESULT = 2;
     public static final int LIMIT = 15;
+
+    public static final int DEFAULT_ORDER=3;
     private AtomicInteger mPage = new AtomicInteger();
     private MovieDao mMovieDao;
     private VideoTagDao mVideoTagDao;
@@ -51,7 +53,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     private int mTotalRow;
     private VideoTag mVideoTag;
     private String mGenre, mYear, mYear2;
-    private int mOrder = 0;
+    private int mOrder = DEFAULT_ORDER;
     private boolean isDesc = false;
 
     private OnRefresh mOnRefresh;
