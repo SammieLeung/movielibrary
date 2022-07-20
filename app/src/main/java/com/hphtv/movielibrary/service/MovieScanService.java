@@ -362,6 +362,8 @@ public class MovieScanService extends Service {
     private void getMovieDetail(String movie_id, VideoFile videoFile, Constants.WatchLimit limit,String source, String type){
         Movie movie = mMovieDao.queryByMovieIdAndType(movie_id, source, type);
         if(movie!=null){
+            movie.addTime=System.currentTimeMillis();
+            mMovieDao.update(movie);
             MovieHelper.establishRelationshipBetweenPosterAndVideos(getBaseContext(),movie.id,videoFile,source);
             MovieHelper.quickAutoClassification(getBaseContext(),movie_id,source);
             OnlineDBApiService.uploadMovie(movie,videoFile,source);
