@@ -7,7 +7,7 @@ package com.hphtv.movielibrary.scraper.postbody;
 public class PostDetailRequestBody {
     public String movie_id;
     public String type;
-//    public String source="api";
+    public String source="db";
 
     public PostDetailRequestBody(String movie_id) {
         this.movie_id = movie_id;
@@ -18,4 +18,9 @@ public class PostDetailRequestBody {
         this.type = type;
     }
 
+    public PostDetailRequestBody(String movie_id, String type, String source) {
+        this.movie_id = movie_id;
+        this.type = type;
+        this.source = source;
+    }
 }
