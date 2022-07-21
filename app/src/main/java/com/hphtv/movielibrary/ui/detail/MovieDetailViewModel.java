@@ -58,7 +58,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     private String mSource;
     private ObservableInt mLastPlayEpisodePos = new ObservableInt(-1);
     private ObservableField<String> mEpisodePlayBtnText = new ObservableField<>();
-    private VideoFile mLastPlayVideoFile;
+    private VideoFile mLastPlayEpisodeVideoFile;
 
     private int mSeason;
 
@@ -99,7 +99,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             return mMovieWrapper;
                         mTabLayoutPaginationMap.clear();
                         mEpisodeVideoFilesList.clear();
-                        mLastPlayVideoFile=null;
+                        mLastPlayEpisodeVideoFile =null;
                         ArrayList<VideoFile> tmpVideoFileList = new ArrayList<>();
                         tmpVideoFileList.addAll(mMovieWrapper.videoFiles);
 
@@ -115,19 +115,19 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 tmpList.add(videoFile);
                                 //获取上次播放的文件
                                 if (videoFile.lastPlayTime > 0) {
-                                    if (mLastPlayVideoFile == null) {
-                                        mLastPlayVideoFile = videoFile;
+                                    if (mLastPlayEpisodeVideoFile == null) {
+                                        mLastPlayEpisodeVideoFile = videoFile;
                                         lastPlayPos = i;
                                     }
-                                    if (videoFile.lastPlayTime > mLastPlayVideoFile.lastPlayTime) {
-                                        mLastPlayVideoFile = videoFile;
+                                    if (videoFile.lastPlayTime > mLastPlayEpisodeVideoFile.lastPlayTime) {
+                                        mLastPlayEpisodeVideoFile = videoFile;
                                         lastPlayPos = i;
                                     }
                                 }
                             }
-                            if (mLastPlayVideoFile != null) {
+                            if (mLastPlayEpisodeVideoFile != null) {
                                 mLastPlayEpisodePos.set(lastPlayPos);//episode从1开始，所以索引应该是episode-1;
-                                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayVideoFile.aired));
+                                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayEpisodeVideoFile.aired));
                             }
                         } else {
                             //按集数分配视频文件，如 720P Ep1--->  第一集
@@ -142,10 +142,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                     if (videoFile.season == mMovieWrapper.season.seasonNumber) {
                                         //获取上次播放的文件
                                         if (videoFile.lastPlayTime > 0) {
-                                            if (mLastPlayVideoFile == null)
-                                                mLastPlayVideoFile = videoFile;
-                                            if (videoFile.lastPlayTime > mLastPlayVideoFile.lastPlayTime) {
-                                                mLastPlayVideoFile = videoFile;
+                                            if (mLastPlayEpisodeVideoFile == null)
+                                                mLastPlayEpisodeVideoFile = videoFile;
+                                            if (videoFile.lastPlayTime > mLastPlayEpisodeVideoFile.lastPlayTime) {
+                                                mLastPlayEpisodeVideoFile = videoFile;
                                             }
                                         }
                                         //筛选出对应的文件
@@ -159,9 +159,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 }
                             }
                             //根据上次播放的文件标记他集数列表中的位置
-                            if (mLastPlayVideoFile != null) {
-                                mLastPlayEpisodePos.set(mLastPlayVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
-                                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayVideoFile.episode));
+                            if (mLastPlayEpisodeVideoFile != null) {
+                                mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
+                                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
                             }
                             //按分页划分视频文件合集
                             int episodeSize = mEpisodeVideoFilesList.size();
@@ -281,8 +281,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return mEpisodePlayBtnText;
     }
 
-    public VideoFile getLastPlayVideoFile() {
-        return mLastPlayVideoFile;
+    public VideoFile getLastPlayEpisodeVideoFile() {
+        return mLastPlayEpisodeVideoFile;
     }
 
     public void playingVideo(String path, String name) {
@@ -295,19 +295,19 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     }
 
     public void playingEpisodeVideo(VideoFile videoFile) {
-        mLastPlayVideoFile = videoFile;
+        mLastPlayEpisodeVideoFile = videoFile;
         if(mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)){
             for(int i=0;i<mEpisodeVideoFilesList.size();i++){
                 VideoFile tmp=mEpisodeVideoFilesList.get(i).get(0);
                 if(tmp.equals(videoFile)){
                     mLastPlayEpisodePos.set(i);//episode从1开始，所以索引应该是episode-1;
-                    mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayVideoFile.aired));
+                    mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayEpisodeVideoFile.aired));
                     break;
                 }
             }
         }else {
-            mLastPlayEpisodePos.set(mLastPlayVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
-            mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayVideoFile.episode));
+            mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
+            mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
         }
         String path = videoFile.path;
         String name = videoFile.filename;
