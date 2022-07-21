@@ -17,7 +17,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "FROM "+VIEW.UNRECOGNIZEDFILE_DATAVIEW+" AS u " +
                 "LEFT OUTER JOIN "+VIEW.MOVIE_DATAVIEW+" AS m " +
                 "ON u.path=m.file_uri " +
-                "LEFT OUTER JOIN "+ TABLE.STAGEPHOTO +" AS sp " +
+                "LEFT OUTER JOIN (SELECT * FROM "+TABLE.STAGEPHOTO+" WHERE movie_id IN (SELECT DISTINCT id FROM "+TABLE.MOVIE+") GROUP BY movie_id) AS sp " +
                 "ON sp.movie_id=m.id "+
                 "LEFT OUTER JOIN shortcut AS st " +
                 "ON st.uri=u.dir_uri "+

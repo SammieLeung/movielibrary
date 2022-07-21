@@ -154,7 +154,6 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
         prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
         prepareFavorite();
-        prepareRecommand();
     }
 
     /**
@@ -241,6 +240,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
                     @Override
                     public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
                         updateRecentlyPlayed(historyMovieDataViews);
+                        prepareRecommand();
                     }
                 });
     }
