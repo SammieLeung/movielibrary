@@ -47,7 +47,7 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
         binding.setRatings(dataView.ratings);
         if (dataView.episode != -1) {
             binding.setTag(mContext.getString(R.string.btn_play_episode, dataView.episode));
-        }else if (!TextUtils.isEmpty(dataView.aired)){
+        }else if (!TextUtils.isEmpty(dataView.aired)&&!"-1".equals(dataView.aired)){
             binding.setTag(mContext.getString(R.string.btn_play_episode_2, dataView.aired));
         }else{
             binding.setTag(null);

@@ -33,7 +33,6 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
 import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
-import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -73,10 +72,14 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 break;
             case R.id.btn_play_episode:
                 if (mViewModel.getMovieWrapper().season != null) {
-                    if (mViewModel.getLastPlayVideoFile() != null) {
-                        playingEpisodeVideo(mViewModel.getLastPlayVideoFile());
+                    if (mViewModel.getLastPlayEpisodeVideoFile() != null) {
+                        playingEpisodeVideo(mViewModel.getLastPlayEpisodeVideoFile());
                     } else {
-                        playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
+                        VideoFile videoFile = mViewModel.getFirstEnableEpisodeVideoFile();
+                        if (videoFile != null)
+                            playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
+                        else if(mViewModel.getMovieWrapper().videoFiles.size() > 1)
+                            showVideoSelectDialog();
                     }
                 } else {
                     if (mViewModel.getMovieWrapper().videoFiles.size() == 1) {
@@ -89,10 +92,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 }
                 break;
             case R.id.btn_remove:
-                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mViewModel.getMovieWrapper().movie.movieId,mViewModel.getMovieWrapper().movie.type);
+                ConfirmDeleteDialog confirmDialogFragment = ConfirmDeleteDialog.newInstance(mViewModel.getMovieWrapper().movie.movieId, mViewModel.getMovieWrapper().movie.type);
                 confirmDialogFragment.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
                     @Override
-                    public void confirmDelete(String movie_id,String type) {
+                    public void confirmDelete(String movie_id, String type) {
                         refreshParent();
                         stopLoading();
                         finish();
