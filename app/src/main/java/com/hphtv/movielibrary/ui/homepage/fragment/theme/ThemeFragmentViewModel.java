@@ -47,6 +47,7 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
     private MovieDao mMovieDao;
     private HomeFragmentViewModel.Callback mGenreCallback;
     private Constants.SearchType mSearchType;
+    private List<HistoryMovieDataView> mHistoryMovieDataViews=new ArrayList<>();
 
     public ThemeFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -69,6 +70,8 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
         return Observable.just("")
                 .map(s -> {
                     List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    mHistoryMovieDataViews.clear();
+                    mHistoryMovieDataViews.addAll(movieDataViewList);
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -160,12 +163,11 @@ public class ThemeFragmentViewModel extends BaseAndroidViewModel {
     public Observable<List<MovieDataView>> prepareRecommend() {
         return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
                     String source = ScraperSourceTools.getSource();
-                    List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source, mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
-                    if (history.size() > 0) {
+                    if (mHistoryMovieDataViews.size() > 0) {
                         List<String> genreList = new ArrayList<>();
                         List<Long> idList = new ArrayList<>();
-                        for (int i = 0; idList.size() < 3 && i < history.size(); i++) {
-                            MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
+                        for (int i = 0; idList.size() < 3 && i < mHistoryMovieDataViews.size(); i++) {
+                            MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(mHistoryMovieDataViews.get(i).path, source);
                             if (wrapper != null) {
                                 for (Genre genre : wrapper.genres) {
                                     if (genre.source.equals(source) && !genreList.contains(genre.name)) {

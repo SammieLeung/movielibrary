@@ -210,7 +210,6 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
         prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
         prepareFavorite();
-        prepareRecommend();
     }
 
     /**
@@ -297,6 +296,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
                     @Override
                     public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
                         updateRecentlyPlayed(historyMovieDataViews);
+                        prepareRecommend();
                     }
                 });
     }

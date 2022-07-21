@@ -46,6 +46,8 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
 
+    private List<HistoryMovieDataView> mHistoryMovieDataViews=new ArrayList<>();
+
     public HomeFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
 
@@ -68,6 +70,8 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
         return Observable.just("")
                 .map(s -> {
                     List<HistoryMovieDataView> movieDataViewList = mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    mHistoryMovieDataViews.clear();
+                    mHistoryMovieDataViews.addAll(movieDataViewList);
                     return movieDataViewList;
                 })
                 .subscribeOn(Schedulers.io())
@@ -155,12 +159,11 @@ public class HomeFragmentViewModel extends BaseAndroidViewModel {
     public Observable<List<MovieDataView>> prepareRecommend() {
         return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
                     String source = ScraperSourceTools.getSource();
-                    List<HistoryMovieDataView> history = mVideoFileDao.queryHistoryMovieDataView(source, Config.getSqlConditionOfChildMode(), 0, LIMIT);
-                    if (history.size() > 0) {
+                    if (mHistoryMovieDataViews.size() > 0) {
                         List<String> genreList = new ArrayList<>();
                         List<Long> idList = new ArrayList<>();
-                        for (int i = 0; idList.size() < 3 && i < history.size(); i++) {
-                            MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(history.get(i).path, source);
+                        for (int i = 0; idList.size() < 3 && i < mHistoryMovieDataViews.size(); i++) {
+                            MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(mHistoryMovieDataViews.get(i).path, source);
                             if (wrapper != null) {
                                 for (Genre genre : wrapper.genres) {
                                     if (genre.source.equals(source) && !genreList.contains(genre.name)) {
