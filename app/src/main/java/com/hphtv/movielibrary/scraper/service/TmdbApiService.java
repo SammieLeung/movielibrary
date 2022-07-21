@@ -98,5 +98,19 @@ public class TmdbApiService {
         return detailResponseObservable;
     }
 
+    public static Observable<MovieDetailRespone> getDetailFromApi(String movieId, String source, String type) {
+        StationMovieProtocol request;
+        switch (source) {
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofitTools.createENRequest();
+                break;
+            default:
+                request = RetrofitTools.createRequest();
+                break;
+        }
+        PostDetailRequestBody body = new PostDetailRequestBody(movieId,type,"api");
+        Observable<MovieDetailRespone> detailResponseObservable = request.createDetail(body);
+        return detailResponseObservable;
+    }
 
 }
