@@ -28,7 +28,7 @@ public class NewVideoFileItemListAdapter extends BaseScaleAdapter<PosterItemBind
         super.onBindViewHolder(holder, position);
         UnrecognizedFileDataView dataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
-        Glide.with(mContext).load(R.mipmap.default_poster)
+        Glide.with(mContext).load(R.drawable.default_poster)
                 .into(binding.rvPoster);
         binding.setTitle(dataView.keyword);
     }
