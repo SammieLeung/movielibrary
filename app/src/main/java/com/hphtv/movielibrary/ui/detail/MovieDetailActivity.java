@@ -259,7 +259,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                             } else if (!TextUtils.isEmpty(wrapper.movie.poster)) {
                                 GlideTools.GlideWrapperWithCrossFade(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
                             } else {
-                                Glide.with(getBaseContext()).load(R.mipmap.default_poster).into(mBinding.ivStagephoto);
+                                Glide.with(getBaseContext()).load(R.drawable.default_poster).into(mBinding.ivStagephoto);
                             }
 
                             mViewModel.loadTags().subscribe(new SimpleObserver<List<String>>() {

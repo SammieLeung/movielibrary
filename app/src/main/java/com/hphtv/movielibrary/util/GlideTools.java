@@ -40,7 +40,7 @@ public class GlideTools {
     public static RequestBuilder<Drawable> GlideWrapper(Context context, String path) {
         if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/")||path.lastIndexOf(".")==-1)||path.endsWith("/")) {
             return Glide.with(context)
-                    .load(R.mipmap.default_poster);
+                    .load(R.drawable.default_poster);
         } else {
             return Glide.with(context)
                     .load(path)
@@ -48,9 +48,26 @@ public class GlideTools {
 //                    .skipMemoryCache(true)
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
-                    .placeholder(R.mipmap.default_poster)
-                    .fallback(R.mipmap.default_poster)
-                    .error(R.mipmap.default_poster);
+                    .placeholder(R.drawable.default_poster)
+                    .fallback(R.drawable.default_poster)
+                    .error(R.drawable.default_poster);
+        }
+    }
+
+    public static RequestBuilder<Drawable> GlideWrapper(Context context, String path,int defaultResId) {
+        if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/")||path.lastIndexOf(".")==-1)||path.endsWith("/")) {
+            return Glide.with(context)
+                    .load(defaultResId);
+        } else {
+            return Glide.with(context)
+                    .load(path)
+//                    .load(buildGlideUrl(path))
+//                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                    .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
+                    .placeholder(defaultResId)
+                    .fallback(defaultResId)
+                    .error(defaultResId);
         }
     }
 
@@ -59,7 +76,7 @@ public class GlideTools {
         DrawableCrossFadeFactory fadeFactory=builder.setCrossFadeEnabled(false).build();
         if (TextUtils.isEmpty(path) || !(path.startsWith("http") || path.startsWith("/")||path.lastIndexOf(".")==-1)||path.endsWith("/")) {
             return Glide.with(context)
-                    .load(R.mipmap.default_poster);
+                    .load(R.drawable.default_poster_land);
         } else {
             return Glide.with(context)
                     .load(path)
@@ -68,9 +85,9 @@ public class GlideTools {
                     .transition(DrawableTransitionOptions.with(fadeFactory))
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .signature(new ObjectKey(Constants.GLIDE_CACHE_VERSION))
-                    .placeholder(R.mipmap.default_poster)
-                    .fallback(R.mipmap.default_poster)
-                    .error(R.mipmap.default_poster);
+                    .placeholder(R.drawable.default_poster_land)
+                    .fallback(R.drawable.default_poster_land)
+                    .error(R.drawable.default_poster_land);
         }
     }
 

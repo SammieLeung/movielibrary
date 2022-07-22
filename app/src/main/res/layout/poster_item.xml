@@ -41,15 +41,15 @@
         android:layout_height="wrap_content">
 
         <com.lqm.roundview.RoundImageView
-            android:id="@+id/rv_poster"
-            android:layout_width="@dimen/poster_item_1_w"
-            android:layout_height="@dimen/poster_item_1_h"
-            android:background="@drawable/poster_item_bg"
-            android:src="@mipmap/default_poster"
-            android:duplicateParentState="true"
-            app:border_color="@android:color/transparent"
-            app:border_width="@dimen/poster_border_width"
-            app:corner_radius="@dimen/poster_item_1_radius" />
+          android:id="@+id/rv_poster"
+          android:layout_width="@dimen/poster_item_1_w"
+          android:layout_height="@dimen/poster_item_1_h"
+          android:background="@drawable/poster_item_bg"
+          android:duplicateParentState="true"
+          android:src="@drawable/default_poster"
+          app:border_color="@android:color/transparent"
+          app:border_width="@dimen/poster_border_width"
+          app:corner_radius="@dimen/poster_item_1_radius" />
 
         <TextView
             android:id="@+id/tv_title"

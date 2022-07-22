@@ -59,7 +59,7 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
             title += " " + dataView.season_name;
         else if (dataView.season != -1)
             title += " " + mContext.getResources().getString(R.string.season_name_for_unknow, dataView.season);
-        GlideTools.GlideWrapper(mContext, !TextUtils.isEmpty(dataView.stage_photo) ? dataView.stage_photo : dataView.poster)
+        GlideTools.GlideWrapper(mContext, !TextUtils.isEmpty(dataView.stage_photo) ? dataView.stage_photo : dataView.poster,R.drawable.default_poster_land)
                 .into(binding.ivImg);
         binding.setTitle(title);
     }

@@ -45,7 +45,7 @@ public class UnknowFileItemListAdapter extends BaseScaleAdapter<PosterItemBindin
         super.onBindViewHolder(holder, position);
         UnrecognizedFileDataView dataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
-            Glide.with(mContext).load(R.mipmap.default_poster).into(binding.rvPoster);
+            Glide.with(mContext).load(R.drawable.default_poster).into(binding.rvPoster);
         binding.setTitle(dataView.filename);
     }
 //

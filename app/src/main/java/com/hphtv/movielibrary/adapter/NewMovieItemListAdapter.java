@@ -58,7 +58,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                         .into(binding.rvPoster);
             }
         else
-            Glide.with(mContext).load(R.mipmap.default_poster).into(binding.rvPoster);
+            Glide.with(mContext).load(R.drawable.default_poster).into(binding.rvPoster);
         String title = movieDataView.title;
         if (movieDataView.type.equals(Constants.SearchType.tv)) {
             if (!TextUtils.isEmpty(movieDataView.season_name))
