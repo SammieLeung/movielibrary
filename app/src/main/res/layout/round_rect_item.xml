@@ -1,37 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-        <variable
-            name="title"
-            type="String" />
-    </data>
+  <data>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-       >
-        <com.lqm.roundview.RoundImageView
-            android:id="@+id/iv_backgroud"
-            android:layout_centerInParent="true"
-            app:border_color="@android:color/transparent"
-            app:border_width="@dimen/poster_border_width"
-            android:duplicateParentState="true"
-            android:layout_width="@dimen/round_rect_item_w"
-            android:layout_height="@dimen/round_rect_item_h"
-            app:bindingBackground="@{title}"
-            />
-        <TextView
-            android:id="@+id/tv_title"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textSize="27sp"
-            android:layout_marginTop="33dp"
-            android:layout_marginStart="44dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@{title}"
-            />
-    </RelativeLayout>
+    <variable
+      name="title"
+      type="String" />
+  </data>
+
+  <RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.lqm.roundview.RoundImageView
+      android:id="@+id/iv_backgroud"
+      android:layout_width="@dimen/round_rect_item_w"
+      android:layout_height="@dimen/round_rect_item_h"
+      android:layout_centerInParent="true"
+      android:duplicateParentState="true"
+      app:bindingBackground="@{title}"
+      app:border_color="@android:color/transparent"
+      app:border_width="@dimen/poster_border_width" />
+
+    <TextView
+      android:id="@+id/tv_title"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_alignStart="@id/iv_backgroud"
+      android:layout_alignEnd="@id/iv_backgroud"
+      android:layout_marginStart="44dp"
+      android:layout_marginTop="33dp"
+      android:layout_marginEnd="44dp"
+      android:autoSizeMaxTextSize="27sp"
+      android:autoSizeTextType="uniform"
+      android:gravity="left"
+      android:maxLines="2"
+      android:text="@{title}"
+      android:textSize="27sp"
+      android:textStyle="bold" />
+  </RelativeLayout>
 </layout>
