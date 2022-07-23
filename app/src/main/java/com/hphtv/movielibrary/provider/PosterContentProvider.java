@@ -17,6 +17,7 @@ import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
 import com.hphtv.movielibrary.data.Constants;
 
@@ -50,6 +51,8 @@ public class PosterContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection, @Nullable String[] selectionArgs, @Nullable String sortOrder) {
         int code = matcher.match(uri);
         if (code == POSTER) {
+            Uri aliveUri=Uri.parse("content://com.android.alive.tvremote/keepAlive");
+            Cursor cursor=getContext().getContentResolver().query(aliveUri,null,null,null,null);
             return createPhotoCursor();
         }
         return null;
