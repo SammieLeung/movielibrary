@@ -22,7 +22,7 @@ import com.hphtv.movielibrary.ui.BaseFragment2;
 /**
  * author: Sam Leung
  * date:  2022/2/19
- * TODO
+ *
  */
 public class TvRecyclerView extends RecyclerView {
     private static final String TAG = "TvRecyclerView";

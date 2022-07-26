@@ -1,9 +1,16 @@
 package com.hphtv.movielibrary.ui.detail;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
+import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -14,11 +21,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.core.view.ViewCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.ripple.RippleUtils;
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.EpisodeItemListAdapter;
@@ -78,7 +89,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         VideoFile videoFile = mViewModel.getFirstEnableEpisodeVideoFile();
                         if (videoFile != null)
                             playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
-                        else if(mViewModel.getMovieWrapper().videoFiles.size() > 1)
+                        else if (mViewModel.getMovieWrapper().videoFiles.size() > 1)
                             showVideoSelectDialog();
                     }
                 } else {
@@ -239,7 +250,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                     tabLayout.removeAllTabs();
 
                                     for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
-                                        tabLayout.addTab(tabLayout.newTab().setText(name));
+                                        tabLayout.addTab(newTabView(tabLayout,name));//TODO
                                     }
                                     tabLayout.selectTab(tabLayout.getTabAt(0));
                                 }
@@ -468,5 +479,44 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void refreshParent() {
         setResult(RESULT_OK);
+    }
+
+    @SuppressLint("RestrictedApi")
+    private TabLayout.Tab newTabView(TabLayout parent, String name) {
+
+        TabLayout.Tab tab = parent.newTab().setText(name);
+        TabLayout.TabView tabView = tab.view;
+        ColorStateList tabRippleColorStateList = parent.getTabRippleColor();
+        boolean unboundedRipple=parent.hasUnboundedRipple();
+
+        Drawable background;
+        Drawable contentDrawable = new GradientDrawable();
+        ((GradientDrawable) contentDrawable).setColor(Color.TRANSPARENT);
+
+        if (tabRippleColorStateList != null) {
+            GradientDrawable maskDrawable = new GradientDrawable();
+            maskDrawable.setCornerRadius(10F);
+            maskDrawable.setColor(Color.WHITE);
+
+            ColorStateList rippleColor =
+                    RippleUtils.convertToRippleDrawableColor(tabRippleColorStateList);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                background =
+                        new RippleDrawable(
+                                rippleColor,
+                                unboundedRipple ? null : contentDrawable,
+                                unboundedRipple ? null : maskDrawable);
+            } else {
+                Drawable rippleDrawable = DrawableCompat.wrap(maskDrawable);
+                DrawableCompat.setTintList(rippleDrawable, rippleColor);
+                background = new LayerDrawable(new Drawable[]{contentDrawable, rippleDrawable});
+            }
+        } else {
+            background = contentDrawable;
+        }
+        ViewCompat.setBackground(tabView, background);
+        parent.invalidate();
+        return tab;
     }
 }
