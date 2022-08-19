@@ -1,8 +1,10 @@
 package com.hphtv.movielibrary.util;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 /**
@@ -80,6 +82,15 @@ public class VideoPlayTools {
 
 
     public static void play(Context context, String path, String name) {
+        if (Build.VERSION.SDK_INT == 32) { //适配Android 12
+            try {
+                playByComponentName(context, path, name);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         Intent intent = new Intent();
         intent.setAction("firefly.intent.action.PLAY_VIDEO");
         intent.putExtra("name", name);
@@ -93,6 +104,23 @@ public class VideoPlayTools {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    //适配Android 12, 解决播放界面关闭, 出现"一闪"的问题;
+    public static void playByComponentName(Context context, String path, String name) {
+        ComponentName component = new ComponentName("com.hph.videoplayer",
+                "com.hph.videoplayer.ui.VideoPlayerExternalActivity");
+
+        Intent intent = new Intent();
+        intent.putExtra("name", name);
+        intent.putExtra("play_url", path);
+        intent.setComponent(component);
+
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        context.startActivity(intent);
+        Log.v(TAG, "playByComponentName path=" + path);
     }
 
 
