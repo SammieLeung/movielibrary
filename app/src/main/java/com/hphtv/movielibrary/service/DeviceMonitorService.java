@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.service;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -24,9 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.firefly.videonameparser.MovieNameInfo;
-import com.firefly.videonameparser.VideoNameParser;
-import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.AuthHelper;
 import com.hphtv.movielibrary.data.Config;
@@ -98,6 +94,8 @@ public class DeviceMonitorService extends Service {
     private Object mStorageVolumeCallback;
     private StorageManager mStorageManager;
 
+    private boolean isScanDevice = false;
+
 
     private BroadcastReceiver mMediaMountReceiver = new BroadcastReceiver() {
         @Override
@@ -167,7 +165,14 @@ public class DeviceMonitorService extends Service {
                 case Constants.ACTION.RESCAN_ALL_FILES:
                     if (Config.isAutoSearch().get()) {
                         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
-                            startScanAllLocalUnScannedFiles();
+                            if (!isScanDevice) {
+                                new Thread(() -> {
+                                    AuthHelper.init();
+                                    scanDevices();
+                                }).start();
+                            }
+                            else
+                                startScanAllLocalUnScannedFiles();
                     }
                     break;
                 case Constants.ACTION.ADD_LOCAL_SHORTCUT:
@@ -201,12 +206,12 @@ public class DeviceMonitorService extends Service {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mMovieScanService = ((MovieScanService.ScanBinder) service).getService();
-            new Thread(() -> {
-                if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                new Thread(() -> {
                     AuthHelper.init();
-                    scanDevices();
-                }
-            }).start();
+                }).start();
+                scanDevices();
+            }
         }
 
         @Override
@@ -343,9 +348,9 @@ public class DeviceMonitorService extends Service {
      * 扫描本地所有挂载设备并扫描文件
      */
     public void scanDevices() {
+        isScanDevice = true;
         mDeviceInitExecutor.execute(new DeviceInitThread(this));
     }
-
 
     /**
      * 设备挂载处理线程
@@ -361,18 +366,18 @@ public class DeviceMonitorService extends Service {
 
     private void startScanLocalDevices(String devicePath) {
         Observable.create((ObservableOnSubscribe<Object[]>) emitter -> {
-            List<Shortcut> shortcutList = LocalFileScanHelper.scanDevice(getApplication(), devicePath);
-            if(shortcutList.size()==0)
-                emitter.onNext(new Object[0]);
-            for (Shortcut shortcut : shortcutList) {
-                List<VideoFile> videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut.uri);
-                Object[] data = new Object[2];
-                data[0] = shortcut;
-                data[1] = videoFileList;
-                emitter.onNext(data);
-            }
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.newThread())
+                    List<Shortcut> shortcutList = LocalFileScanHelper.scanDevice(getApplication(), devicePath);
+                    if (shortcutList.size() == 0)
+                        emitter.onNext(new Object[0]);
+                    for (Shortcut shortcut : shortcutList) {
+                        List<VideoFile> videoFileList = mVideoFileDao.queryUnScannedVideoFiles(shortcut.uri);
+                        Object[] data = new Object[2];
+                        data[0] = shortcut;
+                        data[1] = videoFileList;
+                        emitter.onNext(data);
+                    }
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.newThread())
                 .onErrorReturn(throwable -> {
                     throwable.printStackTrace();
                     LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
@@ -412,7 +417,6 @@ public class DeviceMonitorService extends Service {
                         super.onSubscribe(d);
                         LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_START));
                     }
-
 
 
                 });
@@ -615,6 +619,10 @@ public class DeviceMonitorService extends Service {
      */
     private List<VideoFile> getUnScannedLocalFiles() {
         return mVideoFileDao.queryAllLocalUnScannedVideoFiles();
+    }
+
+    private boolean isScanDevice() {
+        return isScanDevice;
     }
 
     public class MonitorBinder extends Binder {
