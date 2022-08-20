@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.NestedScrollView;
@@ -72,11 +71,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 break;
             case R.id.btn_play:
                 if (mViewModel.getMovieWrapper() != null) {
-                    if (mViewModel.getMovieWrapper().videoFiles.size() == 1) {
-                        String path = mViewModel.getMovieWrapper().videoFiles.get(0).path;
-                        String name = mViewModel.getMovieWrapper().videoFiles.get(0).filename;
+                    if (mViewModel.getVideoFileList().size() == 1) {
+                        String path = mViewModel.getVideoFileList().get(0).path;
+                        String name = mViewModel.getVideoFileList().get(0).filename;
                         playVideo(path, name);
-                    } else if (mViewModel.getMovieWrapper().videoFiles.size() > 1) {
+                    } else if (mViewModel.getVideoFileList().size() > 1) {
                         showVideoSelectDialog();
                     }
                 }
@@ -89,15 +88,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         VideoFile videoFile = mViewModel.getFirstEnableEpisodeVideoFile();
                         if (videoFile != null)
                             playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
-                        else if (mViewModel.getMovieWrapper().videoFiles.size() > 1)
+                        else if (mViewModel.getVideoFileList().size() > 1)
                             showVideoSelectDialog();
                     }
                 } else {
-                    if (mViewModel.getMovieWrapper().videoFiles.size() == 1) {
-                        String path = mViewModel.getMovieWrapper().videoFiles.get(0).path;
-                        String name = mViewModel.getMovieWrapper().videoFiles.get(0).filename;
+                    if (mViewModel.getVideoFileList().size() == 1) {
+                        String path = mViewModel.getVideoFileList().get(0).path;
+                        String name = mViewModel.getVideoFileList().get(0).filename;
                         playVideo(path, name);
-                    } else if (mViewModel.getMovieWrapper().videoFiles.size() > 1) {
+                    } else if (mViewModel.getVideoFileList().size() > 1) {
                         showVideoSelectDialog();
                     }
                 }
@@ -242,7 +241,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                 if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
                                     mEpisodeItemListAdapter.setVarietyShow(true);
                                     mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
-                                    mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeVideoFilesList());
+                                    mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeList());
                                 } else {
                                     mEpisodeItemListAdapter.setVarietyShow(false);
                                     mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
@@ -389,7 +388,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 编辑封面信息
      */
     private void editVideoInfo() {
-        String keyword = mViewModel.getMovieWrapper().videoFiles.get(0).keyword;
+        String keyword = mViewModel.getVideoFileList().get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             startLoading();
@@ -444,7 +443,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     public void showVideoSelectDialog() {
-        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mViewModel.getMovieWrapper().videoFiles);
+        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mViewModel.getVideoFileList());
         dialogFragment.setPlayingVideo((videoFile, position) -> {
             playVideo(videoFile.path, videoFile.filename);
         });

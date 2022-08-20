@@ -28,7 +28,6 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -53,7 +53,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     private ExecutorService mSingleThreadPool;
     private MovieWrapper mMovieWrapper;
     private List<MovieDataView> mRecommendList = new ArrayList<>();
-    private List<List<VideoFile>> mEpisodeVideoFilesList = new ArrayList<>();//总剧集列表
+    private List<VideoFile> mVideoFileList = new ArrayList<>();
+    private List<List<VideoFile>> mEpisodeList = new ArrayList<>();//总剧集列表
     private LinkedHashMap<String, List<List<VideoFile>>> mTabLayoutPaginationMap = new LinkedHashMap<>();//剧集列表分页
     private String mSource;
     private ObservableInt mLastPlayEpisodePos = new ObservableInt(-1);
@@ -87,6 +88,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .map(movie_id -> {
                     mMovieWrapper = mMovieDao.queryMovieWrapperById(movie_id, mSource);
                     mLastPlayEpisodePos.set(-1);
+                    mTabLayoutPaginationMap.clear();
+                    mEpisodeList.clear();
+                    mVideoFileList.clear();
+                    mLastPlayEpisodeVideoFile = null;
+                    //电视剧/综艺
                     if (Constants.SearchType.tv.equals(mMovieWrapper.movie.type)) {
                         for (Season _season : mMovieWrapper.seasons) {
                             int num = _season.seasonNumber;
@@ -95,24 +101,30 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 break;
                             }
                         }
-                        if(mMovieWrapper.season==null)
+                        //无法匹配到合适的season，则当电影处理！
+                        if (mMovieWrapper.season == null) {
                             return mMovieWrapper;
-                        mTabLayoutPaginationMap.clear();
-                        mEpisodeVideoFilesList.clear();
-                        mLastPlayEpisodeVideoFile =null;
-                        ArrayList<VideoFile> tmpVideoFileList = new ArrayList<>();
-                        tmpVideoFileList.addAll(mMovieWrapper.videoFiles);
+                        }
+
+                        ArrayList<VideoFile> filterVideoFileList = new ArrayList<>();
+                        filterVideoFileList.addAll(mMovieWrapper.videoFiles
+                                .stream()
+                                .filter(videoFile ->
+                                        videoFile.season == mMovieWrapper.season.seasonNumber)
+                                .collect(Collectors.toList()));
 
                         if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
-                            Collections.sort(tmpVideoFileList, Comparator.comparing(o -> o.aired));
+                            filterVideoFileList.sort(Comparator.comparing(o -> o.aired));
                             //按集数分配视频文件，如 720P Ep1--->  第一集
                             //                  1080p EP1-↑
                             int lastPlayPos = -1;
-                            for (int i = 0; i < tmpVideoFileList.size(); i++) {
-                                ArrayList<VideoFile> tmpList = new ArrayList<>();
-                                mEpisodeVideoFilesList.add(tmpList);
-                                VideoFile videoFile = tmpVideoFileList.get(i);
-                                tmpList.add(videoFile);
+
+                            for (int i = 0; i < filterVideoFileList.size(); i++) {
+                                ArrayList<VideoFile> episodeFiles = new ArrayList<>();
+                                mEpisodeList.add(episodeFiles);
+                                VideoFile videoFile = filterVideoFileList.get(i);
+                                mVideoFileList.add(videoFile);
+                                episodeFiles.add(videoFile);
                                 //获取上次播放的文件
                                 if (videoFile.lastPlayTime > 0) {
                                     if (mLastPlayEpisodeVideoFile == null) {
@@ -132,14 +144,13 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         } else {
                             //按集数分配视频文件，如 720P Ep1--->  第一集
                             //                  1080p EP1-↑
-                            for (int i = 0; i < mMovieWrapper.season.episodeCount + 1; i++) {
-                                Iterator<VideoFile> videoFileIterator = tmpVideoFileList.iterator();
-                                ArrayList<VideoFile> tmpList = new ArrayList<>();
-                                mEpisodeVideoFilesList.add(tmpList);
+                            for (int i = 0; i < mMovieWrapper.season.episodeCount ; i++) {
+                                Iterator<VideoFile> filterVideoFileIterator = filterVideoFileList.iterator();
+                                ArrayList<VideoFile> episodeFiles = new ArrayList<>();
+                                mEpisodeList.add(episodeFiles);
 
-                                while (videoFileIterator.hasNext()) {
-                                    VideoFile videoFile = videoFileIterator.next();
-                                    if (videoFile.season == mMovieWrapper.season.seasonNumber) {
+                                while (filterVideoFileIterator.hasNext()) {
+                                    VideoFile videoFile = filterVideoFileIterator.next();
                                         //获取上次播放的文件
                                         if (videoFile.lastPlayTime > 0) {
                                             if (mLastPlayEpisodeVideoFile == null)
@@ -149,13 +160,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                             }
                                         }
                                         //筛选出对应的文件
-                                        if (videoFile.episode == i) {
-                                            tmpList.add(videoFile);
-                                            videoFileIterator.remove();
+                                        if (videoFile.episode == i+1) {
+                                            episodeFiles.add(videoFile);
+                                            mVideoFileList.add(videoFile);
+                                            filterVideoFileIterator.remove();
                                         }
-                                    } else {
-                                        videoFileIterator.remove();
-                                    }
                                 }
                             }
                             //根据上次播放的文件标记他集数列表中的位置
@@ -164,7 +173,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
                             }
                             //按分页划分视频文件合集
-                            int episodeSize = mEpisodeVideoFilesList.size();
+                            int episodeSize = mEpisodeList.size();
                             if (episodeSize > 1) {
                                 int part = (episodeSize - 1) / 10;//index 0是不能识别的剧集，所以需要长度-1.
                                 int remaining = (episodeSize - 1) % 10;
@@ -182,7 +191,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                     String name = start + "-" + end;
                                     if (start == end)
                                         name = String.valueOf(start);
-                                    mTabLayoutPaginationMap.put(name, mEpisodeVideoFilesList.subList(start, end + 1));
+                                    mTabLayoutPaginationMap.put(name, mEpisodeList.subList(start, end + 1));
                                 }
                                 //TODO 暂时不处理更多剧集
 //                            if (mEpisodeVideoFilesList.get(0).size() > 0)
@@ -190,8 +199,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             }
                         }
 
+                    } else {
+                        mVideoFileList.addAll(mMovieWrapper.videoFiles);
                     }
-
                     return mMovieWrapper;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
@@ -296,16 +306,16 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     public void playingEpisodeVideo(VideoFile videoFile) {
         mLastPlayEpisodeVideoFile = videoFile;
-        if(mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)){
-            for(int i=0;i<mEpisodeVideoFilesList.size();i++){
-                VideoFile tmp=mEpisodeVideoFilesList.get(i).get(0);
-                if(tmp.equals(videoFile)){
+        if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
+            for (int i = 0; i < mEpisodeList.size(); i++) {
+                VideoFile tmp = mEpisodeList.get(i).get(0);
+                if (tmp.equals(videoFile)) {
                     mLastPlayEpisodePos.set(i);//episode从1开始，所以索引应该是episode-1;
                     mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayEpisodeVideoFile.aired));
                     break;
                 }
             }
-        }else {
+        } else {
             mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
             mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
         }
@@ -343,14 +353,17 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return Observable.just(mMovieWrapper)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(wrapper -> {
-                    List<VideoFile> list = wrapper.videoFiles;
                     StringBuffer sb = new StringBuffer();
-                    for (VideoFile videoFile : list) {
+                    for (VideoFile videoFile : mVideoFileList) {
                         sb.append(StringTools.hideSmbAuthInfo(videoFile.path) + "\n");
                     }
                     return sb.toString();
                 })
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public List<VideoFile> getVideoFileList() {
+        return mVideoFileList;
     }
 
     public MovieWrapper getMovieWrapper() {
@@ -361,8 +374,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return mRecommendList;
     }
 
-    public List<List<VideoFile>> getEpisodeVideoFilesList() {
-        return mEpisodeVideoFilesList;
+    public List<List<VideoFile>> getEpisodeList() {
+        return mEpisodeList;
     }
 
     /**
@@ -371,7 +384,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
      * @return
      */
     public VideoFile getFirstEnableEpisodeVideoFile() {
-        for (List<VideoFile> list : mEpisodeVideoFilesList) {
+        for (List<VideoFile> list : mEpisodeList) {
             if (list.size() > 0)
                 return list.get(0);
         }

@@ -89,7 +89,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             } else {
                 autoSearch();
             }
-
         }).start();
     }
 

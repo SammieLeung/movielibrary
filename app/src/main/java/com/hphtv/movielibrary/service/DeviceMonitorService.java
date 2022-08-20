@@ -170,8 +170,7 @@ public class DeviceMonitorService extends Service {
                                     AuthHelper.init();
                                     scanDevices();
                                 }).start();
-                            }
-                            else
+                            } else
                                 startScanAllLocalUnScannedFiles();
                     }
                     break;

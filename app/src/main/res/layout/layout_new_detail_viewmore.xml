@@ -75,14 +75,14 @@
                     android:text="@string/plot_s" />
 
                 <TextView
-                    android:id="@+id/label_file"
-                    style="@style/detial_viewmore_title_style"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/sv_plot"
-                    android:layout_marginLeft="62dp"
-                    android:layout_marginTop="36dp"
-                    android:text="@string/video_list" />
+                  android:id="@+id/label_file"
+                  style="@style/detial_viewmore_title_style"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@id/sv_plot"
+                  android:layout_marginLeft="62dp"
+                  android:layout_marginTop="36dp"
+                  android:text="@string/video_list" />
 
                 <TextView
                     android:id="@+id/tv_video_list"
