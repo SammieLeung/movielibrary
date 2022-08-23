@@ -2,6 +2,13 @@ package com.hphtv.movielibrary;
 
 import android.app.Application;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.text.TextUtils;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.archos.filecorelibrary.filecorelibrary.jcifs.JcifsUtils;
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -31,12 +38,40 @@ public class MovieApplication extends Application {
     public static final String TAG = MovieApplication.class.getSimpleName();
     private boolean isShowEncrypted = false;
     private static MovieApplication sMovieApplication;
+    private ConnectivityManager mConnectivityManager;
+
+    private ConnectivityManager.NetworkCallback mNetworkCallback = new ConnectivityManager.NetworkCallback() {
+        @Override
+        public void onAvailable(@NonNull Network network) {
+            super.onAvailable(network);
+            if (TextUtils.isEmpty(AuthHelper.sTokenCN)) {
+                AuthHelper.requestTokenCN();
+            }
+            if (TextUtils.isEmpty(AuthHelper.sTokenEN)) {
+                AuthHelper.requestTokenEN();
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
         super.onCreate();
         sMovieApplication = this;
         init();
+        registerNetworkCallback();
+    }
+
+    public void registerNetworkCallback() {
+        if (mConnectivityManager == null)
+            mConnectivityManager = getSystemService(ConnectivityManager.class);
+        mConnectivityManager.registerDefaultNetworkCallback(mNetworkCallback);
+    }
+
+    public void unregisterNetworkCallback() {
+        if (mConnectivityManager != null) {
+            mConnectivityManager.unregisterNetworkCallback(mNetworkCallback);
+            mConnectivityManager = null;
+        }
     }
 
     private void init() {
@@ -65,6 +100,7 @@ public class MovieApplication extends Application {
     public void onTerminate() {
         super.onTerminate();
         RxJavaGcManager.getInstance().clearDisposable();
+        unregisterNetworkCallback();
     }
 
 

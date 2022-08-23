@@ -43,7 +43,6 @@ public class RetrofitTools {
             default:
                 return RetrofitBuilder(BaseUrl.BASE_URL_CN,AuthHelper.sTokenCN).create(StationMovieProtocol.class);
         }
-
     }
 
     public static StationMovieProtocol createENRequest() {

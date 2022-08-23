@@ -1,7 +1,10 @@
 package com.hphtv.movielibrary.data;
 
+import android.text.TextUtils;
+
 import com.hphtv.movielibrary.util.retrofit.RetrofitTools;
 import com.station.device.TokenHelper;
+import com.station.kit.util.Tools;
 
 /**
  * author: Sam Leung
@@ -10,6 +13,7 @@ import com.station.device.TokenHelper;
 public class AuthHelper {
     public static String sTokenCN = "";
     public static String sTokenEN = "";
+
     public static synchronized boolean init() {
         switch (RetrofitTools.mode) {
             case RetrofitTools.PRE:
@@ -42,5 +46,57 @@ public class AuthHelper {
                 break;
         }
         return true;
+    }
+
+    public static void requestTokenCN() {
+        new Thread(() -> {
+            if (TextUtils.isEmpty(sTokenCN)) {
+                synchronized (sTokenCN) {
+                    if (TextUtils.isEmpty(sTokenCN)) {
+                        switch (RetrofitTools.mode) {
+                            case RetrofitTools.PRE:
+                                try {
+                                    sTokenCN = TokenHelper.getToken(TokenHelper.PRE_CN);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            case RetrofitTools.RELEASE:
+                                try {
+                                    sTokenCN = TokenHelper.getToken(TokenHelper.CN);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
+    public static void requestTokenEN() {
+        new Thread(() -> {
+            if (TextUtils.isEmpty(sTokenEN)) {
+                synchronized (sTokenEN) {
+                    switch (RetrofitTools.mode) {
+                        case RetrofitTools.PRE:
+                            try {
+                                sTokenEN = TokenHelper.getToken(TokenHelper.PRE_EN);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                        case RetrofitTools.RELEASE:
+                            try {
+                                sTokenEN = TokenHelper.getToken(TokenHelper.EN);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            break;
+                    }
+                }
+            }
+        }).start();
     }
 }
