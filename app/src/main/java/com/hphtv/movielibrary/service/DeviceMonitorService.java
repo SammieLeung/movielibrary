@@ -222,26 +222,13 @@ public class DeviceMonitorService extends Service {
 
     @Override
     public void onCreate() {
+        LogUtil.v(TAG, "onBind");
         super.onCreate();
+        bindRegisterReceivers();
+        bindServices();
         init();
     }
 
-    /**
-     * 绑定扫描服务
-     * 绑定监听器
-     *
-     * @param intent
-     * @param flags
-     * @param startId
-     * @return
-     */
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        LogUtil.v(TAG, "onStartCommand flags:" + flags + " startId:" + startId);
-        bindRegisterReceivers();
-        bindServices();
-        return super.onStartCommand(intent, flags, startId);
-    }
 
     @Nullable
     @Override
