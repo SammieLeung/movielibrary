@@ -86,7 +86,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
                 .doOnSubscribe(entity -> adapter.loading())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(Schedulers.io())
-                .map(responeEntity -> responeEntity.toEntity())
+                .map(responseEntity -> responseEntity.toEntity())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<Movie>>() {
                     @Override

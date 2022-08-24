@@ -1,21 +1,15 @@
-package com.hphtv.movielibrary.ui.common;
+package com.hphtv.movielibrary.ui.moviesearch.online;
 
 import android.content.Context;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.ViewCompat;
 import androidx.databinding.ObservableInt;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.CommonViewHolder;
 import com.hphtv.movielibrary.databinding.UnionsearchMovieFooterBinding;
 import com.hphtv.movielibrary.databinding.UnionsearchMovieItemBinding;
@@ -25,7 +19,6 @@ import com.hphtv.movielibrary.util.GlideTools;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -73,6 +66,7 @@ public class MovieSearchAdapter extends RecyclerView.Adapter<CommonViewHolder> i
             Movie movie = mMovieList.get(position);
             vh.mDataBinding.setMovie(movie);
             vh.mDataBinding.setPos(position);
+            vh.mDataBinding.getRoot().setTag(position);
             GlideTools.GlideWrapper(mContext, movie.poster)
                     .into(vh.mDataBinding.ivCover);
         }

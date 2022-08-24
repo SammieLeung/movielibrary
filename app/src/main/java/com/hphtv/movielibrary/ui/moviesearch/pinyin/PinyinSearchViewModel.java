@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.moviesearch;
+package com.hphtv.movielibrary.ui.moviesearch.pinyin;
 
 import android.app.Application;
 
