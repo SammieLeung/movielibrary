@@ -1,16 +1,14 @@
-package com.hphtv.movielibrary.ui.common;
+package com.hphtv.movielibrary.ui.moviesearch.online;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,6 +23,7 @@ import com.hphtv.movielibrary.databinding.FLayoutUnionsearchBinding;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
+import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
@@ -33,18 +32,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+import io.reactivex.rxjava3.disposables.Disposable;
+
 /**
  * author: Sam Leung
  * date:  2021/7/6
  */
-public class MovieSearchDialog extends DialogFragment {
+public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogViewModel, FLayoutUnionsearchBinding> {
     public static final String TAG = MovieSearchDialog.class.getSimpleName();
-    private FLayoutUnionsearchBinding mBinding;
-    private MovieSearchDialogViewModel mViewModel;
     private MovieSearchAdapter mAdapter;
     private ArrayAdapter<String> mSpinnerAdapter;
 
-    private TvRecyclerView.OnNoNextFocusListener mOnNoNextFocusListener=new TvRecyclerView.OnNoNextFocusListener() {
+    private TvRecyclerView.OnNoNextFocusListener mOnNoNextFocusListener = new TvRecyclerView.OnNoNextFocusListener() {
         @Override
         public boolean forceFocusLeft(View currentFocus) {
             return false;
@@ -75,21 +74,16 @@ public class MovieSearchDialog extends DialogFragment {
         return fragment;
     }
 
+    private MovieSearchDialog() {
+    }
+
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mViewModel = new ViewModelProvider(getActivity()).get(MovieSearchDialogViewModel.class);
         String keyword = getArguments().getString("keyword");
         mViewModel.setCurrentKeyword(keyword);
     }
 
-    @Nullable
-    @org.jetbrains.annotations.Nullable
-    @Override
-    public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        mBinding = FLayoutUnionsearchBinding.inflate(inflater, container, false);
-        return mBinding.getRoot();
-    }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -99,7 +93,7 @@ public class MovieSearchDialog extends DialogFragment {
 
     private void initView() {
         //recyclerview
-        mAdapter = new MovieSearchAdapter(getContext(),mViewModel.getSelectPos());
+        mAdapter = new MovieSearchAdapter(getContext(), mViewModel.getSelectPos());
         mAdapter.setOnItemClickListener(movie -> {
             if(getActivity() instanceof AppBaseActivity)
                 ((AppBaseActivity)getActivity()).startLoading();
@@ -134,7 +128,7 @@ public class MovieSearchDialog extends DialogFragment {
         });
         mBinding.recyclerviewSearchResult.setOnNoNextFocusListener(mOnNoNextFocusListener);
         mBinding.etBoxName.setOnEditorActionListener((v, actionId, event) -> {
-            if(actionId== EditorInfo.IME_ACTION_SEARCH){
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 reSearch();
                 return true;
             }
@@ -165,11 +159,10 @@ public class MovieSearchDialog extends DialogFragment {
         });
     }
 
+
     @Override
-    public void onStart() {
-        super.onStart();
-        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+    protected MovieSearchDialogViewModel createViewModel() {
+        return new ViewModelProvider(getActivity()).get(MovieSearchDialogViewModel.class);
     }
 
     @Override
@@ -178,7 +171,7 @@ public class MovieSearchDialog extends DialogFragment {
     }
 
 
-    private void reSearch(){
+    private void reSearch() {
         mAdapter.clearAll();
         String keyword = mBinding.etBoxName.getText().toString();
         mViewModel.refresh(keyword, mAdapter);

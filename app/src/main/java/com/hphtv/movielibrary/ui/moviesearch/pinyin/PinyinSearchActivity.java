@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.moviesearch;
+package com.hphtv.movielibrary.ui.moviesearch.pinyin;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * author: Sam Leung
  * date:  2021/8/19
  */
-public class PinyinSearchActivity extends AppBaseActivity<MovieSearchViewModel, ActivityLocalSearchBinding> {
+public class PinyinSearchActivity extends AppBaseActivity<PinyinSearchViewModel, ActivityLocalSearchBinding> {
     private NewMovieLargeItemListAdapter mMovieAdapter;
 
     private View.OnClickListener mOnClickListener = v -> {

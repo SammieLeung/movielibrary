@@ -14,7 +14,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.ILoadingState;
-import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
 import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;

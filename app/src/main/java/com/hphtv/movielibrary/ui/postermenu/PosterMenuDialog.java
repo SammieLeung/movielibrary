@@ -14,7 +14,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
-import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;

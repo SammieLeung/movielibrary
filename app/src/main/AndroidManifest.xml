@@ -67,7 +67,7 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.moviesearch.PinyinSearchActivity" />
+        <activity android:name=".ui.moviesearch.pinyin.PinyinSearchActivity" />
         <activity android:name=".ui.settings.SettingsActivity" />
 
         <meta-data

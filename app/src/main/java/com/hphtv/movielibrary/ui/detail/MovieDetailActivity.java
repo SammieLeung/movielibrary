@@ -41,7 +41,8 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
-import com.hphtv.movielibrary.ui.common.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.moviesearch.online.SeasonSelectDialog;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
@@ -55,6 +56,7 @@ import java.util.List;
 import java.util.Random;
 
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutTvDetailBinding> {
     public static final int REMOVE = 1;
@@ -67,7 +69,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public OnClickListener mClickListener = view -> {
         switch (view.getId()) {
             case R.id.btn_edit:
-                editVideoInfo();
+                showMovieSearchDialog();
                 break;
             case R.id.btn_play:
                 if (mViewModel.getMovieWrapper() != null) {
@@ -193,7 +195,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 int pos = tab.getPosition();
                 List<String> keySetList = new ArrayList<>(mViewModel.getTabLayoutPaginationMap().keySet());
                 String key = keySetList.get(pos);
-                mEpisodeItemListAdapter.setPart(pos);
+                mEpisodeItemListAdapter.setSelectTabPos(pos);
                 mEpisodeItemListAdapter.addAll(mViewModel.getTabLayoutPaginationMap().get(key));
             }
 
@@ -387,42 +389,70 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     /**
      * 编辑封面信息
      */
-    private void editVideoInfo() {
+    private void showMovieSearchDialog() {
         String keyword = mViewModel.getVideoFileList().get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            startLoading();
-            //选择新电影逻辑
-            mViewModel.selectMovie(wrapper)
-                    .subscribe(new SimpleObserver<MovieWrapper>() {
+            if (wrapper.movie != null
+                    && wrapper.movie.type.equals(Constants.SearchType.tv)
+                    && wrapper.seasons != null
+            ) {
+                stopLoading();
+                showSeasonDialog(wrapper, (wrapper1, season) -> {
+                    mViewModel.setMovie(wrapper1)
+                            .doOnNext(new Consumer<MovieWrapper>() {
+                                @Override
+                                public void accept(MovieWrapper movieWrapper) throws Throwable {
+                                    LogUtil.v(Thread.currentThread().getName() + " [accept]");
+                                }
+                            })
+                            .subscribe(new Consumer<MovieWrapper>() {
+                                @Override
+                                public void accept(MovieWrapper movieWrapper) throws Throwable {
+                                    LogUtil.v(Thread.currentThread().getName() + " [subscribe]");
 
-                        @Override
-                        public void onAction(MovieWrapper movieWrapper) {
-                            if (movieWrapper.movie != null) {
-                                prepareMovieWrapper(movieWrapper.movie.id, mViewModel.getSeason());
-                                refreshParent();
-                            } else {
-                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                                }
+                            });
+                });
+            } else {
+                //选择新电影逻辑
+                mViewModel.setMovie(wrapper)
+                        .subscribe(new SimpleObserver<MovieWrapper>() {
+
+                            @Override
+                            public void onAction(MovieWrapper movieWrapper) {
+                                if (movieWrapper.movie != null) {
+                                    prepareMovieWrapper(movieWrapper.movie.id, mViewModel.getSeason());
+                                    refreshParent();
+                                } else {
+                                    ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                                }
+                                stopLoading();
                             }
-                            stopLoading();
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            e.printStackTrace();
-                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
-                            stopLoading();
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                super.onError(e);
+                                e.printStackTrace();
+                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                                stopLoading();
+                            }
 
-                        @Override
-                        public void onComplete() {
-                            super.onComplete();
-                            stopLoading();
-                        }
-                    });
+                            @Override
+                            public void onComplete() {
+                                super.onComplete();
+                                stopLoading();
+                            }
+                        });
+            }
         });
         movieSearchFragment.show(getSupportFragmentManager(), "");
+    }
+
+    private void showSeasonDialog(MovieWrapper wrapper, SeasonSelectDialog.OnClickListener listener) {
+        SeasonSelectDialog seasonSelectDialog = SeasonSelectDialog.newInstance(wrapper);
+        seasonSelectDialog.setOnClickListener(listener);
+        seasonSelectDialog.show(getSupportFragmentManager(), "");
     }
 
 
@@ -486,7 +516,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         TabLayout.Tab tab = parent.newTab().setText(name);
         TabLayout.TabView tabView = tab.view;
         ColorStateList tabRippleColorStateList = parent.getTabRippleColor();
-        boolean unboundedRipple=parent.hasUnboundedRipple();
+        boolean unboundedRipple = parent.hasUnboundedRipple();
 
         Drawable background;
         Drawable contentDrawable = new GradientDrawable();

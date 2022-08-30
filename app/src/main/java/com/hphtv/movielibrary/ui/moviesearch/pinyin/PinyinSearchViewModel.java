@@ -25,7 +25,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2021/8/19
  */
-public class MovieSearchViewModel extends AndroidViewModel {
+public class PinyinSearchViewModel extends AndroidViewModel {
 
     private MovieDao mMovieDao;
 
@@ -35,7 +35,7 @@ public class MovieSearchViewModel extends AndroidViewModel {
     private ObservableBoolean isEmpty=new ObservableBoolean(true);
     private ObservableBoolean isShowTab=new ObservableBoolean(false);
 
-    public MovieSearchViewModel(@NonNull @NotNull Application application) {
+    public PinyinSearchViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase database = MovieLibraryRoomDatabase.getDatabase(application);
         mMovieDao = database.getMovieDao();

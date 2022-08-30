@@ -15,6 +15,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.RvItemEpisodeLayoutBinding;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,8 +24,9 @@ import java.util.List;
  */
 public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemListAdapter.ViewHolder> implements View.OnFocusChangeListener, View.OnClickListener, View.OnHoverListener {
     protected float mZoomRatio = 1.15f;
-    private List<List<VideoFile>> mList;
-    private int mPart = 0;
+    private List<List<VideoFile>> mEpisodeList;
+    private List<VideoFile> mOtherEpisodeList=new ArrayList<>();
+    private int mSelectTabPos = 0;
     private Context mContext;
     protected OnRecyclerViewItemActionListener mOnItemClickListener = null;
     protected ObservableInt mLastPlayEpisodePos;
@@ -32,15 +34,15 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
 
     public EpisodeItemListAdapter(Context context, List<List<VideoFile>> list) {
         mContext = context;
-        mList = list;
+        mEpisodeList = list;
     }
 
-    public void setPart(int part) {
-        mPart = part;
+    public void setSelectTabPos(int pos) {
+        mSelectTabPos = pos;
     }
 
-    public int getPart() {
-        return mPart;
+    public int getSelectTabPos() {
+        return mSelectTabPos;
     }
 
     @NonNull
@@ -57,16 +59,16 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
         RvItemEpisodeLayoutBinding binding = holder.mBinding;
         binding.getRoot().setTag(position);
         if(!isVarietyShow) {
-            binding.setText(String.valueOf(mPart * 10 + position + 1));
-            binding.setItemPos(mPart * 10 + position);
-            if (mList.get(position).size() == 0) {
+            binding.setText(String.valueOf(mSelectTabPos * 10 + position + 1));
+            binding.setItemPos(mSelectTabPos * 10 + position);
+            if (mEpisodeList.get(position).size() == 0) {
                 binding.getRoot().setEnabled(false);
             } else {
                 binding.getRoot().setEnabled(true);
             }
         }else{
-            if(mList.size()>0&&mList.get(position).size()>0) {
-                VideoFile videoFile = mList.get(position).get(0);
+            if(mEpisodeList.size()>0&& mEpisodeList.get(position).size()>0) {
+                VideoFile videoFile = mEpisodeList.get(position).get(0);
                 if (videoFile != null) {
                     binding.getRoot().setEnabled(true);
                     binding.setText(videoFile.aired);
@@ -79,12 +81,16 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mEpisodeList.size();
     }
 
     public void addAll(List<List<VideoFile>> dataList) {
-        mList.clear();
-        mList.addAll(dataList);
+        mEpisodeList.clear();
+        mEpisodeList.addAll(dataList);
+        notifyDataSetChanged();
+    }
+
+    public void addAllUnknowns(List<VideoFile> videoFiles){
         notifyDataSetChanged();
     }
 
@@ -108,9 +114,9 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
     public void onClick(View v) {
         if (mOnItemClickListener != null && v.getTag() != null) {
             int position = (int) v.getTag();
-            int realPosition=mPart*10+position;
+            int realPosition= mSelectTabPos *10+position;
             mLastPlayEpisodePos.set(realPosition);
-            List<VideoFile> data = mList.get(position);
+            List<VideoFile> data = mEpisodeList.get(position);
             //注意这里使用getTag方法获取数据
             mOnItemClickListener.onItemClick(v, realPosition, data);
         }
@@ -122,7 +128,7 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
             if (mOnItemClickListener != null) {
                 int pos = (int) v.getTag();
-                List<VideoFile> data = mList.get(pos);
+                List<VideoFile> data = mEpisodeList.get(pos);
                 mOnItemClickListener.onItemFocus(v, pos, data);
             }
         } else {
@@ -136,7 +142,7 @@ public class EpisodeItemListAdapter extends RecyclerView.Adapter<EpisodeItemList
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
             if (mOnItemClickListener != null) {
                 int pos = (int) v.getTag();
-                List<VideoFile> data = mList.get(pos);
+                List<VideoFile> data = mEpisodeList.get(pos);
                 mOnItemClickListener.onItemFocus(v, pos, data);
             }
         } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <variable
+      name="title"
+      type="String" />
+  </data>
+
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <RelativeLayout
+      android:layout_width="641dp"
+      android:layout_height="645dp"
+      android:background="@drawable/detail_poster_bg"
+      android:gravity="top">
+
+      <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp"
+        android:ellipsize="marquee"
+        android:lines="1"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxWidth="630dp"
+        android:maxLines="1"
+        android:text="@string/select_season_title"
+        android:textColor="#FFFFFF"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:textViewSelect="@{true}" />
+
+      <com.hphtv.movielibrary.ui.view.TvRecyclerView
+        android:id="@+id/rv_season_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tv_title"
+        android:layout_alignParentEnd="true"
+        android:layout_marginLeft="38dp"
+        android:layout_marginTop="38dp"
+        android:layout_marginRight="38dp"
+        android:layout_marginBottom="38dp" />
+
+      <ImageView
+        android:id="@+id/btn_close"
+        style="@style/close_btn_style" />
+    </RelativeLayout>
+  </RelativeLayout>
+</layout>

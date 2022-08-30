@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <import type="androidx.databinding.ObservableInt" />
+
+    <import type="android.text.TextUtils" />
+
+
+    <import type="com.hphtv.movielibrary.roomdb.entity.Season" />
+
+    <variable
+      name="title"
+      type="String" />
+    <variable
+      name="season"
+      type="Season" />
+
+    <variable
+      name="selectPos"
+      type="ObservableInt" />
+
+    <variable
+      name="pos"
+      type="int" />
+  </data>
+
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="22dp"
+    android:background="@drawable/detail_poster_searchitem_bg">
+
+    <com.lqm.roundview.RoundImageView
+      android:id="@+id/iv_cover"
+      android:layout_width="@dimen/unionsearch_movie_cover_w"
+      android:layout_height="@dimen/unionsearch_movie_cover_h"
+      android:layout_marginLeft="25dp"
+      android:layout_marginTop="20dp"
+      android:layout_marginRight="14dp"
+      android:layout_marginBottom="20dp"
+      android:scaleType="fitXY"
+      android:src="@drawable/default_poster"
+      app:border_color="@android:color/transparent"
+      app:corner_radius="8dp" />
+
+
+
+      <TextView
+        android:layout_toEndOf="@id/iv_cover"
+        android:gravity="center_vertical"
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/iv_cover"
+        android:layout_marginRight="23dp"
+        android:ellipsize="marquee"
+        android:maxWidth="480dp"
+        android:singleLine="true"
+        android:text="@{title}"
+        android:textColor="@color/white"
+        android:textSize="23sp"
+        android:textStyle="bold" />
+
+
+
+    <TextView
+      android:id="@+id/tips_releasedate"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/tv_title"
+      android:layout_marginTop="13dp"
+      android:layout_marginRight="6dp"
+      android:layout_toEndOf="@id/iv_cover"
+      android:text="@string/search_video_dialog_release_date"
+      android:textColor="#FFCFCFCF"
+      android:textSize="17sp" />
+
+    <TextView
+      android:id="@+id/tv_releasedate"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/tv_title"
+      android:layout_marginTop="13dp"
+      android:layout_toEndOf="@id/tips_releasedate"
+      android:text="@{!TextUtils.isEmpty(season.airDate) ? season.airDate:@string/unknown}"
+      android:textColor="#FFCFCFCF"
+      android:textSize="17sp" />
+
+    <TextView
+      android:id="@+id/tv_plot"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/tv_releasedate"
+      android:layout_alignBottom="@id/iv_cover"
+      android:layout_marginTop="13dp"
+      android:layout_marginRight="23dp"
+      android:layout_toEndOf="@id/iv_cover"
+      android:ellipsize="end"
+      android:text="@{!TextUtils.isEmpty(season.plot)?season.plot:@string/plot_s_empty}"
+      android:textColor="#FFAAAAAA"
+      android:textSize="17sp" />
+    />
+  </RelativeLayout>
+</layout>

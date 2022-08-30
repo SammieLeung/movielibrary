@@ -162,8 +162,6 @@ public class ShortcutOptionsViewModel extends BaseAndroidViewModel {
                     mShortcut.access = Constants.WatchLimit.ADULT;
                     break;
             }
-
-
             emitter.onNext(mShortcut);
             emitter.onComplete();
         })

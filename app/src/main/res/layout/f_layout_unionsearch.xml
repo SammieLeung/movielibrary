@@ -9,78 +9,84 @@
        >
 
         <RelativeLayout
-            android:background="@drawable/detail_poster_bg"
-            android:layout_width="841dp"
-            android:layout_height="645dp"
-            android:gravity="center|top"
-            android:orientation="vertical">
-            <TextView
-                android:layout_centerHorizontal="true"
-                android:id="@+id/tv_title"
-                android:text="@string/edit_title"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:layout_marginTop="38dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <RelativeLayout
-                android:layout_below="@id/tv_title"
-                android:layout_marginTop="38dp"
-                android:layout_marginLeft="38dp"
-                android:layout_marginRight="38dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/et_box_name"
-                    android:layout_width="552dp"
-                    android:layout_height="60dp"
+          android:layout_width="841dp"
+          android:layout_height="645dp"
+          android:background="@drawable/detail_poster_bg"
+          android:gravity="center|top"
+          >
 
-                    android:background="@drawable/new_edittext_bg"
-                    android:hint="@string/hint"
-                    android:paddingLeft="32dp"
-                    android:paddingRight="32dp"
-                    android:imeOptions="actionSearch"
-                    android:maxLength="100"
-                    android:singleLine="true"
-                    android:textColor="@color/white"
-                    android:textSize="23sp" />
+            <TextView
+              android:id="@+id/tv_title"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_centerHorizontal="true"
+              android:layout_marginTop="38dp"
+              android:text="@string/edit_title"
+              android:textColor="#FFFFFF"
+              android:textSize="26sp"
+              android:textStyle="bold" />
+
+            <RelativeLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_below="@id/tv_title"
+              android:layout_marginLeft="38dp"
+              android:layout_marginTop="38dp"
+              android:layout_marginRight="38dp">
+
+                <EditText
+                  android:id="@+id/et_box_name"
+                  android:layout_width="552dp"
+                  android:layout_height="60dp"
+
+                  android:background="@drawable/new_edittext_bg"
+                  android:hint="@string/hint"
+                  android:imeOptions="actionSearch"
+                  android:maxLength="100"
+                  android:paddingLeft="32dp"
+                  android:paddingRight="32dp"
+                  android:singleLine="true"
+                  android:textColor="@color/white"
+                  android:textSize="23sp" />
+
                 <Spinner
-                    style="@style/common_spiner"
-                    android:layout_toEndOf="@id/et_box_name"
-                    android:layout_marginLeft="15dp"
-                    android:id="@+id/spinner"
-                    android:layout_width="114dp"
-                    android:layout_height="60dp"
-                    android:gravity="center"
-                    android:dropDownWidth="114dp"
-                    android:dropDownSelector="@drawable/spinner_dropitem_selector"
-                    android:popupBackground="@drawable/new_edittext_bg"
-                    android:spinnerMode="dropdown"
-                    android:textAllCaps="false" />
+                  android:id="@+id/spinner"
+                  style="@style/common_spiner"
+                  android:layout_width="114dp"
+                  android:layout_height="60dp"
+                  android:layout_marginLeft="15dp"
+                  android:layout_toEndOf="@id/et_box_name"
+                  android:dropDownWidth="114dp"
+                  android:dropDownSelector="@drawable/spinner_dropitem_selector"
+                  android:gravity="center"
+                  android:popupBackground="@drawable/new_edittext_bg"
+                  android:spinnerMode="dropdown"
+                  android:textAllCaps="false" />
+
                 <ImageButton
-                    android:background="@drawable/new_common_spinner_bg"
-                    android:layout_toEndOf="@id/spinner"
-                    android:id="@+id/btn_search"
-                    android:layout_width="80dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/icon_circle_search_35"
-                    android:textAllCaps="false" />
+                  android:id="@+id/btn_search"
+                  android:layout_width="80dp"
+                  android:layout_height="60dp"
+                  android:layout_marginLeft="15dp"
+                  android:layout_toEndOf="@id/spinner"
+                  android:background="@drawable/new_common_spinner_bg"
+                  android:src="@drawable/icon_circle_search_35"
+                  android:textAllCaps="false" />
 
                 <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                    android:id="@+id/recyclerview_search_result"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@id/et_box_name"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginTop="21dp"
-                    android:layout_marginBottom="21dp" />
+                  android:id="@+id/recyclerview_search_result"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_below="@id/et_box_name"
+                  android:layout_alignParentEnd="true"
+                  android:layout_marginTop="21dp"
+                  android:layout_marginBottom="21dp" />
 
             </RelativeLayout>
+
             <ImageView
-                style="@style/close_btn_style"
-                android:id="@+id/btn_close"/>
+              android:id="@+id/btn_close"
+              style="@style/close_btn_style" />
         </RelativeLayout>
 
     </RelativeLayout>

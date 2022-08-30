@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.common;
+package com.hphtv.movielibrary.ui.moviesearch.online;
 
 import android.app.Application;
 import android.text.TextUtils;
