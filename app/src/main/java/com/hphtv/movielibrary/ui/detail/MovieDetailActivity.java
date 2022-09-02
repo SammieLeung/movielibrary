@@ -78,7 +78,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         String name = mViewModel.getVideoFileList().get(0).filename;
                         playVideo(path, name);
                     } else if (mViewModel.getVideoFileList().size() > 1) {
-                        showVideoSelectDialog();
+                        showVideoSelectDialog(mViewModel.getVideoFileList());
                     }
                 }
                 break;
@@ -91,7 +91,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         if (videoFile != null)
                             playingEpisodeVideo(mViewModel.getFirstEnableEpisodeVideoFile());
                         else if (mViewModel.getVideoFileList().size() > 1)
-                            showVideoSelectDialog();
+                            showVideoSelectDialog(mViewModel.getVideoFileList());
                     }
                 } else {
                     if (mViewModel.getVideoFileList().size() == 1) {
@@ -99,7 +99,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         String name = mViewModel.getVideoFileList().get(0).filename;
                         playVideo(path, name);
                     } else if (mViewModel.getVideoFileList().size() > 1) {
-                        showVideoSelectDialog();
+                        showVideoSelectDialog(mViewModel.getVideoFileList());
                     }
                 }
                 break;
@@ -168,7 +168,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.rvEpisodeList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(this, 72), DensityUtil.dip2px(this, 7), DensityUtil.dip2px(this, 23)));
         mEpisodeItemListAdapter.setOnItemClickListener(new EpisodeItemListAdapter.OnRecyclerViewItemActionListener() {
             @Override
-            public void onItemClick(View view, int position, List<VideoFile> data) {
+            public void onEpisodeClick(View view, int position, List<VideoFile> data) {
                 LogUtil.v("position " + position);
                 if (data.size() == 1) {
                     startLoading();
@@ -180,9 +180,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             }
 
             @Override
-            public void onItemFocus(View view, int position, List<VideoFile> data) {
-
+            public void onUnknownClick(List<VideoFile> unknownList) {
+                   showVideoSelectDialog(mViewModel.getUnknownEpisodeList());
             }
+
+
         });
         mBinding.nestScrollview.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
         LinearLayout linearLayout = (LinearLayout) mBinding.tabEpisodeSet.getChildAt(0);
@@ -193,10 +195,14 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int pos = tab.getPosition();
-                List<String> keySetList = new ArrayList<>(mViewModel.getTabLayoutPaginationMap().keySet());
-                String key = keySetList.get(pos);
                 mEpisodeItemListAdapter.setSelectTabPos(pos);
-                mEpisodeItemListAdapter.addAll(mViewModel.getTabLayoutPaginationMap().get(key));
+                if(pos<mViewModel.getTabLayoutPaginationMap().size()) {
+                    List<String> keySetList = new ArrayList<>(mViewModel.getTabLayoutPaginationMap().keySet());
+                    String key = keySetList.get(pos);
+                    mEpisodeItemListAdapter.addAll(mViewModel.getTabLayoutPaginationMap().get(key));
+                }else{
+                    mEpisodeItemListAdapter.addOthers(mViewModel.getUnknownEpisodeList());
+                }
             }
 
             @Override
@@ -251,7 +257,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                     tabLayout.removeAllTabs();
 
                                     for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
-                                        tabLayout.addTab(newTabView(tabLayout,name));//TODO
+                                        tabLayout.addTab(newTabView(tabLayout, name));//TODO
+                                    }
+
+                                    if (mViewModel.getUnknownEpisodeList().size() > 0) {
+                                        tabLayout.addTab(newTabView(tabLayout, getString(R.string.episode_pagination_others_title)));
                                     }
                                     tabLayout.selectTab(tabLayout.getTabAt(0));
                                 }
@@ -472,8 +482,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 });
     }
 
-    public void showVideoSelectDialog() {
-        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(mViewModel.getVideoFileList());
+    public void showVideoSelectDialog(List<VideoFile> videoFileList) {
+        VideoSelectDialog dialogFragment = VideoSelectDialog.newInstance(videoFileList);
         dialogFragment.setPlayingVideo((videoFile, position) -> {
             playVideo(videoFile.path, videoFile.filename);
         });

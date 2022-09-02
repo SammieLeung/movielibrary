@@ -55,7 +55,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     private List<MovieDataView> mRecommendList = new ArrayList<>();
     private List<VideoFile> mVideoFileList = new ArrayList<>();
     private List<List<VideoFile>> mEpisodeList = new ArrayList<>();//总剧集列表
-    private List<VideoFile> mUnknownEpisodeList=new ArrayList<>();//无法识别的剧集列表
+    private List<VideoFile> mUnknownEpisodeList = new ArrayList<>();//无法识别的剧集列表
     private LinkedHashMap<String, List<List<VideoFile>>> mTabLayoutPaginationMap = new LinkedHashMap<>();//剧集列表分页
     private String mSource;
     private ObservableInt mLastPlayEpisodePos = new ObservableInt(-1);
@@ -93,6 +93,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     mEpisodeList.clear();
                     mVideoFileList.clear();
                     mLastPlayEpisodeVideoFile = null;
+                    mUnknownEpisodeList.clear();
                     //电视剧/综艺
                     if (Constants.SearchType.tv.equals(mMovieWrapper.movie.type)) {
                         for (Season _season : mMovieWrapper.seasons) {
@@ -114,6 +115,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                         videoFile.season == mMovieWrapper.season.seasonNumber)
                                 .collect(Collectors.toList()));
                         mVideoFileList.addAll(filterVideoFileList);
+                        mUnknownEpisodeList.addAll(mMovieWrapper.videoFiles
+                                .stream()
+                                .filter(videoFile ->
+                                        videoFile.season == -1)
+                                .collect(Collectors.toList()));
                         if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
                             filterVideoFileList.sort(Comparator.comparing(o -> o.aired));
                             //按集数分配视频文件，如 720P Ep1--->  第一集
@@ -149,8 +155,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 mEpisodeList.add(episodeFiles);
                             }
 
-                            for(int i=0;i<filterVideoFileList.size();i++){
-                                VideoFile filterVideoFile=filterVideoFileList.get(i);
+                            for (int i = 0; i < filterVideoFileList.size(); i++) {
+                                VideoFile filterVideoFile = filterVideoFileList.get(i);
                                 if (filterVideoFile.lastPlayTime > 0) {
                                     if (mLastPlayEpisodeVideoFile == null)
                                         mLastPlayEpisodeVideoFile = filterVideoFile;
@@ -158,9 +164,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                         mLastPlayEpisodeVideoFile = filterVideoFile;
                                     }
                                 }
-                                if(filterVideoFile.episode>0){
-                                    mEpisodeList.get(filterVideoFile.episode-1).add(filterVideoFile);
-                                }else{
+                                if (filterVideoFile.episode > 0) {
+                                    mEpisodeList.get(filterVideoFile.episode - 1).add(filterVideoFile);
+                                } else {
                                     mUnknownEpisodeList.add(filterVideoFile);
                                 }
                             }
@@ -189,7 +195,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                     String name = (start + 1) + "-" + (end + 1);
                                     if (start == end)
                                         name = String.valueOf(start);
-                                    mTabLayoutPaginationMap.put(name, mEpisodeList.subList(start, end+1));
+                                    mTabLayoutPaginationMap.put(name, mEpisodeList.subList(start, end + 1));
                                 }
                                 //TODO 暂时不处理更多剧集
                             }
