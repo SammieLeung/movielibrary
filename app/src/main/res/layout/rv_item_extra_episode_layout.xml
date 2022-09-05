@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <data>
+
+    <variable
+      name="lastPlayEpisodePos"
+      type="androidx.databinding.ObservableInt" />
+
+    <variable
+      name="itemPos"
+      type="int" />
+
+    <variable
+      name="text"
+      type="String" />
+  </data>
+  <com.hphtv.movielibrary.ui.view.GifTextView
+    android:layout_width="314dp"
+    android:layout_height="71dp"
+    android:background="@drawable/episode_item_bg"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    app:gifTextViewSelected="@{lastPlayEpisodePos==itemPos}"
+    app:gifDrawHeight="17dp"
+    app:gifDrawPadding="14dp"
+    app:gifDrawStart="@drawable/ic_episode_watching"
+    app:gifDrawWidth="17dp"
+    app:gifPlaceHolder="@drawable/ic_episode_watching"
+    app:gifText="@{text}"
+    app:gifTextSize="20sp"
+    app:gifTextColor="@color/episode_item_textcolor">
+
+  </com.hphtv.movielibrary.ui.view.GifTextView>
+</layout>

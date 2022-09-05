@@ -7,6 +7,7 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Animatable;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -233,6 +234,8 @@ public class GifTextView extends LinearLayout {
                     break;
             }
         }
+        mTextView.setMaxLines(2);
+        mTextView.setEllipsize(TextUtils.TruncateAt.END);
 
     }
 

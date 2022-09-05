@@ -312,7 +312,7 @@ public class MovieHelper {
                 if (vtid > -1) {
                     typeTag.vtid = vtid;
                 } else {
-                    LogUtil.e("setVideoTag(sys): insert error " + typeTag.tag);//TODO
+                    LogUtil.e("setVideoTag(sys): insert error " + typeTag.tag);
                 }
             }
             if (typeTag != null) {

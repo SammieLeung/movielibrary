@@ -14,6 +14,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
@@ -141,6 +143,23 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         this.onNewIntent(getIntent());
     }
 
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent ev) {
+        startBottomMaskAnimate();
+        return super.dispatchGenericMotionEvent(ev);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        startBottomMaskAnimate();
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        startBottomMaskAnimate();
+        return super.dispatchTouchEvent(ev);
+    }
 
     public void initView() {
         mBinding.setExpand(false);
@@ -180,8 +199,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             }
 
             @Override
-            public void onUnknownClick(List<VideoFile> unknownList) {
-                   showVideoSelectDialog(mViewModel.getUnknownEpisodeList());
+            public void onUnknownClick(VideoFile videoFile) {
+                playingOtherEpisodeVideo(videoFile);
             }
 
 
@@ -196,11 +215,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             public void onTabSelected(TabLayout.Tab tab) {
                 int pos = tab.getPosition();
                 mEpisodeItemListAdapter.setSelectTabPos(pos);
-                if(pos<mViewModel.getTabLayoutPaginationMap().size()) {
+                if (pos < mViewModel.getTabLayoutPaginationMap().size()) {
                     List<String> keySetList = new ArrayList<>(mViewModel.getTabLayoutPaginationMap().keySet());
                     String key = keySetList.get(pos);
                     mEpisodeItemListAdapter.addAll(mViewModel.getTabLayoutPaginationMap().get(key));
-                }else{
+                } else {
                     mEpisodeItemListAdapter.addOthers(mViewModel.getUnknownEpisodeList());
                 }
             }
@@ -252,6 +271,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                     mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeList());
                                 } else {
                                     mEpisodeItemListAdapter.setVarietyShow(false);
+                                    mEpisodeItemListAdapter.setEpisodeCount(mViewModel.getEpisodeList().size());//设置总集数
                                     mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
                                     TabLayout tabLayout = mBinding.tabEpisodeSet;
                                     tabLayout.removeAllTabs();
@@ -260,9 +280,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                         tabLayout.addTab(newTabView(tabLayout, name));//TODO
                                     }
 
+                                    //如有未分类剧集，设置“其他” tabview
                                     if (mViewModel.getUnknownEpisodeList().size() > 0) {
                                         tabLayout.addTab(newTabView(tabLayout, getString(R.string.episode_pagination_others_title)));
                                     }
+                                    //TODO 计算剧集所在的tab位置
                                     tabLayout.selectTab(tabLayout.getTabAt(0));
                                 }
                             }
@@ -501,16 +523,29 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         dialog.show(getSupportFragmentManager(), "");
     }
 
+    /**
+     * 播放电影
+     * @param path
+     * @param name
+     */
     private void playVideo(String path, String name) {
         startLoading();
         mViewModel.playingVideo(path, name);
-//        refreshParent();
     }
 
+    /**
+     * 播放电视剧
+     * @param videoFile
+     */
     private void playingEpisodeVideo(VideoFile videoFile) {
         startLoading();
         mViewModel.playingEpisodeVideo(videoFile);
-//        refreshParent();
+    }
+
+    //播放其他剧集
+    private void playingOtherEpisodeVideo(VideoFile videoFile) {
+        startLoading();
+        mViewModel.playingOtherEpisodeVideo(videoFile);
     }
 
     /**

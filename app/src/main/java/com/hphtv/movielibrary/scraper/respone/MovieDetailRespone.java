@@ -36,7 +36,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
         private String duration;
         private ResponeGenres[] genres;
         private People[] directors;
-        private People[] writers;//TODO 添加 writers
+        private People[] writers;
         private ResponeActor[] actors;
         private String plot;
         private String language;

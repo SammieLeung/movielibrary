@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -95,6 +97,24 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
             mViewModel.setGenre(genreName);
             reloadMovieDataViews();
         }
+    }
+
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent ev) {
+        startBottomMaskAnimate();
+        return super.dispatchGenericMotionEvent(ev);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        startBottomMaskAnimate();
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        startBottomMaskAnimate();
+        return super.dispatchTouchEvent(ev);
     }
 
     private void initView() {
@@ -218,7 +238,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
 
     @Override
     public void remoteRemoveMovie(String movie_id, String type) {
-        mMovieItemListAdapter.remove(movie_id,type);
+        mMovieItemListAdapter.remove(movie_id, type);
     }
 
     @Override
@@ -248,4 +268,19 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         setResult(RESULT_OK);
     }
 
+    /**
+     * 蒙版隱藏動畫
+     */
+    private void startBottomMaskAnimate() {
+        mHandler.removeCallbacks(mBottomMaskFadeInTask);
+        if (mBinding.bottomMask.getAlpha() > 0) {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 0).setDuration(200);
+            objectAnimator.start();
+        }
+        mBottomMaskFadeInTask = () -> {
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(mBinding.bottomMask, "alpha", mBinding.bottomMask.getAlpha(), 1).setDuration(500);
+            objectAnimator.start();
+        };
+        mHandler.postDelayed(mBottomMaskFadeInTask, 800);
+    }
 }
