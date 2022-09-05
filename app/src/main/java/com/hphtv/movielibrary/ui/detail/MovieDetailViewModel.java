@@ -348,8 +348,20 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 }
             }
         } else {
-            mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
-            mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
+            if(mLastPlayEpisodeVideoFile.episode>0) {
+                mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
+                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
+            }else{
+                //当最后播放文件没有剧集信息则在未分类中寻找匹配
+                for(int i=0;i<mUnknownEpisodeList.size();i++){
+                    VideoFile tmp=mUnknownEpisodeList.get(i);
+                    if(tmp.equals(videoFile)){
+                        mLastPlayEpisodePos.set(mEpisodeList.size()+i);
+                        mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_resume));
+                        break;
+                    }
+                }
+            }
         }
         String path = videoFile.path;
         String name = videoFile.filename;
