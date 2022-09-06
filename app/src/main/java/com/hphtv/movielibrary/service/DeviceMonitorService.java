@@ -221,7 +221,7 @@ public class DeviceMonitorService extends Service {
 
     @Override
     public void onCreate() {
-        LogUtil.v(TAG, "onBind");
+        LogUtil.v(TAG, "onCreate");
         super.onCreate();
         bindRegisterReceivers();
         bindServices();
@@ -326,8 +326,9 @@ public class DeviceMonitorService extends Service {
             mStorageManager.unregisterStorageVolumeCallback((StorageManager.StorageVolumeCallback) mStorageVolumeCallback);
         } else {
             unregisterReceiver(mMediaMountReceiver);
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mDeviceMountReceiver);
         }
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mDeviceMountReceiver);
+
     }
 
     /**
