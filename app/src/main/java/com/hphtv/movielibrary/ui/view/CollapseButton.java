@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.R;
+import com.station.kit.util.LogUtil;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -24,6 +26,8 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
 
     public String mPresetText = null;
     public AtomicBoolean mAtomicMeasure = new AtomicBoolean(false);
+    private int mMinWidth = -1;
+    private int mMaxWidth = -1;
 
     public CollapseButton(Context context) {
         this(context, null);
@@ -53,13 +57,20 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
     }
 
     public void showPresetText() {
-        int measureWidth = getMeasuredWidth();
+        if(mMinWidth<0)
+            mMinWidth=getMeasuredWidth();
+        int measureWidth = mMinWidth;
+
         int drawPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_drawable_padding);
         int minPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_min_padding);
         int normalPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_padding);
         if (measureWidth > 0) {
             int textWidth = (int) this.getPaint().measureText(mPresetText);
             int targetWidth = measureWidth + textWidth + drawPadding - 2 * minPadding + 2 * normalPadding;
+            if (mMaxWidth < 0)
+                mMaxWidth = targetWidth;
+            Log.e(TAG, "hidePresetText: measureWidth=" + measureWidth + " targetWidth=" + targetWidth);
+
             ObjectAnimator objectAnimator = ObjectAnimator.ofInt(this, "wrapperWidth", measureWidth, targetWidth).setDuration(200);
             objectAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -86,7 +97,7 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
     }
 
     public void hidePresetText() {
-        int measureWidth = getMeasuredWidth();
+        int measureWidth = mMaxWidth < 0 ? getMeasuredWidth() : mMaxWidth;
         int drawPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_drawable_padding);
         int minPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_min_padding);
         int normalPadding = getResources().getDimensionPixelSize(R.dimen.common_circle_btn_padding);
@@ -95,6 +106,8 @@ public class CollapseButton extends androidx.appcompat.widget.AppCompatButton im
 
             int targetWidth = measureWidth - textWidth - drawPadding - 2 * normalPadding + 2 * minPadding;
             setWrapperWidth(measureWidth);
+
+            Log.e(TAG, "hidePresetText: measureWidth=" + measureWidth + " targetWidth=" + targetWidth);
             ObjectAnimator objectAnimator = ObjectAnimator.ofInt(this, "wrapperWidth", measureWidth, targetWidth).setDuration(200);
             objectAnimator.addListener(new AnimatorListenerAdapter() {
                 @Override
