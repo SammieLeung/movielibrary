@@ -14,7 +14,9 @@ import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
+import com.station.kit.util.ToastUtil;
 
 import java.io.File;
 import java.util.HashMap;
@@ -84,10 +86,17 @@ public class VideoPlayTools {
                 if (cursor != null && cursor.moveToFirst()) {
                     int _id = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media._ID));
                     uri = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, String.valueOf(_id));
+                } else {
+                    uri = FileProvider.getUriForFile(context, "com.hphtv.movielibrary.fileprovider", file);
                 }
             }
             intent.setDataAndType(uri, "video/*");// type:改成"video/*"表示获取视频的
-            context.startActivity(intent);
+            try {
+                context.startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+                ToastUtil.newInstance(context).toast(context.getString(R.string.toast_player_error, Config.getPlayerName()));
+            }
         }
     }
 
@@ -126,7 +135,7 @@ public class VideoPlayTools {
                 for (ResolveInfo ri : mResolveInfoList) {
                     String name = ri.loadLabel(pm).toString();
                     String packageName = ri.activityInfo.packageName;
-                    if (!packageName.equals("com.android.gallery3d")) {
+                    if (!packageName.equals("com.rockchips.mediacenter")) {
                         map.put(packageName, name);
                     }
                 }
