@@ -202,6 +202,8 @@
   <!--设置-偏好-->
   <string name="settings_preference_autosearch_title">自动扫描本地文件夹</string>
   <string name="settings_preference_default_searchmode">默认搜索模式</string>
+  <string name="settings_preference_default_player">默认播放器</string>
+  <string name="settings_preference_system_player">系统播放器</string>
 
   <!--设置-关于-->
   <string name="settings_about_source">海报来源</string>
@@ -247,4 +249,5 @@
   <string name="total_episodes">%1$d集</string>
 
   <string name="select_season_title">选择播出季</string>
+
 </resources>

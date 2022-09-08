@@ -10,6 +10,9 @@
             name="stateName"
             type="ObservableField" />
         <variable
+          name="playerName"
+          type="ObservableField" />
+        <variable
             name="nextFocus"
             type="com.hphtv.movielibrary.NextFocusModel" />
     </data>
@@ -30,15 +33,27 @@
             tools:ignore="IncludeLayoutParam" />
 
         <include
-            android:id="@+id/view_default_search_mode"
-            style="@style/setting_item_size"
-            layout="@layout/settings_options_item"
-            app:nextFocus="@{nextFocus}"
-            app:stateText="@{stateName}"
-            app:title="@{@string/settings_preference_default_searchmode}"
-            android:layout_below="@id/view_autosearch"
-            android:layout_marginLeft="75dp"
-            android:layout_marginTop="15dp"
-            tools:ignore="IncludeLayoutParam" />
+          android:id="@+id/view_default_search_mode"
+          style="@style/setting_item_size"
+          layout="@layout/settings_options_item"
+          android:layout_below="@id/view_autosearch"
+          android:layout_marginLeft="75dp"
+          android:layout_marginTop="15dp"
+          app:nextFocus="@{nextFocus}"
+          app:stateText="@{stateName}"
+          app:title="@{@string/settings_preference_default_searchmode}"
+          tools:ignore="IncludeLayoutParam" />
+
+        <include
+          android:id="@+id/view_defalut_player"
+          style="@style/setting_item_size"
+          layout="@layout/settings_options_item_2"
+          android:layout_below="@id/view_default_search_mode"
+          android:layout_marginLeft="75dp"
+          android:layout_marginTop="15dp"
+          app:nextFocus="@{nextFocus}"
+          app:stateText="@{playerName}"
+          app:title="@{@string/settings_preference_default_player}"
+          tools:ignore="IncludeLayoutParam" />
     </RelativeLayout>
 </layout>

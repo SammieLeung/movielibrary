@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <data>
+
+    <import type="androidx.databinding.ObservableInt" />
+
+    <import type="android.text.TextUtils" />
+
+    <variable
+      name="title"
+      type="String" />
+
+    <variable
+      name="pos"
+      type="int" />
+
+    <variable
+      name="checkPos"
+      type="ObservableInt" />
+  </data>
+
+    <RadioButton
+      android:background="@drawable/new_common_tab_bg"
+      android:id="@+id/radio_btn"
+      style="@style/common_content_text_style"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:button="@null"
+      android:drawableRight="@drawable/radiobutton_selector_26"
+      android:checked="@{pos==checkPos}"
+      android:drawableTint="@drawable/radiobutton_selector_26_tint"
+      android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
+      android:paddingRight="@dimen/postermenu_subitem_padding_lr"
+      android:text="@{title}"
+      android:textStyle="bold" />
+
+
+</layout>

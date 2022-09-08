@@ -208,6 +208,8 @@
     <!--设置-偏好-->
     <string name="settings_preference_autosearch_title">Auto Scan Local Folders</string>
     <string name="settings_preference_default_searchmode">Default search mode</string>
+    <string name="settings_preference_default_player">Default Player</string>
+    <string name="settings_preference_system_player">System VideoPlayer</string>
 
     <!--设置-关于-->
     <string name="settings_about_source">Poster Source</string>

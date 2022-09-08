@@ -11,6 +11,7 @@ import com.station.kit.util.SharePreferencesTools;
  * date:  2022/3/11
  */
 public class Config {
+    public static final String SYSTEM_PLAYER_PACKAGE="com.hph.videoplayer";
     public static final String CHILD_MODE="child_mode";
     public static final String CHILD_MODE_PSW="child_mode_psw";
     public static final String SHOW_TITLE="show_title";
@@ -18,6 +19,8 @@ public class Config {
     public static final String SHOW_CORNER_MARK="show_cornermark";
     public static final String SHOW_RATING="show_rating";
     public static final String SHOW_LIKE="show_like";
+    public static final String PLAYER_NAME ="player_name";
+    public static final String PLAYER_PACKAGE="player_package";
 
     public static final String AUTO_SEARCH="auto_search";
     public static final String DEFAULT_SEARCH_MODE="default_search_mode";
@@ -36,6 +39,8 @@ public class Config {
 
     private static ObservableBoolean sAutoSearch;
     private static String sDefaultSearchMode;
+    private static String sPlayerName;
+    private static String sPlayerPackage;
 
     static {
         SharePreferencesTools tools=SharePreferencesTools.getInstance(MovieApplication.getInstance());
@@ -51,6 +56,10 @@ public class Config {
 
         sAutoSearch=new ObservableBoolean(tools.readProperty(AUTO_SEARCH,true));
         sDefaultSearchMode =tools.readProperty(DEFAULT_SEARCH_MODE, Constants.SearchType.auto.name());
+
+        sPlayerName =tools.readProperty(PLAYER_NAME,"");
+        sPlayerPackage=tools.readProperty(PLAYER_PACKAGE,"com.hph.videoplayer");
+
     }
 
     /**
@@ -173,5 +182,23 @@ public class Config {
     public static void setDefaultSearchMode(Constants.SearchType type) {
         sDefaultSearchMode = type.name();
         SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(DEFAULT_SEARCH_MODE,type.name());
+    }
+
+    public static String getPlayerName() {
+        return sPlayerName;
+    }
+
+    public static void setPlayerName(String playerName) {
+        sPlayerName = playerName;
+        SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(PLAYER_NAME, playerName);
+    }
+
+    public static String getPlayerPackage() {
+        return sPlayerPackage;
+    }
+
+    public static void setPlayerPackage(String playerPackage) {
+        sPlayerPackage = playerPackage;
+        SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(PLAYER_PACKAGE, playerPackage);
     }
 }

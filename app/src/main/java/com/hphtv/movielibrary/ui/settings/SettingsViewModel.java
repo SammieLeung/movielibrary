@@ -1,8 +1,7 @@
 package com.hphtv.movielibrary.ui.settings;
 
 import android.app.Application;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -16,17 +15,25 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
-import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.VideoPlayTools;
 import com.station.kit.util.AppUtils;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * author: Sam Leung
  * date:  2022/3/14
  */
 public class SettingsViewModel extends BaseAndroidViewModel {
+    public static final String TAG = SettingsViewModel.class.getSimpleName();
+
     public static final int OK = 0;
     public static final int PSW_ERROR = 1;
     public static final int NEW_PSW_ERROR = 2;
@@ -37,12 +44,43 @@ public class SettingsViewModel extends BaseAndroidViewModel {
 
     private ObservableInt mSelectPos = new ObservableInt(-1);
     private ObservableBoolean mChildModeState = new ObservableBoolean(Config.isChildMode());
+    private ObservableInt mSelectPlayerPos = new ObservableInt(0);
 
     private ObservableBoolean mAutoSearchState = new ObservableBoolean(Config.isAutoSearch());
     private ObservableField<String> mDefaultSearchMode = new ObservableField<>();
+    private ObservableField<String> mPlayerName = new ObservableField<>();
+    private HashMap<String, String> mVideoPlayerMap;
+    private List<String> mPlayerNames = new ArrayList<>();
+    private List<String> mPlayerPackages = new ArrayList<>();
 
     public SettingsViewModel(@NonNull @NotNull Application application) {
         super(application);
+        mSelectPlayerPos.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                Config.setPlayerPackage(mPlayerPackages.get(mSelectPlayerPos.get()));
+                Config.setPlayerName(mPlayerNames.get(mSelectPlayerPos.get()));
+                readDefaultPlayer();
+            }
+        });
+
+
+        mVideoPlayerMap = VideoPlayTools.getVideoPlayers(application);
+        if (mVideoPlayerMap != null) {
+            mVideoPlayerMap.keySet().stream().sorted((o1, o2) -> {
+                if (o1.equals(Config.SYSTEM_PLAYER_PACKAGE))
+                    return -1;
+                return 0;
+            }).forEach(s -> {
+                String name = mVideoPlayerMap.get(s);
+                if (s.equals(Config.SYSTEM_PLAYER_PACKAGE)) {
+                    name = getString(R.string.settings_preference_system_player);
+                }
+                mPlayerPackages.add(s);
+                mPlayerNames.add(name);
+            });
+            readDefaultPlayer();
+        }
     }
 
     public ObservableBoolean getFlagRefresh() {
@@ -124,6 +162,10 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         return mDefaultSearchMode;
     }
 
+    public ObservableField<String> getPlayerName() {
+        return mPlayerName;
+    }
+
     public void toggleAutoSearchState(View v) {
         Config.setAutoSearch(!Config.isAutoSearch().get());
     }
@@ -138,13 +180,13 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         } else if (type == Constants.SearchType.tv) {
             Config.setDefaultSearchMode(Constants.SearchType.auto);
         }
-        getDeafutSearchModeString();
+        readDefaultSearchModeString();
     }
 
     /**
      * 刷新默认搜索模式的值
      */
-    public void getDeafutSearchModeString(){
+    public void readDefaultSearchModeString() {
         Constants.SearchType type = Constants.SearchType.valueOf(Config.getDefaultSearchMode());
         if (type == Constants.SearchType.auto) {
             mDefaultSearchMode.set(getString(R.string.shortcut_type_auto));
@@ -155,8 +197,37 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         }
     }
 
-    public String getVersionName(){
+    /**
+     * 重新读取默认播放器名称。
+     */
+    public void readDefaultPlayer() {
+        if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE)) {
+            mPlayerName.set(getApplication().getString(R.string.settings_preference_system_player));
+        } else {
+            mPlayerName.set(Config.getPlayerName());
+        }
+        if (mPlayerPackages.contains(Config.getPlayerPackage())) {
+            mSelectPlayerPos.set(mPlayerPackages.indexOf(Config.getPlayerPackage()));
+        }
+    }
+
+    public void setDefaultPlayer(int pos) {
+        mSelectPlayerPos.set(pos);
+    }
+
+    public ObservableInt getSelectPlayerPos() {
+        return mSelectPlayerPos;
+    }
+
+    public String getVersionName() {
         return AppUtils.getVersionName(getApplication());
     }
 
+    public List<String> getPlayerNames() {
+        return mPlayerNames;
+    }
+
+    public List<String> getPlayerPackages() {
+        return mPlayerPackages;
+    }
 }

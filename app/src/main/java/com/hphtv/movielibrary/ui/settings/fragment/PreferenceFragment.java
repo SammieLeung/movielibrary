@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.ui.settings.fragment;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.view.View;
 
@@ -11,9 +12,13 @@ import com.hphtv.movielibrary.NextFocusModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.FragmentSettingsPreferenceBinding;
 import com.hphtv.movielibrary.ui.BaseFragment2;
+import com.hphtv.movielibrary.ui.common.RadioGroupDViewModel;
+import com.hphtv.movielibrary.ui.common.RadioGroupDialog;
 import com.hphtv.movielibrary.ui.settings.SettingsViewModel;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * author: Sam Leung
@@ -39,8 +44,9 @@ public class PreferenceFragment extends BaseFragment2<SettingsViewModel, Fragmen
     }
 
     private void bindDatas() {
-        mViewModel.getDeafutSearchModeString();
+        mViewModel.readDefaultSearchModeString();
         mBinding.setStateName(mViewModel.getDefaultSearchMode());
+        mBinding.setPlayerName(mViewModel.getPlayerName());
         NextFocusModel model = new NextFocusModel();
         model.setNextFocusLeft(R.id.tab_preference);
         mBinding.setNextFocus(model);
@@ -50,6 +56,24 @@ public class PreferenceFragment extends BaseFragment2<SettingsViewModel, Fragmen
 
         mBinding.viewAutosearch.view.setOnClickListener(mViewModel::toggleAutoSearchState);
         mBinding.viewDefaultSearchMode.view.setOnClickListener(mViewModel::changeDefaultSearchState);
+        mBinding.viewDefalutPlayer.view.setOnClickListener(v -> {
+            SelectPlayerDialog dialog=new SelectPlayerDialog(mViewModel.getPlayerNames());
+            dialog.setCheckPos(mViewModel.getSelectPlayerPos());
+            dialog.show(getChildFragmentManager(),"");
+        });
+    }
+
+    public static class SelectPlayerViewModel extends RadioGroupDViewModel {
+        public SelectPlayerViewModel(@NonNull @NotNull Application application) {
+            super(application);
+        }
+    }
+
+    public static class SelectPlayerDialog extends RadioGroupDialog<SelectPlayerViewModel>{
+
+        public SelectPlayerDialog(List<String> datas) {
+            super(datas);
+        }
     }
 
 
