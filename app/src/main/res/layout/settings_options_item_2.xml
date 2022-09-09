@@ -11,6 +11,9 @@
             name="title"
             type="String" />
         <variable
+          name="hints"
+          type="String" />
+        <variable
             name="state"
             type="ObservableBoolean" />
         <variable
@@ -36,7 +39,20 @@
             style="@style/common_content_text_style"
             android:text="@{title}"
          />
-
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="23dp"
+          android:layout_marginRight="23dp"
+          android:layout_toStartOf="@id/text_2"
+          android:layout_toEndOf="@id/text_1"
+          android:autoSizeTextType="uniform"
+          android:autoSizeMaxTextSize="20sp"
+          android:gravity="right"
+          android:lines="1"
+          android:text="@{hints}"
+          android:textColor="#AAAAAA"
+          android:textSize="20sp" />
         <TextView
             android:layout_alignParentEnd="true"
             android:id="@+id/text_2"

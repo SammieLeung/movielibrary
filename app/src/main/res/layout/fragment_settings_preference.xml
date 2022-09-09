@@ -22,15 +22,15 @@
         android:layout_height="match_parent">
 
         <include
-            android:id="@+id/view_autosearch"
-            style="@style/setting_item_size"
-            layout="@layout/settings_switch_item"
-            android:layout_marginLeft="75dp"
-            android:layout_marginTop="170dp"
-            app:nextFocus="@{nextFocus}"
-            app:checkstate="@{Config.isAutoSearch()}"
-            app:title="@{@string/settings_preference_autosearch_title}"
-            tools:ignore="IncludeLayoutParam" />
+          android:id="@+id/view_autosearch"
+          style="@style/setting_item_size"
+          layout="@layout/settings_switch_item"
+          android:layout_marginLeft="75dp"
+          android:layout_marginTop="170dp"
+          app:checkstate="@{Config.isAutoSearch()}"
+          app:nextFocus="@{nextFocus}"
+          app:title="@{@string/settings_preference_autosearch_title}"
+          tools:ignore="IncludeLayoutParam" />
 
         <include
           android:id="@+id/view_default_search_mode"
@@ -51,6 +51,7 @@
           android:layout_below="@id/view_default_search_mode"
           android:layout_marginLeft="75dp"
           android:layout_marginTop="15dp"
+          app:hints="@{@string/settings_preference_only_for_local}"
           app:nextFocus="@{nextFocus}"
           app:stateText="@{playerName}"
           app:title="@{@string/settings_preference_default_player}"

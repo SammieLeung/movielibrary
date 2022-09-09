@@ -327,16 +327,12 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return mLastPlayEpisodeVideoFile;
     }
 
-    public void playingVideo(String path, String name) {
-        MovieHelper.playingMovie(path, name)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                    }
-                });
+    public Observable<String> playingVideo(String path, String name) {
+        return MovieHelper.playingMovie(path, name);
+
     }
 
-    public void playingEpisodeVideo(VideoFile videoFile) {
+    public Observable<String> playingEpisodeVideo(VideoFile videoFile) {
         mLastPlayEpisodeVideoFile = videoFile;
         if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
             for (int i = 0; i < mEpisodeList.size(); i++) {
@@ -365,12 +361,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         }
         String path = videoFile.path;
         String name = videoFile.filename;
-        MovieHelper.playingMovie(path, name)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                    }
-                });
+        return MovieHelper.playingMovie(path, name);
     }
 
     /**
@@ -378,7 +369,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
      *
      * @param videoFile
      */
-    public void playingOtherEpisodeVideo(VideoFile videoFile) {
+    public Observable<String> playingOtherEpisodeVideo(VideoFile videoFile) {
         mLastPlayEpisodeVideoFile = videoFile;
         for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
             VideoFile tmp = mUnknownEpisodeList.get(i);
@@ -390,12 +381,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         }
         String path = videoFile.path;
         String name = videoFile.filename;
-        MovieHelper.playingMovie(path, name)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                    }
-                });
+        return MovieHelper.playingMovie(path, name);
     }
 
 

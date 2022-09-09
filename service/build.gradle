@@ -6,8 +6,6 @@ android {
     defaultConfig {
         minSdkVersion android.minSdkVersion
         targetSdkVersion android.targetSdkVersion
-        versionCode 4
-        versionName "1.1.3"
     }
     buildTypes {
         release {

@@ -48,7 +48,8 @@ public class VideoPlayTools {
 
 
     public static void play(Context context, String path, String name) {
-        if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE)) {
+        File file = new File(path);
+        if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE) || !file.exists()) {
             if (Build.VERSION.SDK_INT == 32) { //适配Android 12
                 try {
                     playByComponentName(context, path, name);
@@ -78,11 +79,9 @@ public class VideoPlayTools {
             intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setPackage(Config.getPlayerPackage());
-            File file = new File(path);
-            Uri uri = Uri.parse(path);
-            if (file.exists()) {
-                uri = FileContentProvider.getUriForFile(file.getPath());
-            }
+
+            Uri uri = FileContentProvider.getUriForFile(file.getPath());
+
             intent.setDataAndType(uri, "video/*");// type:改成"video/*"表示获取视频的
             try {
                 context.startActivity(intent);

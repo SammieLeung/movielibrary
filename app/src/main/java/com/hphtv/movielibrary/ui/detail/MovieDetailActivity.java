@@ -525,27 +525,64 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
     /**
      * 播放电影
+     *
      * @param path
      * @param name
      */
     private void playVideo(String path, String name) {
         startLoading();
-        mViewModel.playingVideo(path, name);
+        mViewModel.playingVideo(path, name)
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        stopLoading();
+                    }
+                });
     }
 
     /**
      * 播放电视剧
+     *
      * @param videoFile
      */
     private void playingEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        mViewModel.playingEpisodeVideo(videoFile);
+        mViewModel.playingEpisodeVideo(videoFile)
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        stopLoading();
+                    }
+                });
+        ;
     }
 
     //播放其他剧集
     private void playingOtherEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        mViewModel.playingOtherEpisodeVideo(videoFile);
+        mViewModel.playingOtherEpisodeVideo(videoFile)
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onAction(String s) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        stopLoading();
+                    }
+                });
+
     }
 
     /**

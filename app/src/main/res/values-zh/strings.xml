@@ -207,6 +207,7 @@
   <string name="settings_preference_default_searchmode">默认搜索模式</string>
   <string name="settings_preference_default_player">默认播放器</string>
   <string name="settings_preference_system_player">系统播放器</string>
+  <string name="settings_preference_only_for_local">*仅支持本地视频</string>
 
   <!--设置-关于-->
   <string name="settings_about_source">海报来源</string>
