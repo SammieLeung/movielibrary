@@ -13,21 +13,29 @@
     <LinearLayout
       android:id="@+id/view_main_dialog"
       android:layout_width="@dimen/common_edittext_dialog_w"
+      android:layout_marginTop="120dp"
+      android:layout_marginBottom="120dp"
       android:layout_height="wrap_content"
       android:background="@drawable/new_common_dialog_bg"
       android:gravity="center"
       android:minHeight="301dp"
       android:orientation="vertical">
 
-      <RadioGroup
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="25dp"
+      <androidx.core.widget.NestedScrollView
         android:layout_marginLeft="29dp"
+        android:layout_marginTop="25dp"
         android:layout_marginRight="29dp"
-        android:id="@+id/radio_group"
+        android:layout_marginBottom="25dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="match_parent">
+
+        <RadioGroup
+          android:id="@+id/radio_group"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"/>
+      </androidx.core.widget.NestedScrollView>
+
+
     </LinearLayout>
   </RelativeLayout>
 </layout>

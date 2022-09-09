@@ -81,14 +81,7 @@ public class VideoPlayTools {
             File file = new File(path);
             Uri uri = Uri.parse(path);
             if (file.exists()) {
-                ContentResolver contentResolver = context.getContentResolver();
-                Cursor cursor = contentResolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, MediaStore.Video.Media.DATA + "=?", new String[]{path}, null);
-                if (cursor != null && cursor.moveToFirst()) {
-                    int _id = cursor.getInt(cursor.getColumnIndex(MediaStore.Video.Media._ID));
-                    uri = Uri.withAppendedPath(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, String.valueOf(_id));
-                } else {
-                    uri = FileProvider.getUriForFile(context, "com.hphtv.movielibrary.fileprovider", file);
-                }
+                uri = FileContentProvider.getUriForFile(file.getPath());
             }
             intent.setDataAndType(uri, "video/*");// type:改成"video/*"表示获取视频的
             try {
@@ -135,7 +128,9 @@ public class VideoPlayTools {
                 for (ResolveInfo ri : mResolveInfoList) {
                     String name = ri.loadLabel(pm).toString();
                     String packageName = ri.activityInfo.packageName;
-                    if (!packageName.equals("com.rockchips.mediacenter")) {
+                    if (!packageName.equals("org.xbmc.kodi")
+                            && !packageName.equals("com.rockchips.mediacenter")
+                            && !packageName.equals("com.android.gallery3d")) {
                         map.put(packageName, name);
                     }
                 }

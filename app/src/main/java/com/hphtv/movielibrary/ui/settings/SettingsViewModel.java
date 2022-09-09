@@ -73,9 +73,9 @@ public class SettingsViewModel extends BaseAndroidViewModel {
                 return 0;
             }).forEach(s -> {
                 String name = mVideoPlayerMap.get(s);
-                if (s.equals(Config.SYSTEM_PLAYER_PACKAGE)) {
-                    name = getString(R.string.settings_preference_system_player);
-                }
+//                if (s.equals(Config.SYSTEM_PLAYER_PACKAGE)) {
+//                    name = getString(R.string.settings_preference_system_player);
+//                }
                 mPlayerPackages.add(s);
                 mPlayerNames.add(name);
             });
@@ -201,11 +201,11 @@ public class SettingsViewModel extends BaseAndroidViewModel {
      * 重新读取默认播放器名称。
      */
     public void readDefaultPlayer() {
-        if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE)) {
-            mPlayerName.set(getApplication().getString(R.string.settings_preference_system_player));
-        } else {
-            mPlayerName.set(Config.getPlayerName());
-        }
+//        if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE)) {
+//            mPlayerName.set(getApplication().getString(R.string.settings_preference_system_player));
+//        } else {
+        mPlayerName.set(Config.getPlayerName());
+//        }
         if (mPlayerPackages.contains(Config.getPlayerPackage())) {
             mSelectPlayerPos.set(mPlayerPackages.indexOf(Config.getPlayerPackage()));
         }
