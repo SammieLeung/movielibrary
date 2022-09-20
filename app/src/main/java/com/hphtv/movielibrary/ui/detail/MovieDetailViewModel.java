@@ -171,7 +171,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                     }
                                 }
                                 if (filterVideoFile.episode > 0) {
-                                    mEpisodeList.get(filterVideoFile.episode - 1).add(filterVideoFile);
+                                    int maybePos = filterVideoFile.episode - 1;
+                                    if (maybePos < mEpisodeList.size())
+                                        mEpisodeList.get(maybePos).add(filterVideoFile);
+                                    else
+                                        mUnknownEpisodeList.add(filterVideoFile);
                                 } else {
                                     mUnknownEpisodeList.add(filterVideoFile);
                                 }
@@ -181,17 +185,17 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             int lastPlayUnknownEpisodePos = 0;
                             if (mUnknownEpisodeList.size() > 0) {
                                 mUnknownEpisodeList.sort(Comparator.comparing(o -> o.path));
-                                int episodeSize=mEpisodeList.size();
+                                int episodeSize = mEpisodeList.size();
                                 //查找播放记录
-                                for (int i=0;i<mUnknownEpisodeList.size();i++) {
-                                    VideoFile videoFile=mUnknownEpisodeList.get(i);
+                                for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
+                                    VideoFile videoFile = mUnknownEpisodeList.get(i);
                                     if (mLastPlayEpisodeVideoFile == null) {
                                         mLastPlayEpisodeVideoFile = videoFile;
-                                        lastPlayUnknownEpisodePos=episodeSize+i;
+                                        lastPlayUnknownEpisodePos = episodeSize + i;
                                     }
                                     if (videoFile.lastPlayTime > mLastPlayEpisodeVideoFile.lastPlayTime) {
                                         mLastPlayEpisodeVideoFile = videoFile;
-                                        lastPlayUnknownEpisodePos=episodeSize+i;
+                                        lastPlayUnknownEpisodePos = episodeSize + i;
                                     }
                                 }
                             }
@@ -344,15 +348,15 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 }
             }
         } else {
-            if(mLastPlayEpisodeVideoFile.episode>0) {
+            if (mLastPlayEpisodeVideoFile.episode > 0) {
                 mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
                 mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
-            }else{
+            } else {
                 //当最后播放文件没有剧集信息则在未分类中寻找匹配
-                for(int i=0;i<mUnknownEpisodeList.size();i++){
-                    VideoFile tmp=mUnknownEpisodeList.get(i);
-                    if(tmp.equals(videoFile)){
-                        mLastPlayEpisodePos.set(mEpisodeList.size()+i);
+                for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
+                    VideoFile tmp = mUnknownEpisodeList.get(i);
+                    if (tmp.equals(videoFile)) {
+                        mLastPlayEpisodePos.set(mEpisodeList.size() + i);
                         mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_resume));
                         break;
                     }
