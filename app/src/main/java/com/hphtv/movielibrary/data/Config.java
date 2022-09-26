@@ -57,7 +57,7 @@ public class Config {
         sAutoSearch=new ObservableBoolean(tools.readProperty(AUTO_SEARCH,true));
         sDefaultSearchMode =tools.readProperty(DEFAULT_SEARCH_MODE, Constants.SearchType.auto.name());
 
-        sPlayerName =tools.readProperty(PLAYER_NAME,"");
+        sPlayerName =tools.readProperty(PLAYER_NAME,"视频播放器");
         sPlayerPackage=tools.readProperty(PLAYER_PACKAGE,"com.hph.videoplayer");
 
     }
