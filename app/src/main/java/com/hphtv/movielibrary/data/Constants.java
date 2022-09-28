@@ -192,6 +192,7 @@ public class Constants {
         /**
          * 设备挂载/卸载广播
          */
+        String DEVICE_RE_INIT="action.devices.re.init";
         String DEVICE_INIT="action.devices.init";
         String DEVICE_MOUNTED = "action_mounted";
         String DEVICE_UNMOUNTED = "action_unmounted";

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.firefly.videonameparser.bean.Source;
@@ -19,6 +20,7 @@ import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.service.Thread.DeviceMountThread;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.station.kit.util.Base64Helper;
 import com.station.kit.util.LogUtil;
@@ -28,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -52,8 +55,8 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
         MovieLibraryRoomDatabase roomDatabase = MovieLibraryRoomDatabase.getDatabase(application);
         mDeviceDao = roomDatabase.getDeviceDao();
         mShortcutDao = roomDatabase.getShortcutDao();
-        mMovieVideofileCrossRefDao=roomDatabase.getMovieVideofileCrossRefDao();
-        mVideoFileDao=roomDatabase.getVideoFileDao();
+        mMovieVideofileCrossRefDao = roomDatabase.getMovieVideofileCrossRefDao();
+        mVideoFileDao = roomDatabase.getVideoFileDao();
     }
 
     /**
@@ -64,18 +67,17 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
                     mShortcutList = mShortcutDao.queryAllShortcuts();
-                    for(Shortcut shortcut:mShortcutList){
-                        int fileCount=mShortcutDao.queryTotalFiles(shortcut.uri);
-                        int matchedCount=mShortcutDao.queryMatchedFiles(shortcut.uri);
-                        shortcut.fileCount=fileCount;
-                        shortcut.posterCount=matchedCount;
+                    for (Shortcut shortcut : mShortcutList) {
+                        int fileCount = mShortcutDao.queryTotalFiles(shortcut.uri);
+                        int matchedCount = mShortcutDao.queryMatchedFiles(shortcut.uri);
+                        shortcut.fileCount = fileCount;
+                        shortcut.posterCount = matchedCount;
                         mShortcutDao.updateShortcut(shortcut);
                     }
                     return mShortcutList;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
 
     /**
      * 添加索引
@@ -89,14 +91,11 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                     String deviceTypeStr = uri.getPathSegments().get(0);//device Api str
                     String base64Id = queryUri.getPathSegments().get(1);//dir id
                     String path = Base64Helper.decode(base64Id);
-                    switch (deviceTypeStr) {
-                        case "local":
-                            break;
-                        case "dlna":
-                            break;
-                    }
                     if (deviceTypeStr.equals("local")) {
-                        for (Device device : mDeviceDao.qureyAll()) {
+                        //FIXME 异常：当设备没有添加成功时的处理？
+
+                        List<Device> deviceList = mDeviceDao.qureyAll();
+                        for (Device device : deviceList) {
                             if (path.contains(device.path)) {
                                 LogUtil.v("id " + device.id + " localpath:" + device.path);
                                 Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
@@ -109,6 +108,7 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                                 return shortcut;
                             }
                         }
+                        throw new DeviceNotFoundException();
                     } else if (deviceTypeStr.equals("dlna") || deviceTypeStr.equals("samba")) {
                         Shortcut shortcut = mShortcutDao.queryShortcutByUri(path);
                         if (shortcut == null) {
@@ -139,9 +139,9 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                 .subscribeOn(Schedulers.io())
                 .map(_shortcut -> {
                     mShortcutDao.delete(_shortcut);
-                    List<VideoFile> videoFileList=mVideoFileDao.queryVideoFilesOnShortcut(_shortcut.uri);
-                    List<String> paths=new ArrayList<>();
-                    for(VideoFile videoFile:videoFileList){
+                    List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesOnShortcut(_shortcut.uri);
+                    List<String> paths = new ArrayList<>();
+                    for (VideoFile videoFile : videoFileList) {
                         paths.add(videoFile.path);
                     }
                     mVideoFileDao.deleteVideoFilesOnShortcut(_shortcut.uri);
@@ -151,6 +151,9 @@ public class ShortcutManagerViewModel extends AndroidViewModel {
                     return _shortcut;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public class DeviceNotFoundException extends Exception {
     }
 
 }

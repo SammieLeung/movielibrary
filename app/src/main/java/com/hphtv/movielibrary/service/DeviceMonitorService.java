@@ -154,6 +154,9 @@ public class DeviceMonitorService extends Service {
                     break;
                 case Constants.ACTION.DEVICE_UNMOUNTED:
                     break;
+                case Constants.ACTION.DEVICE_RE_INIT:
+                    scanDevices();
+                    break;
                 case Constants.ACTION.DEVICE_INIT:
                     new Thread(() -> {
                         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -309,6 +312,7 @@ public class DeviceMonitorService extends Service {
         }
         IntentFilter localFilter = new IntentFilter();
         localFilter.addAction(Constants.ACTION.DEVICE_INIT);
+        localFilter.addAction(Constants.ACTION.DEVICE_RE_INIT);
         localFilter.addAction(Constants.ACTION.DEVICE_MOUNTED);
         localFilter.addAction(Constants.ACTION.DEVICE_UNMOUNTED);
         localFilter.addAction(Constants.ACTION.RESCAN_ALL_FILES);

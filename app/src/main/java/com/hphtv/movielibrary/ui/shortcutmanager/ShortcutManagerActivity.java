@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.FolderItemAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FLayoutFolderBinding;
@@ -31,6 +32,7 @@ import com.hphtv.movielibrary.ui.shortcutmanager.options.ShortcutOptionsViewMode
 import com.hphtv.movielibrary.ui.shortcutmanager.options.scan.ShortcutScanDialog;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.LogUtil;
+import com.station.kit.util.ToastUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -112,6 +114,17 @@ public class ShortcutManagerActivity extends AppBaseActivity<ShortcutManagerView
                         public void onAction(Shortcut shortcut) {
                             addShortcut(shortcut);
                             mBinding.setIsEmtpy(false);
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            if(e instanceof ShortcutManagerViewModel.DeviceNotFoundException) {
+                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.errtips_device_not_found));
+                                Intent intent = new Intent();
+                                intent.setAction(Constants.ACTION.DEVICE_RE_INIT);
+                                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
+                            }
                         }
                     });
             setResult(RESULT_OK);
