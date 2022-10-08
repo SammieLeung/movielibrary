@@ -81,6 +81,8 @@ public class VideoPlayTools {
             intent.setPackage(Config.getPlayerPackage());
 
             Uri uri = FileContentProvider.getUriForFile(file.getPath());
+            if (Config.getPlayerPackage().equals("com.dangbei.lerad.videoposter"))
+                uri = FileProvider.getUriForFile(context.getApplicationContext(), "com.hphtv.movielibrary.fileprovider2", file);
 
             intent.setDataAndType(uri, "video/*");// type:改成"video/*"表示获取视频的
             try {

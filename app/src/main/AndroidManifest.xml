@@ -103,6 +103,17 @@
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/filepaths" />
     </provider>
+    <provider
+      android:name="androidx.core.content.FileProvider"
+      android:authorities="com.hphtv.movielibrary.fileprovider2"
+      android:exported="false"
+      android:grantUriPermissions="true"
+      android:permission="android.permission.READ_EXTERNAL_STORAGE">
+      <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/filepaths" />
+    </provider>
+
   </application>
 
 </manifest>
