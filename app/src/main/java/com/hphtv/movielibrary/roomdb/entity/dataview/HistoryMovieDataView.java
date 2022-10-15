@@ -27,7 +27,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM " + TABLE.STAGEPHOTO + " ORDER BY movie_id,img_url DESC) GROUP BY movie_id) AS sp " +
                 "ON sp.movie_id=mv.id " +
                 "WHERE u.last_playtime>0 " +
-                "GROUP BY mv.movie_id " +
+                "GROUP BY mv.movie_id,mv.source " +
                 "ORDER BY u.last_playtime DESC",
         viewName = VIEW.HISTORY_MOVIE_DATAVIEW
 )

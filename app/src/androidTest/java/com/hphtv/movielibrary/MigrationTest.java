@@ -53,7 +53,8 @@ public class MigrationTest {
                 MIGRATION_7_8,
                 MIGRATION_8_9,
                 MIGRATION_9_10,
-                MIGRATION_10_11
+                MIGRATION_10_11,
+                MIGRATION_11_12
         };
         SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 1);
         db.execSQL("insert or ignore into " + TABLE.VIDEOFILE + " (vid,path,filename,episode,season) values (1,\"storage/emulate/0/\",\"测试数据\",\"01-08\",0)");
@@ -66,7 +67,7 @@ public class MigrationTest {
 
         // Re-open the database with version 2 and provide
         // MIGRATION_1_2 as the migration process.
-        db = helper.runMigrationsAndValidate(TEST_DB, 11, true, migrations);
+        db = helper.runMigrationsAndValidate(TEST_DB, 12, true, migrations);
 
         // MigrationTestHelper automatically verifies the schema changes,
         // but you need to validate that the data was migrated properly.
@@ -237,6 +238,14 @@ public class MigrationTest {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("DROP VIEW "+VIEW.HISTORY_MOVIE_DATAVIEW);
             database.execSQL("CREATE VIEW `"+VIEW.HISTORY_MOVIE_DATAVIEW+"` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode,u.aired,u.s_ap,mv.poster,mv.source,mv.title,mv.ratings,mv.ap,CASE WHEN s.season_number IS NOT NULL THEN s.season_number ELSE -1 END AS season,s.name AS season_name,s.poster AS season_poster,sp.img_url AS stage_photo FROM (SELECT * FROM unrecognizedfile_dataview WHERE last_playtime >0 ORDER BY last_playtime DESC) AS u JOIN (SELECT m.id,m.movie_id,m.title,m.ratings,m.source,m.type,m.poster,m.ap,mvcf.path FROM movie AS m JOIN movie_videofile_cross_ref AS mvcf ON mvcf.id = m.id ORDER BY m.movie_id) AS mv ON mv.path = u.path LEFT OUTER JOIN season AS s ON s.movie_id=mv.id AND u.season=s.season_number LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM stagephoto ORDER BY movie_id,img_url DESC) GROUP BY movie_id) AS sp ON sp.movie_id=mv.id WHERE u.last_playtime>0 GROUP BY mv.movie_id ORDER BY u.last_playtime DESC");
+        }
+    };
+
+    public Migration MIGRATION_11_12=new Migration(11,12) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP VIEW "+VIEW.HISTORY_MOVIE_DATAVIEW);
+            database.execSQL("CREATE VIEW `"+VIEW.HISTORY_MOVIE_DATAVIEW+"` AS SELECT u.filename,u.keyword,u.path,u.last_playtime,u.episode,u.aired,u.s_ap,mv.poster,mv.source,mv.title,mv.ratings,mv.ap,CASE WHEN s.season_number IS NOT NULL THEN s.season_number ELSE -1 END AS season,s.name AS season_name,s.poster AS season_poster,sp.img_url AS stage_photo FROM (SELECT * FROM unrecognizedfile_dataview WHERE last_playtime >0 ORDER BY last_playtime DESC) AS u JOIN (SELECT m.id,m.movie_id,m.title,m.ratings,m.source,m.type,m.poster,m.ap,mvcf.path FROM movie AS m JOIN movie_videofile_cross_ref AS mvcf ON mvcf.id = m.id ORDER BY m.movie_id) AS mv ON mv.path = u.path LEFT OUTER JOIN season AS s ON s.movie_id=mv.id AND u.season=s.season_number LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM stagephoto ORDER BY movie_id,img_url DESC) GROUP BY movie_id) AS sp ON sp.movie_id=mv.id WHERE u.last_playtime>0 GROUP BY mv.movie_id,mv.source ORDER BY u.last_playtime DESC");
         }
     };
 }
