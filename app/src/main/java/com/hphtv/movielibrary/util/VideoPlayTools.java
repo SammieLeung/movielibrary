@@ -53,25 +53,9 @@ public class VideoPlayTools {
     public static void play(Context context, String path, String name) {
         File file = new File(path);
         if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE) || !file.exists()) {
-            if (Build.VERSION.SDK_INT == 32) { //适配Android 12
-                try {
-                    playByComponentName(context, path, name);
-                    return;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Intent intent = new Intent();
-            intent.setAction("firefly.intent.action.PLAY_VIDEO");
-            intent.putExtra("name", name);
-            intent.putExtra("play_url", path);
-
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Log.v(TAG, "play path=" + path);
             try {
-                context.startActivity(intent);
+                playByComponentName(context, path, name);
+                return;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -84,7 +68,7 @@ public class VideoPlayTools {
             intent.setPackage(Config.getPlayerPackage());
 
             Uri uri = FileContentProvider.getUriForFile(file.getPath());
-            Log.d(TAG, "player "+Config.getPlayerPackage());
+            Log.d(TAG, "player " + Config.getPlayerPackage());
             if (Config.getPlayerPackage().equals(DANGBEI_PKG))
                 uri = FileProvider.getUriForFile(context.getApplicationContext(), "com.hphtv.movielibrary.fileprovider2", file);
 
@@ -104,6 +88,7 @@ public class VideoPlayTools {
                 "com.hph.videoplayer.ui.VideoPlayerExternalActivity");
 
         Intent intent = new Intent();
+        intent.setAction("firefly.intent.action.PLAY_VIDEO");
         intent.putExtra("name", name);
         intent.putExtra("play_url", path);
         intent.setComponent(component);
