@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.util;
+package com.hphtv.movielibrary.provider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -12,6 +12,7 @@ import android.webkit.MimeTypeMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hphtv.movielibrary.util.MimeTypes;
 import com.station.kit.util.FileUtils;
 
 

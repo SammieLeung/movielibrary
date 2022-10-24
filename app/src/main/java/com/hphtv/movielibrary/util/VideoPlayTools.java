@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.provider.FileContentProvider;
 import com.station.kit.util.ToastUtil;
 
 import java.io.File;
@@ -28,6 +29,8 @@ import java.util.List;
  */
 public class VideoPlayTools {
     public static final String TAG = VideoPlayTools.class.getSimpleName();
+
+    public static final String DANGBEI_PKG = "com.dangbei.lerad.videoposter";
 
     public static void play(Context context, Uri uri) {
         Intent intent = new Intent();
@@ -81,7 +84,8 @@ public class VideoPlayTools {
             intent.setPackage(Config.getPlayerPackage());
 
             Uri uri = FileContentProvider.getUriForFile(file.getPath());
-            if (Config.getPlayerPackage().equals("com.dangbei.lerad.videoposter"))
+            Log.d(TAG, "player "+Config.getPlayerPackage());
+            if (Config.getPlayerPackage().equals(DANGBEI_PKG))
                 uri = FileProvider.getUriForFile(context.getApplicationContext(), "com.hphtv.movielibrary.fileprovider2", file);
 
             intent.setDataAndType(uri, "video/*");// type:改成"video/*"表示获取视频的
