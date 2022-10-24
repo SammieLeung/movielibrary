@@ -31,7 +31,7 @@ public class ThemeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected List<HistoryMovieDataView> queryHistoryMovieDataView() {
-        return mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(),  Config.getSqlConditionOfChildMode(),mSearchType, 0, LIMIT);
     }
 
     @Override
@@ -63,12 +63,6 @@ public class ThemeFragmentViewModel extends BaseHomePageViewModel {
     protected List<MovieDataView> queryRecommend(String source) {
         return mMovieDao.queryRecommend(source, mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
-
-
-    public Observable<MovieDataView> getUpdatingFavorite(String movie_id) {
-        return super.getUpdatingFavorite(movie_id,mSearchType.name());
-    }
-
 
     public Constants.SearchType getSearchType() {
         return mSearchType;

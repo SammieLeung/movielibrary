@@ -123,7 +123,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mGenresList = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource());
+                    mGenresList = mGenreDao.queryGenresBySource(ScraperSourceTools.getSource(),null);
                     return mGenresList;
                 }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<String>>() {

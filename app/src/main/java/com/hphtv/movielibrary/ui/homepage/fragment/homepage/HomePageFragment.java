@@ -323,7 +323,7 @@ public class HomePageFragment extends BaseAutofitHeightFragment<HomeFragmentView
     @Override
     public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
         if (mViewModel != null) {
-            mViewModel.getUpdatingFavorite(movie_id, type)
+            mViewModel.getUpdatingFavorite(movie_id,type)
                     .subscribe(new SimpleObserver<MovieDataView>() {
                         @Override
                         public void onAction(MovieDataView movieDataView) {

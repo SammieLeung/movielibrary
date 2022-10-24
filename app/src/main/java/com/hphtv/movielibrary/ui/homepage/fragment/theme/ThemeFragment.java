@@ -152,7 +152,7 @@ public class ThemeFragment extends BaseAutofitHeightFragment<ThemeFragmentViewMo
     @Override
     public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
         if (mViewModel != null && mViewModel.getSearchType().name().equals("movie")) {
-            mViewModel.getUpdatingFavorite(movie_id)
+            mViewModel.getUpdatingFavorite(movie_id,type)
                     .subscribe(new SimpleObserver<MovieDataView>() {
                         @Override
                         public void onAction(MovieDataView movieDataView) {

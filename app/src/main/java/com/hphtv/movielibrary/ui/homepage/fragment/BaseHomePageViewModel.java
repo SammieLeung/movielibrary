@@ -52,33 +52,19 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
         initDao();
     }
 
-    protected List<HistoryMovieDataView> queryHistoryMovieDataView() {
-        return null;
-    }
+    protected abstract List<HistoryMovieDataView> queryHistoryMovieDataView();
 
-    protected List<String> queryGenresBySource() {
-        return null;
-    }
+    protected abstract List<String> queryGenresBySource();
 
-    protected List<MovieDataView> queryMovieDataViewForRecentlyAdded() {
-        return null;
-    }
+    protected abstract List<MovieDataView> queryMovieDataViewForRecentlyAdded();
 
-    protected List<MovieDataView> queryFavoriteMovieDataView() {
-        return null;
-    }
+    protected abstract List<MovieDataView> queryFavoriteMovieDataView();
 
-    protected MovieDataView queryMovieDataViewByMovieId(String movie_id, String type) {
-        return null;
-    }
+    protected abstract MovieDataView queryMovieDataViewByMovieId(String movie_id,String type);
 
-    protected List<MovieDataView> queryRecommendByGenres(String source, List<String> genreList, List<Long> idList) {
-        return null;
-    }
+    protected abstract List<MovieDataView> queryRecommendByGenres(String source, List<String> genreList, List<Long> idList);
 
-    protected List<MovieDataView> queryRecommend(String source) {
-        return null;
-    }
+    protected abstract List<MovieDataView> queryRecommend(String source);
 
 
     /**

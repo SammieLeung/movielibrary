@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.roomdb.dao;
 
+import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -32,11 +33,8 @@ public interface GenreDao {
     @Query("SELECT genre_id FROM " + TABLE.GENRE + " WHERE name in (:names)")
     public long[] queryByName(List<String> names);
 
-    @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source AND genre_name!=\"\" GROUP BY genre_name;")
-    public List<String> queryGenresBySource(String source);
-
-    @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source AND genre_name!=\"\" AND type=:type GROUP BY genre_name;")
-    public List<String> queryGenresBySource(String source, Constants.SearchType type);
+    @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source AND genre_name!=\"\" AND (:type IS NULL OR type=:type) GROUP BY genre_name;")
+    public List<String> queryGenresBySource(String source, @Nullable Constants.SearchType type);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertGenreTags(List<GenreTag> genreTagItemList);

@@ -92,6 +92,8 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         if (getIntent().getSerializableExtra(EXTRA_VIDEO_TAG) != null) {
             Constants.SearchType searchType = (Constants.SearchType) getIntent().getSerializableExtra(EXTRA_VIDEO_TAG);
             mViewModel.setSearchType(searchType);
+        }else{
+            mViewModel.setSearchType(null);
         }
         reload();
     }

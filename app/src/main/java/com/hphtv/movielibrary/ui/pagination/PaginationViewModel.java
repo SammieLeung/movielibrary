@@ -99,13 +99,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     mPage.set(0);
                     int count = 0;
                     List<MovieDataView> movieDataViewList;
-                    if (mSearchType != null) {
-                        count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
-                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
-                    } else {
-                        count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode());
-                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
-                    }
+                    count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
+                    movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
                     mTotal.set(count);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -127,11 +122,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
                         int offset = mPage.incrementAndGet() * LIMIT;
                         List<MovieDataView> movieDataViewList;
-                        if (mSearchType != null) {
-                            movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                        } else {
-                            movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                        }
+                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
                         emitter.onNext(movieDataViewList);
                     }
                     emitter.onComplete();
@@ -152,13 +143,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     mPage.set(0);
                     int count;
                     List<MovieDataView> movieDataViewList;
-                    if (mSearchType != null) {
-                        count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
-                        movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
-                    } else {
-                        count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode());
-                        movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
-                    }
+                    count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
+                    movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
                     mTotal.set(count);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -180,10 +166,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
                         int offset = mPage.incrementAndGet() * LIMIT;
                         List<MovieDataView> movieDataViewList;
-                        if (mSearchType != null)
-                            movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(),mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                        else
-                            movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
                         emitter.onNext(movieDataViewList);
                     }
                     emitter.onComplete();
