@@ -309,7 +309,7 @@ public interface MovieDao {
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
-            " AND genre_name in (:genre_name) " +
+            " AND genre_name IN (:genre_name) " +
             " AND id NOT IN (:ids) " +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND type=:type" +

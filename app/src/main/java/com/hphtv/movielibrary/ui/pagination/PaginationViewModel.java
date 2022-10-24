@@ -14,13 +14,11 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
