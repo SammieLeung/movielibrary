@@ -50,7 +50,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
         MovieDataView movieDataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
         if (Config.getShowPoster().get())
-            if (movieDataView.type.equals(Constants.SearchType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
+            if (movieDataView.type.equals(Constants.VideoType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
                 GlideTools.GlideWrapper(mContext, movieDataView.season_poster)
                         .into(binding.rvPoster);
             } else {
@@ -60,7 +60,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
         else
             Glide.with(mContext).load(R.drawable.default_poster).into(binding.rvPoster);
         String title = movieDataView.title;
-        if (movieDataView.type.equals(Constants.SearchType.tv)) {
+        if (movieDataView.type.equals(Constants.VideoType.tv)) {
             if (!TextUtils.isEmpty(movieDataView.season_name))
                 title += " " + movieDataView.season_name;
             else if (movieDataView.season != -1)
@@ -100,19 +100,18 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                     &&dataView.type.name().equals(type)){
                 mList.remove(i);
                 notifyItemRemoved(i);
+                break;
             }
         }
     }
 
     public void remove(MovieDataView movieDataView) {
         for (int i = 0; i < mList.size(); i++) {
-            if (mList.get(i) instanceof MovieDataView) {
                 if (mList.get(i).equals(movieDataView)) {
                     mList.remove(i);
                     notifyItemRemoved(i);
                     break;
                 }
-            }
         }
     }
 
@@ -123,13 +122,11 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
      */
     public void updateStatus(MovieDataView movieDataView) {
         for (int i = 0; i < mList.size(); i++) {
-            if (mList.get(i) instanceof MovieDataView) {
                 if (mList.get(i).equals(movieDataView)) {
                     mList.set(i, movieDataView);
                     notifyItemChanged(i);
                     break;
                 }
-            }
         }
     }
 

@@ -39,7 +39,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mFilterMovieDataViewList.get(position);
         PosterItemLargeBinding binding = (PosterItemLargeBinding) holder.mBinding;
-        if (movieDataView.type.equals(Constants.SearchType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
+        if (movieDataView.type.equals(Constants.VideoType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
             GlideTools.GlideWrapper(mContext, movieDataView.season_poster)
                     .into(binding.rvPoster);
         } else {
@@ -47,7 +47,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
                     .into(binding.rvPoster);
         }
         String title = movieDataView.title;
-        if (movieDataView.type.equals(Constants.SearchType.tv)) {
+        if (movieDataView.type.equals(Constants.VideoType.tv)) {
             if (!TextUtils.isEmpty(movieDataView.season_name))
                 title += " " + movieDataView.season_name;
             else if (movieDataView.season != -1)
@@ -99,9 +99,9 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
                 if (constraint == null) {
                     filterDatas = mList;
                 } else {
-                    Constants.SearchType searchType = Constants.SearchType.valueOf(constraint.toString());
+                    Constants.VideoType videoType = Constants.VideoType.valueOf(constraint.toString());
                     for (int i = 0; i < mList.size(); i++) {
-                        if (searchType == mList.get(i).type) {
+                        if (videoType == mList.get(i).type) {
                             filterDatas.add(mList.get(i));
                         }
                     }

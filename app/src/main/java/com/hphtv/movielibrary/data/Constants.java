@@ -85,7 +85,7 @@ public class Constants {
 //        OTHER,//其他
     }
 
-    public enum VideoType{
+    public enum VideoType implements Serializable{
         movie,
         tv,
         unknow,

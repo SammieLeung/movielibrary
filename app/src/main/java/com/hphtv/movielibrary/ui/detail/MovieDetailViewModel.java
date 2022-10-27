@@ -95,7 +95,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     mLastPlayEpisodeVideoFile = null;
                     mUnknownEpisodeList.clear();
                     //电视剧/综艺
-                    if (Constants.SearchType.tv.equals(mMovieWrapper.movie.type)) {
+                    if (Constants.VideoType.tv.equals(mMovieWrapper.movie.type)) {
                         for (Season _season : mMovieWrapper.seasons) {
                             int num = _season.seasonNumber;
                             if (num == mSeason) {
@@ -407,14 +407,14 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return Observable.just(mMovieWrapper)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))
                 .map(wrapper -> {
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     if (mVideoFileList.size() > 0) {
                         for (VideoFile videoFile : mVideoFileList) {
-                            sb.append(StringTools.hideSmbAuthInfo(videoFile.path) + "\n");
+                            sb.append(StringTools.hideSmbAuthInfo(videoFile.path)).append("\n");
                         }
                     } else {
                         for (VideoFile videoFile : mMovieWrapper.videoFiles) {
-                            sb.append(StringTools.hideSmbAuthInfo(videoFile.path) + "\n");
+                            sb.append(StringTools.hideSmbAuthInfo(videoFile.path)).append("\n");
                         }
                     }
                     return sb.toString();

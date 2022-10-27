@@ -34,7 +34,7 @@ public interface GenreDao {
     public long[] queryByName(List<String> names);
 
     @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source AND genre_name!=\"\" AND (:type IS NULL OR type=:type) GROUP BY genre_name;")
-    public List<String> queryGenresBySource(String source, @Nullable Constants.SearchType type);
+    public List<String> queryGenresBySource(String source, @Nullable String type);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertGenreTags(List<GenreTag> genreTagItemList);

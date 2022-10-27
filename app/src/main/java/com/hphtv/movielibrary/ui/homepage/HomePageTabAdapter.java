@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.ui.homepage.fragment.customtag.CustomTagFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknowFileFragment;
@@ -30,18 +31,22 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
 
 
         HomePageFragment homePageFragment = HomePageFragment.newInstance(autofitHeight, 0);
-        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(autofitHeight, 1, Constants.SearchType.movie);
-        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(autofitHeight, 2, Constants.SearchType.tv);
+        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(autofitHeight, 1, Constants.VideoType.movie);
+        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(autofitHeight, 2, Constants.VideoType.tv);
         UnknowFileFragment unknowFileFragment = UnknowFileFragment.newInstance(autofitHeight, 3);
+        CustomTagFragment customTagFragment=CustomTagFragment.newInstance(autofitHeight,4);
 
         mList.add(homePageFragment);
         mList.add(movieThemeFragment);
         mList.add(tvThemeFragment);
         mList.add(unknowFileFragment);
+        mList.add(customTagFragment);
 
         mIRefreshGenreList.add(homePageFragment);
         mIRefreshGenreList.add(movieThemeFragment);
         mIRefreshGenreList.add(tvThemeFragment);
+
+        mIRefreshGenreList.add(customTagFragment);
 
     }
 

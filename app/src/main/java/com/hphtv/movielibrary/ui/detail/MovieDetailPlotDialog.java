@@ -75,7 +75,7 @@ public class MovieDetailPlotDialog extends BaseDialogFragment2<MovieDetailViewMo
         mBinding.rvActorList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 62), DensityUtil.dip2px(getContext(), 22), DensityUtil.dip2px(getContext(), 22)));
         mBinding.rvActorList.setAdapter(mActorPosterItemListApdater);
         String plot=movieWrapper.movie.plot;
-        if(movieWrapper.movie.type.equals(Constants.SearchType.tv)&&movieWrapper.season!=null&&!TextUtils.isEmpty(movieWrapper.season.plot))
+        if(movieWrapper.movie.type.equals(Constants.VideoType.tv)&&movieWrapper.season!=null&&!TextUtils.isEmpty(movieWrapper.season.plot))
             plot=movieWrapper.season.plot;
         mBinding.setPlot(plot);
         mBinding.btnFold.setOnClickListener(v -> dismiss());

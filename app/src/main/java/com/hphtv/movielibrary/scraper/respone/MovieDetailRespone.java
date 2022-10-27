@@ -65,7 +65,7 @@ public class MovieDetailRespone implements ResponeEntity<MovieWrapper> {
             movie.plot = plot;
             movie.year = year;
             movie.language = language;
-            movie.type = Constants.SearchType.valueOf(type);
+            movie.type = Constants.VideoType.valueOf(type);
             movie.source = api;
 
             List<Genre> genreList = new ArrayList<>();

@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.widget.NestedScrollView;
@@ -208,7 +209,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.nestScrollview.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
         LinearLayout linearLayout = (LinearLayout) mBinding.tabEpisodeSet.getChildAt(0);
         linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-        linearLayout.setDividerDrawable(getDrawable(R.drawable.divider_vertical));
+        linearLayout.setDividerDrawable(AppCompatResources.getDrawable(getBaseContext(),R.drawable.divider_vertical));
         linearLayout.setDividerPadding(DensityUtil.dip2px(getBaseContext(), 13));
         mBinding.tabEpisodeSet.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -264,7 +265,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     @Override
                     public void onAction(MovieWrapper wrapper) {
                         if (wrapper != null) {
-                            if (Constants.SearchType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
+                            if (Constants.VideoType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
                                 if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
                                     mEpisodeItemListAdapter.setVarietyShow(true);
                                     mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
@@ -318,7 +319,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                         textView.setText(tag);
                                         textView.setTextSize(20);
                                         textView.setTextColor(Color.parseColor("#FFCCCCCC"));
-                                        textView.setBackground(getDrawable(R.drawable.detail_tag));
+                                        textView.setBackground(AppCompatResources.getDrawable(context,R.drawable.detail_tag));
                                         textView.setPadding(paddingLeft, paddingTop, paddingLeft, paddingTop);
                                         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                                         layoutParams.rightMargin = DensityUtil.dip2px(context, 23);
@@ -329,12 +330,12 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
 
                             mViewModel.loadRecommend()
                                     .subscribe(new SimpleObserver<List<MovieDataView>>() {
+                                        @SuppressLint("NotifyDataSetChanged")
                                         @Override
                                         public void onAction(List<MovieDataView> movieDataViewList) {
                                             if (movieDataViewList != null && movieDataViewList.size() > 0) {
                                                 mBinding.setRecommand(true);
                                                 mRecommandMovieAdapter.addAll(movieDataViewList);
-                                                mRecommandMovieAdapter.notifyDataSetChanged();
                                             } else {
                                                 mBinding.setRecommand(false);
                                             }
@@ -426,7 +427,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             if (wrapper.movie != null
-                    && wrapper.movie.type.equals(Constants.SearchType.tv)
+                    && wrapper.movie.type.equals(Constants.VideoType.tv)
                     && wrapper.seasons != null
             ) {
                 stopLoading();

@@ -131,6 +131,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.tabLayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.video_type_movie)));
         mBinding.tabLayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.video_type_tv)));
         mBinding.tabLayout.getTabAt(3).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
+        mBinding.tabLayout.getTabAt(4).setCustomView(buildTabView(getString(R.string.video_type_cartoon)));
 //        mBinding.tabLayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
 
         for (int i = 0; i < mBinding.tabLayout.getTabCount(); i++) {

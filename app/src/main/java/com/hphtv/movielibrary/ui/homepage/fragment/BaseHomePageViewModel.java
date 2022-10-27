@@ -45,7 +45,11 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     protected MovieDao mMovieDao;
     public Callback mGenreCallback;
     protected List<HistoryMovieDataView> mHistoryMovieDataViews = new ArrayList<>();
-
+    private List<HistoryMovieDataView> mRecentlyPlayedList = new ArrayList<>();
+    private List<String> mGenreTagList = new ArrayList<>();
+    private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
+    private List<MovieDataView> mFavoriteList = new ArrayList<>();
+    private List<MovieDataView> mRecommandList = new ArrayList<>();
     public BaseHomePageViewModel(@NonNull @NotNull Application application) {
         super(application);
 

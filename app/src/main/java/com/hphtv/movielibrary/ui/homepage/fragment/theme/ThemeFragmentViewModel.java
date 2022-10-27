@@ -15,14 +15,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Observable;
-
 /**
  * author: Sam Leung
  * date:  2022/6/7
  */
 public class ThemeFragmentViewModel extends BaseHomePageViewModel {
-    private Constants.SearchType mSearchType;
+    private Constants.VideoType mVideoType;
 
     public ThemeFragmentViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -31,44 +29,44 @@ public class ThemeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected List<HistoryMovieDataView> queryHistoryMovieDataView() {
-        return mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(),  Config.getSqlConditionOfChildMode(),mSearchType, 0, LIMIT);
+        return mVideoFileDao.queryHistoryMovieDataViewByVideoTag(ScraperSourceTools.getSource(),  Config.getSqlConditionOfChildMode(), mVideoType.name(), 0, LIMIT);
     }
 
     @Override
     protected List<String> queryGenresBySource() {
-        return mGenreDao.queryGenresBySource(ScraperSourceTools.getSource(), mSearchType);
+        return mGenreDao.queryGenresBySource(ScraperSourceTools.getSource(), mVideoType.name());
     }
 
     @Override
     protected List<MovieDataView> queryMovieDataViewForRecentlyAdded() {
-        return mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoType.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
     @Override
     protected List<MovieDataView> queryFavoriteMovieDataView() {
-        return  mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return  mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoType.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
     @Override
     protected MovieDataView queryMovieDataViewByMovieId(String movie_id, String type) {
-        return mMovieDao.queryMovieDataViewByMovieId(movie_id, mSearchType.name(), ScraperSourceTools.getSource());
+        return mMovieDao.queryMovieDataViewByMovieId(movie_id, mVideoType.name(), ScraperSourceTools.getSource());
     }
 
     @Override
     protected List<MovieDataView> queryRecommendByGenres(String source, List<String> genreList, List<Long> idList) {
-        return mMovieDao.queryRecommend(source, mSearchType, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT);
+        return mMovieDao.queryRecommend(source, mVideoType.name(), Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT);
     }
 
     @Override
     protected List<MovieDataView> queryRecommend(String source) {
-        return mMovieDao.queryRecommend(source, mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mMovieDao.queryRecommend(source, mVideoType.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
-    public Constants.SearchType getSearchType() {
-        return mSearchType;
+    public Constants.VideoType getVideoType() {
+        return mVideoType;
     }
 
-    public void setSearchType(Constants.SearchType searchType) {
-        mSearchType = searchType;
+    public void setVideoType(Constants.VideoType videoType) {
+        mVideoType = videoType;
     }
 }

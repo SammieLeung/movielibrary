@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RewriteQueriesToDropUnusedColumns;
 import androidx.room.Update;
 
 import com.hphtv.movielibrary.data.Constants;
@@ -13,6 +14,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
+import com.hphtv.movielibrary.roomdb.entity.relation.VideoTagWithHistoryMovieDataView;
 
 import java.util.List;
 
@@ -76,7 +78,19 @@ public interface VideoFileDao {
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND (:type IS NULL OR type=:type)" +
             " LIMIT :offset,:limit")
-    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source, @Nullable String ap,@Nullable Constants.SearchType type, int offset, int limit);
+    public List<HistoryMovieDataView> queryHistoryMovieDataView(String source, @Nullable String ap, @Nullable Constants.SearchType type, int offset, int limit);
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT * FROM " + VIEW.HISTORY_MOVIE_DATAVIEW + " AS H " +
+            "JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCRF " +
+            "ON MVCRF.id=H._mid " +
+            "JOIN " + TABLE.VIDEO_TAG + " AS VTG " +
+            "ON VTG.vtid=MVCRF.vtid " +
+            "WHERE VTG.tag=:video_tag" +
+            " AND (source=:source OR source IS NULL)" +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " LIMIT :offset,:limit")
+    List<HistoryMovieDataView> queryHistoryMovieDataViewByVideoTag(String source, @Nullable String ap, String video_tag, int offset, int limit);
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
     public void deleteByDevice(String devicePath, List<String> paths);

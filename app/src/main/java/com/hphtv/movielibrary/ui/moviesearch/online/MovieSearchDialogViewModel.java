@@ -149,7 +149,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
                 });
     }
 
-    public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.SearchType type) {
+    public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.VideoType type) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
             //1.获取本地数据
             MovieDao movieDao= MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();

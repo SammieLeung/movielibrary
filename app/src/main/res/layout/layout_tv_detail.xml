@@ -70,7 +70,7 @@
                     <TextView
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="@{wrapper.movie.title+(wrapper.movie.type.equals(Constants.SearchType.tv)&amp;&amp;wrapper.season!=null?(' '+wrapper.season.name):&quot;&quot;)}"
+                      android:text="@{wrapper.movie.title+(wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?(' '+wrapper.season.name):&quot;&quot;)}"
                       android:textColor="@color/white"
                       android:textSize="36sp"
                       android:textStyle="bold" />
@@ -171,7 +171,7 @@
                           app:layout_constraintEnd_toStartOf="@id/btn_favorite"
                           >
                             <Button
-                              android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)&amp;&amp;wrapper.season!=null?View.GONE:View.VISIBLE}"
+                              android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.GONE:View.VISIBLE}"
                               android:id="@+id/btn_play"
                               style="@style/detail_btn_style"
                               android:drawableLeft="@drawable/ic_btn_play_drawable"
@@ -185,7 +185,7 @@
                               android:drawableLeft="@drawable/ic_btn_play_drawable"
                               android:focusedByDefault="true"
                               android:text="@{play_episode_btn_text}"
-                              android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}" />
+                              android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}" />
                         </RelativeLayout>
 
 
@@ -244,11 +244,11 @@
                   android:layout_marginTop="45dp"
                   android:text="@{episodes_title}"
                   android:textStyle="bold"
-                  android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}" />
+                  android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}" />
 
                 <com.hphtv.movielibrary.ui.view.TvRecyclerView
                   android:id="@+id/rv_episode_list"
-                  android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}"
+                  android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:layout_below="@id/tv_episodes"
@@ -256,7 +256,7 @@
 
                 <com.google.android.material.tabs.TabLayout
                   android:layout_below="@id/rv_episode_list"
-                  android:visibility="@{wrapper.movie.type.equals(Constants.SearchType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}"
+                  android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}"
                   android:id="@+id/tab_episode_set"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

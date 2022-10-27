@@ -27,7 +27,7 @@ public class Movie implements Serializable {
     public String plot;//剧情
     public String ratings;//评分
     public String source;//来源
-    public Constants.SearchType type;//电影？电视剧  movie/tv  搜索接口自动分配不用管
+    public Constants.VideoType type;//电影？电视剧  movie/tv  搜索接口自动分配不用管
     public String poster;//海报
     public String region;//制片国家/地区
     @ColumnInfo(name = "release_date")

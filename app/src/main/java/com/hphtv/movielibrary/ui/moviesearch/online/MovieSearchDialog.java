@@ -99,7 +99,7 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
                 ((AppBaseActivity)getActivity()).startLoading();
             String movie_id = movie.movieId;
             String source = movie.source;
-            Constants.SearchType type = movie.type;
+            Constants.VideoType type = movie.type;
             mViewModel.selectMovie(movie_id, source, type)
                     .subscribe(new SimpleObserver<MovieWrapper>() {
                         @Override

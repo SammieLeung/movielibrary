@@ -12,14 +12,14 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  */
 @DatabaseView(
         value = "SELECT filename,keyword,path,last_playtime,episode,aired,s_ap," +
-                "NULL AS poster,NULL AS source,NULL AS title,NULL AS ratings,NULL AS ap,NULL AS type," +
+                "NULL AS _mid,NULL AS movie_id,NULL AS poster,NULL AS source,NULL AS title,NULL AS ratings,NULL AS ap,NULL AS type," +
                 "NULL AS season,NULL AS season_name,NULL AS season_poster," +
                 "NULL AS stage_photo " +
                 "FROM " + VIEW.UNRECOGNIZEDFILE_DATAVIEW + " " +
                 "WHERE last_playtime >0 AND path NOT IN (SELECT path FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+") " +
                 "UNION " +
                 "SELECT u.filename,u.keyword,u.path,max(u.last_playtime) AS last_playtime,u.episode,u.aired,u.s_ap," +
-                "mv.poster,mv.source,mv.title,mv.ratings,mv.ap,mv.type," +
+                "mv.id AS _mid,mv.movie_id,mv.poster,mv.source,mv.title,mv.ratings,mv.ap,mv.type," +
                 "CASE WHEN s.season_number IS NOT NULL THEN s.season_number ELSE -1 END AS season,s.name AS season_name,s.poster AS season_poster," +
                 "sp.img_url AS stage_photo " +
                 "FROM " +
@@ -44,6 +44,8 @@ public class HistoryMovieDataView {
     public String aired;
     public Constants.WatchLimit s_ap;
 
+    public long _mid;
+    public String movie_id;
     public String poster;
     public String source;
     public String title;

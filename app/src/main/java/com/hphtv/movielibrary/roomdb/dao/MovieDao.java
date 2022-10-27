@@ -6,6 +6,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RewriteQueriesToDropUnusedColumns;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
@@ -228,17 +229,6 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryMovieDataView(@Nullable String dir_uri, @Nullable long vtid, @Nullable String genre_name, @Nullable String year, @Nullable String year_2, int order, @Nullable String ap, @Nullable boolean isDesc, String source, int offset, int limit);
 
-    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW
-            + " WHERE source=:source " +
-//            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
-            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
-            " AND (:type IS NULL OR type=:type)" +
-            " GROUP BY id " +
-            " ORDER BY add_time DESC)"
-    )
-    public int countMovieDataViewForRecentlyAdded(String source, Constants.SearchType type, String ap);
-
-
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW
             + " WHERE source=:source " +
 //            " AND JULIANDAY('now') - JULIANDAY(DATE(add_time/1000,'UNIXEPOCH')) < 7 " +
@@ -249,6 +239,37 @@ public interface MovieDao {
             " LIMIT :offset,:limit"
     )
     public List<MovieDataView> queryMovieDataViewForRecentlyAdded(String source, Constants.SearchType type, String ap, int offset, int limit);
+
+    @Query("SELECT COUNT(*) FROM (" +
+            "SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
+            " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
+            " ON M.id=MVCF.id " +
+            " JOIN " + TABLE.VIDEO_TAG + " AS VT " +
+            " ON VT.vtid=MVCF.vtid " +
+            " WHERE source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
+            " GROUP BY M.id " +
+            " ORDER BY add_time DESC" +
+            ")"
+    )
+    public int countMovieDataViewForRecentlyAddedByVideoTag(String source, String video_tag, String ap);
+
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
+            " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
+            " ON M.id=MVCF.id " +
+            " JOIN " + TABLE.VIDEO_TAG + " AS VT " +
+            " ON VT.vtid=MVCF.vtid " +
+            " WHERE source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
+            " GROUP BY M.id " +
+            " ORDER BY add_time DESC" +
+            " LIMIT :offset,:limit"
+    )
+    List<MovieDataView> queryMovieDataViewForRecentlyAddedByVideoTag(String source, String video_tag, String ap, int offset, int limit);
+
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW +
             " WHERE source=:source " +
@@ -271,7 +292,7 @@ public interface MovieDao {
             " ORDER BY add_time DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommend(String source, Constants.SearchType type, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
+    public List<MovieDataView> queryRecommend(String source, String type, String ap, List<String> genre_name, List<Long> ids, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW +
             " WHERE source=:source " +
@@ -281,7 +302,7 @@ public interface MovieDao {
             " ORDER BY ratings DESC " +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryRecommend(String source, Constants.SearchType type, String ap, int offset, int limit);
+    public List<MovieDataView> queryRecommend(String source, String type, String ap, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW +
             " WHERE source=:source" +
@@ -289,20 +310,43 @@ public interface MovieDao {
             " GROUP BY id ")
     public List<MovieDataView> queryAllMovieDataView(String source, String ap);
 
-
-    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
-            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
-            " AND (:type IS NULL OR type=:type) " +
-            " GROUP BY id ORDER BY pinyin ASC)")
-    public int countFavoriteMovieDataView(String source, Constants.SearchType type, String ap);
-
-
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " WHERE is_favorite=1 AND source=:source" +
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND (:type IS NULL OR type=:type) " +
             " GROUP BY id ORDER BY pinyin ASC" +
             " LIMIT :offset,:limit")
     public List<MovieDataView> queryFavoriteMovieDataView(String source, Constants.SearchType type, String ap, int offset, int limit);
+
+    @Query("SELECT COUNT(*) FROM (" +
+            " SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
+            " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
+            " ON M.id=MVCF.id " +
+            " JOIN " + TABLE.VIDEO_TAG + " AS VT " +
+            " ON VT.vtid=MVCF.vtid " +
+            " WHERE is_favorite=1 " +
+            " AND source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
+            " GROUP BY M.id " +
+            " ORDER BY pinyin ASC"+
+            ")")
+    public int countFavoriteMovieDataViewByVideoTag(String source, String video_tag, String ap);
+
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
+            " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
+            " ON M.id=MVCF.id " +
+            " JOIN " + TABLE.VIDEO_TAG + " AS VT " +
+            " ON VT.vtid=MVCF.vtid " +
+            " WHERE is_favorite=1 " +
+            " AND source=:source " +
+            " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
+            " GROUP BY M.id " +
+            " ORDER BY pinyin ASC" +
+            " LIMIT :offset,:limit"
+    )
+    public List<MovieDataView> queryFavoriteMovieDataViewByVideoTag(String source,  String video_tag, String ap, int offset, int limit);
+
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);

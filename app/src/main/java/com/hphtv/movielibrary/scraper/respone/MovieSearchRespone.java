@@ -69,7 +69,7 @@ public class MovieSearchRespone implements ResponeEntity<List<Movie>> {
                 movie.title = title;
                 movie.tag = genre;
                 movie.tag2 = actors;
-                movie.type =  Constants.SearchType.valueOf(type);
+                movie.type =  Constants.VideoType.valueOf(type);
                 movie.releaseDate = year;
                 movie.ratings=rating;
                 movie.plot=plot;

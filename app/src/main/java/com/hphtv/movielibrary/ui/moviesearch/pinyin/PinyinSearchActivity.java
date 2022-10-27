@@ -217,10 +217,10 @@ public class PinyinSearchActivity extends AppBaseActivity<PinyinSearchViewModel,
                         mMovieAdapter.getFilter().filter(null);
                         break;
                     case 1:
-                        mMovieAdapter.getFilter().filter(Constants.SearchType.movie.name());
+                        mMovieAdapter.getFilter().filter(Constants.VideoType.movie.name());
                         break;
                     case 2:
-                        mMovieAdapter.getFilter().filter(Constants.SearchType.tv.name());
+                        mMovieAdapter.getFilter().filter(Constants.VideoType.tv.name());
                         break;
                 }
             }
@@ -260,9 +260,9 @@ public class PinyinSearchActivity extends AppBaseActivity<PinyinSearchViewModel,
                 int movie_count = 0;
                 int tv_count = 0;
                 for (int i = 0; i < mMovieAdapter.getRealCount(); i++) {
-                    if (data.get(i).type == Constants.SearchType.movie)
+                    if (data.get(i).type == Constants.VideoType.movie)
                         movie_count++;
-                    if (data.get(i).type == Constants.SearchType.tv)
+                    if (data.get(i).type == Constants.VideoType.tv)
                         tv_count++;
                 }
                 setTabs(mMovieAdapter.getRealCount(), movie_count, tv_count);

@@ -8,11 +8,10 @@ import androidx.databinding.ObservableField;
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
-import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
+import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -35,11 +34,10 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     public static final int LIMIT = 15;
     public static final int OPEN_RECENTLY_ADD = 1;
     public static final int OPEN_FAVORITE = 2;
-    private GenreDao mGenreDao;
-    private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
+    private VideoTagDao mVideoTagDao;
     private int mType;
-    private Constants.SearchType mSearchType;
+    private VideoTag mVideoTag;
     private ObservableField<String> mTitle = new ObservableField<>();
     private AtomicInteger mPage = new AtomicInteger(0);
     private AtomicInteger mTotal = new AtomicInteger(0);
@@ -47,9 +45,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     public PaginationViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
-        mGenreDao = movieLibraryRoomDatabase.getGenreDao();
-        mVideoFileDao = movieLibraryRoomDatabase.getVideoFileDao();
         mMovieDao = movieLibraryRoomDatabase.getMovieDao();
+        mVideoTagDao=movieLibraryRoomDatabase.getVideoTagDao();
     }
 
     public void setType(int type) {
@@ -64,8 +61,21 @@ public class PaginationViewModel extends BaseAndroidViewModel {
         }
     }
 
-    public void setSearchType(Constants.SearchType searchType) {
-        mSearchType = searchType;
+
+    public void setVideoTag(String videoTagString){
+        if(videoTagString!=null){
+            Observable.create((ObservableOnSubscribe<VideoTag>) emitter -> {
+                mVideoTag = mVideoTagDao.queryVtidByNormalTag(videoTagString);
+                emitter.onNext(mVideoTag);
+                emitter.onComplete();
+            }).subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(videoTag -> reload());
+        }else{
+            mVideoTag=null;
+            reload();
+        }
+
     }
 
     public ObservableField<String> getTitle() {
@@ -99,8 +109,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     mPage.set(0);
                     int count = 0;
                     List<MovieDataView> movieDataViewList;
-                    count = mMovieDao.countMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
-                    movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
+                    count = mMovieDao.countMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode());
+                    movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
                     mTotal.set(count);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -122,7 +132,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
                         int offset = mPage.incrementAndGet() * LIMIT;
                         List<MovieDataView> movieDataViewList;
-                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
                         emitter.onNext(movieDataViewList);
                     }
                     emitter.onComplete();
@@ -143,8 +153,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     mPage.set(0);
                     int count;
                     List<MovieDataView> movieDataViewList;
-                    count = mMovieDao.countFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode());
-                    movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    count = mMovieDao.countFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode());
+                    movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
                     mTotal.set(count);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -166,7 +176,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
                         int offset = mPage.incrementAndGet() * LIMIT;
                         List<MovieDataView> movieDataViewList;
-                        movieDataViewList = mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), mSearchType, Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
                         emitter.onNext(movieDataViewList);
                     }
                     emitter.onComplete();

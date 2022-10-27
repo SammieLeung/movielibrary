@@ -27,13 +27,13 @@ public class ConfirmDeleteDialog extends ConfirmDialog<ConfirmDeleteViewModel> {
     private String movieId;
     private String mType;
 
-    public static ConfirmDeleteDialog newInstance(String movie_id, Constants.SearchType searchType) {
+    public static ConfirmDeleteDialog newInstance(String movie_id, Constants.VideoType videoType) {
 
         Bundle args = new Bundle();
 
         ConfirmDeleteDialog fragment = new ConfirmDeleteDialog();
         args.putString("movie_id",movie_id);
-        args.putString("type",searchType.name());
+        args.putString("type",videoType.name());
         fragment.setArguments(args);
         return fragment;
     }

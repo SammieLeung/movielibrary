@@ -5,14 +5,11 @@
     <data>
         <import type="androidx.databinding.ObservableInt"/>
         <import type="android.text.TextUtils"/>
-        <import type="com.hphtv.movielibrary.data.Constants.SearchType"/>
+        <import type="com.hphtv.movielibrary.data.Constants"/>
         <import type="com.hphtv.movielibrary.roomdb.entity.Movie"/>
         <variable
             name="movie"
             type="Movie" />
-        <variable
-            name="searchType"
-            type="SearchType" />
         <variable
             name="selectPos"
             type="ObservableInt" />
@@ -86,7 +83,7 @@
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
                 android:textColor="#FFAAAAAA"
-                android:text="@{movie.type.equals(searchType.movie)?@string/video_type_movie:@string/video_type_tv}" />
+                android:text="@{movie.type.equals(Constants.VideoType.movie)?@string/video_type_movie:@string/video_type_tv}" />
         </androidx.appcompat.widget.LinearLayoutCompat>
 
         <TextView

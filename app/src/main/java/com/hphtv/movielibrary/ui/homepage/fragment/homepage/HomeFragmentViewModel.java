@@ -42,7 +42,7 @@ public class HomeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected List<MovieDataView> queryMovieDataViewForRecentlyAdded() {
-        return mMovieDao.queryMovieDataViewForRecentlyAdded(ScraperSourceTools.getSource(),null, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(),null, Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
     @Override

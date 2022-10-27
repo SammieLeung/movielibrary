@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -89,13 +90,12 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         super.onNewIntent(intent);
         int type = getIntent().getIntExtra(EXTRA_PAGE_TYPE, -1);
         mViewModel.setType(type);
-        if (getIntent().getSerializableExtra(EXTRA_VIDEO_TAG) != null) {
-            Constants.SearchType searchType = (Constants.SearchType) getIntent().getSerializableExtra(EXTRA_VIDEO_TAG);
-            mViewModel.setSearchType(searchType);
+        if (!TextUtils.isEmpty(getIntent().getStringExtra(EXTRA_VIDEO_TAG)) ) {
+            String video_tag=getIntent().getStringExtra(EXTRA_VIDEO_TAG);
+            mViewModel.setVideoTag(video_tag);
         }else{
-            mViewModel.setSearchType(null);
+            mViewModel.setVideoTag(null);
         }
-        reload();
     }
 
     private void initView() {
@@ -121,7 +121,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         mBinding.recyclerview.addOnScrollListener(new OnMovieLoadListener() {
             @Override
             protected void onLoading(int countItem, int lastItem) {
-                loadMore();
+                mViewModel.loadMore();
             }
 
             @Override
@@ -152,20 +152,13 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         mBinding.setTitle(mViewModel.getTitle());
     }
 
-    private void reload() {
-        mViewModel.reload();
-    }
-
-    private void loadMore() {
-        mViewModel.loadMore();
-    }
 
     @Override
     protected void onActivityResultCallback(ActivityResult result) {
         super.onActivityResultCallback(result);
         if (result.getResultCode() == RESULT_OK) {
             setResult(RESULT_OK);
-            reload();
+            mViewModel.reload();
         }
     }
 
