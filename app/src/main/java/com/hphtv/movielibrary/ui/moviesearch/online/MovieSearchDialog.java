@@ -66,6 +66,11 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
         }
     };
 
+    private TvRecyclerView.OnBackPressListener mOnBackPressListener= () -> {
+        mBinding.etBoxName.selectAll();
+        mBinding.etBoxName.requestFocus();
+    };
+
     public static MovieSearchDialog newInstance(String keyword) {
         Bundle args = new Bundle();
         args.putString("keyword", keyword);
@@ -127,6 +132,7 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
             }
         });
         mBinding.recyclerviewSearchResult.setOnNoNextFocusListener(mOnNoNextFocusListener);
+        mBinding.recyclerviewSearchResult.setOnBackPressListener(mOnBackPressListener);
         mBinding.etBoxName.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 reSearch();
