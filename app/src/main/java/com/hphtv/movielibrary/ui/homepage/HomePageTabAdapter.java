@@ -4,10 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.hphtv.movielibrary.data.Constants;
-import com.hphtv.movielibrary.ui.homepage.fragment.customtag.CustomTagFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknowFileFragment;
@@ -23,30 +21,38 @@ import java.util.List;
  * date:  2022/1/14
  */
 public class HomePageTabAdapter extends FragmentPagerAdapter {
-    protected List<Fragment> mList = new ArrayList<>();
+    public static final int HOME=0;
+    public static final int MOVIE=1;
+    public static final int TV=2;
+    public static final int CHILD=3;
+    public static final int VARIETY_SHOW=4;
+    public static final int UNKNOWN=5;
+    protected List<Fragment> mList = new ArrayList<>(5);
     protected List<IRefreshGenre> mIRefreshGenreList=new ArrayList<>();
 
     public HomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
         super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
 
-        HomePageFragment homePageFragment = HomePageFragment.newInstance(autofitHeight, 0);
-        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(autofitHeight, 1, Constants.VideoType.movie);
-        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(autofitHeight, 2, Constants.VideoType.tv);
-        UnknowFileFragment unknowFileFragment = UnknowFileFragment.newInstance(autofitHeight, 3);
-        CustomTagFragment customTagFragment=CustomTagFragment.newInstance(autofitHeight,4);
+        HomePageFragment homePageFragment = HomePageFragment.newInstance(autofitHeight, HOME);
+        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(autofitHeight, MOVIE, Constants.VideoType.movie);
+        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(autofitHeight, TV, Constants.VideoType.tv);
+        ThemeFragment childThemeFragment=ThemeFragment.newInstance(autofitHeight,CHILD,Constants.VideoType.child);
+        ThemeFragment varietyShowThemeFragment=ThemeFragment.newInstance(autofitHeight,VARIETY_SHOW,Constants.VideoType.variety_show);
+        UnknowFileFragment unknowFileFragment = UnknowFileFragment.newInstance(autofitHeight, UNKNOWN);
 
         mList.add(homePageFragment);
         mList.add(movieThemeFragment);
         mList.add(tvThemeFragment);
+        mList.add(childThemeFragment);
+        mList.add(varietyShowThemeFragment);
         mList.add(unknowFileFragment);
-        mList.add(customTagFragment);
 
         mIRefreshGenreList.add(homePageFragment);
         mIRefreshGenreList.add(movieThemeFragment);
         mIRefreshGenreList.add(tvThemeFragment);
-
-        mIRefreshGenreList.add(customTagFragment);
+        mIRefreshGenreList.add(childThemeFragment);
+        mIRefreshGenreList.add(varietyShowThemeFragment);
 
     }
 

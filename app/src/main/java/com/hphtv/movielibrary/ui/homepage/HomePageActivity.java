@@ -127,11 +127,13 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
         mBinding.viewpager.setOffscreenPageLimit(4);
         mBinding.tabLayout.setupWithViewPager(mBinding.viewpager);
-        mBinding.tabLayout.getTabAt(0).setCustomView(buildTabView(getString(R.string.tab_homepage)));
-        mBinding.tabLayout.getTabAt(1).setCustomView(buildTabView(getString(R.string.video_type_movie)));
-        mBinding.tabLayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.video_type_tv)));
-        mBinding.tabLayout.getTabAt(3).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
-        mBinding.tabLayout.getTabAt(4).setCustomView(buildTabView(getString(R.string.video_type_cartoon)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.HOME).setCustomView(buildTabView(getString(R.string.tab_homepage)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.MOVIE).setCustomView(buildTabView(getString(R.string.video_type_movie)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.TV).setCustomView(buildTabView(getString(R.string.video_type_tv)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.UNKNOWN).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.CHILD).setCustomView(buildTabView(getString(R.string.video_type_cartoon)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.VARIETY_SHOW).setCustomView(buildTabView(getString(R.string.video_type_variety_show)));
+
 //        mBinding.tabLayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
 
         for (int i = 0; i < mBinding.tabLayout.getTabCount(); i++) {
