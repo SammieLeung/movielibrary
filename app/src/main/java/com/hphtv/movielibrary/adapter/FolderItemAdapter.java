@@ -1,7 +1,11 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.InputDevice;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -70,8 +74,19 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
         FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
         binding.getRoot().setOnClickListener(v -> {
-            if (mOnClickListener != null)
-                mOnClickListener.onClick((FolderItem) v.getTag());
+//            if (mOnClickListener != null)
+//                mOnClickListener.onClick((FolderItem) v.getTag());
+        });
+
+        binding.getRoot().setOnKeyListener((v, keyCode, event) -> {
+            if ((keyCode == KeyEvent.KEYCODE_MENU)) {
+                if (event.getAction() == KeyEvent.ACTION_UP) {
+                    if (mOnClickListener != null)
+                        mOnClickListener.onClick((FolderItem) v.getTag());
+                }
+                return true;
+            }
+            return false;
         });
         return vh;
 //        }
@@ -128,7 +143,7 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     public void add(Shortcut shortcut) {
         FolderItem folderItem = buildFolderItem(shortcut);
         if (!mFolderItemList.contains(folderItem)) {
-            mFolderItemList.add(0,folderItem);
+            mFolderItemList.add(0, folderItem);
             notifyItemInserted(0);
         }
     }
