@@ -1,12 +1,16 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.theme;
 
 import android.os.Bundle;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * author: Sam Leung
@@ -32,6 +36,12 @@ public class ThemeFragment extends BaseHomeFragment<ThemeFragmentViewModel>  {
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mViewModel.setVideoType((Constants.VideoType) getArguments().getSerializable("type"));
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mBinding.setType(mViewModel.getVideoType());
     }
 
     @Override

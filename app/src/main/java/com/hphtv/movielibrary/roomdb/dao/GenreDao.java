@@ -33,8 +33,16 @@ public interface GenreDao {
     @Query("SELECT genre_id FROM " + TABLE.GENRE + " WHERE name in (:names)")
     public long[] queryByName(List<String> names);
 
-    @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " WHERE source=:source AND genre_name!=\"\" AND (:type IS NULL OR type=:type) GROUP BY genre_name;")
-    public List<String> queryGenresBySource(String source, @Nullable String type);
+    @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
+            " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
+            " ON M.id=MVCF.id " +
+            " JOIN " + TABLE.VIDEO_TAG + " AS VT " +
+            " ON VT.vtid=MVCF.vtid " +
+            " WHERE source=:source " +
+            " AND genre_name!=\"\" "+
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
+            " GROUP BY genre_name")
+    public List<String> queryGenresBySource(String source, @Nullable String video_tag);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long[] insertGenreTags(List<GenreTag> genreTagItemList);

@@ -1,7 +1,19 @@
 package com.hphtv.movielibrary.ui.homepage;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.IntEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.TypeConverter;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -9,14 +21,19 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.view.ViewCompat;
 import androidx.core.widget.NestedScrollView;
+import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
@@ -51,6 +68,71 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
     private boolean isMouseEvent = false;
+    ObjectAnimator mObjectAnimator;
+
+    private ViewPager.OnPageChangeListener mOnPageChangeListener = new ViewPager.OnPageChangeListener() {
+        private int mLastPos = 0;
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            if (position != HomePageTabAdapter.CHILD && mLastPos == HomePageTabAdapter.CHILD) {
+                if (mObjectAnimator != null) {
+                    mObjectAnimator.cancel();
+                    mObjectAnimator = null;
+                }
+                mObjectAnimator = ObjectAnimator.ofFloat(mBinding.viewBg2, View.ALPHA, 1);
+                mObjectAnimator.setDuration(300);
+                mObjectAnimator.start();
+                mBinding.btnPinyinSearch.setBackgroundResource(R.drawable.circle_btn_bg);
+                mBinding.btnShortcutmanager.setBackgroundResource(R.drawable.circle_btn_bg);
+                mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_bg);
+                mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_bg);
+
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch,getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager,getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode,getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings,getColorStateList(R.color.circle_btn_color_list));
+                //为child tabview设置特殊的背景
+                ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
+                View childTab=viewGroup.getChildAt(HomePageTabAdapter.CHILD);
+                ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_bg_2));
+
+            } else if (position == HomePageTabAdapter.CHILD) {
+                if (mObjectAnimator != null) {
+                    mObjectAnimator.cancel();
+                    mObjectAnimator = null;
+                }
+                mObjectAnimator = ObjectAnimator.ofFloat(mBinding.viewBg2, View.ALPHA, 0);
+                mObjectAnimator.setDuration(300);
+                mObjectAnimator.start();
+                mBinding.btnPinyinSearch.setBackgroundResource(R.drawable.circle_btn_child_bg);
+                mBinding.btnShortcutmanager.setBackgroundResource(R.drawable.circle_btn_child_bg);
+                mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_child_bg);
+                mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_child_bg);
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch, ColorStateList.valueOf(Color.WHITE));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager, ColorStateList.valueOf(Color.WHITE));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode, ColorStateList.valueOf(Color.WHITE));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, ColorStateList.valueOf(Color.WHITE));
+                //为child tabview设置特殊的背景
+                ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
+                View childTab=viewGroup.getChildAt(HomePageTabAdapter.CHILD);
+                ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_child_bg_2));
+
+
+            }
+
+            mLastPos = position;
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -91,6 +173,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }).start();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBinding.viewpager.removeOnPageChangeListener(mOnPageChangeListener);
+    }
+
     /**
      * 后台搜索结束后调用.
      */
@@ -125,7 +213,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     private void initTab() {
         mNewHomePageTabAdapter = new HomePageTabAdapter(this, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
-        mBinding.viewpager.setOffscreenPageLimit(4);
+        mBinding.viewpager.setOffscreenPageLimit(6);
         mBinding.tabLayout.setupWithViewPager(mBinding.viewpager);
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.HOME).setCustomView(buildTabView(getString(R.string.tab_homepage)));
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.MOVIE).setCustomView(buildTabView(getString(R.string.video_type_movie)));
@@ -134,14 +222,15 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.CHILD).setCustomView(buildTabView(getString(R.string.video_type_cartoon)));
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.VARIETY_SHOW).setCustomView(buildTabView(getString(R.string.video_type_variety_show)));
 
-//        mBinding.tabLayout.getTabAt(2).setCustomView(buildTabView(getString(R.string.tab_tv)));
+
+        mBinding.viewpager.addOnPageChangeListener(mOnPageChangeListener);
 
         for (int i = 0; i < mBinding.tabLayout.getTabCount(); i++) {
             LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mBinding.tabLayout.getTabAt(i).view.getLayoutParams();//
             params.rightMargin = DensityUtil.dip2px(this, 32);
             mBinding.tabLayout.getTabAt(i).view.setLayoutParams(params);
 
-//            //设定tabview的左右焦点 （主页、电影、电视剧、...）
+            //设定tabview的左右焦点 （主页、电影、电视剧、...）
             if (mBinding.tabLayout.getTabCount() > 1) {
                 View view = mBinding.tabLayout.getTabAt(i).view;
                 if (i == 0) {
@@ -259,12 +348,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
-    public void remoteRemoveMovieForFragment(int pos,String movie_id,String type){
+    public void remoteRemoveMovieForFragment(int pos, String movie_id, String type) {
         if (pos < mNewHomePageTabAdapter.mList.size()) {
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IRemoteRefresh) {
                 IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteRemoveMovie(movie_id,type);
+                activityResult.remoteRemoveMovie(movie_id, type);
             }
         }
     }
@@ -345,7 +434,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      */
     private void pageScroll(int offset) {
         LogUtil.v("pageScroll");
-            mBinding.nsv.smoothScrollBy(0, offset);
+        mBinding.nsv.smoothScrollBy(0, offset);
     }
 
     /**
@@ -442,6 +531,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     @Override
     public void remoteRemoveMovie(String movie_id, String type) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
-        remoteRemoveMovieForFragment(pos,movie_id,type);
+        remoteRemoveMovieForFragment(pos, movie_id, type);
     }
 }

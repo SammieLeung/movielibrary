@@ -100,7 +100,7 @@ public class MovieHelper {
     }
 
     public static void manualSaveMovie(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
-        manualSaveMovie(context,movieWrapper,videoFileList,true);
+        manualSaveMovie(context, movieWrapper, videoFileList, true);
     }
 
     /**
@@ -285,10 +285,10 @@ public class MovieHelper {
         }
     }
 
-    public static void quickAutoClassification(Context context,String movie_id,String source){
-        MovieDao movieDao=MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
-        MovieWrapper wrapper=movieDao.queryMovieWrapperByMovieId(movie_id,source);
-        autoClassification(context,wrapper.movie,wrapper.genres);
+    public static void quickAutoClassification(Context context, String movie_id, String source) {
+        MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
+        MovieWrapper wrapper = movieDao.queryMovieWrapperByMovieId(movie_id, source);
+        autoClassification(context, wrapper.movie, wrapper.genres);
     }
 
     /**
@@ -322,10 +322,10 @@ public class MovieHelper {
                 movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
             }
         }
-        Locale locale= Constants.Scraper.TMDB.equals(movie.source)?Locale.CHINESE:Locale.ENGLISH;
-        Configuration configuration=new Configuration(context.getResources().getConfiguration());
+        Locale locale = Constants.Scraper.TMDB.equals(movie.source) ? Locale.CHINESE : Locale.ENGLISH;
+        Configuration configuration = new Configuration(context.getResources().getConfiguration());
         configuration.setLocale(locale);
-        Context context_2=context.createConfigurationContext(configuration);
+        Context context_2 = context.createConfigurationContext(configuration);
 
         String kids = context_2.getString(R.string.kids);
         String animation = context_2.getString(R.string.animation);
@@ -333,11 +333,20 @@ public class MovieHelper {
         String family = context_2.getString(R.string.family);
         String talk = context_2.getString(R.string.talk);
         String reality = context_2.getString(R.string.reality);
+
+
+        //不宜儿童观看的类型
+        String crime = context_2.getString(R.string.crime);
+        String horror = context_2.getString(R.string.horror);
+        String thriller = context_2.getString(R.string.thriller);
+
         boolean isKids = false;
         boolean isComedy = false;
         boolean isFamily = false;
         boolean isAnimation = false;
         boolean isShow = false;
+
+        boolean isNotForKids = false;
 
         for (Genre genre : genreList) {
             String name = genre.name;
@@ -351,9 +360,11 @@ public class MovieHelper {
                 isFamily = true;
             if (name.equals(talk) || name.equals(reality))
                 isShow = true;
+            if (name.equals(crime) || name.equals(horror) || name.equals(thriller))
+                isNotForKids = true;
         }
 
-        if (isKids || (isAnimation && (isFamily || isComedy))) {
+        if (!isNotForKids&&(isKids || (isAnimation && (isFamily || isComedy)))) {
             VideoTag childTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.child);
             if (childTag == null) {
                 childTag = new VideoTag(Constants.VideoType.child);

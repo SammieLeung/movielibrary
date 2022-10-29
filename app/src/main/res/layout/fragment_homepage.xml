@@ -122,7 +122,7 @@
                 android:layout_below="@id/tv_empty_tips_1"
                 android:layout_centerInParent="true"
                 android:layout_marginTop="13dp"
-                android:background="@drawable/new_common_spinner_bg"
+                android:background="@{VideoType.child.equals(type)?@drawable/new_common_spinner_child_bg:@drawable/new_common_spinner_bg}"
                 android:padding="15dp"
                 android:text="@string/homepage_goto_add_shortcut" />
         </RelativeLayout>
@@ -142,13 +142,14 @@
               android:maxHeight="60dp"
               android:minHeight="60dp"
               android:layout_centerHorizontal="true"
-              android:background="@drawable/loading_view_bg"
+              android:background="@{VideoType.child.equals(type)?@drawable/loading_view_child_bg:@drawable/loading_view_bg}"
               app:SpinKit_Color="@color/white_light" />
         </RelativeLayout>
     </RelativeLayout>
 
     <data>
         <import type="android.view.View"/>
+        <import type="com.hphtv.movielibrary.data.Constants.VideoType"/>
         <variable
             name="recentAdd"
             type="boolean" />
@@ -164,5 +165,8 @@
         <variable
           name="isLoading"
           type="boolean" />
+        <variable
+          name="type"
+          type="VideoType" />
     </data>
 </layout>

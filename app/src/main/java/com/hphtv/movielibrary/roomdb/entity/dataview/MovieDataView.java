@@ -19,7 +19,7 @@ import java.util.Objects;
                 "SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.is_watched," +
                         "VF.path AS file_uri,VF.video_source,VF.resolution," +
                         "ST.uri AS dir_uri,ST.device_path AS device_uri,ST.name AS dir_name,ST.friendly_name AS dir_fname ," +
-                        "ST.access AS s_ap,"+
+                        "ST.access AS s_ap," +
                         "G.name AS genre_name," +
                         "M.add_time,M.last_playtime,M.is_favorite, " +
                         "CASE WHEN SD.season IS NOT NULL THEN SD.season " +
@@ -38,7 +38,7 @@ import java.util.Objects;
                         "ON M.id=MGCF.id " +
                         "LEFT OUTER JOIN " + TABLE.GENRE + " AS G " +
                         "ON MGCF.genre_id = G.genre_id " +
-                        "LEFT OUTER JOIN "+VIEW.SEASON_DATAVIEW+" AS SD " +
+                        "LEFT OUTER JOIN " + VIEW.SEASON_DATAVIEW + " AS SD " +
                         "ON SD.id=M.id",
         viewName = VIEW.MOVIE_DATAVIEW
 )
@@ -65,7 +65,7 @@ public class MovieDataView implements Serializable {
     public boolean is_favorite;
     public boolean is_watched;
 
-    public int season=-1;
+    public int season = -1;
     public String season_name;
     public String season_poster;
     public int episode_count;
@@ -78,12 +78,17 @@ public class MovieDataView implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MovieDataView that = (MovieDataView) o;
-        return movie_id.equals(that.movie_id) &&
-                source.equals(that.source) && season==that.season;//TODO 添加type比较
+        if (type.equals(that.type) && movie_id.equals(that.movie_id) && source.equals(that.source)) {
+            if (type.equals(Constants.VideoType.movie))
+                return true;
+            else if (type.equals(Constants.VideoType.tv))
+                return season == that.season;
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(movie_id, source,season);
+        return Objects.hash(movie_id, type, source, season);
     }
 }
