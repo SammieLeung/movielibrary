@@ -312,15 +312,14 @@ public class MovieHelper {
                 if (vtid > -1) {
                     typeTag.vtid = vtid;
                 } else {
-                    LogUtil.e("setVideoTag(sys): insert error " + typeTag.tag);
+                    LogUtil.w("setVideoTag(sys): insert error " + typeTag.tag + ";try to query");
+                    typeTag = videoTagDao.queryVtidBySysTag(type);
                 }
             }
-            if (typeTag != null) {
-                MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
-                movieVideoTagCrossRef.id = movie.id;
-                movieVideoTagCrossRef.vtid = typeTag.vtid;
-                movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
-            }
+            MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
+            movieVideoTagCrossRef.id = movie.id;
+            movieVideoTagCrossRef.vtid = typeTag.vtid;
+            movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
         }
         Locale locale = Constants.Scraper.TMDB.equals(movie.source) ? Locale.CHINESE : Locale.ENGLISH;
         Configuration configuration = new Configuration(context.getResources().getConfiguration());
@@ -364,24 +363,22 @@ public class MovieHelper {
                 isNotForKids = true;
         }
 
-        if (!isNotForKids&&(isKids || (isAnimation && (isFamily || isComedy)))) {
+        if (!isNotForKids && (isKids || (isAnimation && (isFamily || isComedy)))) {
             VideoTag childTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.child);
             if (childTag == null) {
                 childTag = new VideoTag(Constants.VideoType.child);
-                childTag.flag = 0;
                 long vtid = videoTagDao.insertOrIgnore(childTag);
                 if (vtid > -1) {
                     childTag.vtid = vtid;
                 } else {
-                    LogUtil.e("setVideoTag: insert error " + childTag.tag);
+                    childTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.child);
+                    LogUtil.w("setVideoTag(sys): insert error " + childTag.tag + ";try to query");
                 }
             }
-            if (childTag != null) {
-                MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
-                movieVideoTagCrossRef.id = movie.id;
-                movieVideoTagCrossRef.vtid = childTag.vtid;
-                movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
-            }
+            MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
+            movieVideoTagCrossRef.id = movie.id;
+            movieVideoTagCrossRef.vtid = childTag.vtid;
+            movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
 
         }
 
@@ -389,20 +386,18 @@ public class MovieHelper {
             VideoTag showTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.variety_show);
             if (showTag == null) {
                 showTag = new VideoTag(Constants.VideoType.variety_show);
-                showTag.flag = 0;
                 long vtid = videoTagDao.insertOrIgnore(showTag);
                 if (vtid > -1) {
                     showTag.vtid = vtid;
                 } else {
-                    LogUtil.e("setVideoTag: insert error " + showTag.tag);
+                    showTag = videoTagDao.queryVtidBySysTag(Constants.VideoType.variety_show);
+                    LogUtil.w("setVideoTag(sys): insert error " + showTag.tag + ";try to query");
                 }
             }
-            if (showTag != null) {
-                MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
-                movieVideoTagCrossRef.id = movie.id;
-                movieVideoTagCrossRef.vtid = showTag.vtid;
-                movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
-            }
+            MovieVideoTagCrossRef movieVideoTagCrossRef = new MovieVideoTagCrossRef();
+            movieVideoTagCrossRef.id = movie.id;
+            movieVideoTagCrossRef.vtid = showTag.vtid;
+            movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
         }
 
     }
