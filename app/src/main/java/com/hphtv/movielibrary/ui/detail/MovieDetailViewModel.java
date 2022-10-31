@@ -14,6 +14,7 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Season;
+import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.MovieHelper;
@@ -21,16 +22,13 @@ import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.StringTools;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -467,15 +465,5 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         mSeason = season;
     }
 
-    public interface Callback2 {
-        void runOnUIThread(Object... args);
-    }
 
-    public interface MovieWrapperCallback {
-        void runOnUIThread(MovieWrapper movieWrapper);
-    }
-
-    public interface UnrecognizedFileCallback {
-        void runOnUIThread(List<UnrecognizedFileDataView> unrecognizedFileDataViewList);
-    }
 }

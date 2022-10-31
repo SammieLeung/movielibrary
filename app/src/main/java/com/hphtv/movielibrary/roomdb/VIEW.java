@@ -6,10 +6,9 @@ package com.hphtv.movielibrary.roomdb;
  */
 public interface VIEW {
     String MOVIE_DATAVIEW="movie_dataview";
-    String UNRECOGNIZEDFILE_DATAVIEW="unrecognizedfile_dataview";
+    String CONNECTED_FILE_DATAVIEW ="connected_file_dataview";
     String HISTORY_MOVIE_DATAVIEW="history_movie_dataview";
 
-    String REMOTE_MOVIE_DATAVIEW="remote_movie_dataview";
     String SEASON_DATAVIEW ="season_dataview";
 
 }

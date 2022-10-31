@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.databinding.PosterItemBinding;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,9 +20,9 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class UnknowFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, UnrecognizedFileDataView> {
+public class UnknowFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, ConnectedFileDataView> {
 
-    public UnknowFileItemListAdapter(Context context, List<UnrecognizedFileDataView> list) {
+    public UnknowFileItemListAdapter(Context context, List<ConnectedFileDataView> list) {
         super(context, list);
     }
 
@@ -43,7 +43,7 @@ public class UnknowFileItemListAdapter extends BaseScaleAdapter<PosterItemBindin
     @Override
     public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        UnrecognizedFileDataView dataView = mList.get(position);
+        ConnectedFileDataView dataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
             Glide.with(mContext).load(R.drawable.default_poster).into(binding.rvPoster);
         binding.setTitle(dataView.filename);

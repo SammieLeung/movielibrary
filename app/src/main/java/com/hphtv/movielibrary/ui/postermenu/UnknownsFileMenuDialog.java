@@ -9,8 +9,8 @@ import androidx.annotation.Nullable;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.databinding.DialogUnknowfileItemMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
+import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.ILoadingState;
@@ -28,11 +28,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenuViewModel, DialogUnknowfileItemMenuBinding> {
 
-    public static UnknownsFileMenuDialog newInstance(int pos, UnrecognizedFileDataView unrecognizedFileDataView) {
+    public static UnknownsFileMenuDialog newInstance(int pos, ConnectedFileDataView connectedFileDataView) {
 
         Bundle args = new Bundle();
         args.putInt("pos", pos);
-        args.putSerializable("unknows", unrecognizedFileDataView);
+        args.putSerializable("unknows", connectedFileDataView);
         UnknownsFileMenuDialog fragment = new UnknownsFileMenuDialog();
         fragment.setArguments(args);
         return fragment;
@@ -57,16 +57,16 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
 
 
     private void bindDatas() {
-        UnrecognizedFileDataView dataView = (UnrecognizedFileDataView) getArguments().getSerializable("unknows");
+        ConnectedFileDataView dataView = (ConnectedFileDataView) getArguments().getSerializable("unknows");
         int pos = getArguments().getInt("pos");
         mViewModel.setItemPosition(pos);
-        mViewModel.setUnrecognizedFileDataView(dataView);
-        mBinding.setFilename(mViewModel.getUnrecognizedFileDataView().filename);
+        mViewModel.setConnectedFileDataView(dataView);
+        mBinding.setFilename(mViewModel.getConnectedFileDataView().filename);
     }
 
     private void playVideo(View view) {
-        UnrecognizedFileDataView unrecognizedFileDataView = mViewModel.getUnrecognizedFileDataView();
-        MovieHelper.playingMovie(unrecognizedFileDataView.path, unrecognizedFileDataView.filename)
+        ConnectedFileDataView connectedFileDataView = mViewModel.getConnectedFileDataView();
+        MovieHelper.playingMovie(connectedFileDataView.path, connectedFileDataView.filename)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
@@ -76,7 +76,7 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
     }
 
     private void showSelectPoster(View v) {
-        MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(mViewModel.getUnrecognizedFileDataView().keyword);
+        MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(mViewModel.getConnectedFileDataView().keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             ILoadingState loadingState = null;
             if (getParentFragment() instanceof ILoadingState)

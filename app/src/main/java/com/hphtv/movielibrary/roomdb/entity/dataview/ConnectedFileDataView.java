@@ -13,24 +13,25 @@ import java.io.Serializable;
  * date:  2021/6/22
  */
 @DatabaseView(value =
-        "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.uri AS dir_uri,ST.access AS s_ap,DEV.path AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired " +
+        "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.name AS dir_name,ST.uri AS dir_uri,ST.access AS s_ap,DEV.path AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired " +
                 "FROM " + TABLE.VIDEOFILE + " AS VF " +
                 "JOIN " + TABLE.SHORTCUT + " AS ST " +
                 "ON VF.dir_path=ST.uri " +
                 "JOIN " + TABLE.DEVICE + " AS DEV " +
                 "ON DEV.path=ST.device_path " +
                 "UNION " +
-                "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.uri AS dir_uri,ST.access AS s_ap,NULL AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired " +
+                "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.name AS dir_name,ST.uri AS dir_uri,ST.access AS s_ap,NULL AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired " +
                 "FROM " + TABLE.VIDEOFILE + " AS VF " +
                 "JOIN " + TABLE.SHORTCUT + " AS ST " +
                 "ON VF.dir_path=ST.uri " +
                 "WHERE ST.device_type>5",
-        viewName = VIEW.UNRECOGNIZEDFILE_DATAVIEW)
-public class UnrecognizedFileDataView implements Serializable {
+        viewName = VIEW.CONNECTED_FILE_DATAVIEW)
+public class ConnectedFileDataView implements Serializable {
     public long vid;
     public String filename;
     public String keyword;
     public String path;
+    public String dir_name;
     public String dir_uri;
     public String device_uri;
     public Constants.WatchLimit s_ap;

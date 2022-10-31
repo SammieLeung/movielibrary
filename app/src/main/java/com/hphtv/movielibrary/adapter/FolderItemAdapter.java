@@ -73,9 +73,10 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
 //        } else {
         FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
-        binding.getRoot().setOnClickListener(v -> {
-//            if (mOnClickListener != null)
-//                mOnClickListener.onClick((FolderItem) v.getTag());
+        binding.getRoot().setOnLongClickListener((View.OnLongClickListener) v -> {
+            if (mOnClickListener != null)
+                mOnClickListener.onClick((FolderItem) v.getTag());
+            return true;
         });
 
         binding.getRoot().setOnKeyListener((v, keyCode, event) -> {

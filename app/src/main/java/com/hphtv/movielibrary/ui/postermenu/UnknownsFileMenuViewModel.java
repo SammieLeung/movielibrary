@@ -10,7 +10,7 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
@@ -30,7 +30,7 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
     private VideoFileDao mVideoFileDao;
     private MovieDao mMovieDao;
     private int mItemPosition=0;
-    private UnrecognizedFileDataView mUnrecognizedFileDataView;
+    private ConnectedFileDataView mConnectedFileDataView;
     public UnknownsFileMenuViewModel(@NonNull @NotNull Application application) {
         super(application);
         mVideoFileDao= MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
@@ -39,7 +39,7 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
 
     public Observable<MovieDataView> reMatchMovie(MovieWrapper newWrapper){
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            VideoFile videoFile=mVideoFileDao.queryByVid(mUnrecognizedFileDataView.vid);
+            VideoFile videoFile=mVideoFileDao.queryByVid(mConnectedFileDataView.vid);
             MovieHelper.addNewMovieInfo(getApplication(),newWrapper,videoFile);
             MovieDataView movieDataView=mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId,newWrapper.movie.type.name(), ScraperSourceTools.getSource());
             emitter.onNext(movieDataView);
@@ -57,11 +57,11 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
         mItemPosition = itemPosition;
     }
 
-    public UnrecognizedFileDataView getUnrecognizedFileDataView() {
-        return mUnrecognizedFileDataView;
+    public ConnectedFileDataView getConnectedFileDataView() {
+        return mConnectedFileDataView;
     }
 
-    public void setUnrecognizedFileDataView(UnrecognizedFileDataView unrecognizedFileDataView) {
-        mUnrecognizedFileDataView = unrecognizedFileDataView;
+    public void setConnectedFileDataView(ConnectedFileDataView connectedFileDataView) {
+        mConnectedFileDataView = connectedFileDataView;
     }
 }

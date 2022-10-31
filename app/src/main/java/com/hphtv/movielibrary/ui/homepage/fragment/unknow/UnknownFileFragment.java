@@ -15,9 +15,8 @@ import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnrecognizedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
-import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
@@ -28,7 +27,6 @@ import com.station.kit.util.DensityUtil;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -91,10 +89,10 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileVie
             protected void onLoading(int countItem, int lastItem) {
                 if (mViewModel != null)
                     mViewModel.loadMoreUnknowFiles()
-                            .subscribe(new SimpleObserver<List<UnrecognizedFileDataView>>() {
+                            .subscribe(new SimpleObserver<List<ConnectedFileDataView>>() {
                                 @Override
-                                public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
-                                    mUnknowsFileItemListAdapter.appendAll(unrecognizedFileDataViews);
+                                public void onAction(List<ConnectedFileDataView> connectedFileDataViews) {
+                                    mUnknowsFileItemListAdapter.appendAll(connectedFileDataViews);
                                 }
                             });
             }
@@ -128,14 +126,14 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileVie
      * @param data
      * @return
      */
-    private boolean showUnknownsFileMenuDialog(View view, int position, UnrecognizedFileDataView data) {
+    private boolean showUnknownsFileMenuDialog(View view, int position, ConnectedFileDataView data) {
         ActivityHelper.showUnknownsFileMenuDialog(getChildFragmentManager(), position, data);
         return true;
     }
 
-    private BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<UnrecognizedFileDataView>() {
+    private BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<ConnectedFileDataView>() {
         @Override
-        public void onItemClick(View view, int position, UnrecognizedFileDataView data) {
+        public void onItemClick(View view, int position, ConnectedFileDataView data) {
             mViewModel.playVideo(data.path, data.filename)
                     .subscribe(new SimpleObserver<String>() {
                         @Override
@@ -165,15 +163,15 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileVie
         }
         if (mViewModel != null) {
             mViewModel.reLoadUnknownFiles()
-                    .subscribe(new SimpleLoadingObserver<List<UnrecognizedFileDataView>>(this) {
+                    .subscribe(new SimpleLoadingObserver<List<ConnectedFileDataView>>(this) {
                         @Override
-                        public void onAction(List<UnrecognizedFileDataView> unrecognizedFileDataViews) {
-                            if(unrecognizedFileDataViews.size()>0) {
+                        public void onAction(List<ConnectedFileDataView> connectedFileDataViews) {
+                            if(connectedFileDataViews.size()>0) {
                                 mBinding.setIsEmpty(false);
-                                mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
+                                mUnknowsFileItemListAdapter.addAll(connectedFileDataViews);
                             }else{
                                 mBinding.setIsEmpty(true);
-                                mUnknowsFileItemListAdapter.addAll(unrecognizedFileDataViews);
+                                mUnknowsFileItemListAdapter.addAll(connectedFileDataViews);
                             }
                         }
                     });
