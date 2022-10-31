@@ -8,8 +8,9 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
-import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknowFileFragment;
+import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
+import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -30,16 +31,16 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
     protected List<Fragment> mList = new ArrayList<>(5);
     protected List<IRefreshGenre> mIRefreshGenreList=new ArrayList<>();
 
-    public HomePageTabAdapter(IAutofitHeight autofitHeight, FragmentManager fm) {
+    public HomePageTabAdapter(NoScrollAutofitHeightViewPager viewPager, FragmentManager fm) {
         super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
 
-        HomePageFragment homePageFragment = HomePageFragment.newInstance(autofitHeight, HOME);
-        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(autofitHeight, MOVIE, Constants.VideoType.movie);
-        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(autofitHeight, TV, Constants.VideoType.tv);
-        ThemeFragment childThemeFragment=ThemeFragment.newInstance(autofitHeight,CHILD,Constants.VideoType.child);
-        ThemeFragment varietyShowThemeFragment=ThemeFragment.newInstance(autofitHeight,VARIETY_SHOW,Constants.VideoType.variety_show);
-        UnknowFileFragment unknowFileFragment = UnknowFileFragment.newInstance(autofitHeight, UNKNOWN);
+        HomePageFragment homePageFragment = HomePageFragment.newInstance(viewPager, HOME);
+        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(viewPager, MOVIE, Constants.VideoType.movie);
+        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(viewPager, TV, Constants.VideoType.tv);
+        ThemeFragment childThemeFragment=ThemeFragment.newInstance(viewPager,CHILD,Constants.VideoType.child);
+        ThemeFragment varietyShowThemeFragment=ThemeFragment.newInstance(viewPager,VARIETY_SHOW,Constants.VideoType.variety_show);
+        UnknownFileFragment unknowFileFragment = UnknownFileFragment.newInstance(viewPager, UNKNOWN);
 
         mList.add(homePageFragment);
         mList.add(movieThemeFragment);

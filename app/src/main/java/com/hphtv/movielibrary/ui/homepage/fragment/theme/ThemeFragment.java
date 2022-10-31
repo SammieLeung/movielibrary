@@ -7,30 +7,35 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment;
+import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 
 /**
  * author: Sam Leung
  * date:  2022/6/7
  */
-public class ThemeFragment extends BaseHomeFragment<ThemeFragmentViewModel>  {
-    public static final String TAG=ThemeFragment.class.getSimpleName();
+public class ThemeFragment extends BaseHomeFragment<ThemeFragmentViewModel> {
 
+    public ThemeFragment() {
+        super(ThemeFragment.class.getSimpleName());
+    }
 
-    public static ThemeFragment newInstance(IAutofitHeight autofitHeight, int position, Constants.VideoType type) {
+    public static ThemeFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position, Constants.VideoType type) {
         Bundle args = new Bundle();
-        ThemeFragment fragment = new ThemeFragment(autofitHeight, position);
+        ThemeFragment fragment = new ThemeFragment();
         args.putSerializable("type", type);
+        args.putInt(BaseAutofitHeightFragment.POSITION, position);
         fragment.setArguments(args);
+        fragment.setAutoFitHeightViewPager(viewPager);
         return fragment;
     }
 
-    public ThemeFragment(IAutofitHeight autofitHeight, int position) {
-        super(autofitHeight, position, TAG);
-    }
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {

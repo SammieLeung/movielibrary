@@ -2,10 +2,12 @@ package com.hphtv.movielibrary.ui.homepage;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
@@ -15,31 +17,45 @@ import com.hphtv.movielibrary.ui.BaseFragment2;
 import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
+import java.lang.ref.WeakReference;
+
 /**
  * author: Sam Leung
  * date:  2021/11/5
  */
-public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IAutofitHeight, IActivityResult, IRemoteRefresh {
-    private IAutofitHeight mIAutofitHeight;
-    private int mPostion;
+public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IActivityResult, IRemoteRefresh {
+    public static String TAG;
+    public static final String AUTO_FIT_HEIGHT = "arg_autofit";
+    public static final String POSITION = "pos";
+    private int mPosition;
+    private WeakReference<NoScrollAutofitHeightViewPager> mViewPagerWeakReference;
 
-    public BaseAutofitHeightFragment(IAutofitHeight autofitHeight, int position) {
-        mIAutofitHeight = autofitHeight;
-        mPostion = position;
+
+    public BaseAutofitHeightFragment(String tag) {
+        TAG = tag;
+    }
+
+
+    @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mPosition = getArguments().getInt(POSITION);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        int pos = mPostion;
-        getAutofitHeightViewPager().setViewPosition(view, pos);
+        int pos = mPosition;
+        if (mViewPagerWeakReference != null) {
+            mViewPagerWeakReference.get().setViewPosition(view, pos);
+            mViewPagerWeakReference = null;
+            Log.w(TAG, "onCreateView:  getWeakRefence");
+        } else {
+            Log.w(TAG, "onCreateView:  getBaseActivity.viewpager");
+            getBaseActivity().getBinding().viewpager.setViewPosition(view, pos);
+        }
         return view;
-    }
-
-    @Override
-    public NoScrollAutofitHeightViewPager getAutofitHeightViewPager() {
-        return mIAutofitHeight.getAutofitHeightViewPager();
     }
 
     @Override
@@ -59,16 +75,21 @@ public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id,String type, boolean isFavorite) {
+    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
 
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id,String type){
+    public void remoteRemoveMovie(String movie_id, String type) {
 
     }
 
-    public HomePageActivity getBaseActivity(){
+    //TODO
+    public void setAutoFitHeightViewPager(NoScrollAutofitHeightViewPager viewPager) {
+        mViewPagerWeakReference = new WeakReference<>(viewPager);
+    }
+
+    public HomePageActivity getBaseActivity() {
         return (HomePageActivity) getActivity();
     }
 

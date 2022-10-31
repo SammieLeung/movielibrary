@@ -45,7 +45,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * date:  2022/10/26
  */
 public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends BaseAutofitHeightFragment<VM, FragmentHomepageBinding> implements IRefreshGenre, ILoadingState {
-    private static String sTAG;
     private HistoryListAdapter mHistoryListAdapter;
     private GenreTagAdapter mGenreTagAdapter;
     private NewMovieItemWithMoreListAdapter mRecentlyAddListAdapter;
@@ -104,8 +103,9 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private TvRecyclerView.OnBackPressListener mOnBackPressListener = () -> getActivity().finish();
 
     protected abstract String getVideoTagName();
-    public BaseHomeFragment(IAutofitHeight autofitHeight, int position, String tag) {
-        super(autofitHeight, position);
+
+    public BaseHomeFragment(String tag) {
+        super(tag);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.unknow;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -21,14 +20,15 @@ import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
+import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
-import com.station.kit.util.LogUtil;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,19 +38,20 @@ import io.reactivex.rxjava3.disposables.Disposable;
  * author: Sam Leung
  * date:  2022/4/2
  */
-public class UnknowFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
-    public static final String TAG = UnknowFileFragment.class.getSimpleName();
+public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
     private UnknowFileItemListAdapter mUnknowsFileItemListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
 
-    public UnknowFileFragment(IAutofitHeight autofitHeight, int position) {
-        super(autofitHeight, position);
+    public UnknownFileFragment(){
+        super(UnknownFileFragment.class.getSimpleName());
     }
 
-    public static UnknowFileFragment newInstance(IAutofitHeight autofitHeight, int positon) {
+    public static UnknownFileFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position) {
         Bundle args = new Bundle();
-        UnknowFileFragment fragment = new UnknowFileFragment(autofitHeight, positon);
+        UnknownFileFragment fragment = new UnknownFileFragment();
+        args.putInt(BaseAutofitHeightFragment.POSITION,position);
         fragment.setArguments(args);
+        fragment.setAutoFitHeightViewPager(viewPager);
         return fragment;
     }
 

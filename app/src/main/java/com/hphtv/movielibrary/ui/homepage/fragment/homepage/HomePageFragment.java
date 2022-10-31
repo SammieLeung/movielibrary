@@ -31,6 +31,7 @@ import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
+import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -40,6 +41,7 @@ import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,15 +51,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  * date:  2021/11/5
  */
 public class HomePageFragment extends BaseHomeFragment<HomeFragmentViewModel> {
-    public static final String TAG=HomePageFragment.class.getSimpleName();
-    private HomePageFragment(IAutofitHeight autofitHeight, int position) {
-        super(autofitHeight, position,TAG);
+
+    public HomePageFragment() {
+        super( HomePageFragment.class.getSimpleName());
     }
 
-    public static HomePageFragment newInstance(IAutofitHeight autofitHeight, int positon) {
+    public static HomePageFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position) {
         Bundle args = new Bundle();
-        HomePageFragment fragment = new HomePageFragment(autofitHeight, positon);
+        HomePageFragment fragment = new HomePageFragment();
+        args.putInt(BaseAutofitHeightFragment.POSITION, position);
         fragment.setArguments(args);
+        fragment.setAutoFitHeightViewPager(viewPager);
         return fragment;
     }
 

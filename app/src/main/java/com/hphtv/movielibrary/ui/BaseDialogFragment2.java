@@ -51,7 +51,7 @@ public abstract class BaseDialogFragment2<VM extends AndroidViewModel, VDB exten
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBinding.setLifecycleOwner(this);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
     }
 

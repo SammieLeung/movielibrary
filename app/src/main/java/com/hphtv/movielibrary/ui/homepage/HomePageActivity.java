@@ -57,13 +57,14 @@ import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.PackageTools;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * author: Sam Leung
  * date:  2022/1/13
  */
-public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements IAutofitHeight, OnMovieChangeListener {
+public class HomePageActivity extends PermissionActivity<HomePageViewModel, ActivityNewHomepageBinding> implements OnMovieChangeListener {
     private HomePageTabAdapter mNewHomePageTabAdapter;
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
@@ -92,13 +93,13 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                 mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_bg);
                 mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_bg);
 
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch,getColorStateList(R.color.circle_btn_color_list));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager,getColorStateList(R.color.circle_btn_color_list));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode,getColorStateList(R.color.circle_btn_color_list));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings,getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch, getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager, getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode, getColorStateList(R.color.circle_btn_color_list));
+                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, getColorStateList(R.color.circle_btn_color_list));
                 //为child tabview设置特殊的背景
                 ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
-                View childTab=viewGroup.getChildAt(HomePageTabAdapter.CHILD);
+                View childTab = viewGroup.getChildAt(HomePageTabAdapter.CHILD);
                 ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_bg_2));
 
             } else if (position == HomePageTabAdapter.CHILD) {
@@ -119,7 +120,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                 TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, ColorStateList.valueOf(Color.WHITE));
                 //为child tabview设置特殊的背景
                 ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
-                View childTab=viewGroup.getChildAt(HomePageTabAdapter.CHILD);
+                View childTab = viewGroup.getChildAt(HomePageTabAdapter.CHILD);
                 ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_child_bg_2));
 
 
@@ -211,7 +212,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      * 初始化TAB
      */
     private void initTab() {
-        mNewHomePageTabAdapter = new HomePageTabAdapter(this, getSupportFragmentManager());
+        mNewHomePageTabAdapter = new HomePageTabAdapter(mBinding.viewpager, getSupportFragmentManager());
         mBinding.viewpager.setAdapter(mNewHomePageTabAdapter);
         mBinding.viewpager.setOffscreenPageLimit(6);
         mBinding.tabLayout.setupWithViewPager(mBinding.viewpager);
@@ -356,17 +357,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                 activityResult.remoteRemoveMovie(movie_id, type);
             }
         }
-    }
-
-
-    /**
-     * 获取NoScrollAutofitHeightViewPager
-     *
-     * @return
-     */
-    @Override
-    public NoScrollAutofitHeightViewPager getAutofitHeightViewPager() {
-        return mBinding.viewpager;
     }
 
     @Override
@@ -533,4 +523,5 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         int pos = mBinding.tabLayout.getSelectedTabPosition();
         remoteRemoveMovieForFragment(pos, movie_id, type);
     }
+
 }

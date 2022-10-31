@@ -7,6 +7,6 @@ import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
  * date:  2022/1/14
  * 用于实现当NestedScrollView嵌套Viewpager，viewpager实现自适应高度的接口
  */
-public interface IAutofitHeight {
+public interface IAutofitHeight  {
     NoScrollAutofitHeightViewPager getAutofitHeightViewPager();
 }
