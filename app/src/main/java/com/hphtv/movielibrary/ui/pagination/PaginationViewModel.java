@@ -109,8 +109,9 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     mPage.set(0);
                     int count = 0;
                     List<MovieDataView> movieDataViewList;
-                    count = mMovieDao.countMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode());
-                    movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
+                    String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
+                    count = mMovieDao.countMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode());
+                    movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
                     mTotal.set(count);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -132,7 +133,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
                         int offset = mPage.incrementAndGet() * LIMIT;
                         List<MovieDataView> movieDataViewList;
-                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
+                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, LIMIT);
                         emitter.onNext(movieDataViewList);
                     }
                     emitter.onComplete();
@@ -153,8 +155,9 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     mPage.set(0);
                     int count;
                     List<MovieDataView> movieDataViewList;
-                    count = mMovieDao.countFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode());
-                    movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
+                    String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
+                    count = mMovieDao.countFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode());
+                    movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), 0, LIMIT);
                     mTotal.set(count);
                     emitter.onNext(movieDataViewList);
                     emitter.onComplete();
@@ -176,7 +179,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
                         int offset = mPage.incrementAndGet() * LIMIT;
                         List<MovieDataView> movieDataViewList;
-                        movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoTag.tag.name(), Config.getSqlConditionOfChildMode(), offset, LIMIT);
+                        String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
+                        movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, LIMIT);
                         emitter.onNext(movieDataViewList);
                     }
                     emitter.onComplete();

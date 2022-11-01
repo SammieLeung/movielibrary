@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityPaginationBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
@@ -43,7 +42,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
 
-    BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView>() {
+    BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView>() {
         @Override
         public void onItemClick(View view, int position, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(PaginationActivity.this, data);
