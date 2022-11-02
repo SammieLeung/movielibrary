@@ -65,14 +65,11 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
     @NotNull
     @Override
     public CommonViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-//        if (viewType == TYPE_HEAD) {
-//            FolderAddItemLayoutBinding binding = FolderAddItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
-//            CommonViewHolder<FolderAddItemLayoutBinding> vh = new CommonViewHolder<>(binding);
-//            binding.setPosterHandler(mEventHandler);
-//            return vh;
-//        } else {
         FolderItemLayoutBinding binding = FolderItemLayoutBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         CommonViewHolder<FolderItemLayoutBinding> vh = new CommonViewHolder<>(binding);
+        binding.getRoot().setOnClickListener(v -> {
+
+        });
         binding.getRoot().setOnLongClickListener((View.OnLongClickListener) v -> {
             if (mOnClickListener != null)
                 mOnClickListener.onClick((FolderItem) v.getTag());
@@ -90,13 +87,10 @@ public class FolderItemAdapter extends RecyclerView.Adapter<CommonViewHolder> {
             return false;
         });
         return vh;
-//        }
     }
 
     @Override
     public int getItemViewType(int position) {
-//        if (position == 0)
-//            return TYPE_HEAD;
         return TYPE_FOLDER;
     }
 
