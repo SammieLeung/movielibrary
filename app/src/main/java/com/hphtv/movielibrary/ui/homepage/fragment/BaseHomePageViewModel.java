@@ -21,7 +21,6 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
-import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,16 +42,13 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     protected GenreDao mGenreDao;
     protected VideoFileDao mVideoFileDao;
     protected MovieDao mMovieDao;
-    public Callback mGenreCallback;
-    protected List<HistoryMovieDataView> mHistoryMovieDataViews = new ArrayList<>();
     private List<HistoryMovieDataView> mRecentlyPlayedList = new ArrayList<>();
     private List<String> mGenreTagList = new ArrayList<>();
     private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
     private List<MovieDataView> mFavoriteList = new ArrayList<>();
-    private List<MovieDataView> mRecommandList = new ArrayList<>();
+    private List<MovieDataView> mRecommendList = new ArrayList<>();
     public BaseHomePageViewModel(@NonNull @NotNull Application application) {
         super(application);
-
         initDao();
     }
 
@@ -84,25 +80,13 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     public Observable<List<HistoryMovieDataView>> prepareHistory() {
         return Observable.just("").map(s -> {
             List<HistoryMovieDataView> movieDataViewList = queryHistoryMovieDataView();
-            mHistoryMovieDataViews.clear();
-            mHistoryMovieDataViews.addAll(movieDataViewList);
             return movieDataViewList;
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
 
     }
 
-    public void playingVideo(String path, String name, Callback callback) {
-        MovieHelper.playingMovie(path, name).subscribe(new SimpleObserver<String>() {
-            @Override
-            public void onAction(String s) {
-                prepareHistory().subscribe(new SimpleObserver<List<HistoryMovieDataView>>() {
-                    @Override
-                    public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
-                        callback.runOnUIThread(historyMovieDataViews);
-                    }
-                });
-            }
-        });
+    public Observable<String> playingVideo(String path, String name) {
+       return MovieHelper.playingMovie(path, name);
     }
 
     public void startDetailActivity(AppBaseActivity appBaseActivity, MovieDataView movieDataView) {
@@ -150,8 +134,6 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
             emitter.onNext(movieDataViewList);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-
-
     }
 
     public Observable<List<MovieDataView>> prepareFavorite() {
@@ -165,11 +147,11 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     public Observable<List<MovieDataView>> prepareRecommend() {
         return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
             String source = ScraperSourceTools.getSource();
-            if (mHistoryMovieDataViews.size() > 0) {
+            if (mRecentlyPlayedList.size() > 0) {
                 List<String> genreList = new ArrayList<>();
                 List<Long> idList = new ArrayList<>();
-                for (int i = 0; idList.size() < 3 && i < mHistoryMovieDataViews.size(); i++) {
-                    MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(mHistoryMovieDataViews.get(i).path, source);
+                for (int i = 0; idList.size() < 3 && i < mRecentlyPlayedList.size(); i++) {
+                    MovieWrapper wrapper = mMovieDao.queryMovieWrapperByFilePath(mRecentlyPlayedList.get(i).path, source);
                     if (wrapper != null) {
                         for (Genre genre : wrapper.genres) {
                             if (genre.source.equals(source) && !genreList.contains(genre.name)) {
@@ -196,7 +178,23 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
 
-    public interface Callback {
-        void runOnUIThread(List<?> list);
+    public List<HistoryMovieDataView> getRecentlyPlayedList() {
+        return mRecentlyPlayedList;
+    }
+
+    public List<String> getGenreTagList() {
+        return mGenreTagList;
+    }
+
+    public List<MovieDataView> getRecentlyAddedList() {
+        return mRecentlyAddedList;
+    }
+
+    public List<MovieDataView> getFavoriteList() {
+        return mFavoriteList;
+    }
+
+    public List<MovieDataView> getRecommendList() {
+        return mRecommendList;
     }
 }

@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.ui.moviesearch.pinyin;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
@@ -26,26 +27,29 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2021/8/19
  */
 public class PinyinSearchViewModel extends AndroidViewModel {
-
+    public static final String TAG = PinyinSearchViewModel.class.getSimpleName();
     private MovieDao mMovieDao;
 
     private List<MovieDataView> mMovieDataViewList;
     private String mSource;
 
-    private ObservableBoolean isEmpty=new ObservableBoolean(true);
-    private ObservableBoolean isShowTab=new ObservableBoolean(false);
+    private ObservableBoolean isEmpty = new ObservableBoolean(true);
+    private ObservableBoolean isShowTab = new ObservableBoolean(false);
 
     public PinyinSearchViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase database = MovieLibraryRoomDatabase.getDatabase(application);
         mMovieDao = database.getMovieDao();
-        mSource= ScraperSourceTools.getSource();
+        mSource = ScraperSourceTools.getSource();
     }
 
     public void init() {
         Observable.just("")
                 .observeOn(Schedulers.io())
-                .subscribe(s -> mMovieDataViewList = mMovieDao.queryAllMovieDataView(mSource, Config.getSqlConditionOfChildMode()));
+                .subscribe(s -> {
+                    mMovieDataViewList = mMovieDao.queryAllMovieDataView(mSource, Config.getSqlConditionOfChildMode());
+                    Log.w(TAG, "init:初始化"+mMovieDataViewList.size()+"部电影 ");
+                });
     }
 
     public void search(String keyword, Callback<MovieDataView> callback) {

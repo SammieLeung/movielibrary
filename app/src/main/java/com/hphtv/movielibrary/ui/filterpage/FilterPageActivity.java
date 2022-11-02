@@ -30,7 +30,6 @@ import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -124,7 +123,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
         mBinding.recyclerview.setLayoutManager(gridLayoutManager);
 
-        mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
+        mMovieItemListAdapter = new NewMovieItemListAdapter(this, mViewModel.getMovieDataViews());
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
         mMovieItemListAdapter.setOnItemLongClickListener((view, position, data) -> {
             ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), position, data);
@@ -174,8 +173,6 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     private void bindDatas() {
         mBinding.setEmptyType(mViewModel.getEmptyType());
         mBinding.setConditions(mViewModel.getConditionStr());
-        mBinding.setRow(mViewModel.getRowStr());
-        mBinding.setTotal(mViewModel.getMovieCount());
     }
 
     @Override
@@ -197,7 +194,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     }
 
     private void loadAMoreAllMovies() {
-        mViewModel.loadMoiveDataViews();
+        mViewModel.loadMovieDataViews();
     }
 
     FilterPageViewModel.OnRefresh mOnRefresh = new FilterPageViewModel.OnRefresh() {
@@ -239,6 +236,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     @Override
     public void remoteRemoveMovie(String movie_id, String type) {
         mMovieItemListAdapter.remove(movie_id, type);
+        mViewModel.checkEmpty();
     }
 
     @Override
@@ -257,14 +255,14 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     @Override
     public void OnMovieRemove(String movieId, String type, int pos) {
         mMovieItemListAdapter.remove(movieId, type, pos);
-        mViewModel.checkEmpty(mViewModel.decreaseTotal());
+        mViewModel.checkEmpty();
         setResult(RESULT_OK);
     }
 
     @Override
     public void OnMovieInsert(MovieDataView movieDataView, int pos) {
         mMovieItemListAdapter.insert(movieDataView, pos);
-        mViewModel.checkEmpty(mViewModel.increaseTotal());
+        mViewModel.checkEmpty();
         setResult(RESULT_OK);
     }
 

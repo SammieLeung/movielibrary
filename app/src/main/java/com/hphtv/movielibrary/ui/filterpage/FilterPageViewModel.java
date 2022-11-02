@@ -1,32 +1,31 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.app.Application;
-import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ObservableInt;
 
-import com.firefly.videonameparser.utils.StringUtils;
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
-import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.util.PaginatedDataLoader;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.eclipse.jetty.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -39,18 +38,17 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2022/2/22
  */
 public class FilterPageViewModel extends BaseAndroidViewModel {
+    public static final String TAG = FilterPageViewModel.class.getSimpleName();
+
     public static final int EP_NOT_EMPTY = 0;
     public static final int EP_NO_MOVIE = 1;
     public static final int EP_NO_RESULT = 2;
     public static final int LIMIT = 15;
 
-    public static final int DEFAULT_ORDER=3;
-    private AtomicInteger mPage = new AtomicInteger();
+    public static final int DEFAULT_ORDER = 3;
     private MovieDao mMovieDao;
     private VideoTagDao mVideoTagDao;
     private Shortcut mShortcut;
-    private int mTotal;
-    private int mTotalRow;
     private VideoTag mVideoTag;
     private String mGenre, mYear, mYear2;
     private int mOrder = DEFAULT_ORDER;
@@ -60,8 +58,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
 
     private ObservableInt mEmptyType = new ObservableInt(EP_NO_MOVIE);
     private ObservableField<String> mConditionStr = new ObservableField<>();
-    private ObservableField<String> mMovieCount = new ObservableField<>();
-    private ObservableField<String> mRowStr = new ObservableField<>();
+
+    private List<MovieDataView> mMovieDataViews = new ArrayList<>();
 
 
     public FilterPageViewModel(@NonNull @NotNull Application application) {
@@ -71,70 +69,25 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     }
 
     public void reloadMovieDataViews() {
-        Observable.just("")
-                .map(_offset -> {
-                    mPage.set(0);
-                    String dir_uri = null;
-                    long vtid = -1;
-                    if (mShortcut != null)
-                        dir_uri = mShortcut.uri;
-                    if (mVideoTag != null)
-                        vtid = mVideoTag.vtid;
-                    mTotal = mMovieDao.countMovieDataView(dir_uri, vtid, mGenre, mYear, mYear2,Config.getSqlConditionOfChildMode(), ScraperSourceTools.getSource());
-                    mTotalRow = (int) Math.ceil(1.0f * mTotal / 5);
-                    checkEmpty(mTotal);
-                    return mMovieDao.queryMovieDataView(dir_uri, vtid, mGenre, mYear,mYear2, mOrder, Config.getSqlConditionOfChildMode(), isDesc, ScraperSourceTools.getSource(), 0, LIMIT);
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViews) {
-                        if (mOnRefresh != null)
-                            mOnRefresh.newSearch(movieDataViews);
-                    }
-                });
+        mMovieDataViewPaginatedDataLoader.reload();
     }
 
-    public void loadMoiveDataViews() {
-        Observable.just("")
-                .map(_offset -> {
-                    if ((mPage.get() + 1) * LIMIT < mTotal) {
-                        int offset = mPage.incrementAndGet() * LIMIT;
-                        String dir_uri = null;
-                        long vtid = -1;
-                        if (mShortcut != null)
-                            dir_uri = mShortcut.uri;
-                        if (mVideoTag != null)
-                            vtid = mVideoTag.vtid;
-                        return mMovieDao.queryMovieDataView(dir_uri, vtid, mGenre, mYear,mYear2, mOrder, Config.getSqlConditionOfChildMode(), isDesc, ScraperSourceTools.getSource(), offset, LIMIT);
-                    } else {
-                        List<MovieDataView> emptyList = new ArrayList();
-                        return emptyList;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViews) {
-                        if (mOnRefresh != null)
-                            mOnRefresh.appendMovieDataViews(movieDataViews);
-                    }
-                });
+    public void loadMovieDataViews() {
+        mMovieDataViewPaginatedDataLoader.load();
     }
 
     public void reOrderMovieDataViews() {
         Observable.just("")
                 .map(_offset -> {
-                    int limit = mPage.get() * LIMIT + LIMIT;
+                    int page = mMovieDataViewPaginatedDataLoader.getPage();
+                    int limit=mMovieDataViewPaginatedDataLoader.getFirstLimit()+page*mMovieDataViewPaginatedDataLoader.getLimit();
                     String dir_uri = null;
                     long vtid = -1;
                     if (mShortcut != null)
                         dir_uri = mShortcut.uri;
                     if (mVideoTag != null)
                         vtid = mVideoTag.vtid;
-                    return mMovieDao.queryMovieDataView(dir_uri, vtid, mGenre, mYear, mYear2,mOrder, Config.getSqlConditionOfChildMode(), isDesc, ScraperSourceTools.getSource(), 0, limit);
+                    return mMovieDao.queryMovieDataView(dir_uri, vtid, mGenre, mYear, mYear2, mOrder, Config.getSqlConditionOfChildMode(), isDesc, ScraperSourceTools.getSource(), 0, limit);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -187,14 +140,14 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     }
 
 
-    public void checkEmpty(int total) {
+    public void checkEmpty() {
+        int total = mMovieDataViews.size();
         if (!hasFilter() && total == 0)
             mEmptyType.set(EP_NO_MOVIE);
         else if (hasFilter() && total == 0)
             mEmptyType.set(EP_NO_RESULT);
         else {
             mEmptyType.set(EP_NOT_EMPTY);
-//            refreshResultStr(mTotal);
         }
     }
 
@@ -212,66 +165,31 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
             mConditionStr.set(mGenre + " (" + mVideoTag.toTagName(getApplication()) + ")");
     }
 
-    private void refreshResultStr(int total) {
-        char l_quote = '“';
-        char r_quote = '”';
-        char comma = '、';
-        if (ScraperSourceTools.getSource().equals(Constants.Scraper.TMDB)) {
-            l_quote = '"';
-            r_quote = '"';
-            comma = ',';
-        }
-        mMovieCount.set(String.valueOf(total));
-        StringBuffer sb = new StringBuffer();
-        sb.append(l_quote);
-
-        if (mShortcut != null) {
-            if (TextUtils.isEmpty(mShortcut.friendlyName))
-                sb.append(mShortcut.name + comma);
-            else
-                sb.append(mShortcut.friendlyName + comma);
-        }
-        if (mVideoTag != null) {
-            sb.append(mVideoTag.toTagName(getApplication()) + comma);
-        }
-        if (mGenre != null)
-            sb.append(mGenre + comma);
-        if (mYear != null)
-            sb.append(mYear + comma);
-        if (sb.length() == 1) {
-            sb.append(getString(R.string.all) + r_quote);
-        } else {
-            sb.replace(sb.lastIndexOf(String.valueOf(comma)), sb.length(), String.valueOf(r_quote));
-        }
-        mConditionStr.set(sb.toString());
-        mRowStr.set("1/" + mTotalRow);
-    }
-
     public void setGenre(String genre) {
         mGenre = genre;
         refreshGenre();
     }
 
     public void resolveYear(String yearStr) {
-        if(yearStr==null){
-            mYear=null;
-            mYear2=null;
-        }else         if (NumberUtils.isDigits(yearStr)) {
+        if (yearStr == null) {
+            mYear = null;
+            mYear2 = null;
+        } else if (NumberUtils.isDigits(yearStr)) {
             mYear = yearStr;
             mYear2 = null;
         } else if (getString(R.string.year_earlier).equalsIgnoreCase(yearStr)) {
-            mYear2="1979";
-            mYear=null;
-        } else if(yearStr.contains("-")){
-            String[] years=yearStr.split("-");
-            mYear=years[0].trim();
-            mYear2=years[1].trim();
-        }else if(getString(R.string.year_90s).equals(yearStr)){
-            mYear="1990";
-            mYear2="1999";
-        }else if(getString(R.string.year_80s).equals(yearStr)){
-            mYear="1980";
-            mYear2="1989";
+            mYear2 = "1979";
+            mYear = null;
+        } else if (yearStr.contains("-")) {
+            String[] years = yearStr.split("-");
+            mYear = years[0].trim();
+            mYear2 = years[1].trim();
+        } else if (getString(R.string.year_90s).equals(yearStr)) {
+            mYear = "1990";
+            mYear2 = "1999";
+        } else if (getString(R.string.year_80s).equals(yearStr)) {
+            mYear = "1980";
+            mYear2 = "1989";
         }
     }
 
@@ -308,26 +226,45 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
         return mConditionStr;
     }
 
-    public ObservableField<String> getMovieCount() {
-        return mMovieCount;
+    public List<MovieDataView> getMovieDataViews() {
+        return mMovieDataViews;
     }
 
-    public ObservableField<String> getRowStr() {
-        return mRowStr;
-    }
+    private PaginatedDataLoader<MovieDataView> mMovieDataViewPaginatedDataLoader=new PaginatedDataLoader<MovieDataView>() {
+        @Override
+        public int getLimit() {
+            return 10;
+        }
 
+        @Override
+        public int getFirstLimit() {
+            return 15;
+        }
 
-    public int decreaseTotal() {
-        mTotalRow = (int) Math.ceil(1.0f * --mTotal / 5);
-        return mTotal;
-    }
+        @Override
+        protected List<MovieDataView> loadDataFromDB(int offset, int limit) {
+            String dir_uri = null;
+            long vtid = -1;
+            if (mShortcut != null)
+                dir_uri = mShortcut.uri;
+            if (mVideoTag != null)
+                vtid = mVideoTag.vtid;
+            List<MovieDataView> dataViews = mMovieDao.queryMovieDataView(dir_uri, vtid, mGenre, mYear, mYear2, mOrder, Config.getSqlConditionOfChildMode(), isDesc, ScraperSourceTools.getSource(), offset, limit);
+            return dataViews;
+        }
 
-    public int increaseTotal() {
-        mTotalRow = (int) Math.ceil(1.0f * ++mTotal / 5);
-        return mTotal;
-    }
+        @Override
+        protected void OnReloadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null) {
+                mOnRefresh.newSearch(result);
+                checkEmpty();
+            }
+        }
 
-    public void refreshRowStr(int position) {
-        mRowStr.set((position / 5 + 1) + "/" + mTotalRow);
-    }
+        @Override
+        protected void OnLoadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.appendMovieDataViews(result);
+        }
+    };
 }

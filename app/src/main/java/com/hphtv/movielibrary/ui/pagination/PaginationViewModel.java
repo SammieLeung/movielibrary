@@ -13,12 +13,14 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.util.PaginatedDataLoader;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -31,7 +33,8 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2022/4/22
  */
 public class PaginationViewModel extends BaseAndroidViewModel {
-    public static final int LIMIT = 15;
+    public static final int LIMIT = 10;
+    public static final int FIRST_LIMIT = 15;
     public static final int OPEN_RECENTLY_ADD = 1;
     public static final int OPEN_FAVORITE = 2;
     private MovieDao mMovieDao;
@@ -39,14 +42,12 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     private int mType;
     private VideoTag mVideoTag;
     private ObservableField<String> mTitle = new ObservableField<>();
-    private AtomicInteger mPage = new AtomicInteger(0);
-    private AtomicInteger mTotal = new AtomicInteger(0);
 
     public PaginationViewModel(@NonNull @NotNull Application application) {
         super(application);
         MovieLibraryRoomDatabase movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication());
         mMovieDao = movieLibraryRoomDatabase.getMovieDao();
-        mVideoTagDao=movieLibraryRoomDatabase.getVideoTagDao();
+        mVideoTagDao = movieLibraryRoomDatabase.getVideoTagDao();
     }
 
     public void setType(int type) {
@@ -62,17 +63,17 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
 
-    public void setVideoTag(String videoTagString){
-        if(videoTagString!=null){
+    public void setVideoTag(String videoTagString) {
+        if (videoTagString != null) {
             Observable.create((ObservableOnSubscribe<VideoTag>) emitter -> {
-                mVideoTag = mVideoTagDao.queryVtidByNormalTag(videoTagString);
-                emitter.onNext(mVideoTag);
-                emitter.onComplete();
-            }).subscribeOn(Schedulers.newThread())
+                        mVideoTag = mVideoTagDao.queryVtidByNormalTag(videoTagString);
+                        emitter.onNext(mVideoTag);
+                        emitter.onComplete();
+                    }).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(videoTag -> reload());
-        }else{
-            mVideoTag=null;
+        } else {
+            mVideoTag = null;
             reload();
         }
 
@@ -105,95 +106,19 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
     private void reloadRecentlyAddedMovie() {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-                    mPage.set(0);
-                    int count = 0;
-                    List<MovieDataView> movieDataViewList;
-                    String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
-                    count = mMovieDao.countMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode());
-                    movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), mPage.get(), LIMIT);
-                    mTotal.set(count);
-                    emitter.onNext(movieDataViewList);
-                    emitter.onComplete();
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (mOnRefresh != null)
-                            mOnRefresh.newSearch(movieDataViewList);
-                    }
-                });
-
+        mRecentlyAddedDataLoader.reload();
     }
 
     private void loadRecentlyAddedMovie() {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-                    if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
-                        int offset = mPage.incrementAndGet() * LIMIT;
-                        List<MovieDataView> movieDataViewList;
-                        String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
-                        movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                        emitter.onNext(movieDataViewList);
-                    }
-                    emitter.onComplete();
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (mOnRefresh != null)
-                            mOnRefresh.appendMovieDataViews(movieDataViewList);
-                    }
-                });
+        mRecentlyAddedDataLoader.load();
     }
 
     private void reloadFavoriteMovie() {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-                    mPage.set(0);
-                    int count;
-                    List<MovieDataView> movieDataViewList;
-                    String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
-                    count = mMovieDao.countFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode());
-                    movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), 0, LIMIT);
-                    mTotal.set(count);
-                    emitter.onNext(movieDataViewList);
-                    emitter.onComplete();
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (mOnRefresh != null)
-                            mOnRefresh.newSearch(movieDataViewList);
-                    }
-                });
-
+        mFavoriteDataLoader.reload();
     }
 
     private void loadFavoriteMovie() {
-        Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-                    if ((mPage.get() + 1) * LIMIT < mTotal.get()) {
-                        int offset = mPage.incrementAndGet() * LIMIT;
-                        List<MovieDataView> movieDataViewList;
-                        String tagName=mVideoTag!=null?mVideoTag.tag.name():null;
-                        movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, LIMIT);
-                        emitter.onNext(movieDataViewList);
-                    }
-                    emitter.onComplete();
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViewList) {
-                        if (mOnRefresh != null)
-                            mOnRefresh.appendMovieDataViews(movieDataViewList);
-                    }
-                });
+        mFavoriteDataLoader.load();
     }
 
     private OnRefresh mOnRefresh;
@@ -207,4 +132,61 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
         void appendMovieDataViews(List<MovieDataView> movieDataViews);
     }
+
+    private PaginatedDataLoader<MovieDataView> mRecentlyAddedDataLoader = new PaginatedDataLoader<MovieDataView>() {
+        @Override
+        public int getLimit() {
+            return LIMIT;
+        }
+
+        @Override
+        public int getFirstLimit() {
+            return FIRST_LIMIT;
+        }
+
+        @Override
+        public List<MovieDataView> loadDataFromDB(int offset, int limit) {
+            String tagName = mVideoTag != null ? mVideoTag.tag.name() : null;
+            List<MovieDataView> movieDataViewList = mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, limit);
+            return movieDataViewList;
+        }
+
+        @Override
+        public void OnReloadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.newSearch(result);
+        }
+
+        @Override
+        public void OnLoadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.appendMovieDataViews(result);
+        }
+    };
+
+    private PaginatedDataLoader<MovieDataView> mFavoriteDataLoader = new PaginatedDataLoader<MovieDataView>() {
+        @Override
+        public int getLimit() {
+            return LIMIT;
+        }
+
+        @Override
+        protected List<MovieDataView> loadDataFromDB(int offset, int limit) {
+            String tagName = mVideoTag != null ? mVideoTag.tag.name() : null;
+            List<MovieDataView> movieDataViewList = mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, limit);
+            return movieDataViewList;
+        }
+
+        @Override
+        protected void OnReloadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.newSearch(result);
+        }
+
+        @Override
+        protected void OnLoadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.appendMovieDataViews(result);
+        }
+    };
 }

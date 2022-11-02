@@ -22,7 +22,6 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
-import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
@@ -50,13 +49,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private NewMovieItemWithMoreListAdapter mRecentlyAddListAdapter;
     private NewMovieItemWithMoreListAdapter mFavoriteListAdapter;
     private NewMovieItemListAdapter mRecommendListAdapter;
-
-    private List<HistoryMovieDataView> mRecentlyPlayedList = new ArrayList<>();
-    private List<String> mGenreTagList = new ArrayList<>();
-    private List<MovieDataView> mRecentlyAddedList = new ArrayList<>();
-    private List<MovieDataView> mFavoriteList = new ArrayList<>();
-    private List<MovieDataView> mRecommandList = new ArrayList<>();
-
     public AtomicInteger atomicState = new AtomicInteger();
 
     //电影点击监听
@@ -131,7 +123,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         initGenreList();
         initRecentlyAddedList();
         initFavoriteList();
-        initRecommandList();
+        initRecommendList();
     }
 
     public void prepareAll() {
@@ -149,11 +141,17 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mBinding.rvHistoryList.setLayoutManager(mLayoutManager);
         mBinding.rvHistoryList.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 15)));
-        mHistoryListAdapter = new HistoryListAdapter(getContext(), mRecentlyPlayedList);
+        mHistoryListAdapter = new HistoryListAdapter(getContext(), mViewModel.getRecentlyPlayedList());
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
-        mHistoryListAdapter.setOnItemClickListener((view, position, data) -> mViewModel.playingVideo(data.path, data.filename, list -> {
-            mHistoryListAdapter.addAll(list);
-        }));
+        mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
+            mViewModel.playingVideo(data.path, data.filename)
+                    .subscribe(new SimpleObserver<String>() {
+                        @Override
+                        public void onAction(String s) {
+                            prepareHistoryData();
+                        }
+                    });
+        });
     }
 
     /**
@@ -164,7 +162,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mBinding.rvGenreList.setLayoutManager(mLayoutManager);
         mBinding.rvGenreList.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
-        mGenreTagAdapter = new GenreTagAdapter(getContext(), mGenreTagList);
+        mGenreTagAdapter = new GenreTagAdapter(getContext(), mViewModel.getGenreTagList());
         mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
         mGenreTagAdapter.setOnGenreListener(mGenreListener);
         mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
@@ -178,7 +176,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
         mBinding.rvRecentlyAdded.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
-        mRecentlyAddListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mRecentlyAddedList, PaginationViewModel.OPEN_RECENTLY_ADD);
+        mRecentlyAddListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mViewModel.getRecentlyAddedList(), PaginationViewModel.OPEN_RECENTLY_ADD);
         mRecentlyAddListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
         mRecentlyAddListAdapter.setOnMoreItemClickListener(mOnMoreItemClickListener);
         mBinding.rvRecentlyAdded.setAdapter(mRecentlyAddListAdapter);
@@ -194,7 +192,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mBinding.rvFavorite.setLayoutManager(mLayoutManager);
         mBinding.rvFavorite.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
-        mFavoriteListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mFavoriteList, PaginationViewModel.OPEN_FAVORITE);
+        mFavoriteListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mViewModel.getFavoriteList(), PaginationViewModel.OPEN_FAVORITE);
         mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
         mFavoriteListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
         mFavoriteListAdapter.setOnMoreItemClickListener(mOnMoreItemClickListener);
@@ -203,12 +201,12 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
 
     }
 
-    private void initRecommandList() {
+    private void initRecommendList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecommand.setLayoutManager(mLayoutManager);
         mBinding.rvRecommand.setOnBackPressListener(mOnBackPressListener);
         mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
-        mRecommendListAdapter = new NewMovieItemListAdapter(getContext(), mRecommandList);
+        mRecommendListAdapter = new NewMovieItemListAdapter(getContext(), mViewModel.getRecommendList());
         mBinding.rvRecommand.setAdapter(mRecommendListAdapter);
         mRecommendListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
 

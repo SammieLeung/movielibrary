@@ -88,7 +88,7 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileVie
             @Override
             protected void onLoading(int countItem, int lastItem) {
                 if (mViewModel != null)
-                    mViewModel.loadMoreUnknowFiles()
+                    mViewModel.loadMoreUnknownFiles()
                             .subscribe(new SimpleObserver<List<ConnectedFileDataView>>() {
                                 @Override
                                 public void onAction(List<ConnectedFileDataView> connectedFileDataViews) {
