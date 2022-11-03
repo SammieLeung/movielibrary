@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,7 +26,7 @@ import java.util.List;
  * date:  2021/6/26
  */
 public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, MovieDataView> {
-
+    public static final String TAG=NewMovieItemListAdapter.class.getSimpleName();
     public NewMovieItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {
         super(context, movieDataViewList);
     }
@@ -48,6 +49,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
     public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mList.get(position);
+        Log.d(TAG, "onBindViewHolder: "+movieDataView.title+" "+position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
         if (Config.getShowPoster().get())
             if (movieDataView.type.equals(Constants.VideoType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {
@@ -88,7 +90,10 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
     public void remove(String movie_id, String type, int pos) {
         if (mList.get(pos).movie_id.equals(movie_id)
                 && type.equals(mList.get(pos).type.name())) {
-            super.remove(mList.get(pos), pos);
+            mList.remove(pos);
+            notifyItemRemoved(pos);
+            notifyItemRangeChanged(pos,mList.size());
+
         }
     }
 
@@ -100,6 +105,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                     &&dataView.type.name().equals(type)){
                 mList.remove(i);
                 notifyItemRemoved(i);
+                notifyItemRangeChanged(i,mList.size());
                 break;
             }
         }
@@ -110,6 +116,8 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                 if (mList.get(i).equals(movieDataView)) {
                     mList.remove(i);
                     notifyItemRemoved(i);
+                    notifyItemRangeChanged(i,mList.size());
+
                     break;
                 }
         }
