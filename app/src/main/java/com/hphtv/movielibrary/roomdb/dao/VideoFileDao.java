@@ -14,7 +14,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownFileFolder;
 
 import java.util.List;
 
@@ -120,20 +120,20 @@ public interface VideoFileDao {
     public List<ConnectedFileDataView> queryUnrecognizedFiles(String source, int offset, int limit);
 
 
-//    @Query("SELECT COUNT(*) FROM (" +
-//            " SELECT dir_name,dir_uri,device_uri FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
-//            " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
-//            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) " +
-//            " GROUP BY dir_uri " +
-//            ")")
-//    public int countUnknownFileFolders(String source,String s_ap);
-//
-//    @Query("SELECT dir_name,dir_uri,device_uri FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
-//            " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
-//            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) " +
-//            " GROUP BY dir_uri " +
-//            " LIMIT :offset,:limit ")
-//    public List<UnknownRootDataView> queryUnknownFileFolders(String source, String s_ap, int offset, int limit);
+    @Query("SELECT COUNT(*) FROM (" +
+            " SELECT dir_name,dir_uri,device_uri FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
+            " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
+            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) " +
+            " GROUP BY dir_uri " +
+            ")")
+    public int countUnknownFileFolders(String source,String s_ap);
+
+    @Query("SELECT dir_name,dir_uri,device_uri FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
+            " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
+            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) " +
+            " GROUP BY dir_uri " +
+            " LIMIT :offset,:limit ")
+    public List<UnknownFileFolder> queryUnknownFileFolders(String source, String s_ap,int offset, int limit);
 
 
     @Query("SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW + " WHERE keyword=:keyword AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source)")

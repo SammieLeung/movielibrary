@@ -10,6 +10,5 @@ public interface VIEW {
     String HISTORY_MOVIE_DATAVIEW="history_movie_dataview";
 
     String SEASON_DATAVIEW ="season_dataview";
-    String  UNKNOWN_ROOT_DATAVIEW="unknown_root_dataview";
 
 }

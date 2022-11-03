@@ -1,7 +1,10 @@
 package com.hphtv.movielibrary.data;
 
+import com.hphtv.movielibrary.roomdb.entity.Device;
+
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by tchip on 18-3-1.
@@ -96,11 +99,6 @@ public class Constants {
     public enum WatchLimit {
         ALL_AGE,
         ADULT
-    }
-
-    public enum UnknownRootType {
-        FILE,
-        FOLDER
     }
 
 
