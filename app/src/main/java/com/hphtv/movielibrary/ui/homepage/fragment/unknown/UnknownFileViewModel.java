@@ -24,6 +24,9 @@ import io.reactivex.rxjava3.core.Observable;
  * date:  2022/4/2
  */
 public class UnknowFileViewModel extends BaseAndroidViewModel {
+    public static final int TYPE_FOLDER=1;
+    public static final int TYPE_FILE=2;
+    public static final int TYPE_BACK=-1;
     private VideoFileDao mVideoFileDao;
 
 
