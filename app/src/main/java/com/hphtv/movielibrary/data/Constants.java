@@ -102,6 +102,11 @@ public class Constants {
     }
 
 
+    public enum UnknownRootType{
+        FOLDER,
+        FILE
+    }
+
     public interface FileType {
         /*全部文件*/
         int OTHER = 0; // 全部文件

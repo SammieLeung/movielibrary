@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
-import com.hphtv.movielibrary.ui.homepage.fragment.unknow.UnknownFileFragment;
+import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 

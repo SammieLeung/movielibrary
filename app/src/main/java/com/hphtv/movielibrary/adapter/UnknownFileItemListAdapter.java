@@ -20,9 +20,9 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class UnknowFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, ConnectedFileDataView> {
+public class UnknownFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, ConnectedFileDataView> {
 
-    public UnknowFileItemListAdapter(Context context, List<ConnectedFileDataView> list) {
+    public UnknownFileItemListAdapter(Context context, List<ConnectedFileDataView> list) {
         super(context, list);
     }
 

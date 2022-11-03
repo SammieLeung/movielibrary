@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage.fragment.unknow;
+package com.hphtv.movielibrary.ui.homepage.fragment.unknown;
 
 import android.app.Application;
 
@@ -8,6 +8,7 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.PaginatedDataLoader;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
@@ -23,7 +24,13 @@ import io.reactivex.rxjava3.core.Observable;
  * author: Sam Leung
  * date:  2022/4/2
  */
-public class UnknowFileViewModel extends BaseAndroidViewModel {
+
+public class UnknownFileViewModel extends BaseAndroidViewModel {
+   public static final String TAG= UnknownRootDataView.class.getSimpleName();
+    public static final int TYPE_FOLDER=1;
+    public static final int TYPE_FILE=2;
+    public static final int TYPE_BACK=-1;
+
     private VideoFileDao mVideoFileDao;
 
 
@@ -31,12 +38,13 @@ public class UnknowFileViewModel extends BaseAndroidViewModel {
 
     private List<ConnectedFileDataView> mConnectedFileDataViews;
 
-    public UnknowFileViewModel(@NonNull @NotNull Application application) {
+    public UnknownFileViewModel(@NonNull @NotNull Application application) {
         super(application);
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
         mConnectedFileDataViews = new ArrayList<>();
 
     }
+
 
     public Observable<List<ConnectedFileDataView>> reLoadUnknownFiles() {
         return mDataLoader.rxReload();
@@ -75,7 +83,8 @@ public class UnknowFileViewModel extends BaseAndroidViewModel {
 
         @Override
         protected List<ConnectedFileDataView> loadDataFromDB(int offset, int limit) {
-            return mVideoFileDao.queryUnrecognizedFiles(ScraperSourceTools.getSource(), offset, limit);
+            List<ConnectedFileDataView> connectedFileDataViews= mVideoFileDao.queryUnrecognizedFiles(ScraperSourceTools.getSource(), offset, limit);
+            return connectedFileDataViews;
         }
 
         @Override

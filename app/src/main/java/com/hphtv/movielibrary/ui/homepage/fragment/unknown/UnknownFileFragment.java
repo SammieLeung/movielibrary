@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.ui.homepage.fragment.unknow;
+package com.hphtv.movielibrary.ui.homepage.fragment.unknown;
 
 import android.os.Bundle;
 import android.view.View;
@@ -36,7 +36,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
  * author: Sam Leung
  * date:  2022/4/2
  */
-public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
+public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
     private UnknowFileItemListAdapter mUnknowsFileItemListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
 
@@ -54,7 +54,7 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknowFileVie
     }
 
     @Override
-    protected UnknowFileViewModel createViewModel() {
+    protected UnknownFileViewModel createViewModel() {
         return null;
     }
 
