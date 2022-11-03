@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -200,6 +201,11 @@ public class LocalFileScanHelper {
                     videoFile.aired=tVideoFile.aired;
                     videoFile.videoSource=tVideoFile.videoSource;
                     videoFile.resolution=tVideoFile.resolution;
+                    if(!Objects.equals(videoFile.dirPath, tVideoFile.dirPath)){
+                        if(tVideoFile.dirPath.contains(videoFile.dirPath)){
+                            videoFile.dirPath=tVideoFile.dirPath;
+                        }
+                    }
                     videoFileDao.update(videoFile);
                 } else {
                     videoFile.addTime = System.currentTimeMillis();
