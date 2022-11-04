@@ -12,9 +12,9 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Season;
-import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.util.MovieHelper;
@@ -47,6 +47,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public class MovieDetailViewModel extends BaseAndroidViewModel {
     private MovieDao mMovieDao;
+    private VideoFileDao mVideoFileDao;
 
     private ExecutorService mSingleThreadPool;
     private MovieWrapper mMovieWrapper;
@@ -72,6 +73,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     private void init() {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+        mVideoFileDao=MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
     }
 
     /**
@@ -387,7 +389,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
     }
 
 
-    public Observable<MovieWrapper> setMovie(MovieWrapper wrapper) {
+    public Observable<MovieWrapper> saveMovie(MovieWrapper wrapper) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
                     if (wrapper != null) {
                         MovieHelper.manualSaveMovie(getApplication(), wrapper, mMovieWrapper.videoFiles);
@@ -398,7 +400,25 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());
+    }
 
+    public Observable<MovieWrapper> saveSeries(MovieWrapper wrapper, Season season){
+        return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
+                    if (wrapper != null) {
+                        if(season!=null) {
+                            for (VideoFile videoFile : mMovieWrapper.videoFiles) {
+                                videoFile.season = season.seasonNumber;
+                            }
+                        }
+                        MovieHelper.manualSaveMovie(getApplication(), wrapper, mMovieWrapper.videoFiles);
+
+                    } else {
+                        throw new Throwable();
+                    }
+                    emitter.onNext(wrapper);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.from(mSingleThreadPool))
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Observable<String> loadFileList() {

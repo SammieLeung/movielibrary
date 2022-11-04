@@ -14,7 +14,7 @@ import com.hphtv.movielibrary.roomdb.VIEW;
 import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownFileFolder;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 
 import java.util.List;
 
@@ -45,12 +45,6 @@ public interface VideoFileDao {
     @Query("SELECT poster FROM " + VIEW.MOVIE_DATAVIEW + " WHERE file_uri=:path AND source=:source")
     public String getPoster(String path, String source);
 
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE)
-    public List<VideoFile> queryAll();
-
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE keyword=:keyword AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) ORDER BY filename ASC")
-    public List<VideoFile> queryVideoFileListByKeyword(String keyword, String source);
-
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE id=:id)")
     public List<VideoFile> queryVideoFilesById(long id);
 
@@ -69,8 +63,9 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path in (:paths)")
     public List<VideoFile> queryByPaths(String... paths);
 
-    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE path not in (:paths) and device_path=:device_path")
-    public List<VideoFile> queryInvalidByPaths(List<String> paths, String device_path);
+
+    @Query("SELECT * FROM "+TABLE.VIDEOFILE+" WHERE path LIKE :folder AND path NOT LIKE :limitFolder ORDER BY filename")
+    public List<VideoFile> queryFileByFolder(String folder,String limitFolder);
 
 
     @Query("SELECT * FROM " + VIEW.HISTORY_MOVIE_DATAVIEW +
@@ -92,11 +87,6 @@ public interface VideoFileDao {
             " LIMIT :offset,:limit")
     List<HistoryMovieDataView> queryHistoryMovieDataViewByVideoTag(String source, @Nullable String ap, String video_tag, int offset, int limit);
 
-    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE device_path=:devicePath and path not in (:paths) ")
-    public void deleteByDevice(String devicePath, List<String> paths);
-
-    @Query("DELETE FROM " + TABLE.VIDEOFILE)
-    public void deleteAll();
 
     @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE dir_path=:dirPath")
     public void deleteVideoFilesOnShortcut(String dirPath);
@@ -104,38 +94,29 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE dir_path=:dirPath")
     public List<VideoFile> queryVideoFilesOnShortcut(String dirPath);
 
-    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE :currentTime - add_time > 604800000 ")
-    public int deleteOutdated(long currentTime);
 
-    @Query("SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
-            " WHERE path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source)  GROUP BY keyword ")
-    public List<ConnectedFileDataView> queryUnrecognizedFilesGroupByKeyword(String source);
-
-    @Query("SELECT COUNT(*) FROM (SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
-            " WHERE path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) GROUP BY vid)")
-    public int countUnrecognizedFiles(String source);
-
-    @Query("SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
-            " WHERE path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) GROUP BY vid LIMIT :offset,:limit ")
-    public List<ConnectedFileDataView> queryUnrecognizedFiles(String source, int offset, int limit);
-
-
-    @Query("SELECT COUNT(*) FROM (" +
-            " SELECT dir_name,dir_uri,device_uri FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
+    @Query("SELECT * FROM " + VIEW.UNKNOWN_ROOT_DATAVIEW +
             " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
-            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) " +
-            " GROUP BY dir_uri " +
-            ")")
-    public int countUnknownFileFolders(String source,String s_ap);
-
-    @Query("SELECT dir_name,dir_uri,device_uri FROM " + VIEW.CONNECTED_FILE_DATAVIEW +
-            " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
-            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source) " +
-            " GROUP BY dir_uri " +
+            " AND (:type IS NULL OR type=:type) "+
             " LIMIT :offset,:limit ")
-    public List<UnknownFileFolder> queryUnknownFileFolders(String source, String s_ap,int offset, int limit);
+    public List<UnknownRootDataView> queryUnknownRoot(String s_ap, String type,int offset, int limit);
 
 
-    @Query("SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW + " WHERE keyword=:keyword AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source)")
-    public List<ConnectedFileDataView> queryUnrecognizedFilesByKeyword(String keyword, String source);
+    @Query("SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW + " WHERE path LIKE :parentPath"+
+            " AND (:s_ap IS NULL OR s_ap=:s_ap) " +
+            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + ")" +
+            " ORDER BY filename " +
+            " LIMIT :offset,:limit ")
+    public List<ConnectedFileDataView> queryConnectedFileAndFolderByParentPath(String parentPath, String s_ap,int offset, int limit);
+
+    @Query("SELECT * FROM " + VIEW.CONNECTED_FILE_DATAVIEW + " WHERE path LIKE :likePath" +
+            " AND path NOT LIKE :notLikePath "+
+            " AND (:s_ap IS NULL OR s_ap=:s_ap) " +
+            " AND path NOT IN (SELECT path FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + ")" +
+            " ORDER BY filename " +
+            " LIMIT :offset,:limit ")
+    public List<ConnectedFileDataView> queryConnectedFileDataViewByParentPath(String likePath,String notLikePath, String s_ap,int offset, int limit);
+
+    @Query("SELECT * FROM "+VIEW.CONNECTED_FILE_DATAVIEW+" WHERE path=:path")
+    public ConnectedFileDataView queryConnectedFileDataViewByPath(String path);
 }

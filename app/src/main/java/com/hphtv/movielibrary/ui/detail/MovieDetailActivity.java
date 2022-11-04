@@ -59,7 +59,6 @@ import java.util.List;
 import java.util.Random;
 
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Consumer;
 
 public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutTvDetailBinding> {
     public static final int REMOVE = 1;
@@ -209,7 +208,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.nestScrollview.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
         LinearLayout linearLayout = (LinearLayout) mBinding.tabEpisodeSet.getChildAt(0);
         linearLayout.setShowDividers(LinearLayout.SHOW_DIVIDER_MIDDLE);
-        linearLayout.setDividerDrawable(AppCompatResources.getDrawable(getBaseContext(),R.drawable.divider_vertical));
+        linearLayout.setDividerDrawable(AppCompatResources.getDrawable(getBaseContext(), R.drawable.divider_vertical));
         linearLayout.setDividerPadding(DensityUtil.dip2px(getBaseContext(), 13));
         mBinding.tabEpisodeSet.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -254,102 +253,100 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void prepareMovieWrapper(long movieId, int season) {
 
-        mViewModel.loadMovieWrapper(movieId, season)
-                .subscribe(new SimpleObserver<MovieWrapper>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        startLoading();
-                    }
+        mViewModel.loadMovieWrapper(movieId, season).subscribe(new SimpleObserver<MovieWrapper>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                super.onSubscribe(d);
+                startLoading();
+            }
 
-                    @Override
-                    public void onAction(MovieWrapper wrapper) {
-                        if (wrapper != null) {
-                            if (Constants.VideoType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
-                                if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
-                                    mEpisodeItemListAdapter.setVarietyShow(true);
-                                    mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
-                                    mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeList());
-                                } else {
-                                    mEpisodeItemListAdapter.setVarietyShow(false);
-                                    mEpisodeItemListAdapter.setEpisodeCount(mViewModel.getEpisodeList().size());//设置总集数
-                                    mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
-                                    TabLayout tabLayout = mBinding.tabEpisodeSet;
-                                    tabLayout.removeAllTabs();
+            @Override
+            public void onAction(MovieWrapper wrapper) {
+                if (wrapper != null) {
+                    if (Constants.VideoType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
+                        if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
+                            mEpisodeItemListAdapter.setVarietyShow(true);
+                            mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
+                            mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeList());
+                        } else {
+                            mEpisodeItemListAdapter.setVarietyShow(false);
+                            mEpisodeItemListAdapter.setEpisodeCount(mViewModel.getEpisodeList().size());//设置总集数
+                            mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
+                            TabLayout tabLayout = mBinding.tabEpisodeSet;
+                            tabLayout.removeAllTabs();
 
-                                    for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
-                                        tabLayout.addTab(newTabView(tabLayout, name));//TODO
-                                    }
-
-                                    //如有未分类剧集，设置“其他” tabview
-                                    if (mViewModel.getUnknownEpisodeList().size() > 0) {
-                                        tabLayout.addTab(newTabView(tabLayout, getString(R.string.episode_pagination_others_title)));
-                                    }
-                                    //TODO 计算剧集所在的tab位置
-                                    tabLayout.selectTab(tabLayout.getTabAt(0));
-                                }
+                            for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
+                                tabLayout.addTab(newTabView(tabLayout, name));//TODO
                             }
 
-                            mBinding.setWrapper(wrapper);
-                            String stagePhoto = "";
-                            if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
-                                Random random = new Random();
-                                int index = random.nextInt(wrapper.stagePhotos.size());
-                                stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
+                            //如有未分类剧集，设置“其他” tabview
+                            if (mViewModel.getUnknownEpisodeList().size() > 0) {
+                                tabLayout.addTab(newTabView(tabLayout, getString(R.string.episode_pagination_others_title)));
                             }
-                            mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
-
-                            if (!TextUtils.isEmpty(stagePhoto)) {
-                                GlideTools.GlideWrapperWithCrossFade(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
-                            } else if (!TextUtils.isEmpty(wrapper.movie.poster)) {
-                                GlideTools.GlideWrapperWithCrossFade(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
-                            } else {
-                                Glide.with(getBaseContext()).load(R.drawable.default_poster).into(mBinding.ivStagephoto);
-                            }
-
-                            mViewModel.loadTags().subscribe(new SimpleObserver<List<String>>() {
-                                @Override
-                                public void onAction(List<String> tagList) {
-                                    Context context = MovieDetailActivity.this;
-                                    int paddingTop = DensityUtil.dip2px(context, 5);
-                                    int paddingLeft = DensityUtil.dip2px(context, 11);
-                                    mBinding.viewTags.removeAllViews();
-                                    for (String tag : tagList) {
-                                        TextView textView = new TextView(context);
-                                        textView.setText(tag);
-                                        textView.setTextSize(20);
-                                        textView.setTextColor(Color.parseColor("#FFCCCCCC"));
-                                        textView.setBackground(AppCompatResources.getDrawable(context,R.drawable.detail_tag));
-                                        textView.setPadding(paddingLeft, paddingTop, paddingLeft, paddingTop);
-                                        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                        layoutParams.rightMargin = DensityUtil.dip2px(context, 23);
-                                        mBinding.viewTags.addView(textView, layoutParams);
-                                    }
-                                }
-                            });
-
-                            mViewModel.loadRecommend()
-                                    .subscribe(new SimpleObserver<List<MovieDataView>>() {
-                                        @SuppressLint("NotifyDataSetChanged")
-                                        @Override
-                                        public void onAction(List<MovieDataView> movieDataViewList) {
-                                            if (movieDataViewList != null && movieDataViewList.size() > 0) {
-                                                mBinding.setRecommand(true);
-                                                mRecommandMovieAdapter.addAll(movieDataViewList);
-                                            } else {
-                                                mBinding.setRecommand(false);
-                                            }
-                                        }
-                                    });
+                            //TODO 计算剧集所在的tab位置
+                            tabLayout.selectTab(tabLayout.getTabAt(0));
                         }
                     }
 
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        stopLoading();
+                    mBinding.setWrapper(wrapper);
+                    String stagePhoto = "";
+                    if (wrapper.stagePhotos != null && wrapper.stagePhotos.size() > 0) {
+                        Random random = new Random();
+                        int index = random.nextInt(wrapper.stagePhotos.size());
+                        stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
                     }
-                });
+                    mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
+
+                    if (!TextUtils.isEmpty(stagePhoto)) {
+                        GlideTools.GlideWrapperWithCrossFade(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
+                    } else if (!TextUtils.isEmpty(wrapper.movie.poster)) {
+                        GlideTools.GlideWrapperWithCrossFade(getBaseContext(), wrapper.movie.poster).into(mBinding.ivStagephoto);
+                    } else {
+                        Glide.with(getBaseContext()).load(R.drawable.default_poster).into(mBinding.ivStagephoto);
+                    }
+
+                    mViewModel.loadTags().subscribe(new SimpleObserver<List<String>>() {
+                        @Override
+                        public void onAction(List<String> tagList) {
+                            Context context = MovieDetailActivity.this;
+                            int paddingTop = DensityUtil.dip2px(context, 5);
+                            int paddingLeft = DensityUtil.dip2px(context, 11);
+                            mBinding.viewTags.removeAllViews();
+                            for (String tag : tagList) {
+                                TextView textView = new TextView(context);
+                                textView.setText(tag);
+                                textView.setTextSize(20);
+                                textView.setTextColor(Color.parseColor("#FFCCCCCC"));
+                                textView.setBackground(AppCompatResources.getDrawable(context, R.drawable.detail_tag));
+                                textView.setPadding(paddingLeft, paddingTop, paddingLeft, paddingTop);
+                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                layoutParams.rightMargin = DensityUtil.dip2px(context, 23);
+                                mBinding.viewTags.addView(textView, layoutParams);
+                            }
+                        }
+                    });
+
+                    mViewModel.loadRecommend().subscribe(new SimpleObserver<List<MovieDataView>>() {
+                        @SuppressLint("NotifyDataSetChanged")
+                        @Override
+                        public void onAction(List<MovieDataView> movieDataViewList) {
+                            if (movieDataViewList != null && movieDataViewList.size() > 0) {
+                                mBinding.setRecommand(true);
+                                mRecommandMovieAdapter.addAll(movieDataViewList);
+                            } else {
+                                mBinding.setRecommand(false);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                stopLoading();
+            }
+        });
     }
 
     @Override
@@ -372,17 +369,16 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
         String curMovieId = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.movieId : "";
         if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
-            mViewModel.setLike(isFavorite)
-                    .subscribe(new SimpleObserver<Boolean>() {
-                        @Override
-                        public void onAction(Boolean isFavorite) {
-                            MovieWrapper wrapper = mViewModel.getMovieWrapper();
-                            BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
-                            mBinding.btnFavorite.setSelected(isFavorite);
-                            refreshParent();
-                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
-                        }
-                    });
+            mViewModel.setLike(isFavorite).subscribe(new SimpleObserver<Boolean>() {
+                @Override
+                public void onAction(Boolean isFavorite) {
+                    MovieWrapper wrapper = mViewModel.getMovieWrapper();
+                    BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
+                    mBinding.btnFavorite.setSelected(isFavorite);
+                    refreshParent();
+                    ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
+                }
+            });
         }
     }
 
@@ -426,57 +422,67 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         String keyword = mViewModel.getVideoFileList().get(0).keyword;
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            if (wrapper.movie != null
-                    && wrapper.movie.type.equals(Constants.VideoType.tv)
-                    && wrapper.seasons != null
-            ) {
+            if (wrapper.movie != null && wrapper.movie.type.equals(Constants.VideoType.tv) && wrapper.seasons != null) {
                 stopLoading();
                 showSeasonDialog(wrapper, (wrapper1, season) -> {
-                    mViewModel.setMovie(wrapper1)
-                            .doOnNext(new Consumer<MovieWrapper>() {
-                                @Override
-                                public void accept(MovieWrapper movieWrapper) throws Throwable {
-                                    LogUtil.v(Thread.currentThread().getName() + " [accept]");
-                                }
-                            })
-                            .subscribe(new Consumer<MovieWrapper>() {
-                                @Override
-                                public void accept(MovieWrapper movieWrapper) throws Throwable {
-                                    LogUtil.v(Thread.currentThread().getName() + " [subscribe]");
+                    mViewModel.saveSeries(wrapper1, season)
+                            .subscribe(new SimpleObserver<MovieWrapper>() {
 
-                                }
-                            });
+                        @Override
+                        public void onAction(MovieWrapper movieWrapper) {
+                            if (movieWrapper.movie != null) {
+                                prepareMovieWrapper(movieWrapper.movie.id, season.seasonNumber);
+                                refreshParent();
+                            } else {
+                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                            }
+                            stopLoading();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            super.onError(e);
+                            e.printStackTrace();
+                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                            stopLoading();
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            stopLoading();
+                        }
+                    });
                 });
             } else {
                 //选择新电影逻辑
-                mViewModel.setMovie(wrapper)
-                        .subscribe(new SimpleObserver<MovieWrapper>() {
+                mViewModel.saveMovie(wrapper).subscribe(new SimpleObserver<MovieWrapper>() {
 
-                            @Override
-                            public void onAction(MovieWrapper movieWrapper) {
-                                if (movieWrapper.movie != null) {
-                                    prepareMovieWrapper(movieWrapper.movie.id, mViewModel.getSeason());
-                                    refreshParent();
-                                } else {
-                                    ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
-                                }
-                                stopLoading();
-                            }
+                    @Override
+                    public void onAction(MovieWrapper movieWrapper) {
+                        if (movieWrapper.movie != null) {
+                            prepareMovieWrapper(movieWrapper.movie.id, mViewModel.getSeason());
+                            refreshParent();
+                        } else {
+                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                        }
+                        stopLoading();
+                    }
 
-                            @Override
-                            public void onError(Throwable e) {
-                                super.onError(e);
-                                e.printStackTrace();
-                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
-                                stopLoading();
-                            }
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        e.printStackTrace();
+                        ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                        stopLoading();
+                    }
 
-                            @Override
-                            public void onComplete() {
-                                super.onComplete();
-                                stopLoading();
-                            }
-                        });
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        stopLoading();
+                    }
+                });
             }
         });
         movieSearchFragment.show(getSupportFragmentManager(), "");
@@ -493,16 +499,15 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 切换收藏状态
      */
     private void toggleLike() {
-        mViewModel.toggleLike()
-                .subscribe(new SimpleObserver<Boolean>() {
-                    @Override
-                    public void onAction(Boolean isFavorite) {
-                        MovieWrapper wrapper = mViewModel.getMovieWrapper();
-                        BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
-                        mBinding.btnFavorite.setSelected(isFavorite);
-                        refreshParent();
-                    }
-                });
+        mViewModel.toggleLike().subscribe(new SimpleObserver<Boolean>() {
+            @Override
+            public void onAction(Boolean isFavorite) {
+                MovieWrapper wrapper = mViewModel.getMovieWrapper();
+                BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
+                mBinding.btnFavorite.setSelected(isFavorite);
+                refreshParent();
+            }
+        });
     }
 
     public void showVideoSelectDialog(List<VideoFile> videoFileList) {
@@ -532,18 +537,17 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void playVideo(String path, String name) {
         startLoading();
-        mViewModel.playingVideo(path, name)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                    }
+        mViewModel.playingVideo(path, name).subscribe(new SimpleObserver<String>() {
+            @Override
+            public void onAction(String s) {
+            }
 
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        stopLoading();
-                    }
-                });
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                stopLoading();
+            }
+        });
     }
 
     /**
@@ -553,36 +557,34 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void playingEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        mViewModel.playingEpisodeVideo(videoFile)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                    }
+        mViewModel.playingEpisodeVideo(videoFile).subscribe(new SimpleObserver<String>() {
+            @Override
+            public void onAction(String s) {
+            }
 
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        stopLoading();
-                    }
-                });
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                stopLoading();
+            }
+        });
         ;
     }
 
     //播放其他剧集
     private void playingOtherEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        mViewModel.playingOtherEpisodeVideo(videoFile)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                    }
+        mViewModel.playingOtherEpisodeVideo(videoFile).subscribe(new SimpleObserver<String>() {
+            @Override
+            public void onAction(String s) {
+            }
 
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        stopLoading();
-                    }
-                });
+            @Override
+            public void onComplete() {
+                super.onComplete();
+                stopLoading();
+            }
+        });
 
     }
 
@@ -610,15 +612,10 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             maskDrawable.setCornerRadius(10F);
             maskDrawable.setColor(Color.WHITE);
 
-            ColorStateList rippleColor =
-                    RippleUtils.convertToRippleDrawableColor(tabRippleColorStateList);
+            ColorStateList rippleColor = RippleUtils.convertToRippleDrawableColor(tabRippleColorStateList);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                background =
-                        new RippleDrawable(
-                                rippleColor,
-                                unboundedRipple ? null : contentDrawable,
-                                unboundedRipple ? null : maskDrawable);
+                background = new RippleDrawable(rippleColor, unboundedRipple ? null : contentDrawable, unboundedRipple ? null : maskDrawable);
             } else {
                 Drawable rippleDrawable = DrawableCompat.wrap(maskDrawable);
                 DrawableCompat.setTintList(rippleDrawable, rippleColor);

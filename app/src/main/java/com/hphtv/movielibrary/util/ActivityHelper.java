@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 import com.hphtv.movielibrary.ui.homepage.HomePageActivity;
 import com.hphtv.movielibrary.ui.postermenu.PosterMenuDialog;
 import com.hphtv.movielibrary.ui.postermenu.UnknownsFileMenuDialog;
@@ -27,8 +28,8 @@ public class ActivityHelper {
         dialog.show(fragmentManager, "");
     }
 
-    public static void showUnknownsFileMenuDialog(FragmentManager fragmentManager, int pos, ConnectedFileDataView connectedFileDataView){
-        UnknownsFileMenuDialog dialog=UnknownsFileMenuDialog.newInstance(pos, connectedFileDataView);
+    public static void showUnknownsFileMenuDialog(FragmentManager fragmentManager, int pos, UnknownRootDataView dataView){
+        UnknownsFileMenuDialog dialog=UnknownsFileMenuDialog.newInstance(pos, dataView);
         dialog.show(fragmentManager, "");
 
     }

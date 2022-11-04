@@ -117,6 +117,7 @@ public class MovieHelper {
             establishRelationshipBetweenPosterAndVideos(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
             if (notifyServer)
                 OnlineDBApiService.uploadMovie(movieWrapper, videoFileList, movieWrapper.movie.source);
+            LogUtil.v(Thread.currentThread().getName(), "manualSaveMovie: " + movie_id + " for " + videoFileList.size()+" files");
         }
     }
 
@@ -142,28 +143,32 @@ public class MovieHelper {
             return -1;
         }
 
-        Movie new_movie = movieWrapper.movie;
-        Movie old_movie = movieDao.queryByMovieIdAndType(new_movie.movieId, new_movie.source, new_movie.type.name());
-        if (old_movie != null) {
-            new_movie.id = old_movie.id;
-            new_movie.addTime = old_movie.addTime;
-            new_movie.updateTime = System.currentTimeMillis();
-            new_movie.isFavorite = old_movie.isFavorite;
-            new_movie.isWatched = old_movie.isWatched;
-            new_movie.lastPlayTime = old_movie.lastPlayTime;
-            new_movie.pinyin = old_movie.pinyin;
-            movieDao.update(new_movie);
+        Movie newMovie = movieWrapper.movie;
+        Movie oldMovie = movieDao.queryByMovieIdAndType(newMovie.movieId, newMovie.source, newMovie.type.name());
+        if (oldMovie != null) {
+            newMovie.id = oldMovie.id;
+            newMovie.addTime = oldMovie.addTime;
+            newMovie.updateTime = System.currentTimeMillis();
+            newMovie.isFavorite = oldMovie.isFavorite;
+            newMovie.isWatched = oldMovie.isWatched;
+            newMovie.lastPlayTime = oldMovie.lastPlayTime;
+            newMovie.pinyin = oldMovie.pinyin;
+            movieDao.update(newMovie);
         } else {
-            new_movie.pinyin = Observable.just(new_movie.title)
+            newMovie.pinyin = Observable.just(newMovie.title)
                     .map(s -> {
                         String pinyin = PinyinParseAndMatchTools.parsePinyin(s);
                         return pinyin;
                     }).observeOn(Schedulers.newThread())
                     .blockingFirst();
-            new_movie.addTime = System.currentTimeMillis();
-            new_movie.updateTime = new_movie.addTime;
-            long id = movieDao.insertOrIgnoreMovie(new_movie);
-            new_movie.id = id;
+            newMovie.addTime = System.currentTimeMillis();
+            newMovie.updateTime = newMovie.addTime;
+            long id = movieDao.insertOrIgnoreMovie(newMovie);
+            if (id < 0) {
+                newMovie = movieDao.queryByMovieIdAndType(newMovie.movieId, newMovie.source, newMovie.type.name());
+            } else {
+                newMovie.id = id;
+            }
         }
 
 
@@ -184,7 +189,7 @@ public class MovieHelper {
         }
 
         //查询影片ID
-        long movie_id = new_movie.id;
+        long movie_id = newMovie.id;
         long[] genre_ids = genreDao.queryByName(querySelectionGenreNames);
 
         movieWrapper.movie.id = movie_id;
@@ -230,7 +235,7 @@ public class MovieHelper {
             }
         }
 
-        autoClassification(context, new_movie, genreList);
+        autoClassification(context, newMovie, genreList);
 
         return movie_id;
     }

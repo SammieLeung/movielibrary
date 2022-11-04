@@ -17,4 +17,6 @@
     <dimen name="common_circle_btn_padding">20dp</dimen>
     <dimen name="common_circle_btn_min_padding">11dp</dimen>
 
+    <dimen name="unknown_root_width">177dp</dimen>
+
 </resources>

@@ -1,6 +1,9 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.unknown;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.FocusFinder;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -9,16 +12,16 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
-import com.hphtv.movielibrary.adapter.UnknowFileItemListAdapter;
+import com.hphtv.movielibrary.adapter.UnknownRootItemListAdapter;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
-import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
+import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.ILoadingState;
-import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
@@ -37,17 +40,32 @@ import io.reactivex.rxjava3.disposables.Disposable;
  * date:  2022/4/2
  */
 public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
-    private UnknowFileItemListAdapter mUnknowsFileItemListAdapter;
+    private UnknownRootItemListAdapter mUnknownRootItemListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
+    private Handler mUIHandler = new Handler();
+    private BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = (BaseAdapter2.OnRecyclerViewItemClickListener<UnknownRootDataView>) (view, position, data) -> {
+        switch (data.type) {
+            case FILE:
+                playVideo(data.root);
+                break;
+            case FOLDER:
+                reloadUnknownFiles(data.root);
+                break;
+            case BACK:
+                OnBackPress();
+                break;
+        }
 
-    public UnknownFileFragment(){
+    };
+
+    public UnknownFileFragment() {
         super(UnknownFileFragment.class.getSimpleName());
     }
 
     public static UnknownFileFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position) {
         Bundle args = new Bundle();
         UnknownFileFragment fragment = new UnknownFileFragment();
-        args.putInt(BaseAutofitHeightFragment.POSITION,position);
+        args.putInt(BaseAutofitHeightFragment.POSITION, position);
         fragment.setArguments(args);
         fragment.setAutoFitHeightViewPager(viewPager);
         return fragment;
@@ -60,7 +78,7 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
 
     @Override
     public void forceRefresh() {
-        reloadUnknownFiles();
+        reloadUnknownFiles(UnknownFileViewModel.ROOT);
     }
 
     @Override
@@ -73,49 +91,45 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     @Override
     public void onResume() {
         super.onResume();
-        reloadUnknownFiles();
+        reloadUnknownFiles(mViewModel.getCurrentPath());
     }
 
     /**
      * 初始化UI
      */
     private void initViews() {
-        mUnknowsFileItemListAdapter = new UnknowFileItemListAdapter(getContext(), mViewModel.getUnrecognizedFileDataViewList());
-        FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(getContext(), 5, GridLayoutManager.VERTICAL, false);
+        mUnknownRootItemListAdapter = new UnknownRootItemListAdapter(getContext(), mViewModel.getUnknownRootDataViews());
+        FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(getContext(), 6, GridLayoutManager.VERTICAL, false);
         mBinding.rvUnknowsfile.setLayoutManager(gridLayoutManager);
-        mBinding.rvUnknowsfile.setAdapter(mUnknowsFileItemListAdapter);
+        mBinding.rvUnknowsfile.setAdapter(mUnknownRootItemListAdapter);
         mBinding.rvUnknowsfile.addOnScrollListener(new OnMovieLoadListener() {
             @Override
             protected void onLoading(int countItem, int lastItem) {
                 if (mViewModel != null)
-                    mViewModel.loadMoreUnknownFiles()
-                            .subscribe(new SimpleObserver<List<ConnectedFileDataView>>() {
+                    mViewModel.loadMoreUnknownRoots()
+                            .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
                                 @Override
-                                public void onAction(List<ConnectedFileDataView> connectedFileDataViews) {
-                                    mUnknowsFileItemListAdapter.appendAll(connectedFileDataViews);
+                                public void onAction(List<UnknownRootDataView> unknownRootDataViews) {
+                                    mUnknownRootItemListAdapter.appendAll(unknownRootDataViews);
                                 }
                             });
             }
         });
         mBinding.rvUnknowsfile.addItemDecoration(new GridSpacingItemDecorationVertical(
-                getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),
+                getResources().getDimensionPixelSize(R.dimen.unknown_root_width),
                 DensityUtil.dip2px(getContext(), 43),
-                DensityUtil.dip2px(getContext(), 27),
+                DensityUtil.dip2px(getContext(), 30),
                 DensityUtil.dip2px(getContext(), 40),
-                DensityUtil.dip2px(getContext(), 28),
-                5)
+                DensityUtil.dip2px(getContext(), 46),
+                6)
         );
-        mBinding.rvUnknowsfile.setOnBackPressListener(new TvRecyclerView.OnBackPressListener() {
-
-            @Override
-            public void onBackPress() {
-                ActivityNewHomepageBinding binding = getBaseActivity().getBinding();
-                int pos = binding.tabLayout.getSelectedTabPosition();
-                binding.tabLayout.getTabAt(pos).view.requestFocus();
-            }
+        mBinding.rvUnknowsfile.setOnBackPressListener(() -> {
+            ActivityNewHomepageBinding binding = getBaseActivity().getBinding();
+            int pos = binding.tabLayout.getSelectedTabPosition();
+            binding.tabLayout.getTabAt(pos).view.requestFocus();
         });
-        mUnknowsFileItemListAdapter.setOnItemClickListener(mActionListener);
-        mUnknowsFileItemListAdapter.setOnItemLongClickListener(this::showUnknownsFileMenuDialog);
+        mUnknownRootItemListAdapter.setOnItemClickListener(mActionListener);
+        mUnknownRootItemListAdapter.setOnItemLongClickListener(this::showUnknownsFileMenuDialog);
     }
 
     /**
@@ -126,58 +140,65 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
      * @param data
      * @return
      */
-    private boolean showUnknownsFileMenuDialog(View view, int position, ConnectedFileDataView data) {
-        ActivityHelper.showUnknownsFileMenuDialog(getChildFragmentManager(), position, data);
+    private boolean showUnknownsFileMenuDialog(View view, int position, UnknownRootDataView data) {
+        switch (data.type) {
+            case FOLDER:
+            case FILE:
+                ActivityHelper.showUnknownsFileMenuDialog(getChildFragmentManager(), position, data);
+                break;
+            case BACK:
+                break;
+        }
         return true;
     }
 
-    private BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<ConnectedFileDataView>() {
-        @Override
-        public void onItemClick(View view, int position, ConnectedFileDataView data) {
-            mViewModel.playVideo(data.path, data.filename)
-                    .subscribe(new SimpleObserver<String>() {
-                        @Override
-                        public void onSubscribe(Disposable d) {
-                            mViewModel.setPlayingVideo(true);
-                            super.onSubscribe(d);
-                            getBaseActivity().startLoading();
-                        }
-
-                        @Override
-                        public void onAction(String s) {
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            super.onComplete();
-                            getBaseActivity().stopLoading();
-                        }
-                    });
-        }
-    };
-
-    private void reloadUnknownFiles() {
-        if (mViewModel.isPlayingVideo()) {
-            mViewModel.setPlayingVideo(false);
-            return;
-        }
+    private void reloadUnknownFiles(String root) {
         if (mViewModel != null) {
-            mViewModel.reLoadUnknownFiles()
-                    .subscribe(new SimpleLoadingObserver<List<ConnectedFileDataView>>(this) {
+            if (mViewModel.isPlayingVideo()) {
+                mViewModel.setPlayingVideo(false);
+                return;
+            }
+
+            mViewModel.reloadUnknownRoots(root)
+                    .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
                         @Override
-                        public void onAction(List<ConnectedFileDataView> connectedFileDataViews) {
-                            if(connectedFileDataViews.size()>0) {
+                        public void onAction(List<UnknownRootDataView> roots) {
+                            if (roots.size() > 0) {
                                 mBinding.setIsEmpty(false);
-                                mUnknowsFileItemListAdapter.addAll(connectedFileDataViews);
-                            }else{
+                                mUnknownRootItemListAdapter.addAll(roots);
+                            } else {
                                 mBinding.setIsEmpty(true);
-                                mUnknowsFileItemListAdapter.addAll(connectedFileDataViews);
+                                mUnknownRootItemListAdapter.clearAll();
                             }
                         }
                     });
+
         }
 
     }
+
+    private void playVideo(String path) {
+        mViewModel.playVideo(path)
+                .subscribe(new SimpleObserver<String>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        mViewModel.setPlayingVideo(true);
+                        super.onSubscribe(d);
+                        getBaseActivity().startLoading();
+                    }
+
+                    @Override
+                    public void onAction(String s) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        getBaseActivity().stopLoading();
+                    }
+                });
+    }
+
 
     @Override
     public void startLoading() {
@@ -192,5 +213,47 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
             mBinding.setIsLoading(false);
             atomicState.set(0);
         }
+    }
+
+    public boolean OnBackPress() {
+        String root = mViewModel.pop();
+        if (UnknownFileViewModel.ROOT.equals(root)) {
+            reloadUnknownFiles(root);
+            return true;
+        }
+        return false;
+    }
+
+
+    public void refreshCurrentPage(int pos) {
+        View focusView = mBinding.rvUnknowsfile.findFocus();
+        int curFocusIndex = 0;
+        if (focusView != null) {
+            curFocusIndex = mBinding.rvUnknowsfile.indexOfChild(focusView);
+            if (curFocusIndex == mViewModel.getUnknownRootDataViews().size() - 1)
+                curFocusIndex--;
+        }
+        final int lastCurFocusIndex = curFocusIndex;
+
+        mViewModel.reloadUnknownRoots(mViewModel.getCurrentPath())
+                .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
+                    @Override
+                    public void onAction(List<UnknownRootDataView> roots) {
+                        if (roots.size() > 0) {
+                            mBinding.setIsEmpty(false);
+                            mUnknownRootItemListAdapter.addAll(roots);
+                        } else {
+                            mBinding.setIsEmpty(true);
+                            mUnknownRootItemListAdapter.clearAll();
+                        }
+                        mUIHandler.postDelayed(() -> {
+                            View newFocus = mBinding.rvUnknowsfile.getChildAt(lastCurFocusIndex);
+                            if (newFocus != null)
+                                newFocus.requestFocus();
+                        }, 200);
+                    }
+                });
+
+
     }
 }

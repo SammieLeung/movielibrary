@@ -4,12 +4,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View"/>
         <import type="androidx.databinding.ObservableField"/>
         <import type="androidx.databinding.ObservableBoolean"/>
-        <import type="android.view.View"/>
+        <import type="com.hphtv.movielibrary.data.Constants.UnknownRootType"/>
         <variable
             name="filename"
             type="String" />
+        <variable
+          name="filePath"
+          type="String" />
+        <variable
+          name="type"
+          type="UnknownRootType" />
     </data>
 
     <RelativeLayout
@@ -20,7 +27,7 @@
         <LinearLayout
             android:id="@+id/view_content"
             android:layout_width="518dp"
-            android:layout_height="423dp"
+            android:layout_height="383dp"
             android:layout_marginLeft="14dp"
             android:background="@drawable/poster_item_menu_bg"
             android:gravity="center"
@@ -30,13 +37,28 @@
                 style="@style/common_content_text_style"
                 android:layout_width="481dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="70dp"
                 android:gravity="center"
                 android:paddingLeft="@dimen/postermenu_subitem_padding_lr"
                 android:paddingRight="@dimen/postermenu_subitem_padding_lr"
                 android:text="@{filename}" />
 
+
+            <TextView
+              android:text="@{filePath}"
+              style="@style/unknowfile_menu_sub_item_size"
+              android:textSize="18sp"
+              android:textColor="#888888"
+              android:layout_marginTop="20sp"
+              android:maxLines="3"
+              android:autoSizeMaxTextSize="18sp"
+              android:gravity="center"
+              android:autoSizeTextType="uniform"
+              android:layout_marginBottom="70dp"
+              android:visibility="@{UnknownRootType.FOLDER.equals(type)?View.VISIBLE:View.GONE}"
+              android:layout_height="wrap_content"/>
             <include
+              android:layout_marginTop="70dp"
+                android:visibility="@{UnknownRootType.FILE.equals(type)?View.VISIBLE:View.GONE}"
                 android:id="@+id/include_playmovie"
                 style="@style/unknowfile_menu_sub_item_size"
                 layout="@layout/postermenu_more_item"

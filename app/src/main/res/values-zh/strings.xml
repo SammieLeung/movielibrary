@@ -255,4 +255,6 @@
 
   <string name="select_season_title">选择播出季</string>
 
+  <string name="item_count_format">%1$s项</string>
+
 </resources>

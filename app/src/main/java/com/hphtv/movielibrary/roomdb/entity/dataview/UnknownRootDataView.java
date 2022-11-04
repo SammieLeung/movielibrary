@@ -1,11 +1,15 @@
 package com.hphtv.movielibrary.roomdb.entity.dataview;
 
+import androidx.annotation.Nullable;
 import androidx.room.DatabaseView;
 import androidx.room.Ignore;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.VIEW;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * author: Sam Leung
@@ -22,9 +26,24 @@ import com.hphtv.movielibrary.roomdb.VIEW;
                 "ORDER BY type DESC",
         viewName = VIEW.UNKNOWN_ROOT_DATAVIEW
 )
-public class UnknownRootDataView {
+public class UnknownRootDataView implements Serializable {
     public String root;
     public Constants.UnknownRootType type;
     public int count;
     public Constants.WatchLimit s_ap;
+    @Ignore
+    public ConnectedFileDataView connectedFileView;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UnknownRootDataView that = (UnknownRootDataView) o;
+        return root.equals(that.root) && type == that.type && s_ap == that.s_ap;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root, type, s_ap);
+    }
 }

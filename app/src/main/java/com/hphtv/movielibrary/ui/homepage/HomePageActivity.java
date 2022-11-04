@@ -46,6 +46,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.PermissionActivity;
+import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.moviesearch.pinyin.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
@@ -499,7 +500,13 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public void OnMovieRemove(String movie_id, String type, int pos) {
-
+        for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+            if (fragment instanceof UnknownFileFragment) {
+                UnknownFileFragment unknownFileFragment = (UnknownFileFragment) fragment;
+                unknownFileFragment.refreshCurrentPage(pos);
+                break;
+            }
+        }
     }
 
     @Override
@@ -524,4 +531,18 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         remoteRemoveMovieForFragment(pos, movie_id, type);
     }
 
+    @Override
+    public void onBackPressed() {
+       if(mBinding.viewpager.getCurrentItem()==HomePageTabAdapter.UNKNOWN){
+           if(mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN) instanceof UnknownFileFragment){
+               UnknownFileFragment unknownFileFragment= (UnknownFileFragment) mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN);
+               boolean res=unknownFileFragment.OnBackPress();
+               if(!res){
+                   super.onBackPressed();
+               }
+           }
+       }else{
+           super.onBackPressed();
+       }
+    }
 }

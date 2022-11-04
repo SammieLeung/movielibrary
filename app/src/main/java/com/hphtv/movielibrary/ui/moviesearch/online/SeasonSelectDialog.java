@@ -118,6 +118,7 @@ public class SeasonSelectDialog extends BaseDialogFragment2<MovieSearchDialogVie
                 binding.getRoot().setOnClickListener(v -> {
                             if (mOnClickListener != null)
                                 mOnClickListener.onClick(mMovieWrapper, binding.getSeason());
+                            dismiss();
                         }
                 );
             }
