@@ -67,7 +67,7 @@ import org.jetbrains.annotations.NotNull;
         ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
         Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
         views = {MovieDataView.class, ConnectedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class, UnknownRootDataView.class},
-        version = 16)
+        version = 17)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
 
@@ -119,7 +119,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                             MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
                             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
                             MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
-                            MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16};
+                            MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
+                            MIGRATION_16_17};
                     sInstance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
@@ -301,6 +302,14 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("CREATE VIEW `" + VIEW.UNKNOWN_ROOT_DATAVIEW + "` AS SELECT RTRIM(path,REPLACE(path,'/','')) AS root,'FOLDER' AS type,COUNT(RTRIM(PATH,REPLACE(path,'/','')) ) AS count,s_ap FROM connected_file_dataview WHERE path NOT IN (SELECT path FROM movie_videofile_cross_ref) GROUP BY root HAVING COUNT(root)>1 UNION SELECT path AS root,'FILE' AS type,1 AS count,s_ap FROM connected_file_dataview WHERE path NOT IN (SELECT path FROM movie_videofile_cross_ref) GROUP BY RTRIM(path,REPLACE(path,'/',''))   HAVING COUNT(RTRIM(PATH,REPLACE(PATH,'/',''))) =1 ORDER BY type DESC");
+        }
+    };
+
+    public static final Migration MIGRATION_16_17 = new Migration(16, 17) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP VIEW season_dataview");
+            database.execSQL("CREATE VIEW `season_dataview` AS SELECT M.id,V.season,SS.name,SS.poster,ss.episode_count FROM videofile AS V JOIN movie_videofile_cross_ref AS MVC ON V.path=MVC.path JOIN movie AS M ON M.id=MVC.id JOIN season AS SS ON SS.movie_id=M.id WHERE V.season=SS.season_number");
         }
     };
 }
