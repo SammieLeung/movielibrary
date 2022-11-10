@@ -1,7 +1,11 @@
 package com.hphtv.movielibrary.ui.homepage.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -14,6 +18,7 @@ import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemWithMoreListAdapter;
+import com.hphtv.movielibrary.bean.PlayList;
 import com.hphtv.movielibrary.databinding.FragmentHomepageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
@@ -28,6 +33,7 @@ import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
@@ -35,7 +41,6 @@ import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,6 +55,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private NewMovieItemWithMoreListAdapter mFavoriteListAdapter;
     private NewMovieItemListAdapter mRecommendListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
+    private PlayVideoReceiver mPlayVideoReceiver;
 
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mMovieDataViewEventListener = (view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
@@ -74,7 +80,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private BaseAdapter2.OnRecyclerViewItemClickListener mGenreItemClickListener = (view, postion, data) -> {
         Intent intent = new Intent(getContext(), FilterPageActivity.class);
         intent.putExtra(FilterPageActivity.EXTRA_GENRE, data.toString());
-        intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE,getVideoTagName());
+        intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, getVideoTagName());
         startActivityForResult(intent);
     };
 
@@ -82,6 +88,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         ActivityHelper.showPosterMenuDialog(getChildFragmentManager(), postion, data);
         return false;
     };
+
 
     private NewMovieItemWithMoreListAdapter.OnMoreItemClickListener mOnMoreItemClickListener = type -> {
         LogUtil.v("mOnMoreItemClickListener click " + type);
@@ -144,11 +151,11 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mViewModel.getRecentlyPlayedList());
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
         mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
+            registerPlayReceiver();
             mViewModel.playingVideo(data.path, data.filename)
-                    .subscribe(new SimpleObserver<String>() {
+                    .subscribe(new SimpleObserver<PlayList>() {
                         @Override
-                        public void onAction(String s) {
-                            prepareHistoryData();
+                        public void onAction(PlayList playList) {
                         }
                     });
         });
@@ -372,4 +379,61 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         }
     }
 
+    private void registerPlayReceiver() {
+        try {
+            unregisterPlayReceiver();
+            if (mPlayVideoReceiver == null)
+                mPlayVideoReceiver = new PlayVideoReceiver();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("com.firefly.video.player");
+            getContext().registerReceiver(mPlayVideoReceiver, intentFilter);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void unregisterPlayReceiver() {
+        try {
+            if (mPlayVideoReceiver != null) {
+                getContext().unregisterReceiver(mPlayVideoReceiver);
+                mPlayVideoReceiver = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterPlayReceiver();
+    }
+
+    private class PlayVideoReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if ("com.firefly.video.player".equals(action)) {
+                String path = null;
+                long position = 0;
+                if (intent.hasExtra("video_address")) {
+                    path = intent.getStringExtra("video_address");
+                }
+                if (intent.hasExtra("video_position")) {
+                    position = intent.getLongExtra("video_position", 0);
+                }
+                Log.w(TAG, "onReceive: "+path+" "+position );
+                MovieHelper.updateHistory(getContext(),path)
+                        .subscribe(new SimpleObserver<String>() {
+                            @Override
+                            public void onAction(String s) {
+                                prepareHistoryData();
+                            }
+                        });
+            }
+            unregisterPlayReceiver();
+
+        }
+    }
 }

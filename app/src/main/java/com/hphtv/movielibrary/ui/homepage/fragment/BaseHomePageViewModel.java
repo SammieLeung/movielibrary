@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.bean.PlayList;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
@@ -85,8 +86,8 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
 
     }
 
-    public Observable<String> playingVideo(String path, String name) {
-       return MovieHelper.playingMovie(path, name);
+    public Observable<PlayList> playingVideo(String path, String name) {
+       return MovieHelper.playingSeriesWithPlayList(path, name);
     }
 
     public void startDetailActivity(AppBaseActivity appBaseActivity, MovieDataView movieDataView) {

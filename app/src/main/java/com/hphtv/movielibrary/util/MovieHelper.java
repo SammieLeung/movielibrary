@@ -2,10 +2,10 @@ package com.hphtv.movielibrary.util;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.bean.PlayList;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
@@ -44,7 +44,10 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -54,7 +57,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class MovieHelper {
 
     /**
-     * 播放影片
+     * 播放电影+保存播放记录
      *
      * @param path
      * @param name
@@ -62,8 +65,7 @@ public class MovieHelper {
      */
     public static Observable<String> playingMovie(String path, String name) {
         Context context = MovieApplication.getInstance();
-        return Observable.just(path)
-                .subscribeOn(Schedulers.io())
+        return Observable.just(path).subscribeOn(Schedulers.io())
                 //记录播放时间，作为播放记录
                 .doOnNext(filepath -> {
                     VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
@@ -71,14 +73,59 @@ public class MovieHelper {
                     long currentTime = System.currentTimeMillis();
                     videoFileDao.updateLastPlaytime(filepath, currentTime);
                     Movie movie = movieDao.queryByFilePath(filepath, ScraperSourceTools.getSource());
-                    if (movie != null)
-                        movieDao.updateLastPlaytime(movie.movieId, currentTime);
+                    if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
                     String poster = videoFileDao.getPoster(filepath, ScraperSourceTools.getSource());
                     SharePreferencesTools.getInstance(context).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
                     OnlineDBApiService.updateHistory(filepath, ScraperSourceTools.getSource());
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(s -> VideoPlayTools.play(context, path, name));
+                }).observeOn(AndroidSchedulers.mainThread()).doOnNext(s -> VideoPlayTools.play(context, path, name));
+    }
+
+
+    /**
+     * 播放电视剧/综艺
+     *
+     * @param path
+     * @param name
+     * @return
+     */
+    public static Observable<PlayList> playingSeriesWithPlayList(String path, String name) {
+        Context context = MovieApplication.getInstance();
+        return Observable.create((ObservableOnSubscribe<PlayList>) emitter -> {
+            VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+            List<String> nameList = videoFileDao.queryVideoFileNameList(path);
+            List<String> pathList = videoFileDao.queryVideoFilePathList(path);
+            PlayList playList = new PlayList();
+            playList.setPath(path);
+            playList.setName(name);
+            playList.setPlayList(new ArrayList<>(pathList));
+            playList.setNameList(new ArrayList<>(nameList));
+            emitter.onNext(playList);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnNext(playList -> {
+            VideoPlayTools.play(context, playList.getPath(), playList.getName(), playList.getPlayList(), playList.getNameList());
+        });
+    }
+
+    /**
+     * 保存播放记录
+     * @param context
+     * @param path
+     * @return
+     */
+    public static Observable<String> updateHistory(Context context, String path) {
+        return Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+            MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
+            long currentTime = System.currentTimeMillis();
+            videoFileDao.updateLastPlaytime(path, currentTime);
+            Movie movie = movieDao.queryByFilePath(path, ScraperSourceTools.getSource());
+            if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
+            String poster = videoFileDao.getPoster(path, ScraperSourceTools.getSource());
+            SharePreferencesTools.getInstance(context).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
+            OnlineDBApiService.updateHistory(path, ScraperSourceTools.getSource());
+            emitter.onNext(path);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
     /**
@@ -117,7 +164,7 @@ public class MovieHelper {
             establishRelationshipBetweenPosterAndVideos(context, movie_id, movieWrapper.movie.title, videoFileList, movieWrapper.movie.source);
             if (notifyServer)
                 OnlineDBApiService.uploadMovie(movieWrapper, videoFileList, movieWrapper.movie.source);
-            LogUtil.v(Thread.currentThread().getName(), "manualSaveMovie: " + movie_id + " for " + videoFileList.size()+" files");
+            LogUtil.v(Thread.currentThread().getName(), "manualSaveMovie: " + movie_id + " for " + videoFileList.size() + " files");
         }
     }
 
@@ -155,12 +202,10 @@ public class MovieHelper {
             newMovie.pinyin = oldMovie.pinyin;
             movieDao.update(newMovie);
         } else {
-            newMovie.pinyin = Observable.just(newMovie.title)
-                    .map(s -> {
-                        String pinyin = PinyinParseAndMatchTools.parsePinyin(s);
-                        return pinyin;
-                    }).observeOn(Schedulers.newThread())
-                    .blockingFirst();
+            newMovie.pinyin = Observable.just(newMovie.title).map(s -> {
+                String pinyin = PinyinParseAndMatchTools.parsePinyin(s);
+                return pinyin;
+            }).observeOn(Schedulers.newThread()).blockingFirst();
             newMovie.addTime = System.currentTimeMillis();
             newMovie.updateTime = newMovie.addTime;
             long id = movieDao.insertOrIgnoreMovie(newMovie);
@@ -354,16 +399,11 @@ public class MovieHelper {
 
         for (Genre genre : genreList) {
             String name = genre.name;
-            if (name.equals(kids))
-                isKids = true;
-            if (name.equals(animation))
-                isAnimation = true;
-            if (name.equals(comedy))
-                isComedy = true;
-            if (name.equals(family))
-                isFamily = true;
-            if (name.equals(talk) || name.equals(reality))
-                isShow = true;
+            if (name.equals(kids)) isKids = true;
+            if (name.equals(animation)) isAnimation = true;
+            if (name.equals(comedy)) isComedy = true;
+            if (name.equals(family)) isFamily = true;
+            if (name.equals(talk) || name.equals(reality)) isShow = true;
             if (name.equals(crime) || name.equals(horror) || name.equals(thriller))
                 isNotForKids = true;
         }

@@ -9,6 +9,7 @@ import androidx.databinding.ObservableInt;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.bean.PlayList;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -160,16 +161,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 mEpisodeList.add(episodeFiles);
                             }
 
+                            //将合资格的影片分类到具体剧集里，未成功分类则放到mUnknownEpisodeList中
                             for (int i = 0; i < filterVideoFileList.size(); i++) {
                                 VideoFile filterVideoFile = filterVideoFileList.get(i);
-                                //查找播放历史
-                                if (filterVideoFile.lastPlayTime > 0) {
-                                    if (mLastPlayEpisodeVideoFile == null)
-                                        mLastPlayEpisodeVideoFile = filterVideoFile;
-                                    if (filterVideoFile.lastPlayTime > mLastPlayEpisodeVideoFile.lastPlayTime) {
-                                        mLastPlayEpisodeVideoFile = filterVideoFile;
-                                    }
-                                }
                                 if (filterVideoFile.episode > 0) {
                                     int maybePos = filterVideoFile.episode - 1;
                                     if (maybePos < mEpisodeList.size())
@@ -181,8 +175,26 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 }
                             }
 
-                            //上次播放的未分类剧集的位置
+                            /*定位历史播放文件*/
+                            //从剧集中寻找
                             int lastPlayUnknownEpisodePos = 0;
+                            for(int i=0;i<mEpisodeList.size();i++){
+                                for(int j=0;j<mEpisodeList.get(i).size();j++){
+                                    VideoFile episodeFile=mEpisodeList.get(i).get(j);
+                                    if (episodeFile.lastPlayTime > 0) {
+                                        if (mLastPlayEpisodeVideoFile == null) {
+                                            mLastPlayEpisodeVideoFile = episodeFile;
+                                            lastPlayUnknownEpisodePos = i;
+                                        }
+                                        if (episodeFile.lastPlayTime > mLastPlayEpisodeVideoFile.lastPlayTime) {
+                                            mLastPlayEpisodeVideoFile = episodeFile;
+                                            lastPlayUnknownEpisodePos = i;
+                                        }
+                                    }
+                                }
+                            }
+
+                            //从其他影片中寻找
                             if (mUnknownEpisodeList.size() > 0) {
                                 mUnknownEpisodeList.sort(Comparator.comparing(o -> o.path));
                                 int episodeSize = mEpisodeList.size();
@@ -231,7 +243,6 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                         name = String.valueOf(start);
                                     mTabLayoutPaginationMap.put(name, mEpisodeList.subList(start, end + 1));
                                 }
-                                //TODO 暂时不处理更多剧集
                             }
                         }
 
@@ -336,16 +347,37 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     }
 
-    public Observable<String> playingEpisodeVideo(VideoFile videoFile) {
+    public Observable<PlayList> playingEpisodeVideo(VideoFile videoFile) {
+        updatePlayEpisode(videoFile);
+        String path = videoFile.path;
+        String name = videoFile.filename;
+        return MovieHelper.playingSeriesWithPlayList(path, name);
+    }
+
+    /**
+     * 播放未分类的电视剧
+     *
+     * @param videoFile
+     */
+    public Observable<PlayList> playingOtherEpisodeVideo(VideoFile videoFile) {
+        updatePlayOtherEpisode(videoFile);
+        String path = videoFile.path;
+        String name = videoFile.filename;
+        return MovieHelper.playingSeriesWithPlayList(path, name);
+    }
+
+    public void updatePlayEpisode(VideoFile videoFile){
         mLastPlayEpisodeVideoFile = videoFile;
         if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
             for (int i = 0; i < mEpisodeList.size(); i++) {
-                VideoFile tmp = mEpisodeList.get(i).get(0);
-                if (tmp.equals(videoFile)) {
-                    mLastPlayEpisodePos.set(i);//episode从1开始，所以索引应该是episode-1;
-                    mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayEpisodeVideoFile.aired));
-                    break;
+                for(VideoFile tmp:mEpisodeList.get(i)){
+                    if (tmp.equals(videoFile)) {
+                        mLastPlayEpisodePos.set(i);//episode从1开始，所以索引应该是episode-1;
+                        mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayEpisodeVideoFile.aired));
+                        break;
+                    }
                 }
+
             }
         } else {
             if (mLastPlayEpisodeVideoFile.episode > 0) {
@@ -363,17 +395,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 }
             }
         }
-        String path = videoFile.path;
-        String name = videoFile.filename;
-        return MovieHelper.playingMovie(path, name);
     }
 
-    /**
-     * 播放未分类的电视剧
-     *
-     * @param videoFile
-     */
-    public Observable<String> playingOtherEpisodeVideo(VideoFile videoFile) {
+    public void updatePlayOtherEpisode(VideoFile videoFile){
         mLastPlayEpisodeVideoFile = videoFile;
         for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
             VideoFile tmp = mUnknownEpisodeList.get(i);
@@ -383,11 +407,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 break;
             }
         }
-        String path = videoFile.path;
-        String name = videoFile.filename;
-        return MovieHelper.playingMovie(path, name);
     }
-
 
     public Observable<MovieWrapper> saveMovie(MovieWrapper wrapper) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {

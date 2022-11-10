@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -20,6 +19,7 @@ import com.hphtv.movielibrary.provider.FileContentProvider;
 import com.station.kit.util.ToastUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,12 +49,16 @@ public class VideoPlayTools {
         }
     }
 
-
     public static void play(Context context, String path, String name) {
+        play(context, path, name, null, null);
+    }
+
+
+    public static void play(Context context, String path, String name, ArrayList<String> pathList, ArrayList<String> nameList) {
         File file = new File(path);
         if (Config.getPlayerPackage().equals(Config.SYSTEM_PLAYER_PACKAGE) || !file.exists()) {
             try {
-                playByComponentName(context, path, name);
+                playByComponentName(context, path, name, pathList, nameList);
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -84,6 +88,10 @@ public class VideoPlayTools {
 
     //适配Android 12, 解决播放界面关闭, 出现"一闪"的问题;
     public static void playByComponentName(Context context, String path, String name) {
+        playByComponentName(context, path, name, null, null);
+    }
+
+    public static void playByComponentName(Context context, String path, String name, ArrayList<String> pathList, ArrayList<String> nameList) {
         ComponentName component = new ComponentName("com.hph.videoplayer",
                 "com.hph.videoplayer.ui.VideoPlayerExternalActivity");
 
@@ -92,6 +100,11 @@ public class VideoPlayTools {
         intent.putExtra("name", name);
         intent.putExtra("play_url", path);
         intent.setComponent(component);
+
+        if (nameList != null && pathList != null) {
+            intent.putStringArrayListExtra("MEDIA_CENTER_VIDOE_LIST", pathList);
+            intent.putStringArrayListExtra("MEDIA_CENTER_VIDOE_NAME", nameList);
+        }
 
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -2,8 +2,10 @@ package com.hphtv.movielibrary.ui.detail;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -14,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,19 +39,24 @@ import com.google.android.material.tabs.TabLayout;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.EpisodeItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
+import com.hphtv.movielibrary.bean.PlayList;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutTvDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
+import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment;
 import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
 import com.hphtv.movielibrary.ui.moviesearch.online.SeasonSelectDialog;
 import com.hphtv.movielibrary.ui.videoselect.VideoSelectDialog;
 import com.hphtv.movielibrary.util.BroadcastHelper;
 import com.hphtv.movielibrary.util.GlideTools;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
@@ -58,7 +66,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, LayoutTvDetailBinding> {
     public static final int REMOVE = 1;
@@ -67,6 +78,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     private EpisodeItemListAdapter mEpisodeItemListAdapter;
     private Handler mHandler = new Handler();
     private Runnable mBottomMaskFadeInTask;
+    private PlayVideoReceiver mPlayVideoReceiver;
 
     public OnClickListener mClickListener = view -> {
         switch (view.getId()) {
@@ -428,31 +440,31 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     mViewModel.saveSeries(wrapper1, season)
                             .subscribe(new SimpleObserver<MovieWrapper>() {
 
-                        @Override
-                        public void onAction(MovieWrapper movieWrapper) {
-                            if (movieWrapper.movie != null) {
-                                prepareMovieWrapper(movieWrapper.movie.id, season.seasonNumber);
-                                refreshParent();
-                            } else {
-                                ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
-                            }
-                            stopLoading();
-                        }
+                                @Override
+                                public void onAction(MovieWrapper movieWrapper) {
+                                    if (movieWrapper.movie != null) {
+                                        prepareMovieWrapper(movieWrapper.movie.id, season.seasonNumber);
+                                        refreshParent();
+                                    } else {
+                                        ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                                    }
+                                    stopLoading();
+                                }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            e.printStackTrace();
-                            ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
-                            stopLoading();
-                        }
+                                @Override
+                                public void onError(Throwable e) {
+                                    super.onError(e);
+                                    e.printStackTrace();
+                                    ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
+                                    stopLoading();
+                                }
 
-                        @Override
-                        public void onComplete() {
-                            super.onComplete();
-                            stopLoading();
-                        }
-                    });
+                                @Override
+                                public void onComplete() {
+                                    super.onComplete();
+                                    stopLoading();
+                                }
+                            });
                 });
             } else {
                 //选择新电影逻辑
@@ -557,15 +569,18 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void playingEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        mViewModel.playingEpisodeVideo(videoFile).subscribe(new SimpleObserver<String>() {
-            @Override
-            public void onAction(String s) {
-            }
+        registerPlayReceiver();
+        mViewModel.playingEpisodeVideo(videoFile).subscribe(new SimpleObserver<PlayList>() {
 
             @Override
             public void onComplete() {
                 super.onComplete();
                 stopLoading();
+            }
+
+            @Override
+            public void onAction(PlayList playList) {
+
             }
         });
         ;
@@ -574,15 +589,17 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     //播放其他剧集
     private void playingOtherEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        mViewModel.playingOtherEpisodeVideo(videoFile).subscribe(new SimpleObserver<String>() {
-            @Override
-            public void onAction(String s) {
-            }
-
+        registerPlayReceiver();
+        mViewModel.playingOtherEpisodeVideo(videoFile).subscribe(new SimpleObserver<PlayList>() {
             @Override
             public void onComplete() {
                 super.onComplete();
                 stopLoading();
+            }
+
+            @Override
+            public void onAction(PlayList playList) {
+
             }
         });
 
@@ -628,4 +645,66 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         parent.invalidate();
         return tab;
     }
+    private void registerPlayReceiver() {
+        try {
+            unregisterPlayReceiver();
+            if (mPlayVideoReceiver == null)
+                mPlayVideoReceiver = new PlayVideoReceiver();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("com.firefly.video.player");
+            registerReceiver(mPlayVideoReceiver, intentFilter);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void unregisterPlayReceiver() {
+        try {
+            if (mPlayVideoReceiver != null) {
+                unregisterReceiver(mPlayVideoReceiver);
+                mPlayVideoReceiver = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class PlayVideoReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if ("com.firefly.video.player".equals(action)) {
+                String path = null;
+                long position = 0;
+                if (intent.hasExtra("video_address")) {
+                    path = intent.getStringExtra("video_address");
+                }
+                if (intent.hasExtra("video_position")) {
+                    position = intent.getLongExtra("video_position", 0);
+                }
+                Log.w(TAG, "onReceive: "+path+" "+position );
+                MovieHelper.updateHistory(getBaseContext(),path)
+                        .observeOn(Schedulers.newThread())
+                        .map(new Function<String, VideoFile>() {
+                            @Override
+                            public VideoFile apply(String path) throws Throwable {
+                                VideoFileDao videoFileDao= MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getVideoFileDao();
+                                VideoFile videoFile=videoFileDao.queryByPath(path);
+                                return videoFile;
+                            }
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new SimpleObserver<VideoFile>() {
+                            @Override
+                            public void onAction(VideoFile videoFile) {
+                                mViewModel.updatePlayEpisode(videoFile);
+                            }
+                        });
+            }
+            unregisterPlayReceiver();
+
+        }
+    }
 }
+
