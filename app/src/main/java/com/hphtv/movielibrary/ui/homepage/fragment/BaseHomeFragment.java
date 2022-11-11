@@ -154,7 +154,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mViewModel.getRecentlyPlayedList());
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
         mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
-            if(Constants.RecentlyVideoAction.playNow
+            if(data._mid<0||Constants.RecentlyVideoAction.playNow
                     .equals(Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction()))){
                 registerPlayReceiver();
                 mViewModel.playingVideo(data.path, data.filename)
