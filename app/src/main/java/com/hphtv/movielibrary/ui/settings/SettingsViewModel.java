@@ -49,6 +49,7 @@ public class SettingsViewModel extends BaseAndroidViewModel {
     private ObservableBoolean mAutoSearchState = new ObservableBoolean(Config.isAutoSearch());
     private ObservableField<String> mDefaultSearchMode = new ObservableField<>();
     private ObservableField<String> mPlayerName = new ObservableField<>();
+    private ObservableField<String> mRecentlyVideoAction=new ObservableField<>();
     private HashMap<String, String> mVideoPlayerMap;
     private List<String> mPlayerNames = new ArrayList<>();
     private List<String> mPlayerPackages = new ArrayList<>();
@@ -80,6 +81,7 @@ public class SettingsViewModel extends BaseAndroidViewModel {
                 mPlayerNames.add(name);
             });
             readDefaultPlayer();
+            readRecentlyVideoAction();
         }
     }
 
@@ -162,6 +164,10 @@ public class SettingsViewModel extends BaseAndroidViewModel {
         return mDefaultSearchMode;
     }
 
+    public ObservableField<String> getRecentlyVideoAction() {
+        return mRecentlyVideoAction;
+    }
+
     public ObservableField<String> getPlayerName() {
         return mPlayerName;
     }
@@ -181,6 +187,17 @@ public class SettingsViewModel extends BaseAndroidViewModel {
             Config.setDefaultSearchMode(Constants.SearchType.auto);
         }
         readDefaultSearchModeString();
+    }
+
+    public void changeRecentlyVideoAction(View v){
+        Constants.RecentlyVideoAction action=Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction());
+
+        if (action == Constants.RecentlyVideoAction.playNow) {
+            Config.setRecentlyVideoAction(Constants.RecentlyVideoAction.openDetail);
+        } else if (action == Constants.RecentlyVideoAction.openDetail) {
+            Config.setRecentlyVideoAction(Constants.RecentlyVideoAction.playNow);
+        }
+        readRecentlyVideoAction();
     }
 
     /**
@@ -208,6 +225,18 @@ public class SettingsViewModel extends BaseAndroidViewModel {
 //        }
         if (mPlayerPackages.contains(Config.getPlayerPackage())) {
             mSelectPlayerPos.set(mPlayerPackages.indexOf(Config.getPlayerPackage()));
+        }
+    }
+
+    public void readRecentlyVideoAction(){
+        Constants.RecentlyVideoAction action=Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction());
+        switch (action){
+            case playNow:
+                mRecentlyVideoAction.set(getString(R.string.settings_preference_homepage_recently_played_action_play_now));
+                break;
+            case openDetail:
+                mRecentlyVideoAction.set(getString(R.string.settings_preference_homepage_recently_played_action_open_video_details));
+                break;
         }
     }
 

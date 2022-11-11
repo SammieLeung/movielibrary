@@ -18,7 +18,7 @@
       android:layout_height="wrap_content"
       android:background="@drawable/new_common_dialog_bg"
       android:gravity="center"
-      android:minHeight="301dp"
+      android:minHeight="180dp"
       android:orientation="vertical">
 
       <androidx.core.widget.NestedScrollView

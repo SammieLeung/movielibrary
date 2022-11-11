@@ -47,6 +47,7 @@ public class PreferenceFragment extends BaseFragment2<SettingsViewModel, Fragmen
         mViewModel.readDefaultSearchModeString();
         mBinding.setStateName(mViewModel.getDefaultSearchMode());
         mBinding.setPlayerName(mViewModel.getPlayerName());
+        mBinding.setRecentlyVideoAction(mViewModel.getRecentlyVideoAction());
         NextFocusModel model = new NextFocusModel();
         model.setNextFocusLeft(R.id.tab_preference);
         mBinding.setNextFocus(model);
@@ -56,6 +57,7 @@ public class PreferenceFragment extends BaseFragment2<SettingsViewModel, Fragmen
 
         mBinding.viewAutosearch.view.setOnClickListener(mViewModel::toggleAutoSearchState);
         mBinding.viewDefaultSearchMode.view.setOnClickListener(mViewModel::changeDefaultSearchState);
+        mBinding.viewDefaultRecentlyVideoAction.view.setOnClickListener(mViewModel::changeRecentlyVideoAction);
         mBinding.viewDefalutPlayer.view.setOnClickListener(v -> {
             SelectPlayerDialog dialog=new SelectPlayerDialog(mViewModel.getPlayerNames());
             dialog.setCheckPos(mViewModel.getSelectPlayerPos());

@@ -19,12 +19,15 @@ import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemWithMoreListAdapter;
 import com.hphtv.movielibrary.bean.PlayList;
+import com.hphtv.movielibrary.data.Config;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FragmentHomepageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.ILoadingState;
+import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
@@ -151,13 +154,24 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mViewModel.getRecentlyPlayedList());
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
         mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
-            registerPlayReceiver();
-            mViewModel.playingVideo(data.path, data.filename)
-                    .subscribe(new SimpleObserver<PlayList>() {
-                        @Override
-                        public void onAction(PlayList playList) {
-                        }
-                    });
+            if(Constants.RecentlyVideoAction.playNow
+                    .equals(Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction()))){
+                registerPlayReceiver();
+                mViewModel.playingVideo(data.path, data.filename)
+                        .subscribe(new SimpleObserver<PlayList>() {
+                            @Override
+                            public void onAction(PlayList playList) {
+                            }
+                        });
+            }else{
+                Intent intent = new Intent(getContext(), MovieDetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putLong(Constants.Extras.MOVIE_ID, data._mid);
+                bundle.putInt(Constants.Extras.SEASON, data.season);
+                intent.putExtras(bundle);
+                startActivityForResult(intent);
+            }
+
         });
     }
 

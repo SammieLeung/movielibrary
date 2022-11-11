@@ -209,6 +209,9 @@
   <string name="settings_preference_default_player">默认播放器</string>
   <string name="settings_preference_system_player">系统播放器</string>
   <string name="settings_preference_only_for_local">*仅支持本地视频</string>
+  <string name="settings_preference_homepage_recently_played_action">点击最近播放视频</string>
+  <string name="settings_preference_homepage_recently_played_action_play_now">立即播放</string>
+  <string name="settings_preference_homepage_recently_played_action_open_video_details">打开影片详情</string>
 
   <!--设置-关于-->
   <string name="settings_about_source">海报来源</string>

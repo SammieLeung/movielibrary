@@ -235,4 +235,9 @@ public class Constants {
         String LAST_POTSER = "last_poster";
     }
 
+    public enum RecentlyVideoAction{
+        playNow,
+        openDetail
+    }
+
 }

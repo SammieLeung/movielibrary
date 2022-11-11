@@ -213,6 +213,9 @@
     <string name="settings_preference_default_player">Default Player</string>
     <string name="settings_preference_system_player">System VideoPlayer</string>
     <string name="settings_preference_only_for_local">*Only support local video</string>
+    <string name="settings_preference_homepage_recently_played_action">Actions For Recently Played</string>
+    <string name="settings_preference_homepage_recently_played_action_play_now">Play now</string>
+    <string name="settings_preference_homepage_recently_played_action_open_video_details">Open video details</string>
 
     <!--设置-关于-->
     <string name="settings_about_source">Poster Source</string>

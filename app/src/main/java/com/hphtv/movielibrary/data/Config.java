@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.data;
 
 
+import androidx.databinding.Observable;
 import androidx.databinding.ObservableBoolean;
 
 import com.hphtv.movielibrary.MovieApplication;
@@ -21,6 +22,7 @@ public class Config {
     public static final String SHOW_LIKE="show_like";
     public static final String PLAYER_NAME ="player_name";
     public static final String PLAYER_PACKAGE="player_package";
+    public static final String RECENTLY_VIDEO_ACTION="recently_video_action";
 
     public static final String AUTO_SEARCH="auto_search";
     public static final String DEFAULT_SEARCH_MODE="default_search_mode";
@@ -38,6 +40,7 @@ public class Config {
     private static ObservableBoolean sShowLike;//显示收藏
 
     private static ObservableBoolean sAutoSearch;
+    private static String sRecentlyVideoAction;
     private static String sDefaultSearchMode;
     private static String sPlayerName;
     private static String sPlayerPackage;
@@ -56,6 +59,8 @@ public class Config {
 
         sAutoSearch=new ObservableBoolean(tools.readProperty(AUTO_SEARCH,true));
         sDefaultSearchMode =tools.readProperty(DEFAULT_SEARCH_MODE, Constants.SearchType.auto.name());
+        sRecentlyVideoAction=tools.readProperty(RECENTLY_VIDEO_ACTION,Constants.RecentlyVideoAction.playNow.name());
+
 
         sPlayerName =tools.readProperty(PLAYER_NAME,"视频播放器");
         sPlayerPackage=tools.readProperty(PLAYER_PACKAGE,"com.hph.videoplayer");
@@ -182,6 +187,15 @@ public class Config {
     public static void setDefaultSearchMode(Constants.SearchType type) {
         sDefaultSearchMode = type.name();
         SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(DEFAULT_SEARCH_MODE,type.name());
+    }
+
+    public static String getRecentlyVideoAction() {
+        return sRecentlyVideoAction;
+    }
+
+    public static void setRecentlyVideoAction(Constants.RecentlyVideoAction action) {
+        sRecentlyVideoAction = action.name();
+        SharePreferencesTools.getInstance(MovieApplication.getInstance()).saveProperty(RECENTLY_VIDEO_ACTION,action.name());
     }
 
     public static String getPlayerName() {
