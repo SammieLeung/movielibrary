@@ -64,7 +64,7 @@ import org.jetbrains.annotations.NotNull;
  */
 
 @Database(
-        version = 18,
+        version = 19,
         entities = {Actor.class, Device.class, Director.class, Writer.class, Genre.class, Movie.class, MovieActorCrossRef.class,
                 MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
                 ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
@@ -126,7 +126,7 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
                             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
                             MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
                             MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
-                            MIGRATION_16_17};
+                            MIGRATION_16_17,MIGRATION_18_19};
                     sInstance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     MovieLibraryRoomDatabase.class, "movielibrary_db_v2")
@@ -316,6 +316,14 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("DROP VIEW season_dataview");
             database.execSQL("CREATE VIEW `season_dataview` AS SELECT M.id,V.season,SS.name,SS.poster,ss.episode_count FROM videofile AS V JOIN movie_videofile_cross_ref AS MVC ON V.path=MVC.path JOIN movie AS M ON M.id=MVC.id JOIN season AS SS ON SS.movie_id=M.id WHERE V.season=SS.season_number");
+        }
+    };
+
+    public static final Migration MIGRATION_18_19 = new Migration(18, 19) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE videofile ADD COLUMN `last_position` INTEGER NOT NULL DEFAULT 0");
+            database.execSQL("ALTER TABLE videofile ADD COLUMN `duration` INTEGER NOT NULL DEFAULT 0");
         }
     };
 

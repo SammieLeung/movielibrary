@@ -48,6 +48,10 @@ public class VideoFile implements Serializable {
     public String resolution;
     @ColumnInfo(name = "video_source")
     public String videoSource;
+    @ColumnInfo(name = "last_position",defaultValue = "0")
+    public long lastPosition;
+    @ColumnInfo(defaultValue = "0")
+    public long duration;
 
 
     public VideoFile() {
