@@ -64,14 +64,15 @@ import org.jetbrains.annotations.NotNull;
  */
 
 @Database(
-        version = 19,
+        version = 20,
         entities = {Actor.class, Device.class, Director.class, Writer.class, Genre.class, Movie.class, MovieActorCrossRef.class,
                 MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
                 ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
                 Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
         views = {MovieDataView.class, ConnectedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class, UnknownRootDataView.class},
         autoMigrations = {
-                @AutoMigration(from=17,to=18)
+                @AutoMigration(from=17,to=18),
+                @AutoMigration(from=19,to=20)
         }
 )
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {

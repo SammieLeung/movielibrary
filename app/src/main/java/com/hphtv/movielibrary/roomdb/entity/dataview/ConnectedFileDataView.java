@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.roomdb.entity.dataview;
 
+import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
 
 import com.hphtv.movielibrary.data.Constants;
@@ -13,14 +14,16 @@ import java.io.Serializable;
  * date:  2021/6/22
  */
 @DatabaseView(value =
-        "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.name AS dir_name,ST.uri AS dir_uri,ST.access AS s_ap,DEV.path AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired " +
+        "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.name AS dir_name,ST.uri AS dir_uri,ST.access AS s_ap,DEV.path AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired," +
+                "VF.last_position,VF.duration "+
                 "FROM " + TABLE.VIDEOFILE + " AS VF " +
                 "JOIN " + TABLE.SHORTCUT + " AS ST " +
                 "ON VF.dir_path=ST.uri " +
                 "JOIN " + TABLE.DEVICE + " AS DEV " +
                 "ON DEV.path=ST.device_path " +
                 "UNION " +
-                "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.name AS dir_name,ST.uri AS dir_uri,ST.access AS s_ap,NULL AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired " +
+                "SELECT VF.vid,VF.filename,VF.keyword,VF.path,ST.name AS dir_name,ST.uri AS dir_uri,ST.access AS s_ap,NULL AS device_uri,VF.add_time,VF.last_playtime,VF.season,VF.episode,VF.aired," +
+                "VF.last_position,VF.duration "+
                 "FROM " + TABLE.VIDEOFILE + " AS VF " +
                 "JOIN " + TABLE.SHORTCUT + " AS ST " +
                 "ON VF.dir_path=ST.uri " +
@@ -40,6 +43,8 @@ public class ConnectedFileDataView implements Serializable {
     public String episode;
     public String aired;
     public int season;
+    public long last_position;
+    public long duration;
 
 
 }

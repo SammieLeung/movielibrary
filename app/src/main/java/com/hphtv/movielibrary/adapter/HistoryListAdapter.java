@@ -44,7 +44,6 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
         super.onBindViewHolder(holder, position);
         HistoryMovieDataView dataView = mList.get(position);
         HistoryItemBinding binding = (HistoryItemBinding) holder.mBinding;
-        binding.setRatings(dataView.ratings);
         if (dataView.episode != -1) {
             binding.setTag(mContext.getString(R.string.btn_play_episode, dataView.episode));
         }else if (!TextUtils.isEmpty(dataView.aired)&&!"-1".equals(dataView.aired)){
