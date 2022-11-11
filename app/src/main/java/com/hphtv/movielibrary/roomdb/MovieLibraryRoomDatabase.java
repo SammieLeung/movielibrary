@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import androidx.annotation.NonNull;
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -62,12 +63,17 @@ import org.jetbrains.annotations.NotNull;
  * date:  21-5-14
  */
 
-@Database(entities = {Actor.class, Device.class, Director.class, Writer.class, Genre.class, Movie.class, MovieActorCrossRef.class,
-        MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
-        ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
-        Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
+@Database(
+        version = 18,
+        entities = {Actor.class, Device.class, Director.class, Writer.class, Genre.class, Movie.class, MovieActorCrossRef.class,
+                MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
+                ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
+                Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
         views = {MovieDataView.class, ConnectedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class, UnknownRootDataView.class},
-        version = 17)
+        autoMigrations = {
+                @AutoMigration(from=17,to=18)
+        }
+)
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     private static MovieLibraryRoomDatabase sInstance;//创建单例
 
@@ -312,4 +318,6 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE VIEW `season_dataview` AS SELECT M.id,V.season,SS.name,SS.poster,ss.episode_count FROM videofile AS V JOIN movie_videofile_cross_ref AS MVC ON V.path=MVC.path JOIN movie AS M ON M.id=MVC.id JOIN season AS SS ON SS.movie_id=M.id WHERE V.season=SS.season_number");
         }
     };
+
+
 }

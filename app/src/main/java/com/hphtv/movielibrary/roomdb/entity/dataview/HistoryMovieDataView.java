@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.roomdb.entity.dataview;
 
+import androidx.room.ColumnInfo;
 import androidx.room.DatabaseView;
 
 import com.hphtv.movielibrary.data.Constants;
@@ -12,8 +13,8 @@ import com.hphtv.movielibrary.roomdb.VIEW;
  */
 @DatabaseView(
         value = "SELECT filename,keyword,path,last_playtime,episode,aired,s_ap," +
-                "NULL AS _mid,NULL AS movie_id,NULL AS poster,NULL AS source,NULL AS title,NULL AS ratings,NULL AS ap,NULL AS type," +
-                "NULL AS season,NULL AS season_name,NULL AS season_poster," +
+                "-1 AS _mid,NULL AS movie_id,NULL AS poster,NULL AS source,NULL AS title,NULL AS ratings,NULL AS ap,NULL AS type," +
+                "-1 AS season,NULL AS season_name,NULL AS season_poster," +
                 "NULL AS stage_photo " +
                 "FROM " + VIEW.CONNECTED_FILE_DATAVIEW + " " +
                 "WHERE last_playtime >0 AND path NOT IN (SELECT path FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+") " +
