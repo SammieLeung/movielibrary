@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.roomdb.dao;
 
 import androidx.annotation.Nullable;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -124,4 +125,15 @@ public interface VideoFileDao {
             "SELECT path FROM  "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+
             " WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path))")
     public List<String> queryVideoFileNameList(String path);
+
+
+
+    @Query("SELECT * FROM "+TABLE.VIDEOFILE+" WHERE add_time<:addTime AND dir_path=:dir_path")
+    public List<VideoFile> queryRedundantFile(String dir_path,long addTime);
+
+    @Delete
+    public int delete(VideoFile videoFile);
+
+    @Query("DELETE FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:filePath")
+    public int removeRelation(String filePath);
 }

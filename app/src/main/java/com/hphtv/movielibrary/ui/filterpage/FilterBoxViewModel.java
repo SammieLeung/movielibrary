@@ -70,7 +70,7 @@ public class FilterBoxViewModel extends AndroidViewModel {
         Observable.just("")
                 .subscribeOn(Schedulers.io())
                 .map(s -> {
-                    mLocalShortcutList = mShortcutDao.queryAllLocalShortcuts();
+                    mLocalShortcutList = mShortcutDao.queryAllConnectedLocalShortcuts();
                     mDLNAShortcutList = mShortcutDao.queryAllShortcutsByDevcietype(Constants.DeviceType.DEVICE_TYPE_DLNA);
                     mSMBShortcutList = mShortcutDao.queryAllShortcutsByDevcietype(Constants.DeviceType.DEVICE_TYPE_SMB);
                     if (mDeviceDataList == null)

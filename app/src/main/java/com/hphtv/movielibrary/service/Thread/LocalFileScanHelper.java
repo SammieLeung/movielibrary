@@ -1,13 +1,7 @@
 package com.hphtv.movielibrary.service.Thread;
 
 import android.content.Context;
-import android.content.Intent;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.firefly.videonameparser.MovieNameInfo;
-import com.firefly.videonameparser.VideoNameParser;
-import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -35,62 +29,67 @@ import java.util.Objects;
  */
 public class LocalFileScanHelper {
     public static final String TAG = LocalFileScanHelper.class.getSimpleName();
-    private static final int MAX_DIRS = 2000;//扫描目录队列最大长度
+    private static final int MAX_DIRS = 1000;//扫描目录队列最大长度
 
-    public static void searchAllLocalShortcuts(Context context) {
+    public static void searchAllConnectedLocalShortcuts(Context context) {
         ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
-        List<Shortcut> shortcutList = shortcutDao.queryAllLocalShortcuts();
-        long curTime=System.currentTimeMillis();
-        scanShortcuts(context,shortcutList);
-        LogUtil.v(TAG,"search All Local takes "+(System.currentTimeMillis()-curTime)+"ms");
+        List<Shortcut> shortcutList = shortcutDao.queryAllConnectedLocalShortcuts();
+        long curTime = System.currentTimeMillis();
+        scanShortcuts(context, shortcutList);
+        LogUtil.v(TAG, "search All Local takes " + (System.currentTimeMillis() - curTime) + "ms");
     }
 
-    public static void searchShortcut(Context context, Shortcut shortcut){
-        List<Shortcut> shortcutList=new ArrayList<>();
+    public static void searchShortcut(Context context, Shortcut shortcut) {
+        List<Shortcut> shortcutList = new ArrayList<>();
         shortcutList.add(shortcut);
-        scanShortcuts(context,shortcutList);
+        scanShortcuts(context, shortcutList);
     }
 
-    public static List<Shortcut> scanDevice(Context context,String devicePath){
+    public static List<Shortcut> scanDevice(Context context, String devicePath) {
         ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
-        List<Shortcut> shortcutList=shortcutDao.queryLocalShortcuts(devicePath);
-        scanShortcuts(context,shortcutList);
+        List<Shortcut> shortcutList = shortcutDao.queryLocalShortcuts(devicePath);
+        scanShortcuts(context, shortcutList);
         return shortcutList;
     }
 
     /**
      * 搜索索引下的所有文件，保存到数据库
+     *
      * @param context
      * @param shortcutList
      */
-    private static void scanShortcuts(Context context,List<Shortcut> shortcutList) {
-        LinkedList<ScanDirectory> scanDirectoryList = new LinkedList<>();
-        LinkedList<ScanDirectory> tmpScanDirectoryList = new LinkedList<>();
-
-        ArrayList<VideoFile> allVideoFileList = new ArrayList<>();
+    private static void scanShortcuts(Context context, List<Shortcut> shortcutList) {
 
         DeviceDao deviceDao = MovieLibraryRoomDatabase.getDatabase(context).getDeviceDao();
-        VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
-        ScanDirectoryDao scanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
-        ShortcutDao shortcutDao=MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
-
-        //1 - 获取所有本地文件夹
         for (Shortcut shortcut : shortcutList) {
             Device device = deviceDao.querybyMountPath(shortcut.devicePath);
             if (device != null) {
-                ScanDirectory scanDirectory = new ScanDirectory(shortcut.uri, shortcut.devicePath);
-                scanDirectoryList.add(scanDirectory);
+                runScanProcess(context,shortcut);
             }
         }
+    }
+
+
+    private static void runScanProcess(Context context, Shortcut shortcut) {
+        long addTime = System.currentTimeMillis();
+
+        VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+        ScanDirectoryDao scanDirectoryDao = MovieLibraryRoomDatabase.getDatabase(context).getScanDirectoryDao();
 
         boolean isOverMaxDirs = false;//待扫描队列超过最大缓存标记
+        LinkedList<ScanDirectory> scanDirectoryList = new LinkedList<>();
+        ArrayList<VideoFile> allVideoFileList = new ArrayList<>();
+
+        ScanDirectory parentDirectory = new ScanDirectory(shortcut.uri, shortcut.devicePath);
+        scanDirectoryList.add(parentDirectory);
+        //一.搜索文件
         while (!scanDirectoryList.isEmpty()) {
-            //文件信息超过100则先保存到数据库
+            //* 文件信息超过100则先保存到数据库
             if (allVideoFileList.size() > 100) {
-                saveVideoFileInfotoDB(allVideoFileList, videoFileDao);
+                saveVideoFileInfoToDB(allVideoFileList, videoFileDao);
             }
+            //待扫描设置超过最大缓存标记
             if (scanDirectoryList.size() > MAX_DIRS) {
-                //设置超过最大缓存标记
                 isOverMaxDirs = true;
             } else if (scanDirectoryList.size() < MAX_DIRS / 2 && isOverMaxDirs) {
                 //取消超过最大缓存标记
@@ -112,29 +111,22 @@ public class LocalFileScanHelper {
 
             if (dirFile != null && dirFile.exists()) {
                 File[] subFiles = dirFile.listFiles();//获取子文件
-                if (subFiles == null || subFiles.length == 0)
-                    continue;
+                if (subFiles == null || subFiles.length == 0) continue;
                 for (File subFile : subFiles) {
                     if (!subFile.exists())//判断子文件是否存在
                         continue;
                     //文件夹加入待扫描队列
                     if (subFile.isDirectory()) {
-                        if (isOverMaxDirs) {//当前扫描目录队列超过1000个则先缓存
-                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), scanDirectory.devicePath);
-                            tmpScanDirectory.parentPath = scanDirectory.parentPath;
-                            tmpScanDirectoryList.add(tmpScanDirectory);
-                            if (tmpScanDirectoryList.size() >= MAX_DIRS / 2) {//暂存1000个
-                                scanDirectoryDao.insertScanDirectories(tmpScanDirectoryList.toArray(new ScanDirectory[0]));
-                            }
+                        ScanDirectory childDirectory = new ScanDirectory(subFile.getPath(), scanDirectory.devicePath);
+                        if (isOverMaxDirs) {//当前扫描目录队列超过2000个则先缓存
+                            scanDirectoryDao.insertScanDirectories(childDirectory);
                         } else {
-                            ScanDirectory tmpScanDirectory = new ScanDirectory(subFile.getPath(), scanDirectory.devicePath);
-                            tmpScanDirectory.parentPath = scanDirectory.parentPath;
-                            scanDirectoryList.add(tmpScanDirectory);
+                            scanDirectoryList.add(childDirectory);
                         }
                     } else {
-                        if(!subFile.getName().startsWith(".")) {
+                        if (!subFile.getName().startsWith(".")) {
                             //获取文件信息，传入文件信息暂存列表
-                            VideoFile videoFile = buildVideoInfoFromFile(subFile, scanDirectory);
+                            VideoFile videoFile = buildVideoInfoFromFile(subFile, parentDirectory, addTime);
                             if (videoFile != null) {
                                 allVideoFileList.add(videoFile);
                             }
@@ -144,15 +136,18 @@ public class LocalFileScanHelper {
 
             }
         }
-        //队列结束保存文件信息入库
-        saveVideoFileInfotoDB(allVideoFileList, videoFileDao);
-        updateShortcutFileCount(shortcutList,shortcutDao);
+
+        //二、保存文件列表
+        saveVideoFileInfoToDB(allVideoFileList, videoFileDao);
+        //三、删除多余文件和对应关系表的行
+        clearRedundantFile(context, parentDirectory.path, addTime);
+        //四、更新文件数量
+        updateShortcutFileCount(context,shortcut);
     }
 
 
     private boolean isNoMedia(File file) {
-        if (file.getName().equals(".nomedia"))
-            return true;
+        if (file.getName().equals(".nomedia")) return true;
         return false;
     }
 
@@ -162,22 +157,21 @@ public class LocalFileScanHelper {
      * @param file
      * @return
      */
-    private static VideoFile buildVideoInfoFromFile(File file, ScanDirectory scanDirectory) {
+    private static VideoFile buildVideoInfoFromFile(File file, ScanDirectory parentDir, long addTime) {
         String path = file.getPath();
         int dotIndex = path.lastIndexOf(".");
-        if (dotIndex < 0)
-            return null;
+        if (dotIndex < 0) return null;
         int startIndex = dotIndex + 1;
-        if (startIndex >= path.length())
-            return null;
+        if (startIndex >= path.length()) return null;
         String tailEx = path.substring(startIndex).toLowerCase();
         if (Arrays.binarySearch(Constants.VIDEO_SUFFIX, tailEx) >= 0) {
             String fileName = file.getName();
             VideoFile videoFile = new VideoFile();
             videoFile.filename = (fileName);
             videoFile.path = (file.getPath());
-            videoFile.devicePath = scanDirectory.devicePath;
-            videoFile.dirPath = scanDirectory.parentPath;
+            videoFile.devicePath = parentDir.devicePath;
+            videoFile.dirPath = parentDir.path;
+            videoFile.addTime = addTime;
             return videoFile;
         }
         return null;
@@ -186,47 +180,50 @@ public class LocalFileScanHelper {
     /**
      * 文件信息入库
      */
-    private static void saveVideoFileInfotoDB(ArrayList<VideoFile> videoFileList, VideoFileDao videoFileDao) {
+    private static void saveVideoFileInfoToDB(ArrayList<VideoFile> videoFileList, VideoFileDao videoFileDao) {
         if (!videoFileList.isEmpty()) {
             for (VideoFile videoFile : videoFileList) {
                 VideoFile tVideoFile = videoFileDao.queryByPath(videoFile.path);
                 if (tVideoFile != null) {
-                    videoFile.vid = tVideoFile.vid;
-                    videoFile.isScanned = tVideoFile.isScanned;
-                    videoFile.keyword = tVideoFile.keyword;
-                    videoFile.addTime = tVideoFile.addTime;
-                    videoFile.lastPlayTime = tVideoFile.lastPlayTime;
-                    videoFile.season=tVideoFile.season;
-                    videoFile.episode=tVideoFile.episode;
-                    videoFile.aired=tVideoFile.aired;
-                    videoFile.videoSource=tVideoFile.videoSource;
-                    videoFile.resolution=tVideoFile.resolution;
-                    videoFile.duration=tVideoFile.duration;
-                    videoFile.lastPosition=tVideoFile.lastPosition;
-                    if(!Objects.equals(videoFile.dirPath, tVideoFile.dirPath)){
-                        if(tVideoFile.dirPath.contains(videoFile.dirPath)){
-                            videoFile.dirPath=tVideoFile.dirPath;
+                    tVideoFile.addTime = videoFile.addTime;
+                    if (!Objects.equals(videoFile.dirPath, tVideoFile.dirPath)) {
+                        if (videoFile.dirPath.contains(tVideoFile.dirPath)) {
+                            tVideoFile.dirPath = videoFile.dirPath;
                         }
                     }
                     videoFileDao.update(videoFile);
                 } else {
-                    videoFile.addTime = System.currentTimeMillis();
-                    long id = videoFileDao.insertOrIgnore(videoFile);
-                    videoFile.vid = id;
+                    videoFileDao.insertOrIgnore(videoFile);
                 }
             }
             videoFileList.clear();
         }
     }
 
-    private static void updateShortcutFileCount(List<Shortcut> shortcutList,ShortcutDao shortcutDao){
-        for(Shortcut shortcut:shortcutList) {
-            int fileCount = shortcutDao.queryTotalFiles(shortcut.uri);
-            int matchedCount = shortcutDao.queryMatchedFiles(shortcut.uri);
-            shortcut.fileCount = fileCount;
-            shortcut.posterCount = matchedCount;
-            shortcutDao.updateShortcut(shortcut);
+    /**
+     * 清除没有更新add_time的文件
+     * （先检查设备是否连接，防止删除离线设备文件）
+     *
+     * @param context
+     * @param dir_path
+     * @param add_time
+     */
+    private static void clearRedundantFile(Context context, String dir_path, long add_time) {
+        VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+        List<VideoFile> redundantFiles = videoFileDao.queryRedundantFile(dir_path, add_time);
+        for (VideoFile v : redundantFiles) {
+            videoFileDao.removeRelation(v.path);
+            videoFileDao.delete(v);
         }
+    }
+
+    private static void updateShortcutFileCount(Context context, Shortcut shortcut) {
+        ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(context).getShortcutDao();
+        int fileCount = shortcutDao.queryTotalFiles(shortcut.uri);
+        int matchedCount = shortcutDao.queryMatchedFiles(shortcut.uri);
+        shortcut.fileCount = fileCount;
+        shortcut.posterCount = matchedCount;
+        shortcutDao.updateShortcut(shortcut);
     }
 
 

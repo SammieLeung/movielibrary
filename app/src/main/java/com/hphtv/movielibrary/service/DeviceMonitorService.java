@@ -543,7 +543,7 @@ public class DeviceMonitorService extends Service {
             Observable.just("")
                     .subscribeOn(Schedulers.newThread())
                     .map(arg -> {
-                        LocalFileScanHelper.searchAllLocalShortcuts(getBaseContext());
+                        LocalFileScanHelper.searchAllConnectedLocalShortcuts(getBaseContext());
                         List<VideoFile> unScannedFiles = getUnScannedLocalFiles();
                         HashMap<String, List<VideoFile>> map = new HashMap<>();
                         for (VideoFile videoFile : unScannedFiles) {

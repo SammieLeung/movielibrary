@@ -26,13 +26,10 @@ public class ScanDirectory {
     @ColumnInfo(name = "device_path")
     public String devicePath;
 
-    @Ignore
-    public String parentPath;
 
     public ScanDirectory(String path, String devicePath) {
         this.path = path;
         this.devicePath = devicePath;
-        this.parentPath=path;
     }
 
     @Override
