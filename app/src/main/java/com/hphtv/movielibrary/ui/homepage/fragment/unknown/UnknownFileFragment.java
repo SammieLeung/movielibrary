@@ -1,5 +1,9 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.unknown;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,12 +23,17 @@ import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
+import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
 import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 
@@ -33,7 +42,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * author: Sam Leung
@@ -41,6 +53,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
  */
 public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileViewModel, FragmentUnknowfileBinding> implements ILoadingState {
     private UnknownRootItemListAdapter mUnknownRootItemListAdapter;
+    private PlayVideoReceiver mPlayVideoReceiver;
     public AtomicInteger atomicState = new AtomicInteger();
     private Handler mUIHandler = new Handler();
     private BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = (BaseAdapter2.OnRecyclerViewItemClickListener<UnknownRootDataView>) (view, position, data) -> {
@@ -92,6 +105,12 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     public void onResume() {
         super.onResume();
         reloadUnknownFiles(mViewModel.getCurrentPath());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterPlayReceiver();
     }
 
     /**
@@ -177,7 +196,8 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
 
     }
 
-    private void playVideo(String path) {
+    public void playVideo(String path) {
+        registerPlayReceiver();
         mViewModel.playVideo(path)
                 .subscribe(new SimpleObserver<String>() {
                     @Override
@@ -253,7 +273,66 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
                         }, 200);
                     }
                 });
+    }
 
 
+    private void registerPlayReceiver() {
+        try {
+            unregisterPlayReceiver();
+            if (mPlayVideoReceiver == null)
+                mPlayVideoReceiver = new PlayVideoReceiver();
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction("com.firefly.video.player");
+            getBaseActivity().registerReceiver(mPlayVideoReceiver, intentFilter);
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    private void unregisterPlayReceiver() {
+        try {
+            if (mPlayVideoReceiver != null) {
+                getBaseActivity().unregisterReceiver(mPlayVideoReceiver);
+                mPlayVideoReceiver = null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class PlayVideoReceiver extends BroadcastReceiver {
+        public static final String ACTION_PLAYER_CALLBACK="com.firefly.video.player";
+        public static final String EXTRA_PATH="video_address";
+        public static final String EXTRA_POSITION="video_position";
+        public static final String EXTRA_DURATION="video_duration";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_PLAYER_CALLBACK.equals(action)) {
+                String path = null;
+                long position = 0;
+                long duration = 0;
+                if (intent.hasExtra(EXTRA_PATH)) {
+                    path = intent.getStringExtra(EXTRA_PATH);
+                }
+                if (intent.hasExtra(EXTRA_POSITION)) {
+                    position = intent.getLongExtra(EXTRA_POSITION, 0);
+                }
+                if(intent.hasExtra(EXTRA_DURATION)){
+                    duration=intent.getLongExtra(EXTRA_DURATION,0);
+                }
+
+                Log.w(TAG, "onReceive: " + path + " " + position+"/"+duration);
+                MovieHelper.updateHistory(getContext(),path,position,duration)
+                        .subscribe(new SimpleObserver<String>() {
+                            @Override
+                            public void onAction(String s) {
+
+                            }
+                        });
+            }
+            unregisterPlayReceiver();
+
+        }
     }
 }

@@ -68,15 +68,15 @@ public class MovieHelper {
         return Observable.just(path).subscribeOn(Schedulers.io())
                 //记录播放时间，作为播放记录
                 .doOnNext(filepath -> {
-                    VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
-                    MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
-                    long currentTime = System.currentTimeMillis();
-                    videoFileDao.updateLastPlaytime(filepath, currentTime);
-                    Movie movie = movieDao.queryByFilePath(filepath, ScraperSourceTools.getSource());
-                    if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
-                    String poster = videoFileDao.getPoster(filepath, ScraperSourceTools.getSource());
-                    SharePreferencesTools.getInstance(context).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
-                    OnlineDBApiService.updateHistory(filepath, ScraperSourceTools.getSource());
+//                    VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+//                    MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
+//                    long currentTime = System.currentTimeMillis();
+//                    videoFileDao.updateLastPlaytime(filepath, currentTime);
+//                    Movie movie = movieDao.queryByFilePath(filepath, ScraperSourceTools.getSource());
+//                    if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
+//                    String poster = videoFileDao.getPoster(filepath, ScraperSourceTools.getSource());
+//                    SharePreferencesTools.getInstance(context).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
+//                    OnlineDBApiService.updateHistory(filepath, ScraperSourceTools.getSource());
                 }).observeOn(AndroidSchedulers.mainThread()).doOnNext(s -> VideoPlayTools.play(context, path, name));
     }
 
@@ -104,6 +104,31 @@ public class MovieHelper {
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnNext(playList -> {
             VideoPlayTools.play(context, playList.getPath(), playList.getName(), playList.getPlayList(), playList.getNameList());
         });
+    }
+    /**
+     * 保存播放记录
+     * @param context
+     * @param path
+     * @return
+     */
+    public static Observable<String> updateHistory(Context context, String path,long position,long duration) {
+        return Observable.create((ObservableOnSubscribe<String>) emitter -> {
+            VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+            MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
+            long currentTime = System.currentTimeMillis();
+            VideoFile videoFile=videoFileDao.queryByPath(path);
+            videoFile.lastPlayTime=currentTime;
+            videoFile.lastPosition=position;
+            videoFile.duration=duration;
+            videoFileDao.update(videoFile);
+            Movie movie = movieDao.queryByFilePath(path, ScraperSourceTools.getSource());
+            if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
+            String poster = videoFileDao.getPoster(path, ScraperSourceTools.getSource());
+            SharePreferencesTools.getInstance(context).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
+            OnlineDBApiService.updateHistory(path, ScraperSourceTools.getSource());
+            emitter.onNext(path);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
     }
 
     /**

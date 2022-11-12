@@ -84,7 +84,6 @@ public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB
 
     }
 
-    //TODO
     public void setAutoFitHeightViewPager(NoScrollAutofitHeightViewPager viewPager) {
         mViewPagerWeakReference = new WeakReference<>(viewPager);
     }

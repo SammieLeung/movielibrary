@@ -201,6 +201,8 @@ public class LocalFileScanHelper {
                     videoFile.aired=tVideoFile.aired;
                     videoFile.videoSource=tVideoFile.videoSource;
                     videoFile.resolution=tVideoFile.resolution;
+                    videoFile.duration=tVideoFile.duration;
+                    videoFile.lastPosition=tVideoFile.lastPosition;
                     if(!Objects.equals(videoFile.dirPath, tVideoFile.dirPath)){
                         if(tVideoFile.dirPath.contains(videoFile.dirPath)){
                             videoFile.dirPath=tVideoFile.dirPath;

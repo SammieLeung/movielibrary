@@ -373,7 +373,7 @@ public class DeviceMonitorService extends Service {
                     throwable.printStackTrace();
                     LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                     return new Object[0];
-                })//TODO 切换成主线程?
+                })
                 .subscribe(new SimpleObserver<Object[]>() {
                     @Override
                     public void onAction(Object[] data) {
@@ -383,7 +383,7 @@ public class DeviceMonitorService extends Service {
                             if (videoFileList != null && videoFileList.size() > 0) {
                                 if (mMovieScanService != null)
                                     mMovieScanService.scanVideo(shortcut, videoFileList);
-                            } else {    //TODO mPosterPairingDevice处理
+                            } else {
                                 LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                                 shortcut.isScanned = 1;
                                 mShortcutDao.updateShortcut(shortcut);
@@ -444,7 +444,7 @@ public class DeviceMonitorService extends Service {
                             if (videoFileList != null && videoFileList.size() > 0) {
                                 if (mMovieScanService != null)
                                     mMovieScanService.scanVideo(shortcut, videoFileList);
-                            } else {    //TODO mPosterPairingDevice处理
+                            } else {
                                 LocalBroadcastManager.getInstance(DeviceMonitorService.this).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                                 shortcut.isScanned = 1;
                                 mShortcutDao.updateShortcut(shortcut);
@@ -522,7 +522,7 @@ public class DeviceMonitorService extends Service {
                             if (videoFileList != null && videoFileList.size() > 0) {
                                 if (mMovieScanService != null)
                                     mMovieScanService.scanVideo(shortcut, videoFileList);
-                            } else {    //TODO mPosterPairingDevice处理
+                            } else {
                                 LocalBroadcastManager.getInstance(getApplication()).sendBroadcast(new Intent(Constants.ACTION.MOVIE_SCRAP_STOP));
                                 ServiceStatusHelper.removeView(DeviceMonitorService.this);
                             }

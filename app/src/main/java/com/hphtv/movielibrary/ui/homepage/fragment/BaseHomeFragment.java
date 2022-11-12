@@ -154,8 +154,8 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mViewModel.getRecentlyPlayedList());
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
         mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
-            if(data._mid<0||Constants.RecentlyVideoAction.playNow
-                    .equals(Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction()))){
+            if (data._mid < 0 || Constants.RecentlyVideoAction.playNow
+                    .equals(Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction()))) {
                 registerPlayReceiver();
                 mViewModel.playingVideo(data.path, data.filename)
                         .subscribe(new SimpleObserver<PlayList>() {
@@ -163,7 +163,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                             public void onAction(PlayList playList) {
                             }
                         });
-            }else{
+            } else {
                 Intent intent = new Intent(getContext(), MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putLong(Constants.Extras.MOVIE_ID, data._mid);
@@ -424,21 +424,29 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     private class PlayVideoReceiver extends BroadcastReceiver {
+        public static final String ACTION_PLAYER_CALLBACK="com.firefly.video.player";
+        public static final String EXTRA_PATH="video_address";
+        public static final String EXTRA_POSITION="video_position";
+        public static final String EXTRA_DURATION="video_duration";
 
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if ("com.firefly.video.player".equals(action)) {
+            if (ACTION_PLAYER_CALLBACK.equals(action)) {
                 String path = null;
                 long position = 0;
-                if (intent.hasExtra("video_address")) {
-                    path = intent.getStringExtra("video_address");
+                long duration = 0;
+                if (intent.hasExtra(EXTRA_PATH)) {
+                    path = intent.getStringExtra(EXTRA_PATH);
                 }
-                if (intent.hasExtra("video_position")) {
-                    position = intent.getLongExtra("video_position", 0);
+                if (intent.hasExtra(EXTRA_POSITION)) {
+                    position = intent.getLongExtra(EXTRA_POSITION, 0);
                 }
-                Log.w(TAG, "onReceive: "+path+" "+position );
-                MovieHelper.updateHistory(getContext(),path)
+                if(intent.hasExtra(EXTRA_DURATION)){
+                    duration=intent.getLongExtra(EXTRA_DURATION,0);
+                }
+                Log.w(TAG, "onReceive: " + path + " " + position+"/"+duration);
+                MovieHelper.updateHistory(getContext(), path,position, duration)
                         .subscribe(new SimpleObserver<String>() {
                             @Override
                             public void onAction(String s) {
@@ -447,7 +455,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                         });
             }
             unregisterPlayReceiver();
-
         }
     }
 }

@@ -126,7 +126,6 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
                         mUnknownEpisodeList.sort(Comparator.comparing(o -> o.path));
                         if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
-//                            FIXME 未能识别出播出季的节目处理？
 //                            filterVideoFileList.addAll(mUnknownEpisodeList);
                             filterVideoFileList.sort(Comparator.comparing(o -> o.aired));
                             //按集数分配视频文件，如 720P Ep1--->  第一集
@@ -344,7 +343,12 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     public Observable<String> playingVideo(String path, String name) {
         return MovieHelper.playingMovie(path, name);
+    }
 
+    public Constants.VideoType getVideoType(){
+        if(mMovieWrapper!=null&&mMovieWrapper.movie!=null)
+            return mMovieWrapper.movie.type;
+        return null;
     }
 
     public Observable<PlayList> playingEpisodeVideo(VideoFile videoFile) {

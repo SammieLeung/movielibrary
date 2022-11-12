@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Constants;
@@ -17,6 +18,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
+import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
 import com.hphtv.movielibrary.ui.moviesearch.online.SeasonSelectDialog;
 import com.hphtv.movielibrary.util.MovieHelper;
@@ -119,13 +121,19 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
 
     private void playVideo(View view) {
         ConnectedFileDataView connectedFileDataView = mViewModel.getUnknownRootDataView().connectedFileView;
-        MovieHelper.playingMovie(connectedFileDataView.path, connectedFileDataView.filename)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
 
-                    }
-                });
+        Fragment fragment=getParentFragment();
+        if(fragment instanceof UnknownFileFragment){
+            UnknownFileFragment fileFragment= (UnknownFileFragment) fragment;
+            fileFragment.playVideo(connectedFileDataView.path);
+        }
+//        MovieHelper.playingMovie(connectedFileDataView.path, connectedFileDataView.filename)
+//                .subscribe(new SimpleObserver<String>() {
+//                    @Override
+//                    public void onAction(String s) {
+//
+//                    }
+//                });
     }
 
     /**

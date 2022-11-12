@@ -43,6 +43,7 @@ public interface VideoFileDao {
             "WHERE path=:path")
     public int updateLastPlaytime(String path, long time);
 
+
     @Query("SELECT poster FROM " + VIEW.MOVIE_DATAVIEW + " WHERE file_uri=:path AND source=:source")
     public String getPoster(String path, String source);
 

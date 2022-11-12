@@ -288,14 +288,13 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                             tabLayout.removeAllTabs();
 
                             for (String name : mViewModel.getTabLayoutPaginationMap().keySet()) {
-                                tabLayout.addTab(newTabView(tabLayout, name));//TODO
+                                tabLayout.addTab(newTabView(tabLayout, name));
                             }
 
                             //如有未分类剧集，设置“其他” tabview
                             if (mViewModel.getUnknownEpisodeList().size() > 0) {
                                 tabLayout.addTab(newTabView(tabLayout, getString(R.string.episode_pagination_others_title)));
                             }
-                            //TODO 计算剧集所在的tab位置
                             tabLayout.selectTab(tabLayout.getTabAt(0));
                         }
                     }
@@ -549,6 +548,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void playVideo(String path, String name) {
         startLoading();
+        registerPlayReceiver();
         mViewModel.playingVideo(path, name).subscribe(new SimpleObserver<String>() {
             @Override
             public void onAction(String s) {
@@ -670,21 +670,29 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     private class PlayVideoReceiver extends BroadcastReceiver {
-
+        public static final String ACTION_PLAYER_CALLBACK="com.firefly.video.player";
+        public static final String EXTRA_PATH="video_address";
+        public static final String EXTRA_POSITION="video_position";
+        public static final String EXTRA_DURATION="video_duration";
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if ("com.firefly.video.player".equals(action)) {
+            if (ACTION_PLAYER_CALLBACK.equals(action)) {
                 String path = null;
                 long position = 0;
-                if (intent.hasExtra("video_address")) {
-                    path = intent.getStringExtra("video_address");
+                long duration = 0;
+                if (intent.hasExtra(EXTRA_PATH)) {
+                    path = intent.getStringExtra(EXTRA_PATH);
                 }
-                if (intent.hasExtra("video_position")) {
-                    position = intent.getLongExtra("video_position", 0);
+                if (intent.hasExtra(EXTRA_POSITION)) {
+                    position = intent.getLongExtra(EXTRA_POSITION, 0);
                 }
-                Log.w(TAG, "onReceive: "+path+" "+position );
-                MovieHelper.updateHistory(getBaseContext(),path)
+                if(intent.hasExtra(EXTRA_DURATION)){
+                    duration=intent.getLongExtra(EXTRA_DURATION,0);
+                }
+
+                Log.w(TAG, "onReceive: " + path + " " + position+"/"+duration);
+                MovieHelper.updateHistory(getBaseContext(),path,position,duration)
                         .observeOn(Schedulers.newThread())
                         .map(new Function<String, VideoFile>() {
                             @Override
@@ -698,7 +706,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         .subscribe(new SimpleObserver<VideoFile>() {
                             @Override
                             public void onAction(VideoFile videoFile) {
-                                mViewModel.updatePlayEpisode(videoFile);
+                                if(Constants.VideoType.tv.equals(mViewModel.getVideoType())){
+                                    mViewModel.updatePlayEpisode(videoFile);
+                                }
                             }
                         });
             }

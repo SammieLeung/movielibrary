@@ -260,4 +260,5 @@
 
   <string name="item_count_format">%1$s项</string>
 
+  <string name="state_watched">已看完</string>
 </resources>

@@ -14,9 +14,11 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.HistoryItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.util.GlideTools;
+import com.station.kit.util.TimeFormatter;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -33,7 +35,7 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         BaseScaleAdapter.ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
-        HistoryItemBinding binding=(HistoryItemBinding) viewHolder.mBinding;
+        HistoryItemBinding binding = (HistoryItemBinding) viewHolder.mBinding;
         binding.setShowConrerMark(Config.getShowCornerMark());
         binding.setShowRating(Config.getShowRating());
         return viewHolder;
@@ -46,9 +48,9 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
         HistoryItemBinding binding = (HistoryItemBinding) holder.mBinding;
         if (dataView.episode != -1) {
             binding.setTag(mContext.getString(R.string.btn_play_episode, dataView.episode));
-        }else if (!TextUtils.isEmpty(dataView.aired)&&!"-1".equals(dataView.aired)){
+        } else if (!TextUtils.isEmpty(dataView.aired) && !"-1".equals(dataView.aired)) {
             binding.setTag(mContext.getString(R.string.btn_play_episode_2, dataView.aired));
-        }else{
+        } else {
             binding.setTag(null);
         }
 
@@ -58,9 +60,22 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
             title += " " + dataView.season_name;
         else if (dataView.season != -1)
             title += " " + mContext.getResources().getString(R.string.season_name_for_unknow, dataView.season);
-        GlideTools.GlideWrapper(mContext, !TextUtils.isEmpty(dataView.stage_photo) ? dataView.stage_photo : dataView.poster,R.drawable.default_poster_land)
+        GlideTools.GlideWrapper(mContext, !TextUtils.isEmpty(dataView.stage_photo) ? dataView.stage_photo : dataView.poster, R.drawable.default_poster_land)
                 .into(binding.ivImg);
         binding.setTitle(title);
+
+        if (dataView.duration != 0) {
+            binding.setMax(100);
+            long duration = dataView.duration;
+            long lastPosition = dataView.last_position;
+            int progress = (int) Math.floorDiv(lastPosition*100, duration);
+            binding.setProgress(progress);
+            String durationHRS = TimeFormatter.formatMillisecondToHumanReadableString(duration);
+            String lastPositionHRS = TimeFormatter.formatMillisecondToHumanReadableString(lastPosition);
+            binding.setProgressFormatText(lastPositionHRS + "/" + durationHRS);
+        }else{
+            binding.setMax(0);
+        }
     }
 }
 

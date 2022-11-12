@@ -263,4 +263,7 @@
     <string name="select_season_title">Select Season</string>
 
     <string name="item_count_format">%1$s items</string>
+
+    <string name="state_watched">Watched</string>
+
 </resources>

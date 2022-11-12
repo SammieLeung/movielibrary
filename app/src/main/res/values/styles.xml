@@ -70,6 +70,15 @@
         <item name="android:drawablePadding">@dimen/common_circle_btn_drawable_padding</item>
         <item name="android:drawableTint">@color/circle_btn_color_list</item>
     </style>
+    
+    <style name="history_dataview_playback_progress">
+        <item name="maxHeight">600dp</item>
+        <item name="minHeight">600dp</item>
+        <item name="android:progressDrawable">@drawable/history_dataview_progress_horizontal</item>
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+
+    </style>
 
     <declare-styleable name="FloatKeyboard">
         <attr name="offsetDis" format="dimension" />
