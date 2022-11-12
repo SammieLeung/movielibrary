@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.UnknownRootItemListAdapter;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
@@ -36,6 +37,7 @@ import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.PackageTools;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +45,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -197,26 +200,51 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     }
 
     public void playVideo(String path) {
-        registerPlayReceiver();
-        mViewModel.playVideo(path)
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        mViewModel.setPlayingVideo(true);
-                        super.onSubscribe(d);
-                        getBaseActivity().startLoading();
-                    }
+        if (PackageTools.getPackageVersionCode(getContext(), Config.SYSTEM_PLAYER_PACKAGE) >= 40) {
+            registerPlayReceiver();
+            mViewModel.playVideo(path)
+                    .subscribe(new SimpleObserver<String>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            mViewModel.setPlayingVideo(true);
+                            super.onSubscribe(d);
+                            getBaseActivity().startLoading();
+                        }
 
-                    @Override
-                    public void onAction(String s) {
-                    }
+                        @Override
+                        public void onAction(String s) {
+                        }
 
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        getBaseActivity().stopLoading();
-                    }
-                });
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            getBaseActivity().stopLoading();
+                        }
+                    });
+        } else {
+            mViewModel.playVideo(path)
+                    .flatMap((Function<String, ObservableSource<String>>) MovieHelper::updateHistory)
+                    .subscribe(new SimpleObserver<String>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            mViewModel.setPlayingVideo(true);
+                            super.onSubscribe(d);
+                            getBaseActivity().startLoading();
+                        }
+
+                        @Override
+                        public void onAction(String path) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            getBaseActivity().stopLoading();
+                        }
+                    });
+        }
+
+
     }
 
 
@@ -301,10 +329,11 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     }
 
     private class PlayVideoReceiver extends BroadcastReceiver {
-        public static final String ACTION_PLAYER_CALLBACK="com.firefly.video.player";
-        public static final String EXTRA_PATH="video_address";
-        public static final String EXTRA_POSITION="video_position";
-        public static final String EXTRA_DURATION="video_duration";
+        public static final String ACTION_PLAYER_CALLBACK = "com.firefly.video.player";
+        public static final String EXTRA_PATH = "video_address";
+        public static final String EXTRA_POSITION = "video_position";
+        public static final String EXTRA_DURATION = "video_duration";
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -318,12 +347,12 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
                 if (intent.hasExtra(EXTRA_POSITION)) {
                     position = intent.getLongExtra(EXTRA_POSITION, 0);
                 }
-                if(intent.hasExtra(EXTRA_DURATION)){
-                    duration=intent.getLongExtra(EXTRA_DURATION,0);
+                if (intent.hasExtra(EXTRA_DURATION)) {
+                    duration = intent.getLongExtra(EXTRA_DURATION, 0);
                 }
 
-                Log.w(TAG, "onReceive: " + path + " " + position+"/"+duration);
-                MovieHelper.updateHistory(getContext(),path,position,duration)
+                Log.w(TAG, "onReceive: " + path + " " + position + "/" + duration);
+                MovieHelper.updateHistory(path, position, duration)
                         .subscribe(new SimpleObserver<String>() {
                             @Override
                             public void onAction(String s) {

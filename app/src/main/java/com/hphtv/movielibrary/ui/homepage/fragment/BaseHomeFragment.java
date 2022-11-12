@@ -40,12 +40,16 @@ import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
+import com.station.kit.util.PackageTools;
 import com.station.kit.util.ToastUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.functions.Function;
 
 /**
  * author: Sam Leung
@@ -156,13 +160,25 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
             if (data._mid < 0 || Constants.RecentlyVideoAction.playNow
                     .equals(Constants.RecentlyVideoAction.valueOf(Config.getRecentlyVideoAction()))) {
-                registerPlayReceiver();
-                mViewModel.playingVideo(data.path, data.filename)
-                        .subscribe(new SimpleObserver<PlayList>() {
-                            @Override
-                            public void onAction(PlayList playList) {
-                            }
-                        });
+
+                if (PackageTools.getPackageVersionCode(getContext(), Config.SYSTEM_PLAYER_PACKAGE) >= 40) {
+                    registerPlayReceiver();
+                    mViewModel.playingVideo(data.path, data.filename)
+                            .subscribe(new SimpleObserver<PlayList>() {
+                                @Override
+                                public void onAction(PlayList playList) {
+                                }
+                            });
+                } else {
+                    mViewModel.playingVideo(data.path, data.filename)
+                            .flatMap((Function<PlayList, ObservableSource<String>>) playList -> MovieHelper.updateHistory(data.path))
+                            .subscribe(new SimpleObserver<String>() {
+                                @Override
+                                public void onAction(String s) {
+                                    prepareHistoryData();
+                                }
+                            });
+                }
             } else {
                 Intent intent = new Intent(getContext(), MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
@@ -424,10 +440,10 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     private class PlayVideoReceiver extends BroadcastReceiver {
-        public static final String ACTION_PLAYER_CALLBACK="com.firefly.video.player";
-        public static final String EXTRA_PATH="video_address";
-        public static final String EXTRA_POSITION="video_position";
-        public static final String EXTRA_DURATION="video_duration";
+        public static final String ACTION_PLAYER_CALLBACK = "com.firefly.video.player";
+        public static final String EXTRA_PATH = "video_address";
+        public static final String EXTRA_POSITION = "video_position";
+        public static final String EXTRA_DURATION = "video_duration";
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -442,11 +458,11 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                 if (intent.hasExtra(EXTRA_POSITION)) {
                     position = intent.getLongExtra(EXTRA_POSITION, 0);
                 }
-                if(intent.hasExtra(EXTRA_DURATION)){
-                    duration=intent.getLongExtra(EXTRA_DURATION,0);
+                if (intent.hasExtra(EXTRA_DURATION)) {
+                    duration = intent.getLongExtra(EXTRA_DURATION, 0);
                 }
-                Log.w(TAG, "onReceive: " + path + " " + position+"/"+duration);
-                MovieHelper.updateHistory(getContext(), path,position, duration)
+                Log.w(TAG, "onReceive: " + path + " " + position + "/" + duration);
+                MovieHelper.updateHistory(path, position, duration)
                         .subscribe(new SimpleObserver<String>() {
                             @Override
                             public void onAction(String s) {

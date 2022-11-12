@@ -49,7 +49,6 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
     public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
         MovieDataView movieDataView = mList.get(position);
-        Log.d(TAG, "onBindViewHolder: "+movieDataView.title+" "+position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
         if (Config.getShowPoster().get())
             if (movieDataView.type.equals(Constants.VideoType.tv) && !TextUtils.isEmpty(movieDataView.season_poster)) {

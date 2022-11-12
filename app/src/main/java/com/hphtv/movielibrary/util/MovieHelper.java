@@ -44,9 +44,7 @@ import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -65,19 +63,12 @@ public class MovieHelper {
      */
     public static Observable<String> playingMovie(String path, String name) {
         Context context = MovieApplication.getInstance();
-        return Observable.just(path).subscribeOn(Schedulers.io())
+        return Observable.just(path)
+                .subscribeOn(AndroidSchedulers.mainThread())
                 //记录播放时间，作为播放记录
                 .doOnNext(filepath -> {
-//                    VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
-//                    MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
-//                    long currentTime = System.currentTimeMillis();
-//                    videoFileDao.updateLastPlaytime(filepath, currentTime);
-//                    Movie movie = movieDao.queryByFilePath(filepath, ScraperSourceTools.getSource());
-//                    if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
-//                    String poster = videoFileDao.getPoster(filepath, ScraperSourceTools.getSource());
-//                    SharePreferencesTools.getInstance(context).saveProperty(Constants.SharePreferenceKeys.LAST_POTSER, poster);
-//                    OnlineDBApiService.updateHistory(filepath, ScraperSourceTools.getSource());
-                }).observeOn(AndroidSchedulers.mainThread()).doOnNext(s -> VideoPlayTools.play(context, path, name));
+                    VideoPlayTools.play(context, path, name);
+                });
     }
 
 
@@ -101,25 +92,30 @@ public class MovieHelper {
             playList.setNameList(new ArrayList<>(nameList));
             emitter.onNext(playList);
             emitter.onComplete();
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doOnNext(playList -> {
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(playList -> {
             VideoPlayTools.play(context, playList.getPath(), playList.getName(), playList.getPlayList(), playList.getNameList());
         });
     }
+
     /**
      * 保存播放记录
-     * @param context
      * @param path
+     * @param position
+     * @param duration
      * @return
      */
-    public static Observable<String> updateHistory(Context context, String path,long position,long duration) {
+    public static Observable<String> updateHistory(String path, long position, long duration) {
+        Context context = MovieApplication.getInstance();
         return Observable.create((ObservableOnSubscribe<String>) emitter -> {
             VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
             MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
             long currentTime = System.currentTimeMillis();
-            VideoFile videoFile=videoFileDao.queryByPath(path);
-            videoFile.lastPlayTime=currentTime;
-            videoFile.lastPosition=position;
-            videoFile.duration=duration;
+            VideoFile videoFile = videoFileDao.queryByPath(path);
+            videoFile.lastPlayTime = currentTime;
+            videoFile.lastPosition = position;
+            videoFile.duration = duration;
             videoFileDao.update(videoFile);
             Movie movie = movieDao.queryByFilePath(path, ScraperSourceTools.getSource());
             if (movie != null) movieDao.updateLastPlaytime(movie.movieId, currentTime);
@@ -133,11 +129,12 @@ public class MovieHelper {
 
     /**
      * 保存播放记录
-     * @param context
+     *
      * @param path
      * @return
      */
-    public static Observable<String> updateHistory(Context context, String path) {
+    public static Observable<String> updateHistory(String path) {
+        Context context = MovieApplication.getInstance();
         return Observable.create((ObservableOnSubscribe<String>) emitter -> {
             VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
             MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();

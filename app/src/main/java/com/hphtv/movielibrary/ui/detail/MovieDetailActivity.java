@@ -40,6 +40,7 @@ import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.EpisodeItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.bean.PlayList;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutTvDetailBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
@@ -60,6 +61,7 @@ import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
+import com.station.kit.util.PackageTools;
 import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
@@ -67,6 +69,7 @@ import java.util.List;
 import java.util.Random;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -548,18 +551,36 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void playVideo(String path, String name) {
         startLoading();
-        registerPlayReceiver();
-        mViewModel.playingVideo(path, name).subscribe(new SimpleObserver<String>() {
-            @Override
-            public void onAction(String s) {
-            }
+        if (PackageTools.getPackageVersionCode(getApplication(), Config.SYSTEM_PLAYER_PACKAGE) >= 40) {
+            registerPlayReceiver();
+            mViewModel.playingVideo(path, name)
+                    .subscribe(new SimpleObserver<String>() {
+                        @Override
+                        public void onAction(String s) {
+                        }
 
-            @Override
-            public void onComplete() {
-                super.onComplete();
-                stopLoading();
-            }
-        });
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            stopLoading();
+                        }
+                    });
+        } else {
+            mViewModel.playingVideo(path, name)
+                    .flatMap((Function<String, ObservableSource<String>>) MovieHelper::updateHistory)
+                    .subscribe(new SimpleObserver<String>() {
+                        @Override
+                        public void onAction(String path) {
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            stopLoading();
+                        }
+                    });
+        }
+
     }
 
     /**
@@ -569,39 +590,88 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      */
     private void playingEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        registerPlayReceiver();
-        mViewModel.playingEpisodeVideo(videoFile).subscribe(new SimpleObserver<PlayList>() {
+        if (PackageTools.getPackageVersionCode(getBaseContext(), Config.SYSTEM_PLAYER_PACKAGE) >= 40) {
+            registerPlayReceiver();
+            mViewModel.playingEpisodeVideo(videoFile).subscribe(new SimpleObserver<PlayList>() {
 
-            @Override
-            public void onComplete() {
-                super.onComplete();
-                stopLoading();
-            }
+                @Override
+                public void onComplete() {
+                    super.onComplete();
+                    stopLoading();
+                }
 
-            @Override
-            public void onAction(PlayList playList) {
+                @Override
+                public void onAction(PlayList playList) {
 
-            }
-        });
-        ;
+                }
+            });
+        } else {
+            mViewModel.playingEpisodeVideo(videoFile)
+                    .flatMap((Function<PlayList, ObservableSource<String>>) playList -> MovieHelper.updateHistory(videoFile.path))
+                    .map(path -> {
+                        VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getVideoFileDao();
+                        VideoFile videoFile1 = videoFileDao.queryByPath(path);
+                        return videoFile1;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SimpleObserver<VideoFile>() {
+                        @Override
+                        public void onAction(VideoFile videoFile) {
+                            if (Constants.VideoType.tv.equals(mViewModel.getVideoType())) {
+                                mViewModel.updatePlayEpisode(videoFile);
+                            }
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            stopLoading();
+                        }
+                    });
+        }
     }
 
     //播放其他剧集
     private void playingOtherEpisodeVideo(VideoFile videoFile) {
         startLoading();
-        registerPlayReceiver();
-        mViewModel.playingOtherEpisodeVideo(videoFile).subscribe(new SimpleObserver<PlayList>() {
-            @Override
-            public void onComplete() {
-                super.onComplete();
-                stopLoading();
-            }
+        if (PackageTools.getPackageVersionCode(getBaseContext(), Config.SYSTEM_PLAYER_PACKAGE) >= 40) {
+            registerPlayReceiver();
+            mViewModel.playingOtherEpisodeVideo(videoFile).subscribe(new SimpleObserver<PlayList>() {
+                @Override
+                public void onComplete() {
+                    super.onComplete();
+                    stopLoading();
+                }
 
-            @Override
-            public void onAction(PlayList playList) {
+                @Override
+                public void onAction(PlayList playList) {
 
-            }
-        });
+                }
+            });
+        } else {
+            mViewModel.playingOtherEpisodeVideo(videoFile)
+                    .flatMap((Function<PlayList, ObservableSource<String>>) playList -> MovieHelper.updateHistory(videoFile.path))
+                    .map(path -> {
+                        VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getVideoFileDao();
+                        VideoFile videoFile1 = videoFileDao.queryByPath(path);
+                        return videoFile1;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new SimpleObserver<VideoFile>() {
+                        @Override
+                        public void onAction(VideoFile videoFile) {
+                            if (Constants.VideoType.tv.equals(mViewModel.getVideoType())) {
+                                mViewModel.updatePlayEpisode(videoFile);
+                            }
+                        }
+
+                        @Override
+                        public void onComplete() {
+                            super.onComplete();
+                            stopLoading();
+                        }
+                    });
+        }
 
     }
 
@@ -645,6 +715,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         parent.invalidate();
         return tab;
     }
+
     private void registerPlayReceiver() {
         try {
             unregisterPlayReceiver();
@@ -670,10 +741,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     private class PlayVideoReceiver extends BroadcastReceiver {
-        public static final String ACTION_PLAYER_CALLBACK="com.firefly.video.player";
-        public static final String EXTRA_PATH="video_address";
-        public static final String EXTRA_POSITION="video_position";
-        public static final String EXTRA_DURATION="video_duration";
+        public static final String ACTION_PLAYER_CALLBACK = "com.firefly.video.player";
+        public static final String EXTRA_PATH = "video_address";
+        public static final String EXTRA_POSITION = "video_position";
+        public static final String EXTRA_DURATION = "video_duration";
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -687,18 +759,18 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 if (intent.hasExtra(EXTRA_POSITION)) {
                     position = intent.getLongExtra(EXTRA_POSITION, 0);
                 }
-                if(intent.hasExtra(EXTRA_DURATION)){
-                    duration=intent.getLongExtra(EXTRA_DURATION,0);
+                if (intent.hasExtra(EXTRA_DURATION)) {
+                    duration = intent.getLongExtra(EXTRA_DURATION, 0);
                 }
 
-                Log.w(TAG, "onReceive: " + path + " " + position+"/"+duration);
-                MovieHelper.updateHistory(getBaseContext(),path,position,duration)
+                Log.w(TAG, "onReceive: " + path + " " + position + "/" + duration);
+                MovieHelper.updateHistory(path, position, duration)
                         .observeOn(Schedulers.newThread())
                         .map(new Function<String, VideoFile>() {
                             @Override
                             public VideoFile apply(String path) throws Throwable {
-                                VideoFileDao videoFileDao= MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getVideoFileDao();
-                                VideoFile videoFile=videoFileDao.queryByPath(path);
+                                VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getVideoFileDao();
+                                VideoFile videoFile = videoFileDao.queryByPath(path);
                                 return videoFile;
                             }
                         })
@@ -706,7 +778,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         .subscribe(new SimpleObserver<VideoFile>() {
                             @Override
                             public void onAction(VideoFile videoFile) {
-                                if(Constants.VideoType.tv.equals(mViewModel.getVideoType())){
+                                if (Constants.VideoType.tv.equals(mViewModel.getVideoType())) {
                                     mViewModel.updatePlayEpisode(videoFile);
                                 }
                             }
