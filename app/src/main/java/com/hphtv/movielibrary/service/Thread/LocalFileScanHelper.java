@@ -191,7 +191,7 @@ public class LocalFileScanHelper {
                             tVideoFile.dirPath = videoFile.dirPath;
                         }
                     }
-                    videoFileDao.update(videoFile);
+                    videoFileDao.update(tVideoFile);
                 } else {
                     videoFileDao.insertOrIgnore(videoFile);
                 }
