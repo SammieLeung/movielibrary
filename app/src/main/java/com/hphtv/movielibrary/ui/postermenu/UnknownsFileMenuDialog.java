@@ -22,6 +22,7 @@ import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
 import com.hphtv.movielibrary.ui.moviesearch.online.SeasonSelectDialog;
 import com.hphtv.movielibrary.util.MovieHelper;
+import com.hphtv.movielibrary.util.StringTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
 
@@ -109,9 +110,9 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
         switch (dataView.type) {
             case FOLDER:
                 String folderName = dataView.root.substring(0, dataView.root.length() - 1);
-                folderName = folderName.substring(folderName.lastIndexOf("/") + 1, folderName.length());
+                folderName = folderName.substring(folderName.lastIndexOf("/") + 1);
                 mBinding.setFilename(folderName);
-                mBinding.setFilePath(dataView.root);
+                mBinding.setFilePath( StringTools.hideSmbAuthInfo(dataView.root));
                 break;
             case FILE:
                 mBinding.setFilename(dataView.connectedFileView.filename);
@@ -159,7 +160,7 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
 
 
     /**
-     * 为文件匹配
+     * 为文件夹匹配
      * @param keyword
      */
     private void showSelectPosterForFolder(String keyword) {
