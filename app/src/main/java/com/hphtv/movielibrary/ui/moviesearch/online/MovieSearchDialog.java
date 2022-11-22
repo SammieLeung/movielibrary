@@ -155,7 +155,7 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
         mBinding.btnClose.setOnClickListener(v -> dismiss());
         if (mViewModel.getCurrentKeyword() != null) {
             mBinding.etBoxName.setText(mViewModel.getCurrentKeyword());
-            mBinding.etBoxName.setSelection(0, mViewModel.getCurrentKeyword().length());
+            mBinding.etBoxName.selectAll();
         }
         mSpinnerAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_layout, Arrays.asList(getResources().getStringArray(R.array.search_type)));
         mSpinnerAdapter.setDropDownViewResource(R.layout.spinner_dropitem_layout);
