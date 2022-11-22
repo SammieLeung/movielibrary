@@ -111,7 +111,7 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieDataView> reMatchMovie(MovieWrapper newWrapper) {
+    public Observable<MovieDataView> rematchWithMovie(MovieWrapper newWrapper) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
             List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
             MovieHelper.manualSaveMovie(getApplication(), newWrapper, videoFileList);
@@ -119,6 +119,20 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
             emitter.onNext(movieDataView);
             emitter.onComplete();
         }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<MovieDataView> rematchWithSeries(MovieWrapper newWrapper,int season) {
+        return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
+                    List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
+                    for (VideoFile videoFile : videoFileList) {
+                        videoFile.season = season;
+                    }
+                    MovieHelper.manualSaveMovie(getApplication(), newWrapper, videoFileList);
+                    MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId, newWrapper.movie.type.name(), ScraperSourceTools.getSource());
+                    emitter.onNext(movieDataView);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 

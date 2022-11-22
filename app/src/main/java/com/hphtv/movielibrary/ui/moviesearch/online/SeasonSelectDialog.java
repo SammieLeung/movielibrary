@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.ui.moviesearch.online;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +18,9 @@ import com.hphtv.movielibrary.databinding.FLayoutSeasonSelectBinding;
 import com.hphtv.movielibrary.databinding.SeasonItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
+import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -57,10 +60,16 @@ public class SeasonSelectDialog extends BaseDialogFragment2<MovieSearchDialogVie
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
+        mBinding.btnClose.setOnClickListener(v -> {
+                dismiss();
+        });
         mBinding.rvSeasonList.setLayoutManager(linearLayoutManager);
         mSeasonAdapter = new SeasonAdapter();
         mBinding.rvSeasonList.setAdapter(mSeasonAdapter);
         mSeasonAdapter.setSeasons(mSeasons);
+        mBinding.rvSeasonList.setOnBackPressListener(() -> {
+            dismiss();
+        });
     }
 
     @Override
@@ -75,6 +84,13 @@ public class SeasonSelectDialog extends BaseDialogFragment2<MovieSearchDialogVie
 
     public void setOnClickListener(OnClickListener onClickListener) {
         mOnClickListener = onClickListener;
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        if(getActivity() instanceof AppBaseActivity)
+            ((AppBaseActivity)getActivity()).stopLoading();
     }
 
     class SeasonAdapter extends RecyclerView.Adapter<SeasonAdapter.ViewHolder> {

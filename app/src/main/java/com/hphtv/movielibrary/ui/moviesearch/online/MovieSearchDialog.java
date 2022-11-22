@@ -1,5 +1,6 @@
 package com.hphtv.movielibrary.ui.moviesearch.online;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -100,13 +101,19 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
         //recyclerview
         mAdapter = new MovieSearchAdapter(getContext(), mViewModel.getSelectPos());
         mAdapter.setOnItemClickListener(movie -> {
-            if(getActivity() instanceof AppBaseActivity)
-                ((AppBaseActivity)getActivity()).startLoading();
+
             String movie_id = movie.movieId;
             String source = movie.source;
             Constants.VideoType type = movie.type;
             mViewModel.selectMovie(movie_id, source, type)
                     .subscribe(new SimpleObserver<MovieWrapper>() {
+                        @Override
+                        public void onSubscribe(Disposable d) {
+                            super.onSubscribe(d);
+                            if(getActivity() instanceof AppBaseActivity)
+                                ((AppBaseActivity)getActivity()).startLoading();
+                        }
+
                         @Override
                         public void onAction(MovieWrapper movieWrapper) {
                             if (mOnSelectPosterListener != null) {
@@ -118,9 +125,10 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
                         public void onError(Throwable e) {
                             super.onError(e);
                             ToastUtil.newInstance(getContext()).toast(getString(R.string.toast_selectmovie_getdetial_faild));
+                            if(getActivity() instanceof AppBaseActivity)
+                                ((AppBaseActivity)getActivity()).stopLoading();
                         }
                     });
-            dismiss();
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         mBinding.recyclerviewSearchResult.setLayoutManager(layoutManager);
@@ -193,4 +201,5 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
     public void setOnSelectPosterListener(OnSelectPosterListener onSelectPosterListener) {
         mOnSelectPosterListener = onSelectPosterListener;
     }
+
 }

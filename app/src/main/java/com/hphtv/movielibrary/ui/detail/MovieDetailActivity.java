@@ -437,8 +437,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             if (wrapper.movie != null && wrapper.movie.type.equals(Constants.VideoType.tv) && wrapper.seasons != null) {
-                stopLoading();
-                showSeasonDialog(wrapper, (wrapper1, season) -> {
+                showSeasonDialog(wrapper,(wrapper1, season) -> {
+                    startLoading();
                     mViewModel.saveSeries(wrapper1, season)
                             .subscribe(new SimpleObserver<MovieWrapper>() {
 
@@ -450,7 +450,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                     } else {
                                         ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
                                     }
-                                    stopLoading();
                                 }
 
                                 @Override
@@ -465,6 +464,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                                 public void onComplete() {
                                     super.onComplete();
                                     stopLoading();
+                                    movieSearchFragment.dismiss();
                                 }
                             });
                 });
@@ -480,7 +480,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         } else {
                             ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.toast_selectmovie_faild));
                         }
-                        stopLoading();
                     }
 
                     @Override
@@ -495,6 +494,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     public void onComplete() {
                         super.onComplete();
                         stopLoading();
+                        movieSearchFragment.dismiss();
                     }
                 });
             }
@@ -502,7 +502,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         movieSearchFragment.show(getSupportFragmentManager(), "");
     }
 
-    private void showSeasonDialog(MovieWrapper wrapper, SeasonSelectDialog.OnClickListener listener) {
+    private void showSeasonDialog(MovieWrapper wrapper,SeasonSelectDialog.OnClickListener listener) {
         SeasonSelectDialog seasonSelectDialog = SeasonSelectDialog.newInstance(wrapper);
         seasonSelectDialog.setOnClickListener(listener);
         seasonSelectDialog.show(getSupportFragmentManager(), "");

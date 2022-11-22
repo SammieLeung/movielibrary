@@ -41,7 +41,7 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(application).getMovieDao();
     }
 
-    public Observable<MovieDataView> rematchMovieFile(MovieWrapper newWrapper) {
+    public Observable<MovieDataView> rematchFileWithMovie(MovieWrapper newWrapper) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
                     VideoFile videoFile = mVideoFileDao.queryByVid(mUnknownRootDataView.connectedFileView.vid);
                     MovieHelper.addNewMovieInfo(getApplication(), newWrapper, videoFile);
@@ -52,10 +52,10 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieDataView> rematchMovieFile(MovieWrapper newWrapper,int season) {
+    public Observable<MovieDataView> rematchFileWithSeries(MovieWrapper newWrapper, int season) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
                     VideoFile videoFile = mVideoFileDao.queryByVid(mUnknownRootDataView.connectedFileView.vid);
-                    videoFile.season=season;
+                    videoFile.season = season;
                     MovieHelper.addNewMovieInfo(getApplication(), newWrapper, videoFile);
                     MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId, newWrapper.movie.type.name(), ScraperSourceTools.getSource());
                     emitter.onNext(movieDataView);
@@ -64,7 +64,7 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieDataView> rematchMovieFolder(MovieWrapper movieWrapper) {
+    public Observable<MovieDataView> rematchFolderWithMovie(MovieWrapper movieWrapper) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
                     if (Constants.UnknownRootType.FOLDER.equals(mUnknownRootDataView.type)) {
                         String folder = mUnknownRootDataView.root;
@@ -80,16 +80,16 @@ public class UnknownsFileMenuViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieDataView> rematchMovieFolder(MovieWrapper movieWrapper,int  season) {
+    public Observable<MovieDataView> rematchFolderWithSeries(MovieWrapper movieWrapper, int season) {
         return Observable.create((ObservableOnSubscribe<com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView>) emitter -> {
                     if (Constants.UnknownRootType.FOLDER.equals(mUnknownRootDataView.type)) {
                         String folder = mUnknownRootDataView.root;
                         List<VideoFile> videoFileList = mVideoFileDao.queryFileByFolder(folder + "%", folder + "%/%");
-                        for(VideoFile videoFile:videoFileList){
-                            videoFile.season=season;
+                        for (VideoFile videoFile : videoFileList) {
+                            videoFile.season = season;
                         }
                         MovieHelper.manualSaveMovie(getApplication(), movieWrapper, videoFileList);
-                        com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(movieWrapper.movie.movieId, movieWrapper.movie.type.name(), ScraperSourceTools.getSource());
+                        MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(movieWrapper.movie.movieId, movieWrapper.movie.type.name(), ScraperSourceTools.getSource());
                         emitter.onNext(movieDataView);
                         emitter.onComplete();
                     } else {

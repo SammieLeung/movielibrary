@@ -8,13 +8,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.DialogPosterItemMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
 import com.hphtv.movielibrary.ui.common.ConfirmDeleteDialog;
 import com.hphtv.movielibrary.ui.moviesearch.online.MovieSearchDialog;
+import com.hphtv.movielibrary.ui.moviesearch.online.SeasonSelectDialog;
 import com.hphtv.movielibrary.util.GlideTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.ToastUtil;
@@ -78,15 +82,15 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     }
 
     private void showDeleteConfirmDialog() {
-        ConfirmDeleteDialog confirmDeleteDialog = ConfirmDeleteDialog.newInstance(mViewModel.getMovieDataView().movie_id,mViewModel.getMovieDataView().type);
+        ConfirmDeleteDialog confirmDeleteDialog = ConfirmDeleteDialog.newInstance(mViewModel.getMovieDataView().movie_id, mViewModel.getMovieDataView().type);
         confirmDeleteDialog.setMessage(getString(R.string.remove_confirm));
         confirmDeleteDialog.setConfirmDeleteListener(new ConfirmDeleteDialog.ConfirmDeleteListener() {
             @Override
-            public void confirmDelete(String movie_id,String type) {
+            public void confirmDelete(String movie_id, String type) {
                 PosterMenuDialog.this.dismiss();
                 if (getActivity() instanceof OnMovieChangeListener) {
                     OnMovieChangeListener listener = (OnMovieChangeListener) getActivity();
-                    listener.OnMovieRemove(movie_id, type,getArguments().getInt("position"));
+                    listener.OnMovieRemove(movie_id, type, getArguments().getInt("position"));
                 }
             }
 
@@ -102,47 +106,93 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     private void showSearchDialog() {
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(mViewModel.getMovieDataView().title);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            mViewModel.reMatchMovie(wrapper)
-                    .subscribe(new SimpleObserver<MovieDataView>() {
-                        @Override
-                        public void onAction(MovieDataView movieDataView) {
-                            loadMovieProperty(movieDataView);
-                            if (getActivity() instanceof OnMovieChangeListener) {
-                                OnMovieChangeListener listener = (OnMovieChangeListener) getActivity();
-                                listener.OnRematchPoster(movieDataView, getArguments().getInt("position"));
+            if (Constants.VideoType.tv.equals(wrapper.movie.type)) {
+                showSeasonDialog(wrapper, new SeasonSelectDialog.OnClickListener() {
+                    @Override
+                    public void onClick(MovieWrapper newWrapper, Season season) {
+                        globalStartLoading();
+                        mViewModel.rematchWithSeries(newWrapper, season.seasonNumber)
+                                .subscribe(new SimpleObserver<MovieDataView>() {
+                                    @Override
+                                    public void onAction(MovieDataView movieDataView) {
+                                        loadMovieProperty(movieDataView);
+                                        if (getActivity() instanceof OnMovieChangeListener) {
+                                            OnMovieChangeListener listener = (OnMovieChangeListener) getActivity();
+                                            listener.OnRematchPoster(movieDataView, getArguments().getInt("position"));
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onComplete() {
+                                        super.onComplete();
+                                        globalStopLoading();
+                                        movieSearchFragment.dismiss();
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        super.onError(e);
+                                        globalStopLoading();
+                                        ToastUtil.newInstance(getContext()).toast(getString(R.string.toast_selectmovie_faild));
+                                    }
+
+                                });
+                    }
+                });
+            } else {
+                mViewModel.rematchWithMovie(wrapper)
+                        .subscribe(new SimpleObserver<MovieDataView>() {
+                            @Override
+                            public void onAction(MovieDataView movieDataView) {
+                                loadMovieProperty(movieDataView);
+                                if (getActivity() instanceof OnMovieChangeListener) {
+                                    OnMovieChangeListener listener = (OnMovieChangeListener) getActivity();
+                                    listener.OnRematchPoster(movieDataView, getArguments().getInt("position"));
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onComplete() {
-                            super.onComplete();
-                            if(getActivity() instanceof AppBaseActivity)
-                                ((AppBaseActivity)getActivity()).stopLoading();
+                            @Override
+                            public void onComplete() {
+                                super.onComplete();
+                                globalStopLoading();
+                                movieSearchFragment.dismiss();
+                            }
 
-                        }
+                            @Override
+                            public void onError(Throwable e) {
+                                super.onError(e);
+                                globalStopLoading();
+                                ToastUtil.newInstance(getContext()).toast(getString(R.string.toast_selectmovie_faild));
+                            }
+                        });
+            }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            super.onError(e);
-                            if(getActivity() instanceof AppBaseActivity)
-                                ((AppBaseActivity)getActivity()).stopLoading();
-                            ToastUtil.newInstance(getContext()).toast(getString(R.string.toast_selectmovie_faild));
-                        }
-                    });
 
         });
         movieSearchFragment.show(getChildFragmentManager(), "");
     }
 
-    private void loadMovieProperty(MovieDataView dataView){
+    private void showSeasonDialog(MovieWrapper wrapper, SeasonSelectDialog.OnClickListener listener) {
+        SeasonSelectDialog seasonSelectDialog = SeasonSelectDialog.newInstance(wrapper);
+        seasonSelectDialog.setOnClickListener(listener);
+        seasonSelectDialog.show(getChildFragmentManager(), "");
+    }
+
+    private void loadMovieProperty(MovieDataView dataView) {
         mViewModel.loadMovieProperty(dataView)
                 .subscribe(movieDataView ->
                         GlideTools.GlideWrapper(getContext(), movieDataView.poster)
                                 .into(mBinding.image));
     }
 
-    @Override
-    public void onDismiss(@NonNull DialogInterface dialog) {
-        super.onDismiss(dialog);
+    private void globalStartLoading() {
+        if (getActivity() instanceof AppBaseActivity)
+            ((AppBaseActivity) getActivity()).startLoading();
     }
+
+    private void globalStopLoading() {
+        if (getActivity() instanceof AppBaseActivity)
+            ((AppBaseActivity) getActivity()).stopLoading();
+    }
+
 }
