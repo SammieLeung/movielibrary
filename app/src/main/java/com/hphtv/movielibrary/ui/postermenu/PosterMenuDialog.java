@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.ui.postermenu;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -180,9 +181,13 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
 
     private void loadMovieProperty(MovieDataView dataView) {
         mViewModel.loadMovieProperty(dataView)
-                .subscribe(movieDataView ->
-                        GlideTools.GlideWrapper(getContext(), movieDataView.poster)
-                                .into(mBinding.image));
+                .subscribe(movieDataView -> {
+                    String poster=movieDataView.season_poster;
+                    if(TextUtils.isEmpty(poster))
+                        poster=movieDataView.poster;
+                    GlideTools.GlideWrapper(getContext(),poster)
+                            .into(mBinding.image);
+                });
     }
 
     private void globalStartLoading() {
