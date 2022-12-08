@@ -13,26 +13,40 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
+import androidx.sqlite.db.SupportSQLiteQuery;
+import androidx.sqlite.db.SupportSQLiteQueryBuilder;
 
+import com.firefly.videonameparser.MovieNameInfo;
+import com.firefly.videonameparser.VideoNameParser2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.TABLE;
+import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
+import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.Device;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
+import com.hphtv.movielibrary.service.Thread.LocalFileScanHelper;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.RegexMatcher;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -52,7 +66,8 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int MOVIE_TOTAL = 3;
     public static final int FAVORITE = 4;
     public static final int APP_UPDATE_MOVIE = 5;
-    public static final int APP_REMOVE_MOVIE=6;
+    public static final int APP_REMOVE_MOVIE = 6;
+    public static final int APP_PRE_MATCH = 7;
 
     MovieDao mMovieDao;
     VideoFileDao mVideoFileDao;
@@ -74,7 +89,8 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(AUTHORITY, "count", MOVIE_TOTAL);
         matcher.addURI(AUTHORITY, "favorite", FAVORITE);
         matcher.addURI(AUTHORITY, "app_update_movie", APP_UPDATE_MOVIE);
-        matcher.addURI(AUTHORITY,"app_remove_movie",APP_REMOVE_MOVIE);
+        matcher.addURI(AUTHORITY, "app_remove_movie", APP_REMOVE_MOVIE);
+        matcher.addURI(AUTHORITY, "app_pre_match", APP_PRE_MATCH);
 
         return false;
     }
@@ -156,18 +172,18 @@ public class MovieLibraryProvider extends ContentProvider {
         int code = matcher.match(uri);
         switch (code) {
             case APP_REMOVE_MOVIE:
-                LogUtil.w("APP_REMOVE_MOVIE "+Thread.currentThread().getName());
-                if(selectionArgs!=null&&selectionArgs.length==2){
-                    String movie_id=selectionArgs[0];
-                    String type=selectionArgs[1];
-                    MovieDao movieDao= MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieDao();
-                    MovieVideofileCrossRefDao movieVideofileCrossRefDao= MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieVideofileCrossRefDao();
-                    List<Movie> movieList = movieDao.queryByMovieIdAndType(movie_id,type);
+                LogUtil.w("APP_REMOVE_MOVIE " + Thread.currentThread().getName());
+                if (selectionArgs != null && selectionArgs.length == 2) {
+                    String movie_id = selectionArgs[0];
+                    String type = selectionArgs[1];
+                    MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieDao();
+                    MovieVideofileCrossRefDao movieVideofileCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getMovieVideofileCrossRefDao();
+                    List<Movie> movieList = movieDao.queryByMovieIdAndType(movie_id, type);
                     for (Movie movie : movieList) {
                         movieVideofileCrossRefDao.deleteById(movie.id);
                     }
-                    movieDao.updateFavoriteStateByMovieId(movie_id,type,false);//电影的收藏状态在删除时要设置为false
-                    sendRemoveMovie(movie_id,type);
+                    movieDao.updateFavoriteStateByMovieId(movie_id, type, false);//电影的收藏状态在删除时要设置为false
+                    sendRemoveMovie(movie_id, type);
                     return 1;
                 }
                 break;
@@ -183,9 +199,9 @@ public class MovieLibraryProvider extends ContentProvider {
                 if (selectionArgs != null && selectionArgs.length > 0) {
                     String movie_id = selectionArgs[0];
                     boolean is_favorite = values.getAsBoolean("is_favorite");
-                    String type=values.getAsString("type");
-                    int res = mMovieDao.updateFavoriteStateByMovieId(movie_id,type,is_favorite );
-                    sendRefreshFavoriteBroadcast(movie_id,type,is_favorite);
+                    String type = values.getAsString("type");
+                    int res = mMovieDao.updateFavoriteStateByMovieId(movie_id, type, is_favorite);
+                    sendRefreshFavoriteBroadcast(movie_id, type, is_favorite);
                     return res;
                 }
                 break;
@@ -195,17 +211,25 @@ public class MovieLibraryProvider extends ContentProvider {
                     String movie_id = values.getAsString("movie_id");
                     String type = values.getAsString("type");
 
-                    Movie oldMovie=mMovieDao.queryByFilePath(path,ScraperSourceTools.getSource());
-                    if(oldMovie!=null) {
+                    Movie oldMovie = mMovieDao.queryByFilePath(path, ScraperSourceTools.getSource());
+                    if (oldMovie != null) {
                         mMovieDao.updateFavoriteStateByMovieId(oldMovie.movieId, type, false);//电影的收藏状态在删除时要设置为false
                     }
 
-                    long timeStamp=System.currentTimeMillis();
+                    long timeStamp = System.currentTimeMillis();
 
-                    appUpdateMovie(path, movie_id, type, Constants.Scraper.TMDB,timeStamp);
-                    appUpdateMovie(path, movie_id, type, Constants.Scraper.TMDB_EN,timeStamp);
+                    appUpdateMovie(path, movie_id, type, Constants.Scraper.TMDB, timeStamp);
+                    appUpdateMovie(path, movie_id, type, Constants.Scraper.TMDB_EN, timeStamp);
                     return 1;
                 }
+                break;
+            case APP_PRE_MATCH:
+                String movieId = values.getAsString("movie_id");
+                String type = values.getAsString("type");
+                String downloadPath = values.getAsString("download_path");
+                String videoFileStr = values.getAsString("file_list");
+                preMatchMovie(movieId, type, downloadPath, videoFileStr);
+
                 break;
 
         }
@@ -216,7 +240,7 @@ public class MovieLibraryProvider extends ContentProvider {
     /**
      * 根据提供的文件路径查询当前对应旧电影的其他文件列表，然后需要先查询更新的新电影是否已经存在，不存在需要重新获取详情信息，否则直接更改对应关系即可
      */
-    private void appUpdateMovie(String path, String movie_id, String type, String source,long timeStamp) {
+    private void appUpdateMovie(String path, String movie_id, String type, String source, long timeStamp) {
         MovieVideoFileCrossRef movieVideoFileCrossRef = mMovieVideofileCrossRefDao.queryByPath(path, source);
         Movie new_movie = mMovieDao.queryByMovieIdAndType(movie_id, source, type);
 
@@ -228,7 +252,7 @@ public class MovieLibraryProvider extends ContentProvider {
                 for (VideoFile videoFile : videoFileList) {
                     MovieVideoFileCrossRef tmpRef = mMovieVideofileCrossRefDao.queryByPath(videoFile.path, source);
                     tmpRef.id = new_movie.id;
-                    tmpRef.timeStamp=timeStamp;
+                    tmpRef.timeStamp = timeStamp;
                     mMovieVideofileCrossRefDao.update(tmpRef);
                 }
                 if (source.equals(ScraperSourceTools.getSource()))
@@ -246,17 +270,17 @@ public class MovieLibraryProvider extends ContentProvider {
 
         } else {
             //2 未匹配电影匹配
-            if(new_movie!=null){
+            if (new_movie != null) {
                 MovieVideoFileCrossRef tmpRef = new MovieVideoFileCrossRef();
                 tmpRef.id = new_movie.id;
-                tmpRef.source=source;
-                tmpRef.path=path;
-                tmpRef.timeStamp=timeStamp;
+                tmpRef.source = source;
+                tmpRef.path = path;
+                tmpRef.timeStamp = timeStamp;
                 mMovieVideofileCrossRefDao.insertOrReplace(tmpRef);
                 if (source.equals(ScraperSourceTools.getSource()))
                     sendRefreshMovie(-1, new_movie.id);
-            }else{
-                List<VideoFile> videoFileList=mVideoFileDao.queryByPaths(path);
+            } else {
+                List<VideoFile> videoFileList = mVideoFileDao.queryByPaths(path);
                 MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type)
                         .blockingFirst().toEntity();
                 //被动更新无需通知
@@ -270,13 +294,114 @@ public class MovieLibraryProvider extends ContentProvider {
 
     }
 
-    private void sendRefreshFavoriteBroadcast(String movie_id,String type, boolean isFavorite) {
+    /**
+     * 根据下载器提供的信息预匹配海报
+     *
+     * @param movieId
+     * @param type
+     * @param downloadPath
+     * @param videoFileStr
+     * @return
+     */
+    private int preMatchMovie(String movieId, String type, String downloadPath, String videoFileStr) {
+        //1、整理信息
+        String shortcutUri = new File(downloadPath).getAbsolutePath();
+        String shortcutName = shortcutUri.substring(shortcutUri.lastIndexOf("/") + 1);
+        String[] videoFilePaths = videoFileStr.split("\\|");
+
+        //2.1、添加下载文件夹到监听索引
+        ShortcutDao shortcutDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getShortcutDao();
+        Shortcut shortcut = shortcutDao.queryShortcutByUri(shortcutUri);
+        String devicePath = null;
+        if (shortcut == null) {
+            shortcut = new Shortcut(shortcutUri, Constants.DeviceType.DEVICE_TYPE_LOCAL, shortcutName, shortcutName, shortcutUri);
+            shortcut.access = Constants.WatchLimit.ALL_AGE;
+            shortcut.folderType = Constants.SearchType.auto;
+            shortcut.isScanned = 1;
+            DeviceDao deviceDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getDeviceDao();
+            List<Device> deviceList = deviceDao.qureyAll();
+            for (Device device : deviceList) {
+                if (shortcutUri.startsWith(device.path)) {
+                    shortcut.devicePath = device.path;
+                    shortcut.deviceType = device.type;
+                    devicePath = device.path;
+                    shortcutDao.insertShortcut(shortcut);
+                    break;
+                }
+            }
+        } else {
+            shortcut.isScanned = 1;
+            devicePath = shortcut.devicePath;
+            shortcutDao.updateShortcut(shortcut);
+        }
+
+        //2.2、创建文件列表
+        List<VideoFile> videoFileList = new ArrayList<>();
+        VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getVideoFileDao();
+        for (String videoFilePath : videoFilePaths) {
+            VideoFile videoFile = new VideoFile();
+            videoFile.filename = videoFilePath.substring(videoFilePath.lastIndexOf("/") + 1);
+            videoFile.path = videoFilePath;
+            videoFile.dirPath = shortcutUri;
+            videoFile.devicePath = devicePath;
+            VideoNameParser2 parser = new VideoNameParser2();
+            MovieNameInfo nameInfo = parser.parseVideoName(videoFile.path);
+            String keyword = nameInfo.getName();
+            videoFile.keyword = keyword;
+            videoFile.season = nameInfo.getSeason();
+            videoFile.episode = nameInfo.toEpisode();
+            videoFile.aired = nameInfo.getAired();
+            if (nameInfo.getResolution() != null) {
+                videoFile.resolution = nameInfo.getResolution();
+            }
+            if (nameInfo.getVideoSource() != null) {
+                videoFile.videoSource = nameInfo.getVideoSource();
+            }
+            //2.3、添加文件入数据库
+            long vid = videoFileDao.insertOrIgnore(videoFile);
+            if (vid < 0) {
+                videoFile = videoFileDao.queryByPath(videoFilePath);
+            } else {
+                videoFile.vid = vid;
+            }
+            videoFileList.add(videoFile);
+        }
+
+        //3.查询/插入电影
+        MovieWrapper wrapper = mMovieDao.queryWrapperByMovieIdAndType(movieId, Constants.Scraper.TMDB, type);
+        if (wrapper == null)
+            TmdbApiService.getDetail(movieId, Constants.Scraper.TMDB, type)
+                    .subscribe(new SimpleObserver<MovieDetailRespone>() {
+                        @Override
+                        public void onAction(MovieDetailRespone movieDetailRespone) {
+                            MovieWrapper TMDBWrapper = movieDetailRespone.toEntity();
+                            MovieHelper.manualSaveMovie(getContext(), TMDBWrapper, videoFileList);
+                        }
+                    });
+        else MovieHelper.manualSaveMovie(getContext(), wrapper, videoFileList);
+
+
+        MovieWrapper wrapper_en = mMovieDao.queryWrapperByMovieIdAndType(movieId, Constants.Scraper.TMDB_EN, type);
+        if (wrapper_en == null)
+            TmdbApiService.getDetail(movieId, Constants.Scraper.TMDB_EN, type)
+                    .subscribe(new SimpleObserver<MovieDetailRespone>() {
+                        @Override
+                        public void onAction(MovieDetailRespone movieDetailRespone) {
+                            MovieWrapper TMDBENWrapper = movieDetailRespone.toEntity();
+                            MovieHelper.manualSaveMovie(getContext(), TMDBENWrapper, videoFileList);
+                        }
+                    });
+        else MovieHelper.manualSaveMovie(getContext(), wrapper_en, videoFileList);
+        return 1;
+    }
+
+    private void sendRefreshFavoriteBroadcast(String movie_id, String type, boolean isFavorite) {
         LogUtil.v(TAG, "Broadcast:" + Constants.ACTION_FAVORITE_MOVIE_CHANGE + " ->" + movie_id);
         Intent intent = new Intent();
         intent.setAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
         intent.putExtra("movie_id", movie_id);
         intent.putExtra("is_favorite", isFavorite);
-        intent.putExtra("type",type);
+        intent.putExtra("type", type);
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
@@ -289,8 +414,8 @@ public class MovieLibraryProvider extends ContentProvider {
         LocalBroadcastManager.getInstance(getContext()).sendBroadcast(intent);
     }
 
-    private void sendRemoveMovie(String movie_id,String type){
-        LogUtil.v(TAG, "Broadcast:" + Constants.ACTION_APP_REMOVE_MOVIE +" :"+ movie_id + " ->" + type);
+    private void sendRemoveMovie(String movie_id, String type) {
+        LogUtil.v(TAG, "Broadcast:" + Constants.ACTION_APP_REMOVE_MOVIE + " :" + movie_id + " ->" + type);
         Intent intent = new Intent();
         intent.setAction(Constants.ACTION_APP_REMOVE_MOVIE);
         intent.putExtra("movie_id", movie_id);
