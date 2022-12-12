@@ -26,6 +26,7 @@ public interface TABLE {
     String MOVIE_GENRE_CROSS_REF = "movie_genre_cross_ref";
     String MOVIE_VIDEOFILE_CROSS_REF = "movie_videofile_cross_ref";
     String MOVIE_VIDEOTAG_CROSS_REF = "movie_videotag_cross_ref";
+    String MOVIE_USER_FAVORITE_CROSS_REF = "movie_user_favorite_cross_ref";
 
     String SCAN_DIRECTORY = "scan_directory";
     String VIDEOFILE = "videofile";

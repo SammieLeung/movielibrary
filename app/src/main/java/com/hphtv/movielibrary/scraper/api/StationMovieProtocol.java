@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.scraper.api;
 
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.DeviceConfigRequestBody;
+import com.hphtv.movielibrary.scraper.postbody.GetUserFavoritesRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostDetailRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.PostSearchRequetBody;
 import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
@@ -9,10 +10,12 @@ import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateLikeRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateMovieRequestBody;
 import com.hphtv.movielibrary.scraper.respone.BaseRespone;
+import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
 import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 
 import io.reactivex.rxjava3.core.Observable;
+import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
@@ -47,5 +50,10 @@ public interface StationMovieProtocol {
 
     @POST("device/device/saveConfig")
     Observable<BaseRespone> changeConfig(@Body DeviceConfigRequestBody body);
+
+    @POST("movie/movie/favorites")
+    Observable<GetUserFavoriteResponse> getUserFavorites(@Body GetUserFavoritesRequestBody body);
+
+
 }
  

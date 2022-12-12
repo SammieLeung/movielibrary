@@ -19,6 +19,7 @@ import com.hphtv.movielibrary.roomdb.dao.MovieActorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieUserFavoriteCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideoTagCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieWriterCrossRefDao;
@@ -52,6 +53,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieUserFavoriteCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieWriterCrossRef;
@@ -64,15 +66,16 @@ import org.jetbrains.annotations.NotNull;
  */
 
 @Database(
-        version = 20,
+        version = 21,
         entities = {Actor.class, Device.class, Director.class, Writer.class, Genre.class, Movie.class, MovieActorCrossRef.class,
                 MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
                 ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
-                Season.class, VideoTag.class, MovieVideoTagCrossRef.class},
+                Season.class, VideoTag.class, MovieVideoTagCrossRef.class, MovieUserFavoriteCrossRef.class},
         views = {MovieDataView.class, ConnectedFileDataView.class, HistoryMovieDataView.class, SeasonDataView.class, UnknownRootDataView.class},
         autoMigrations = {
                 @AutoMigration(from=17,to=18),
-                @AutoMigration(from=19,to=20)
+                @AutoMigration(from=19,to=20),
+                @AutoMigration(from=20,to=21)
         }
 )
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
@@ -116,6 +119,8 @@ public abstract class MovieLibraryRoomDatabase extends RoomDatabase {
     public abstract VideoTagDao getVideoTagDao();
 
     public abstract MovieVideoTagCrossRefDao getMovieVideoTagCrossRefDao();
+
+    public abstract MovieUserFavoriteCrossRefDao getMovieUserFavoriteCrossRefDao();
 
     public static MovieLibraryRoomDatabase getDatabase(final Context context) {
         if (sInstance == null) {

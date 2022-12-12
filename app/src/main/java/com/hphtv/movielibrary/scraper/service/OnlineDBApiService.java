@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.scraper.service;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.hphtv.movielibrary.MovieApplication;
@@ -16,21 +17,27 @@ import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.api.StationMovieProtocol;
 import com.hphtv.movielibrary.scraper.postbody.DeleteMovieRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.DeviceConfigRequestBody;
+import com.hphtv.movielibrary.scraper.postbody.GetUserFavoritesRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.RemoveFolderRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateHistoryRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateLikeRequestBody;
 import com.hphtv.movielibrary.scraper.postbody.UpdateMovieRequestBody;
 import com.hphtv.movielibrary.scraper.respone.BaseRespone;
+import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
 import com.hphtv.movielibrary.util.FormatterTools;
 import com.hphtv.movielibrary.util.retrofit.RetrofitTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.device.StationDeviceTool;
 import com.station.kit.util.LogUtil;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * author: Sam Leung
@@ -59,11 +66,11 @@ public class OnlineDBApiService {
             String path = videoFile.path;
             String keyword = videoFile.keyword;
             String filename = videoFile.filename;
-            String storage = FormatterTools.getTypeName(context, device,path);
+            String storage = FormatterTools.getTypeName(context, device, path);
             String folder = videoFile.dirPath;
             String duration = "0";
             String current_point = "0";
-            String watch_limit = movieWrapper.movie.ap!=null&&movieWrapper.movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+            String watch_limit = movieWrapper.movie.ap != null && movieWrapper.movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
             UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
             Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
             updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
@@ -95,7 +102,7 @@ public class OnlineDBApiService {
         String folder = videoFile.dirPath;
         String duration = "0";
         String current_point = "0";
-        String watch_limit =  movie.ap!=null&&movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
+        String watch_limit = movie.ap != null && movie.ap.equals(Constants.WatchLimit.ADULT) ? "1" : "0";
         UpdateMovieRequestBody body = new UpdateMovieRequestBody(movieId, type, path, keyword, filename, storage, folder, duration, current_point, watch_limit);
         Observable<BaseRespone> updateMovieRequest = request.updateMovie(body);
         updateMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
@@ -155,7 +162,7 @@ public class OnlineDBApiService {
         });
     }
 
-    public static void deleteMovie(String movie_id,String type, String source) {
+    public static void deleteMovie(String movie_id, String type, String source) {
         StationMovieProtocol request;
         switch (source) {
             case Constants.Scraper.TMDB_EN:
@@ -166,12 +173,12 @@ public class OnlineDBApiService {
                 break;
         }
 
-        DeleteMovieRequestBody body = new DeleteMovieRequestBody(movie_id,type);
+        DeleteMovieRequestBody body = new DeleteMovieRequestBody(movie_id, type);
         Observable<BaseRespone> deleteMovieRequest = request.removeRelation(body);
         deleteMovieRequest.subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{deleteMovie} " + baseRespone.code + ": " + movie_id +"<"+type+">");
+                LogUtil.w("{deleteMovie} " + baseRespone.code + ": " + movie_id + "<" + type + ">");
             }
         });
     }
@@ -252,12 +259,12 @@ public class OnlineDBApiService {
         request.changeConfig(body).subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{notifyChildMode} " + baseRespone.code );
+                LogUtil.w("{notifyChildMode} " + baseRespone.code);
             }
         });
     }
 
-    public static void notifyShortcuts(List<Shortcut> shortcutList,String source) {
+    public static void notifyShortcuts(List<Shortcut> shortcutList, String source) {
         StationMovieProtocol request;
         switch (source) {
             case Constants.Scraper.TMDB_EN:
@@ -268,18 +275,35 @@ public class OnlineDBApiService {
                 break;
         }
         DeviceConfigRequestBody body = new DeviceConfigRequestBody();
-        List<String> pathList=new ArrayList<>();
-        for(Shortcut shortcut:shortcutList){
+        List<String> pathList = new ArrayList<>();
+        for (Shortcut shortcut : shortcutList) {
             pathList.add(shortcut.uri);
         }
         body.movie_folder = pathList.toArray(new String[0]);
         request.changeConfig(body).subscribe(new SimpleObserver<BaseRespone>() {
             @Override
             public void onAction(BaseRespone baseRespone) {
-                LogUtil.w("{notifyShortcuts} " + baseRespone.code+new Gson().toJson(body.movie_folder));
+                LogUtil.w("{notifyShortcuts} " + baseRespone.code + new Gson().toJson(body.movie_folder));
             }
 
         });
     }
+
+    public static Observable<GetUserFavoriteResponse> getUserFavorites(String source, int page, int limit) {
+        StationMovieProtocol request;
+        switch (source) {
+            case Constants.Scraper.TMDB_EN:
+                request = RetrofitTools.createENRequest();
+                break;
+            default:
+                request = RetrofitTools.createRequest();
+                break;
+        }
+        GetUserFavoritesRequestBody body = new GetUserFavoritesRequestBody();
+        body.page = page;
+        body.limit = limit;
+        return request.getUserFavorites(body);
+    }
+
 
 }

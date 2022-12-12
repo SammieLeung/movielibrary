@@ -197,7 +197,7 @@ public class MovieHelper {
      * @param movieWrapper
      * @return
      */
-    private static long saveBaseInfo(Context context, MovieWrapper movieWrapper) {
+    public static long saveBaseInfo(Context context, MovieWrapper movieWrapper) {
         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
         GenreDao genreDao = MovieLibraryRoomDatabase.getDatabase(context).getGenreDao();
         ActorDao actorDao = MovieLibraryRoomDatabase.getDatabase(context).getActorDao();

@@ -49,47 +49,20 @@ public class AuthHelper {
     }
 
     public static void requestTokenCN() {
-        new Thread(() -> {
-            if (TextUtils.isEmpty(sTokenCN)) {
-                synchronized (sTokenCN) {
-                    if (TextUtils.isEmpty(sTokenCN)) {
-                        switch (RetrofitTools.mode) {
-                            case RetrofitTools.PRE:
-                                try {
-                                    sTokenCN = TokenHelper.getToken(TokenHelper.PRE_CN);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                break;
-                            case RetrofitTools.RELEASE:
-                                try {
-                                    sTokenCN = TokenHelper.getToken(TokenHelper.CN);
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                                break;
-                        }
-                    }
-                }
-            }
-        }).start();
-    }
-
-    public static void requestTokenEN() {
-        new Thread(() -> {
-            if (TextUtils.isEmpty(sTokenEN)) {
-                synchronized (sTokenEN) {
+        if (TextUtils.isEmpty(sTokenCN)) {
+            synchronized (sTokenCN) {
+                if (TextUtils.isEmpty(sTokenCN)) {
                     switch (RetrofitTools.mode) {
                         case RetrofitTools.PRE:
                             try {
-                                sTokenEN = TokenHelper.getToken(TokenHelper.PRE_EN);
+                                sTokenCN = TokenHelper.getToken(TokenHelper.PRE_CN);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
                             break;
                         case RetrofitTools.RELEASE:
                             try {
-                                sTokenEN = TokenHelper.getToken(TokenHelper.EN);
+                                sTokenCN = TokenHelper.getToken(TokenHelper.CN);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -97,6 +70,29 @@ public class AuthHelper {
                     }
                 }
             }
-        }).start();
+        }
+    }
+
+    public static void requestTokenEN() {
+        if (TextUtils.isEmpty(sTokenEN)) {
+            synchronized (sTokenEN) {
+                switch (RetrofitTools.mode) {
+                    case RetrofitTools.PRE:
+                        try {
+                            sTokenEN = TokenHelper.getToken(TokenHelper.PRE_EN);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case RetrofitTools.RELEASE:
+                        try {
+                            sTokenEN = TokenHelper.getToken(TokenHelper.EN);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                }
+            }
+        }
     }
 }
