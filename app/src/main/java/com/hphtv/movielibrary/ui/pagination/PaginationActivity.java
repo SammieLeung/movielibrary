@@ -89,10 +89,10 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         super.onNewIntent(intent);
         int type = getIntent().getIntExtra(EXTRA_PAGE_TYPE, -1);
         mViewModel.setType(type);
-        if (!TextUtils.isEmpty(getIntent().getStringExtra(EXTRA_VIDEO_TAG)) ) {
-            String video_tag=getIntent().getStringExtra(EXTRA_VIDEO_TAG);
+        if (!TextUtils.isEmpty(getIntent().getStringExtra(EXTRA_VIDEO_TAG))) {
+            String video_tag = getIntent().getStringExtra(EXTRA_VIDEO_TAG);
             mViewModel.setVideoTag(video_tag);
-        }else{
+        } else {
             mViewModel.setVideoTag(null);
         }
     }

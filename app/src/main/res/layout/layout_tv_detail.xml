@@ -33,6 +33,10 @@
           type="String" />
 
         <variable
+          name="hasNoVideos"
+          type="boolean" />
+
+        <variable
           name="play_episode_btn_text"
           type="ObservableField&lt;String>" />
     </data>
@@ -190,6 +194,7 @@
 
 
                         <Button
+                          android:visibility="@{hasNoVideos?View.GONE:View.VISIBLE}"
                           android:id="@+id/btn_favorite"
                           style="@style/detail_btn_style"
                           android:drawableLeft="@drawable/ic_btn_like_drawable"
@@ -222,6 +227,7 @@
                           app:layout_constraintTop_toTopOf="parent" />
 
                         <Button
+                          android:visibility="@{hasNoVideos?View.GONE:View.VISIBLE}"
                           android:id="@+id/btn_expand"
                           style="@style/detail_btn_style"
                           android:drawableLeft="@{expand?@drawable/ic_fold:@drawable/ic_btn_more}"

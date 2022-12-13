@@ -74,7 +74,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
 
     private void init() {
         mMovieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
-        mVideoFileDao=MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
+        mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getVideoFileDao();
     }
 
     /**
@@ -95,6 +95,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     mVideoFileList.clear();
                     mLastPlayEpisodeVideoFile = null;
                     mUnknownEpisodeList.clear();
+
                     //电视剧/综艺
                     if (Constants.VideoType.tv.equals(mMovieWrapper.movie.type)) {
                         for (Season _season : mMovieWrapper.seasons) {
@@ -177,9 +178,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             /*定位历史播放文件*/
                             //从剧集中寻找
                             int lastPlayUnknownEpisodePos = 0;
-                            for(int i=0;i<mEpisodeList.size();i++){
-                                for(int j=0;j<mEpisodeList.get(i).size();j++){
-                                    VideoFile episodeFile=mEpisodeList.get(i).get(j);
+                            for (int i = 0; i < mEpisodeList.size(); i++) {
+                                for (int j = 0; j < mEpisodeList.get(i).size(); j++) {
+                                    VideoFile episodeFile = mEpisodeList.get(i).get(j);
                                     if (episodeFile.lastPlayTime > 0) {
                                         if (mLastPlayEpisodeVideoFile == null) {
                                             mLastPlayEpisodeVideoFile = episodeFile;
@@ -239,7 +240,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                         end = last;
                                     String name = (start + 1) + "-" + (end + 1);
                                     if (start == end)
-                                        name = String.valueOf(start);
+                                        name = String.valueOf(start + 1);
                                     mTabLayoutPaginationMap.put(name, mEpisodeList.subList(start, end + 1));
                                 }
                             }
@@ -248,6 +249,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                     } else {
                         mVideoFileList.addAll(mMovieWrapper.videoFiles);
                     }
+
                     return mMovieWrapper;
                 })
                 .observeOn(AndroidSchedulers.mainThread());
@@ -311,9 +313,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .map(wrapper -> {
                     boolean isFavorite = isLike;
                     String movieId = wrapper.movie.movieId;
-                    mMovieDao.updateFavoriteStateByMovieId(isFavorite, movieId);
-                    OnlineDBApiService.updateLike(movieId, isFavorite, ScraperSourceTools.getSource(), wrapper.movie.type.name());
+                    String type=wrapper.movie.type.name();
                     mMovieWrapper.movie.isFavorite = isLike;
+                    MovieHelper.setMovieFavoriteState(getApplication(),movieId,type,isFavorite);
                     return isFavorite;
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());
@@ -345,8 +347,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return MovieHelper.playingMovie(path, name);
     }
 
-    public Constants.VideoType getVideoType(){
-        if(mMovieWrapper!=null&&mMovieWrapper.movie!=null)
+    public Constants.VideoType getVideoType() {
+        if (mMovieWrapper != null && mMovieWrapper.movie != null)
             return mMovieWrapper.movie.type;
         return null;
     }
@@ -370,11 +372,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         return MovieHelper.playingSeriesWithPlayList(path, name);
     }
 
-    public void updatePlayEpisode(VideoFile videoFile){
+    public void updatePlayEpisode(VideoFile videoFile) {
         mLastPlayEpisodeVideoFile = videoFile;
         if (mMovieWrapper.containVideoTags(Constants.VideoType.variety_show)) {
             for (int i = 0; i < mEpisodeList.size(); i++) {
-                for(VideoFile tmp:mEpisodeList.get(i)){
+                for (VideoFile tmp : mEpisodeList.get(i)) {
                     if (tmp.equals(videoFile)) {
                         mLastPlayEpisodePos.set(i);//episode从1开始，所以索引应该是episode-1;
                         mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode_2, mLastPlayEpisodeVideoFile.aired));
@@ -401,7 +403,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
         }
     }
 
-    public void updatePlayOtherEpisode(VideoFile videoFile){
+    public void updatePlayOtherEpisode(VideoFile videoFile) {
         mLastPlayEpisodeVideoFile = videoFile;
         for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
             VideoFile tmp = mUnknownEpisodeList.get(i);
@@ -426,10 +428,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieWrapper> saveSeries(MovieWrapper wrapper, Season season){
+    public Observable<MovieWrapper> saveSeries(MovieWrapper wrapper, Season season) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
                     if (wrapper != null) {
-                        if(season!=null) {
+                        if (season != null) {
                             for (VideoFile videoFile : mMovieWrapper.videoFiles) {
                                 videoFile.season = season.seasonNumber;
                             }

@@ -26,7 +26,8 @@ import java.util.List;
  * date:  2021/6/26
  */
 public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, MovieDataView> {
-    public static final String TAG=NewMovieItemListAdapter.class.getSimpleName();
+    public static final String TAG = NewMovieItemListAdapter.class.getSimpleName();
+
     public NewMovieItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {
         super(context, movieDataViewList);
     }
@@ -80,10 +81,12 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                 binding.setTag(null);
             }
         }
+
         binding.setType(movieDataView.type);
         binding.setTitle(title);
         binding.setRating(movieDataView.ratings);
         binding.setLike(movieDataView.is_favorite);
+        binding.setCloudUserFav(movieDataView.is_user_fav);
     }
 
     public void remove(String movie_id, String type, int pos) {
@@ -91,20 +94,20 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
                 && type.equals(mList.get(pos).type.name())) {
             mList.remove(pos);
             notifyItemRemoved(pos);
-            notifyItemRangeChanged(pos,mList.size());
+            notifyItemRangeChanged(pos, mList.size());
 
         }
     }
 
 
     public void remove(String movie_id, String type) {
-        for(int i=0;i<mList.size();i++){
-            MovieDataView dataView=mList.get(i);
-            if(dataView.movie_id.equals(movie_id)
-                    &&dataView.type.name().equals(type)){
+        for (int i = 0; i < mList.size(); i++) {
+            MovieDataView dataView = mList.get(i);
+            if (dataView.movie_id.equals(movie_id)
+                    && dataView.type.name().equals(type)) {
                 mList.remove(i);
                 notifyItemRemoved(i);
-                notifyItemRangeChanged(i,mList.size());
+                notifyItemRangeChanged(i, mList.size());
                 break;
             }
         }
@@ -112,13 +115,13 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
 
     public void remove(MovieDataView movieDataView) {
         for (int i = 0; i < mList.size(); i++) {
-                if (mList.get(i).equals(movieDataView)) {
-                    mList.remove(i);
-                    notifyItemRemoved(i);
-                    notifyItemRangeChanged(i,mList.size());
+            if (mList.get(i).equals(movieDataView)) {
+                mList.remove(i);
+                notifyItemRemoved(i);
+                notifyItemRangeChanged(i, mList.size());
 
-                    break;
-                }
+                break;
+            }
         }
     }
 
@@ -129,11 +132,11 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
      */
     public void updateStatus(MovieDataView movieDataView) {
         for (int i = 0; i < mList.size(); i++) {
-                if (mList.get(i).equals(movieDataView)) {
-                    mList.set(i, movieDataView);
-                    notifyItemChanged(i);
-                    break;
-                }
+            if (mList.get(i).equals(movieDataView)) {
+                mList.set(i, movieDataView);
+                notifyItemChanged(i);
+                break;
+            }
         }
     }
 

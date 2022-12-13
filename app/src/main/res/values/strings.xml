@@ -83,6 +83,7 @@
     <string name="shortcut_remove_dialog_content">Remove folder %s?</string>
 
     <string name="errtips_device_not_found">Rescanning device, please try again later!</string>
+    <string name="errtips_no_playback_source">No playback source, you can use Station Links to add playback source</string>
 
     <!--   文件夹管理->影片分类-->
     <string name="shortcut_type_auto">Auto</string>

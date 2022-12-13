@@ -15,6 +15,7 @@ import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -60,6 +61,8 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     protected abstract List<MovieDataView> queryMovieDataViewForRecentlyAdded();
 
     protected abstract List<MovieDataView> queryFavoriteMovieDataView();
+
+    protected abstract List<MovieDataView> queryUserFavoriteDataView();
 
     protected abstract MovieDataView queryMovieDataViewByMovieId(String movie_id,String type);
 
@@ -140,10 +143,37 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     public Observable<List<MovieDataView>> prepareFavorite() {
         return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
             List<MovieDataView> movieDataViewList = queryFavoriteMovieDataView();
+            if(movieDataViewList.size()<=5){
+                List<MovieDataView> userFavoriteMovieDataViewList=queryUserFavoriteDataView();
+               for(MovieDataView dataView:userFavoriteMovieDataViewList){
+                   if(movieDataViewList.size()>=6)
+                       break;
+                    if(!movieDataViewList.contains(dataView)){
+                        movieDataViewList.add(dataView);
+                    }
+               }
+            }
             emitter.onNext(movieDataViewList);
             emitter.onComplete();
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
     }
+
+    public Observable<List<MovieDataView>> prepareLocalFavorite() {
+        return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+            List<MovieDataView> movieDataViewList = queryFavoriteMovieDataView();
+            emitter.onNext(movieDataViewList);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public Observable<List<MovieDataView>> prepareUserFavorites(){
+        return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
+            List<MovieDataView> movieDataViewList = queryUserFavoriteDataView();
+            emitter.onNext(movieDataViewList);
+            emitter.onComplete();
+        }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
+    }
+
 
     public Observable<List<MovieDataView>> prepareRecommend() {
         return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {

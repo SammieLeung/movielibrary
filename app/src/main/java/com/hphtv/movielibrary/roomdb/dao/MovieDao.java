@@ -50,8 +50,9 @@ public interface MovieDao {
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
             "SET is_favorite=:isFavorite " +
-            "WHERE movie_id=:movie_id")
-    public int updateFavoriteStateByMovieId(boolean isFavorite, String movie_id);
+            "WHERE movie_id=:movie_id " +
+            "AND (:videoType IS NULL OR type=:videoType)")
+    public int updateFavoriteStateByMovieId(boolean isFavorite, String movie_id,String videoType);
 
     @Query("UPDATE " + TABLE.MOVIE + " " +
             "SET is_favorite=:isFavorite " +
@@ -90,18 +91,7 @@ public interface MovieDao {
      * @return
      */
     @Transaction
-//    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN (SELECT MOVIE__VF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MOVIE__VF JOIN " +
-//            "(SELECT VF.path FROM " + TABLE.VIDEOFILE + " AS VF JOIN " + TABLE.DEVICE + " AS DEV ON VF.device_path=DEV.path) AS VF__DEV " +
-//            "ON MOVIE__VF.path=VF__DEV.path AND MOVIE__VF.source=:source) and id=:id")
-    @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE id IN " +
-            "(SELECT MVCF.id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " AS MVCF  " +
-            "JOIN " + TABLE.VIDEOFILE + " AS VF  " +
-            "ON MVCF.path=VF.path AND MVCF.source =:source " +
-            "JOIN " + TABLE.SHORTCUT + " AS ST " +
-            "ON VF.dir_path=ST.uri  " +
-            "JOIN " + TABLE.DEVICE + " AS DEV  " +
-            "ON DEV.path=ST.device_path OR ST.device_type > 5) " +
-            "AND id=:id")
+    @Query("SELECT * FROM "+TABLE.MOVIE+" WHERE id=:id AND source=:source")
     public MovieWrapper queryMovieWrapperById(long id, String source);
 
     /**
@@ -331,7 +321,7 @@ public interface MovieDao {
             " AND (:ap IS NULL OR (ap=:ap OR (ap IS NULL AND s_ap=:ap)))" +
             " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
             " GROUP BY M.id " +
-            " ORDER BY pinyin ASC"+
+            " ORDER BY pinyin ASC" +
             ")")
     public int countFavoriteMovieDataViewByVideoTag(String source, String video_tag, String ap);
 
@@ -348,8 +338,23 @@ public interface MovieDao {
             " ORDER BY pinyin ASC" +
             " LIMIT :offset,:limit"
     )
-    public List<MovieDataView> queryFavoriteMovieDataViewByVideoTag(String source,  String video_tag, String ap, int offset, int limit);
+    public List<MovieDataView> queryFavoriteMovieDataViewByVideoTag(String source, String video_tag, String ap, int offset, int limit);
 
+    @Query(" SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.add_time,M.last_playtime,M.is_favorite,M.is_watched,-1 AS season,0 AS episode_count " +
+            " FROM "+TABLE.MOVIE+" AS M  " +
+            " JOIN "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" AS MVCF  " +
+            "  ON M.id=MVCF.id  " +
+            " JOIN "+TABLE.VIDEO_TAG+" AS VT  " +
+            " ON VT.vtid=MVCF.vtid  " +
+            " JOIN "+TABLE.MOVIE_USER_FAVORITE_CROSS_REF+" AS MUF " +
+            " ON M.movie_id=MUF.movie_id AND M.type=MUF.type " +
+            " AND M.source=:source " +
+            " AND (:ap IS NULL OR M.ap=:ap )" +
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
+            " GROUP BY M.id  " +
+            " ORDER BY pinyin ASC " +
+            " LIMIT :offset,:limit")
+    public List<MovieDataView> queryUserFavorite(String source,String video_tag,String ap,int offset,int limit);
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);

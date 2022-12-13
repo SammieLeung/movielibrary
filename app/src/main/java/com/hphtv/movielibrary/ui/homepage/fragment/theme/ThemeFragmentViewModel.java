@@ -44,7 +44,16 @@ public class ThemeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected List<MovieDataView> queryFavoriteMovieDataView() {
-        return  mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoType.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return  mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), mVideoType.name(), Config.getSqlConditionOfChildMode(), 0, 6);
+    }
+
+    @Override
+    protected List<MovieDataView> queryUserFavoriteDataView() {
+        List<MovieDataView> movieDataViewList = mMovieDao.queryUserFavorite(ScraperSourceTools.getSource(), mVideoType.name(), Config.getSqlConditionOfChildMode(),0, 12);
+        for (MovieDataView userFav : movieDataViewList) {
+            userFav.is_user_fav = true;
+        }
+        return movieDataViewList;
     }
 
     @Override

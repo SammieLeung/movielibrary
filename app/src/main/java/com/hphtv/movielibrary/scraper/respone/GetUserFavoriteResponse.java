@@ -30,6 +30,8 @@ public class GetUserFavoriteResponse implements ResponeEntity<List<MovieWrapper>
 
     @Override
     public List<MovieWrapper> toEntity() {
+        String TAG="test";
+        Log.e(TAG, "toEntity: "+msg );
         List<MovieWrapper> movieList = new ArrayList<>();
         if (data != null) {
             for (FavoriteMovie favoriteMovie : data) {
@@ -57,6 +59,7 @@ public class GetUserFavoriteResponse implements ResponeEntity<List<MovieWrapper>
         private String country;
         private String tagline;
         private String poster;
+        private String original_poster;
         private String rating;
         private Video[] videos;
         private Img[] stage_img;

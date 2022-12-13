@@ -395,6 +395,11 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     @Override
+    public void updateUserFavorite() {
+
+    }
+
+    @Override
     public void startLoading() {
         int i = atomicState.incrementAndGet();
         mBinding.setIsLoading(true);

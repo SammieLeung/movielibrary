@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.bean.PlayList;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.ActorDao;
@@ -15,6 +16,7 @@ import com.hphtv.movielibrary.roomdb.dao.MovieActorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDirectorCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieGenreCrossRefDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieUserFavoriteCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideoTagCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.SeasonDao;
@@ -82,25 +84,26 @@ public class MovieHelper {
     public static Observable<PlayList> playingSeriesWithPlayList(String path, String name) {
         Context context = MovieApplication.getInstance();
         return Observable.create((ObservableOnSubscribe<PlayList>) emitter -> {
-            VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
-            List<String> nameList = videoFileDao.queryVideoFileNameList(path);
-            List<String> pathList = videoFileDao.queryVideoFilePathList(path);
-            PlayList playList = new PlayList();
-            playList.setPath(path);
-            playList.setName(name);
-            playList.setPlayList(new ArrayList<>(pathList));
-            playList.setNameList(new ArrayList<>(nameList));
-            emitter.onNext(playList);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.io())
+                    VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(context).getVideoFileDao();
+                    List<String> nameList = videoFileDao.queryVideoFileNameList(path);
+                    List<String> pathList = videoFileDao.queryVideoFilePathList(path);
+                    PlayList playList = new PlayList();
+                    playList.setPath(path);
+                    playList.setName(name);
+                    playList.setPlayList(new ArrayList<>(pathList));
+                    playList.setNameList(new ArrayList<>(nameList));
+                    emitter.onNext(playList);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(playList -> {
-            VideoPlayTools.play(context, playList.getPath(), playList.getName(), playList.getPlayList(), playList.getNameList());
-        });
+                    VideoPlayTools.play(context, playList.getPath(), playList.getName(), playList.getPlayList(), playList.getNameList());
+                });
     }
 
     /**
      * 保存播放记录
+     *
      * @param path
      * @param position
      * @param duration
@@ -467,5 +470,20 @@ public class MovieHelper {
             movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
         }
 
+    }
+
+    public static void setMovieFavoriteState(Context context, String movie_id, String videoType,boolean like) {
+        setMovieFavoriteState(context,movie_id,videoType,like,true,true);
+    }
+
+    public static void setMovieFavoriteState(Context context, String movie_id, String videoType,boolean like, boolean notifyServer,boolean removeUserFavorite) {
+        MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
+        movieDao.updateFavoriteStateByMovieId(like, movie_id,videoType);
+        if (notifyServer)
+            OnlineDBApiService.updateLike(movie_id, like, ScraperSourceTools.getSource(), videoType);
+        if(removeUserFavorite){
+            MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao=MovieLibraryRoomDatabase.getDatabase(context).getMovieUserFavoriteCrossRefDao();
+            movieUserFavoriteCrossRefDao.delete(movie_id,videoType,ScraperSourceTools.getSource());
+        }
     }
 }

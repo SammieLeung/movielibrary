@@ -90,7 +90,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 break;
             case R.id.btn_play:
                 if (mViewModel.getMovieWrapper() != null) {
-                    if (mViewModel.getVideoFileList().size() == 1) {
+                    if (mViewModel.getVideoFileList().size() == 0) {
+                        ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.errtips_no_playback_source));
+                    } else if (mViewModel.getVideoFileList().size() == 1) {
                         String path = mViewModel.getVideoFileList().get(0).path;
                         String name = mViewModel.getVideoFileList().get(0).filename;
                         playVideo(path, name);
@@ -278,6 +280,11 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             @Override
             public void onAction(MovieWrapper wrapper) {
                 if (wrapper != null) {
+                    if(wrapper.videoFiles.size()>0){
+                        mBinding.setHasNoVideos(false);
+                    }else{
+                        mBinding.setHasNoVideos(true);
+                    }
                     if (Constants.VideoType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
                         if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
                             mEpisodeItemListAdapter.setVarietyShow(true);
@@ -437,7 +444,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
             if (wrapper.movie != null && wrapper.movie.type.equals(Constants.VideoType.tv) && wrapper.seasons != null) {
-                showSeasonDialog(wrapper,(wrapper1, season) -> {
+                showSeasonDialog(wrapper, (wrapper1, season) -> {
                     startLoading();
                     mViewModel.saveSeries(wrapper1, season)
                             .subscribe(new SimpleObserver<MovieWrapper>() {
@@ -502,7 +509,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         movieSearchFragment.show(getSupportFragmentManager(), "");
     }
 
-    private void showSeasonDialog(MovieWrapper wrapper,SeasonSelectDialog.OnClickListener listener) {
+    private void showSeasonDialog(MovieWrapper wrapper, SeasonSelectDialog.OnClickListener listener) {
         SeasonSelectDialog seasonSelectDialog = SeasonSelectDialog.newInstance(wrapper);
         seasonSelectDialog.setOnClickListener(listener);
         seasonSelectDialog.show(getSupportFragmentManager(), "");

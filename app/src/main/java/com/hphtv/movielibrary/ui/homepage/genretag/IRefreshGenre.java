@@ -6,4 +6,5 @@ package com.hphtv.movielibrary.ui.homepage.genretag;
  */
 public interface IRefreshGenre {
     void refreshGenreUI();
+    void updateUserFavorite();
 }

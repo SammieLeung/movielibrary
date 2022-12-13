@@ -113,16 +113,16 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
 
     public Observable<MovieDataView> rematchWithMovie(MovieWrapper newWrapper) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
-            MovieHelper.manualSaveMovie(getApplication(), newWrapper, videoFileList);
-            MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId, newWrapper.movie.type.name(), ScraperSourceTools.getSource());
-            emitter.onNext(movieDataView);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.newThread())
+                    List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
+                    MovieHelper.manualSaveMovie(getApplication(), newWrapper, videoFileList);
+                    MovieDataView movieDataView = mMovieDao.queryMovieDataViewByMovieId(newWrapper.movie.movieId, newWrapper.movie.type.name(), ScraperSourceTools.getSource());
+                    emitter.onNext(movieDataView);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<MovieDataView> rematchWithSeries(MovieWrapper newWrapper,int season) {
+    public Observable<MovieDataView> rematchWithSeries(MovieWrapper newWrapper, int season) {
         return Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
                     List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
                     for (VideoFile videoFile : videoFileList) {
@@ -141,35 +141,35 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
      */
     public void toggleAccessRights(OnMovieChangeListener listener) {
         Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            Constants.WatchLimit watchLimit = null;
-            if (mMovieDataView.ap != null)
-                watchLimit = mMovieDataView.ap;
-            else
-                watchLimit = mMovieDataView.s_ap;
+                    Constants.WatchLimit watchLimit = null;
+                    if (mMovieDataView.ap != null)
+                        watchLimit = mMovieDataView.ap;
+                    else
+                        watchLimit = mMovieDataView.s_ap;
 
 //            boolean childMode=!Config.isTempCloseChildMode()&&Config.isChildMode();
-            boolean childMode = Config.isChildMode();
+                    boolean childMode = Config.isChildMode();
 
 
-            if (watchLimit.equals(Constants.WatchLimit.ADULT)) {
-                watchLimit = Constants.WatchLimit.ALL_AGE;
-                if (childMode)
-                    listener.OnMovieInsert(mMovieDataView, mItemPosition);
-            } else {
-                watchLimit = Constants.WatchLimit.ADULT;
-                if (childMode)
-                    listener.OnMovieRemove(mMovieDataView.movie_id,mMovieDataView.type.name(), mItemPosition);
-            }
-            mMovieDataView.ap = watchLimit;
-            mMovieDao.updateAccessPermission(mMovieDataView.movie_id, mMovieDataView.ap);
-            List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
-            for (VideoFile videoFile : videoFileList) {
-                OnlineDBApiService.uploadWatchLimit(videoFile.path,watchLimit,Constants.Scraper.TMDB_EN);
-                OnlineDBApiService.uploadWatchLimit(videoFile.path,watchLimit,Constants.Scraper.TMDB);
-            }
-            emitter.onNext(mMovieDataView);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.single())
+                    if (watchLimit.equals(Constants.WatchLimit.ADULT)) {
+                        watchLimit = Constants.WatchLimit.ALL_AGE;
+                        if (childMode)
+                            listener.OnMovieInsert(mMovieDataView, mItemPosition);
+                    } else {
+                        watchLimit = Constants.WatchLimit.ADULT;
+                        if (childMode)
+                            listener.OnMovieRemove(mMovieDataView.movie_id, mMovieDataView.type.name(), mItemPosition);
+                    }
+                    mMovieDataView.ap = watchLimit;
+                    mMovieDao.updateAccessPermission(mMovieDataView.movie_id, mMovieDataView.ap);
+                    List<VideoFile> videoFileList = mVideoFileDao.queryVideoFilesById(mMovieDataView.id);
+                    for (VideoFile videoFile : videoFileList) {
+                        OnlineDBApiService.uploadWatchLimit(videoFile.path, watchLimit, Constants.Scraper.TMDB_EN);
+                        OnlineDBApiService.uploadWatchLimit(videoFile.path, watchLimit, Constants.Scraper.TMDB);
+                    }
+                    emitter.onNext(mMovieDataView);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.single())
                 .subscribe(movieDataView -> {
                     switch (mMovieDataView.ap) {
                         case ALL_AGE:
@@ -185,13 +185,15 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
 
     public void toggleLike(OnMovieChangeListener listener) {
         Observable.create((ObservableOnSubscribe<MovieDataView>) emitter -> {
-            mMovieDataView.is_favorite = !mMovieDataView.is_favorite;
-            mMovieDao.updateFavoriteStateByMovieId(mMovieDataView.is_favorite, mMovieDataView.movie_id);
-            OnlineDBApiService.updateLike(mMovieDataView.movie_id, mMovieDataView.is_favorite, ScraperSourceTools.getSource(), mMovieDataView.type.name());
-            listener.OnMovieChange(mMovieDataView, mItemPosition);
-            emitter.onNext(mMovieDataView);
-            emitter.onComplete();
-        }).subscribeOn(Schedulers.single())
+                    mMovieDataView.is_favorite = !mMovieDataView.is_favorite;
+                    String movieId = mMovieDataView.movie_id;
+                    String type = mMovieDataView.type.name();
+                    boolean isFavorite = mMovieDataView.is_favorite;
+                    MovieHelper.setMovieFavoriteState(getApplication(), movieId, type, isFavorite);
+                    listener.OnMovieChange(mMovieDataView, mItemPosition);
+                    emitter.onNext(mMovieDataView);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.single())
                 .subscribe(movieDataView -> {
                     mLikeFlag.set(mMovieDataView.is_favorite);
                     mRefreshFlag = true;

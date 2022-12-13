@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.roomdb.entity.dataview;
 
 import androidx.room.DatabaseView;
+import androidx.room.Ignore;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
@@ -72,6 +73,9 @@ public class MovieDataView implements Serializable {
 
     public String resolution;
     public String video_source;
+
+    @Ignore
+    public boolean is_user_fav;
 
     @Override
     public boolean equals(Object o) {

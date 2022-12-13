@@ -78,6 +78,12 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
         }
     }
 
+    public void updateUserFragments(int count){
+        for (IRefreshGenre refreshGenre : mIRefreshGenreList) {
+            refreshGenre.updateUserFavorite();
+        }
+    }
+
     public List<IRefreshGenre> getIRefreshGenreList() {
         return mIRefreshGenreList;
     }

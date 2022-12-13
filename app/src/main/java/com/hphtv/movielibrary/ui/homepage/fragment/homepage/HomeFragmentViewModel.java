@@ -32,37 +32,46 @@ public class HomeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected List<HistoryMovieDataView> queryHistoryMovieDataView() {
-        return mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(),null, 0, LIMIT);
+        return mVideoFileDao.queryHistoryMovieDataView(ScraperSourceTools.getSource(), Config.getSqlConditionOfChildMode(), null, 0, LIMIT);
     }
 
     @Override
     protected List<String> queryGenresBySource() {
-        return  mGenreDao.queryGenresBySource(ScraperSourceTools.getSource(),null);
+        return mGenreDao.queryGenresBySource(ScraperSourceTools.getSource(), null);
     }
 
     @Override
     protected List<MovieDataView> queryMovieDataViewForRecentlyAdded() {
-        return mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(),null, Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mMovieDao.queryMovieDataViewForRecentlyAddedByVideoTag(ScraperSourceTools.getSource(), null, Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
     @Override
     protected List<MovieDataView> queryFavoriteMovieDataView() {
-        return mMovieDao.queryFavoriteMovieDataView(ScraperSourceTools.getSource(), null,Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mMovieDao.queryFavoriteMovieDataViewByVideoTag(ScraperSourceTools.getSource(), null, Config.getSqlConditionOfChildMode(), 0, 6);
     }
 
     @Override
-    protected MovieDataView queryMovieDataViewByMovieId(String movie_id,String type) {
-        return  mMovieDao.queryMovieDataViewByMovieId(movie_id, type, ScraperSourceTools.getSource());
+    protected List<MovieDataView> queryUserFavoriteDataView() {
+        List<MovieDataView> movieDataViewList = mMovieDao.queryUserFavorite(ScraperSourceTools.getSource(), null,Config.getSqlConditionOfChildMode(), 0, 12);
+        for (MovieDataView userFav : movieDataViewList) {
+            userFav.is_user_fav = true;
+        }
+        return movieDataViewList;
     }
 
     @Override
-    protected List<MovieDataView> queryRecommendByGenres(String source,List<String> genreList, List<Long> idList) {
-        return mMovieDao.queryRecommend(source, null,Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT);
+    protected MovieDataView queryMovieDataViewByMovieId(String movie_id, String type) {
+        return mMovieDao.queryMovieDataViewByMovieId(movie_id, type, ScraperSourceTools.getSource());
+    }
+
+    @Override
+    protected List<MovieDataView> queryRecommendByGenres(String source, List<String> genreList, List<Long> idList) {
+        return mMovieDao.queryRecommend(source, null, Config.getSqlConditionOfChildMode(), genreList, idList, 0, LIMIT);
     }
 
     @Override
     protected List<MovieDataView> queryRecommend(String source) {
-        return mMovieDao.queryRecommend(source, null,Config.getSqlConditionOfChildMode(), 0, LIMIT);
+        return mMovieDao.queryRecommend(source, null, Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
 

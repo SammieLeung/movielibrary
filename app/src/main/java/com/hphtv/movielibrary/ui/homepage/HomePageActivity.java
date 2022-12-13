@@ -1,19 +1,12 @@
 package com.hphtv.movielibrary.ui.homepage;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ArgbEvaluator;
-import android.animation.IntEvaluator;
 import android.animation.ObjectAnimator;
-import android.animation.TypeConverter;
-import android.animation.TypeEvaluator;
-import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.PointF;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.shapes.Shape;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -53,12 +46,10 @@ import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
-import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.PackageTools;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -136,6 +127,8 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     };
 
+    private BroadcastReceiver mBroadcastReceiver;
+
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,6 +166,18 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                 autoSearch();
             }
         }).start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bindBroadcastReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unBindBroadcastReceiver();
     }
 
     @Override
@@ -290,6 +295,34 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             objectAnimator.start();
         };
         mHandler.postDelayed(mBottomMaskFadeInTask, 800);
+    }
+
+    private void bindBroadcastReceiver() {
+        if (mBroadcastReceiver == null) {
+            mBroadcastReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (Constants.ACTION_APPEND_USER_FAVORITE.equals(intent.getAction())) {
+                        int count = intent.getIntExtra("count", 0);
+                        mNewHomePageTabAdapter.updateUserFragments(count);
+                    }
+                }
+            };
+        }
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.ACTION_APPEND_USER_FAVORITE);
+        LocalBroadcastManager.getInstance(getBaseContext()).registerReceiver(mBroadcastReceiver, intentFilter);
+    }
+
+    private void unBindBroadcastReceiver() {
+        if (mBroadcastReceiver != null) {
+            try {
+                LocalBroadcastManager.getInstance(getBaseContext()).unregisterReceiver(mBroadcastReceiver);
+                mBroadcastReceiver = null;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -533,16 +566,16 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public void onBackPressed() {
-       if(mBinding.viewpager.getCurrentItem()==HomePageTabAdapter.UNKNOWN){
-           if(mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN) instanceof UnknownFileFragment){
-               UnknownFileFragment unknownFileFragment= (UnknownFileFragment) mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN);
-               boolean res=unknownFileFragment.OnBackPress();
-               if(!res){
-                   super.onBackPressed();
-               }
-           }
-       }else{
-           super.onBackPressed();
-       }
+        if (mBinding.viewpager.getCurrentItem() == HomePageTabAdapter.UNKNOWN) {
+            if (mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN) instanceof UnknownFileFragment) {
+                UnknownFileFragment unknownFileFragment = (UnknownFileFragment) mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN);
+                boolean res = unknownFileFragment.OnBackPress();
+                if (!res) {
+                    super.onBackPressed();
+                }
+            }
+        } else {
+            super.onBackPressed();
+        }
     }
 }

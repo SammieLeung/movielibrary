@@ -84,7 +84,9 @@ public class MovieApplication extends Application {
                     .subscribe(new SimpleObserver<String>() {
                         @Override
                         public void onAction(String source) {
-                            updateUserFavorites(source,1,10);
+                            MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getMovieUserFavoriteCrossRefDao();
+                            movieUserFavoriteCrossRefDao.deleteAll();
+                            updateUserFavorites(source, 1, 10);
                         }
                     });
         }
@@ -164,7 +166,7 @@ public class MovieApplication extends Application {
                 .subscribeOn(Schedulers.newThread())
                 .flatMap((Function<Observable<GetUserFavoriteResponse>, ObservableSource<GetUserFavoriteResponse>>) favoriteResponseObservable -> favoriteResponseObservable)
                 .onErrorReturn(throwable -> {
-                    Log.e(TAG, "updateUserFavorites: "+throwable.getMessage() );
+                    Log.e(TAG, "updateUserFavorites: " + throwable.getMessage());
                     return new GetUserFavoriteResponse();
                 })
                 .subscribe(new SimpleObserver<GetUserFavoriteResponse>() {
@@ -172,28 +174,27 @@ public class MovieApplication extends Application {
                     public void onAction(GetUserFavoriteResponse getUserFavoriteResponse) {
                         MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getMovieUserFavoriteCrossRefDao();
                         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getMovieDao();
-
                         List<MovieWrapper> movieList = getUserFavoriteResponse.toEntity();
-                        int count=movieList.size();
+                        int count = movieList.size();
                         if (count > 0) {
                             for (MovieWrapper movieWrapper : movieList) {
                                 Movie movie = movieWrapper.movie;
                                 if (movie != null) {
                                     MovieUserFavoriteCrossRef movieUserFavoriteCrossRef = movieUserFavoriteCrossRefDao.query(movie.movieId, movie.type.name(), movie.source);
                                     if (movieUserFavoriteCrossRef == null) {
-                                        if (movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name()) == null) {
-                                            MovieHelper.saveBaseInfo(getBaseContext(), movieWrapper);
-                                        }
                                         movieUserFavoriteCrossRef = new MovieUserFavoriteCrossRef();
                                         movieUserFavoriteCrossRef.movie_id = movie.movieId;
                                         movieUserFavoriteCrossRef.source = movie.source;
                                         movieUserFavoriteCrossRef.type = movie.type;
                                         movieUserFavoriteCrossRefDao.insertOrIgnore(movieUserFavoriteCrossRef);
                                     }
+                                    if (movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name()) == null) {
+                                        MovieHelper.saveBaseInfo(getBaseContext(), movieWrapper);
+                                    }
                                 }
                             }
-                            Intent intent=new Intent(Constants.ACTION_APPEND_USER_FAVORITE);
-                            intent.putExtra("count",page-1*limit+count);
+                            Intent intent = new Intent(Constants.ACTION_APPEND_USER_FAVORITE);
+                            intent.putExtra("count", (page - 1) * limit + count);
                             LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
                             if (movieList.size() == limit)
                                 updateUserFavorites(source, page + 1, limit);

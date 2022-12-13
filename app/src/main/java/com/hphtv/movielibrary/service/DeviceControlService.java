@@ -60,20 +60,4 @@ public class DeviceControlService extends Service {
             }
         }
     }
-
-    public synchronized void playVideo(long id) {
-        VideoFile videoFile = mVideoFileDao.queryByVid(id);
-        VideoPlayTools.play(this, videoFile.path, videoFile.filename);
-    }
-
-    private synchronized void setFavorite(String movie_id, boolean isFavorite) {
-        Observable.just(movie_id)
-                .observeOn(Schedulers.io())
-                .subscribe(new SimpleObserver<String>() {
-                    @Override
-                    public void onAction(String s) {
-                        mMovieDao.updateFavoriteStateByMovieId(isFavorite, movie_id);
-                    }
-                });
-    }
 }
