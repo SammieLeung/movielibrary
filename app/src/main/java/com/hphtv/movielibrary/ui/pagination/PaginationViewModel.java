@@ -19,6 +19,7 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -114,11 +115,17 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
     private void reloadFavoriteMovie() {
-        mFavoriteDataLoader.reload();
+        if (Config.isGetUserUpdate)
+            mUserFavoriteDataLoader.reload();
+        else
+            mFavoriteDataLoader.reload();
     }
 
     private void loadFavoriteMovie() {
-        mFavoriteDataLoader.load();
+        if (Config.isGetUserUpdate && mUserFavoriteDataLoader.canLoadMore())
+            mUserFavoriteDataLoader.load();
+        else if (mFavoriteDataLoader.canLoadMore())
+            mFavoriteDataLoader.load();
     }
 
     private OnRefresh mOnRefresh;
@@ -165,9 +172,15 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     };
 
     private PaginatedDataLoader<MovieDataView> mFavoriteDataLoader = new PaginatedDataLoader<MovieDataView>() {
+
         @Override
         public int getLimit() {
             return LIMIT;
+        }
+
+        @Override
+        public void reload() {
+            super.reload();
         }
 
         @Override
@@ -182,6 +195,45 @@ public class PaginationViewModel extends BaseAndroidViewModel {
             if (mOnRefresh != null)
                 mOnRefresh.newSearch(result);
         }
+
+        @Override
+        protected void OnLoadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.appendMovieDataViews(result);
+        }
+
+
+    };
+
+
+    private PaginatedDataLoader<MovieDataView> mUserFavoriteDataLoader = new PaginatedDataLoader<MovieDataView>() {
+
+        @Override
+        public int getLimit() {
+            return LIMIT;
+        }
+
+        @Override
+        public void reload() {
+            super.reload();
+        }
+
+        @Override
+        protected List<MovieDataView> loadDataFromDB(int offset, int limit) {
+            String tagName = mVideoTag != null ? mVideoTag.tag.name() : null;
+            List<MovieDataView> movieDataViewList = mMovieDao.queryUserFavorite(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, limit);
+            for (MovieDataView movieDataView : movieDataViewList) {
+                movieDataView.is_user_fav = true;
+            }
+            return movieDataViewList;
+        }
+
+        @Override
+        protected void OnReloadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.newSearch(result);
+        }
+
 
         @Override
         protected void OnLoadResult(List<MovieDataView> result) {

@@ -44,6 +44,7 @@ public class Config {
     private static String sDefaultSearchMode;
     private static String sPlayerName;
     private static String sPlayerPackage;
+    public static boolean isGetUserUpdate=false;
 
     static {
         SharePreferencesTools tools=SharePreferencesTools.getInstance(MovieApplication.getInstance());

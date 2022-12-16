@@ -34,6 +34,7 @@ import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieActorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieDirectorCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieGenreCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieUserFavoriteCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
@@ -472,18 +473,25 @@ public class MovieHelper {
 
     }
 
-    public static void setMovieFavoriteState(Context context, String movie_id, String videoType,boolean like) {
-        setMovieFavoriteState(context,movie_id,videoType,like,true,true);
+    public static void setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like) {
+        setMovieFavoriteState(context, movie_id, videoType, like, true, true);
     }
 
-    public static void setMovieFavoriteState(Context context, String movie_id, String videoType,boolean like, boolean notifyServer,boolean removeUserFavorite) {
+    public static void setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like, boolean notifyServer, boolean removeUserFavorite) {
         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
-        movieDao.updateFavoriteStateByMovieId(like, movie_id,videoType);
+        movieDao.updateFavoriteStateByMovieId(like, movie_id, videoType);
         if (notifyServer)
             OnlineDBApiService.updateLike(movie_id, like, ScraperSourceTools.getSource(), videoType);
-        if(removeUserFavorite){
-            MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao=MovieLibraryRoomDatabase.getDatabase(context).getMovieUserFavoriteCrossRefDao();
-            movieUserFavoriteCrossRefDao.delete(movie_id,videoType,ScraperSourceTools.getSource());
+        if (removeUserFavorite) {
+            MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieUserFavoriteCrossRefDao();
+            if (like) {
+                MovieUserFavoriteCrossRef favoriteCrossRef = new MovieUserFavoriteCrossRef();
+                favoriteCrossRef.type = Constants.VideoType.valueOf(videoType);
+                favoriteCrossRef.movie_id = movie_id;
+                favoriteCrossRef.source = ScraperSourceTools.getSource();
+                movieUserFavoriteCrossRefDao.insertOrIgnore(favoriteCrossRef);
+            } else
+                movieUserFavoriteCrossRefDao.delete(movie_id, videoType, ScraperSourceTools.getSource());
         }
     }
 }

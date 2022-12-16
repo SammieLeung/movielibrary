@@ -16,6 +16,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.stetho.Stetho;
 import com.firefly.filepicker.utils.SambaAuthHelper;
 import com.hphtv.movielibrary.data.AuthHelper;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -52,7 +53,6 @@ import io.reactivex.rxjava3.functions.Function3;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MovieApplication extends Application {
-    private boolean isUpdatedUserFavorite;
     public static final boolean DEBUG = true;
     public static final String TAG = MovieApplication.class.getSimpleName();
     private boolean isShowEncrypted = false;
@@ -198,6 +198,8 @@ public class MovieApplication extends Application {
                             LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
                             if (movieList.size() == limit)
                                 updateUserFavorites(source, page + 1, limit);
+                            else
+                                Config.isGetUserUpdate=true;
                         }
                     }
                 });

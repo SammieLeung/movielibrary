@@ -58,6 +58,11 @@ public abstract class PaginatedDataLoader<T> {
         return mAtomicBooleanCanLoad.get();
     }
 
+    public void reset(){
+        mPage.set(0);
+        mAtomicBooleanCanLoad.set(true);
+    }
+
     public void reload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     mPage.set(0);
