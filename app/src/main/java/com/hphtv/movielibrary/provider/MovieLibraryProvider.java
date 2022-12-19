@@ -68,6 +68,7 @@ public class MovieLibraryProvider extends ContentProvider {
     public static final int APP_UPDATE_MOVIE = 5;
     public static final int APP_REMOVE_MOVIE = 6;
     public static final int APP_PRE_MATCH = 7;
+    public static final int APP_REMOVE_FILE = 8;
 
     MovieDao mMovieDao;
     VideoFileDao mVideoFileDao;
@@ -91,6 +92,7 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(AUTHORITY, "app_update_movie", APP_UPDATE_MOVIE);
         matcher.addURI(AUTHORITY, "app_remove_movie", APP_REMOVE_MOVIE);
         matcher.addURI(AUTHORITY, "app_pre_match", APP_PRE_MATCH);
+        matcher.addURI(AUTHORITY, "app_remove_videofile", APP_REMOVE_FILE);
 
         return false;
     }
@@ -187,6 +189,17 @@ public class MovieLibraryProvider extends ContentProvider {
                     return 1;
                 }
                 break;
+            case APP_REMOVE_FILE:
+                LogUtil.w("APP_REMOVE_FILE " + Thread.currentThread().getName());
+                if (selectionArgs != null && selectionArgs.length > 0) {
+                    VideoFileDao videoFileDao = MovieLibraryRoomDatabase.getDatabase(getContext()).getVideoFileDao();
+
+                    for (String filePath : selectionArgs) {
+                        videoFileDao.deleteByPath(filePath);
+                        videoFileDao.removeRelation(filePath);
+                    }
+                }
+
         }
         return 0;
     }

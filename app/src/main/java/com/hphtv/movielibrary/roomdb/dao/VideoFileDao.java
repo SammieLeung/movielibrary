@@ -136,4 +136,7 @@ public interface VideoFileDao {
 
     @Query("DELETE FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:filePath")
     public int removeRelation(String filePath);
+
+    @Query("DELETE FROM "+TABLE.VIDEOFILE+" WHERE path=:filePath")
+    public int deleteByPath(String filePath);
 }
