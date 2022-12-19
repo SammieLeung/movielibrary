@@ -107,7 +107,7 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
     private void showSearchDialog() {
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(mViewModel.getMovieDataView().title);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            if (Constants.VideoType.tv.equals(wrapper.movie.type)) {
+            if (Constants.VideoType.tv.equals(wrapper.movie.type)&&wrapper.season!=null) {
                 showSeasonDialog(wrapper, new SeasonSelectDialog.OnClickListener() {
                     @Override
                     public void onClick(MovieWrapper newWrapper, Season season) {

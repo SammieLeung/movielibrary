@@ -116,7 +116,7 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
     private void showSelectPoster(String keyword) {
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            if (Constants.VideoType.tv.equals(wrapper.movie.type)) {
+            if (Constants.VideoType.tv.equals(wrapper.movie.type)&&wrapper.season!=null) {
                 showSeasonDialog(wrapper, (wrapper1, season) -> {
                     globalStartLoading();
                     mViewModel.rematchFileWithSeries(wrapper1, season.seasonNumber)
@@ -184,7 +184,7 @@ public class UnknownsFileMenuDialog extends BaseDialogFragment2<UnknownsFileMenu
     private void showSelectPosterForFolder(String keyword) {
         MovieSearchDialog movieSearchFragment = MovieSearchDialog.newInstance(keyword);
         movieSearchFragment.setOnSelectPosterListener((wrapper) -> {
-            if (Constants.VideoType.tv.equals(wrapper.movie.type)) {
+            if (Constants.VideoType.tv.equals(wrapper.movie.type)&&wrapper.season!=null) {
                 showSeasonDialog(wrapper, (wrapper1, season) -> {
                     globalStartLoading();
                     mViewModel.rematchFolderWithSeries(wrapper1, season.seasonNumber)
