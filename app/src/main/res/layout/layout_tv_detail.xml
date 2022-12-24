@@ -194,7 +194,6 @@
 
 
                         <Button
-                          android:visibility="@{hasNoVideos?View.GONE:View.VISIBLE}"
                           android:id="@+id/btn_favorite"
                           style="@style/detail_btn_style"
                           android:drawableLeft="@drawable/ic_btn_like_drawable"

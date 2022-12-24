@@ -70,17 +70,17 @@ public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB
     }
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
 
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
 
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
 
     }
 

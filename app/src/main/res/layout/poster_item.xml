@@ -109,7 +109,7 @@
             android:layout_height="wrap_content"/>
 
         <ImageView
-            android:visibility="@{showLike&amp;&amp;like?View.VISIBLE:View.GONE}"
+            android:visibility="@{showLike&amp;&amp;like&amp;&amp;!cloudUserFav?View.VISIBLE:View.GONE}"
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:layout_alignBottom="@id/rv_poster"
@@ -119,7 +119,7 @@
             android:src="@drawable/ic_btn_like" />
 
         <ImageView
-          android:visibility="@{showLike&amp;&amp;cloudUserFav&amp;&amp;!like?View.VISIBLE:View.GONE}"
+          android:visibility="@{showLike&amp;&amp;cloudUserFav?View.VISIBLE:View.GONE}"
           android:layout_width="25dp"
           android:layout_height="25dp"
           android:layout_alignBottom="@id/rv_poster"

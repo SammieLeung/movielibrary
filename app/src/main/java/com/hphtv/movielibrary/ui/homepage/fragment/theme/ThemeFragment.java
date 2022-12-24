@@ -8,13 +8,10 @@ import androidx.annotation.Nullable;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
-import com.hphtv.movielibrary.ui.homepage.IAutofitHeight;
 import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
 
 /**
  * author: Sam Leung
@@ -60,9 +57,9 @@ public class ThemeFragment extends BaseHomeFragment<ThemeFragmentViewModel> {
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
         if (mViewModel != null && mViewModel.getVideoType().name().equals(type)) {//TODO 检查是否生效
-            super.remoteUpdateFavorite(movie_id, type, isFavorite);
+            super.remoteUpdateFavoriteNotify(movie_id, type, isFavorite);
         }
     }
 }

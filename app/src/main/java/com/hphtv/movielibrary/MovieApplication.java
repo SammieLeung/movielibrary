@@ -180,6 +180,14 @@ public class MovieApplication extends Application {
                             for (MovieWrapper movieWrapper : movieList) {
                                 Movie movie = movieWrapper.movie;
                                 if (movie != null) {
+                                    Movie dbMovie=movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name());
+                                    if (dbMovie==null) {
+                                        movieWrapper.movie.isFavorite=true;
+                                        MovieHelper.saveBaseInfo(getBaseContext(), movieWrapper);
+                                    }else{
+                                        dbMovie.isFavorite=true;
+                                        movieDao.update(dbMovie);
+                                    }
                                     MovieUserFavoriteCrossRef movieUserFavoriteCrossRef = movieUserFavoriteCrossRefDao.query(movie.movieId, movie.type.name(), movie.source);
                                     if (movieUserFavoriteCrossRef == null) {
                                         movieUserFavoriteCrossRef = new MovieUserFavoriteCrossRef();
@@ -187,9 +195,6 @@ public class MovieApplication extends Application {
                                         movieUserFavoriteCrossRef.source = movie.source;
                                         movieUserFavoriteCrossRef.type = movie.type;
                                         movieUserFavoriteCrossRefDao.insertOrIgnore(movieUserFavoriteCrossRef);
-                                    }
-                                    if (movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name()) == null) {
-                                        MovieHelper.saveBaseInfo(getBaseContext(), movieWrapper);
                                     }
                                 }
                             }

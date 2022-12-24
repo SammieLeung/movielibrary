@@ -8,21 +8,17 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
-import androidx.sqlite.db.SupportSQLiteQuery;
-import androidx.sqlite.db.SupportSQLiteQueryBuilder;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParser2;
+import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.TABLE;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
@@ -36,9 +32,7 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone;
-import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.scraper.service.TmdbApiService;
-import com.hphtv.movielibrary.service.Thread.LocalFileScanHelper;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -50,9 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * Created by tchip on 18-5-15.
@@ -213,9 +205,42 @@ public class MovieLibraryProvider extends ContentProvider {
                     String movie_id = selectionArgs[0];
                     boolean is_favorite = values.getAsBoolean("is_favorite");
                     String type = values.getAsString("type");
-                    int res = mMovieDao.updateFavoriteStateByMovieId(movie_id, type, is_favorite);
-                    sendRefreshFavoriteBroadcast(movie_id, type, is_favorite);
-                    return res;
+                    if (mMovieDao.queryByMovieIdAndType(movie_id, ScraperSourceTools.getSource(), type) != null) {
+                        int res=MovieHelper.setMovieFavoriteState(getContext(),movie_id,type,is_favorite,false,true);
+                        sendRefreshFavoriteBroadcast(movie_id, type, is_favorite);
+                        return res;
+                    } else {
+                        Observable<MovieWrapper> observableTMDB = Observable.zip(Observable.just(movie_id),
+                                        Observable.just(Constants.Scraper.TMDB),
+                                        Observable.just(type),
+                                        TmdbApiService::getDetail)
+                                .flatMap(movieDetailResponeObservable -> Observable.just(movieDetailResponeObservable.blockingFirst().toEntity()));
+
+                        Observable<MovieWrapper> observableTMDB_EN = Observable.zip(Observable.just(movie_id),
+                                        Observable.just(Constants.Scraper.TMDB_EN),
+                                        Observable.just(type),
+                                        TmdbApiService::getDetail)
+                                .flatMap(movieDetailResponeObservable -> Observable.just(movieDetailResponeObservable.blockingFirst().toEntity()));
+
+                        boolean saveBaseRes = Observable.zip(observableTMDB, observableTMDB_EN, (tmdb, tmdbEN) -> {
+                            try {
+                                MovieHelper.saveBaseInfo(getContext(), tmdb);
+                                MovieHelper.saveBaseInfo(getContext(), tmdbEN);
+                                return true;
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                return false;
+                            }
+
+                        }).blockingFirst();
+                        if (saveBaseRes) {
+                            int res=MovieHelper.setMovieFavoriteState(getContext(),movie_id,type,is_favorite,false,true);
+                            sendRefreshFavoriteBroadcast(movie_id, type, is_favorite);
+                            return res;
+                        } else
+                            return -1;
+                    }
+
                 }
                 break;
             case APP_UPDATE_MOVIE:
@@ -409,9 +434,9 @@ public class MovieLibraryProvider extends ContentProvider {
     }
 
     private void sendRefreshFavoriteBroadcast(String movie_id, String type, boolean isFavorite) {
-        LogUtil.v(TAG, "Broadcast:" + Constants.ACTION_FAVORITE_MOVIE_CHANGE + " ->" + movie_id);
+        LogUtil.v(TAG, "Broadcast:" + Constants.ACTION_FAVORITE_MOVIE_CHANGE_NOTIFY + " ->" + movie_id);
         Intent intent = new Intent();
-        intent.setAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
+        intent.setAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE_NOTIFY);
         intent.putExtra("movie_id", movie_id);
         intent.putExtra("is_favorite", isFavorite);
         intent.putExtra("type", type);

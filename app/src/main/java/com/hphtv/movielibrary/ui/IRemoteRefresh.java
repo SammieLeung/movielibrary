@@ -5,7 +5,7 @@ package com.hphtv.movielibrary.ui;
  * date:  2022/6/24
  */
 public interface IRemoteRefresh {
-    void remoteUpdateMovie(long o_id,long n_id);
-    void remoteUpdateFavorite(String movie_id,String type,boolean isFavorite);
-    void remoteRemoveMovie(String movie_id,String type);
+    void remoteUpdateMovieNotify(long o_id, long n_id);
+    void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite);
+    void remoteRemoveMovieNotify(String movie_id, String type);
 }

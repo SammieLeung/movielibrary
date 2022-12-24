@@ -58,7 +58,7 @@ public class ThemeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected MovieDataView queryMovieDataViewByMovieId(String movie_id, String type) {
-        return mMovieDao.queryMovieDataViewByMovieId(movie_id, mVideoType.name(), ScraperSourceTools.getSource());
+        return mMovieDao.queryMovieAsMovieDataView(movie_id, mVideoType.name(), ScraperSourceTools.getSource());
     }
 
     @Override

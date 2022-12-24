@@ -72,7 +72,7 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_START);
         intentFilter.addAction(Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH);
-        intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE);
+        intentFilter.addAction(Constants.ACTION_FAVORITE_MOVIE_CHANGE_NOTIFY);
         intentFilter.addAction(Constants.ACTION_APP_UPDATE_MOVIE);
         intentFilter.addAction(Constants.ACTION_APP_REMOVE_MOVIE);
 
@@ -128,19 +128,19 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
                 case Constants.ACTION.MOVIE_SCRAP_STOP_AND_REFRESH:
                     movieScrapeFinish();
                     break;
-                case Constants.ACTION_FAVORITE_MOVIE_CHANGE:
-                    remoteUpdateFavorite(
+                case Constants.ACTION_FAVORITE_MOVIE_CHANGE_NOTIFY:
+                    remoteUpdateFavoriteNotify(
                             intent.getStringExtra("movie_id"),
                             intent.getStringExtra("type"),
                             intent.getBooleanExtra("is_favorite", false));
                     break;
                 case Constants.ACTION_APP_UPDATE_MOVIE:
-                    remoteUpdateMovie(
+                    remoteUpdateMovieNotify(
                             intent.getLongExtra("new", -1),
                             intent.getLongExtra("old", -1));
                     break;
                 case Constants.ACTION_APP_REMOVE_MOVIE:
-                    remoteRemoveMovie(
+                    remoteRemoveMovieNotify(
                             intent.getStringExtra("movie_id"),
                             intent.getStringExtra("type"));
                     break;
@@ -155,17 +155,17 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     ;
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
 
     }
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
 
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
 
     }
 }

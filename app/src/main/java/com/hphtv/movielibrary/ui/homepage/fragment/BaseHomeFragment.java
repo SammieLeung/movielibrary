@@ -341,7 +341,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
         if (mViewModel != null) {
             mViewModel.getUpdatingFavorite(movie_id, type)
                     .subscribe(new SimpleObserver<MovieDataView>() {
@@ -372,7 +372,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
         if (mViewModel != null) {
             prepareAll();
             ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_movie_sync_tips));
@@ -381,7 +381,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
         if (mViewModel != null) {
             prepareAll();
             ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_remove_movie_sync_tips));

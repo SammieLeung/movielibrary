@@ -291,13 +291,13 @@ public class PinyinSearchActivity extends AppBaseActivity<PinyinSearchViewModel,
     }
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
         mBinding.etSearch.getText().clear();
         ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
         mBinding.etSearch.getText().clear();
         ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
     }

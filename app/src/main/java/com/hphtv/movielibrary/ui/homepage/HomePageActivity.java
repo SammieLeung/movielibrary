@@ -368,7 +368,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IRemoteRefresh) {
                 IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteUpdateFavorite(movie_id, type, is_favorite);
+                activityResult.remoteUpdateFavoriteNotify(movie_id, type, is_favorite);
             }
         }
     }
@@ -378,7 +378,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IRemoteRefresh) {
                 IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteUpdateMovie(o_id, n_id);
+                activityResult.remoteUpdateMovieNotify(o_id, n_id);
             }
         }
     }
@@ -388,7 +388,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
             if (fragment instanceof IRemoteRefresh) {
                 IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteRemoveMovie(movie_id, type);
+                activityResult.remoteRemoveMovieNotify(movie_id, type);
             }
         }
     }
@@ -547,19 +547,19 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     }
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
         remoteUpdateMovieForFragment(pos, o_id, n_id);
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
         remoteUpdateFavoriteForFragment(pos, movie_id, type, isFavorite);
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
         int pos = mBinding.tabLayout.getSelectedTabPosition();
         remoteRemoveMovieForFragment(pos, movie_id, type);
     }

@@ -149,6 +149,17 @@ public interface MovieDao {
             "GROUP BY id")
     public MovieDataView queryMovieDataViewByMovieId(String movie_id, String type, String source);
 
+    @Query(" SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.add_time,M.last_playtime,M.is_favorite,M.is_watched,-1 AS season,0 AS episode_count " +
+            " FROM "+TABLE.MOVIE+" AS M  " +
+            " JOIN "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" AS MVCF  " +
+            "  ON M.id=MVCF.id  " +
+            " JOIN "+TABLE.VIDEO_TAG+" AS VT  " +
+            " ON VT.vtid=MVCF.vtid  " +
+            " AND M.source=:source " +
+            " AND (:movie_id IS NULL OR M.movie_id=:movie_id )" +
+            " AND (:video_tag IS NULL OR VT.tag=:video_tag)")
+    public MovieDataView queryMovieAsMovieDataView(String movie_id, String video_tag, String source);
+
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW +
             " WHERE id=:id")
     public MovieDataView queryMovieDataView(long id);
@@ -355,6 +366,7 @@ public interface MovieDao {
             " ORDER BY pinyin ASC " +
             " LIMIT :offset,:limit")
     public List<MovieDataView> queryUserFavorite(String source,String video_tag,String ap,int offset,int limit);
+
 
     @Query("SELECT COUNT(*) FROM (SELECT * FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE source=:source GROUP BY id)")
     public int queryTotalMovieCount(String source);

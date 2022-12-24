@@ -215,13 +215,13 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     };
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
-        super.remoteUpdateMovie(o_id, n_id);
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
+        super.remoteUpdateMovieNotify(o_id, n_id);
         reloadMovieDataViews();
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
         mViewModel.getUpdatingFavorite(movie_id, type)
                 .subscribe(new SimpleObserver<MovieDataView>() {
                     @Override
@@ -234,7 +234,7 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
         mMovieItemListAdapter.remove(movie_id, type);
         mViewModel.checkEmpty();
     }

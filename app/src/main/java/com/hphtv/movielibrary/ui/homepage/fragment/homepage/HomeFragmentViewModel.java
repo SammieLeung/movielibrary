@@ -14,11 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
-import io.reactivex.rxjava3.schedulers.Schedulers;
-
 /**
  * author: Sam Leung
  * date:  2021/6/1
@@ -61,7 +56,7 @@ public class HomeFragmentViewModel extends BaseHomePageViewModel {
 
     @Override
     protected MovieDataView queryMovieDataViewByMovieId(String movie_id, String type) {
-        return mMovieDao.queryMovieDataViewByMovieId(movie_id, type, ScraperSourceTools.getSource());
+        return mMovieDao.queryMovieAsMovieDataView(movie_id, type, ScraperSourceTools.getSource());
     }
 
     @Override

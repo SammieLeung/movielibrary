@@ -473,16 +473,17 @@ public class MovieHelper {
 
     }
 
-    public static void setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like) {
-        setMovieFavoriteState(context, movie_id, videoType, like, true, true);
+    public static int setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like) {
+        Config.isGetUserUpdate=true;
+        return setMovieFavoriteState(context, movie_id, videoType, like, true, true);
     }
 
-    public static void setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like, boolean notifyServer, boolean removeUserFavorite) {
+    public static int setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like, boolean notifyServer, boolean saveToUserFavorite) {
         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
-        movieDao.updateFavoriteStateByMovieId(like, movie_id, videoType);
+        int count = movieDao.updateFavoriteStateByMovieId(like, movie_id, videoType);
         if (notifyServer)
             OnlineDBApiService.updateLike(movie_id, like, ScraperSourceTools.getSource(), videoType);
-        if (removeUserFavorite) {
+        if (saveToUserFavorite) {
             MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieUserFavoriteCrossRefDao();
             if (like) {
                 MovieUserFavoriteCrossRef favoriteCrossRef = new MovieUserFavoriteCrossRef();
@@ -493,5 +494,6 @@ public class MovieHelper {
             } else
                 movieUserFavoriteCrossRefDao.delete(movie_id, videoType, ScraperSourceTools.getSource());
         }
+        return count;
     }
 }

@@ -387,7 +387,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     @Override
-    public void remoteUpdateFavorite(String movie_id, String type, boolean isFavorite) {
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
         String curMovieId = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.movieId : "";
         if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
             mViewModel.setLike(isFavorite).subscribe(new SimpleObserver<Boolean>() {
@@ -404,7 +404,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     @Override
-    public void remoteUpdateMovie(long o_id, long n_id) {
+    public void remoteUpdateMovieNotify(long o_id, long n_id) {
         long cur_id = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.id : -1;
         if (o_id != -1 && o_id == cur_id) {
             prepareMovieWrapper(n_id, mViewModel.getSeason());
@@ -413,7 +413,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     }
 
     @Override
-    public void remoteRemoveMovie(String movie_id, String type) {
+    public void remoteRemoveMovieNotify(String movie_id, String type) {
         refreshParent();
         stopLoading();
         finish();
@@ -524,7 +524,8 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
             @Override
             public void onAction(Boolean isFavorite) {
                 MovieWrapper wrapper = mViewModel.getMovieWrapper();
-                BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
+                //向手机助手发送电影更改的广播
+                BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);
                 mBinding.btnFavorite.setSelected(isFavorite);
                 refreshParent();
             }
