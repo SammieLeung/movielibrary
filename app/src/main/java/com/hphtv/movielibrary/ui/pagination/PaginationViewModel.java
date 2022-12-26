@@ -63,6 +63,9 @@ public class PaginationViewModel extends BaseAndroidViewModel {
         }
     }
 
+    public int getType() {
+        return mType;
+    }
 
     public void setVideoTag(String videoTagString) {
         if (videoTagString != null) {

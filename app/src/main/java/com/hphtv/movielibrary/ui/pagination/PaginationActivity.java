@@ -20,15 +20,25 @@ import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomeFragmentViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
+import com.station.kit.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Function3;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * author: Sam Leung
@@ -159,6 +169,34 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
             setResult(RESULT_OK);
             mViewModel.reload();
         }
+    }
+
+    @Override
+    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
+        super.remoteUpdateFavoriteNotify(movie_id, type, isFavorite);
+        if(mViewModel.getType()==PaginationViewModel.OPEN_FAVORITE) {
+            mViewModel.reload();
+            ToastUtil.newInstance(getApplicationContext()).toast(getString(R.string.remote_movie_sync_tips));
+//        Observable.zip(Observable.just(movie_id),
+//                Observable.just(type),
+//                Observable.just(isFavorite),
+//                (movieId, type1, isFavorite1) -> {
+//            MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getMovieDao();
+//            MovieDataView movieDataView = movieDao.queryMovieAsMovieDataView(movie_id, type1, ScraperSourceTools.getSource());
+//            movieDataView.is_favorite= isFavorite1;
+//            return movieDataView;
+//        }).subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new SimpleObserver<MovieDataView>() {
+//                    @Override
+//                    public void onAction(MovieDataView movieDataView) {
+//                        if(!movieDataView.is_favorite){
+//                            mMovieItemListAdapter.remove(movieDataView);
+//                        }
+//                    }
+//                });
+        }
+
     }
 
     @Override
