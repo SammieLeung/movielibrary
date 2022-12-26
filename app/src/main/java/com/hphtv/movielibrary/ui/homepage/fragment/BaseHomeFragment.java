@@ -350,6 +350,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                             if (isFavorite) {
                                 if (!mFavoriteListAdapter.getDatas().contains(movieDataView)) {
                                     mFavoriteListAdapter.add(movieDataView);
+                                    mFavoriteListAdapter.notifyItemRangeChanged(0,mFavoriteListAdapter.getItemCount());
                                     mBinding.setFavorite(true);
                                 }
                             } else {
