@@ -114,7 +114,8 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
         mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
-            ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), postion, data);
+            if (!data.is_user_fav)
+                ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), postion, data);
             return true;
         });
 
@@ -174,27 +175,9 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
     @Override
     public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
         super.remoteUpdateFavoriteNotify(movie_id, type, isFavorite);
-        if(mViewModel.getType()==PaginationViewModel.OPEN_FAVORITE) {
+        if (mViewModel.getType() == PaginationViewModel.OPEN_FAVORITE) {
             mViewModel.reload();
             ToastUtil.newInstance(getApplicationContext()).toast(getString(R.string.remote_movie_sync_tips));
-//        Observable.zip(Observable.just(movie_id),
-//                Observable.just(type),
-//                Observable.just(isFavorite),
-//                (movieId, type1, isFavorite1) -> {
-//            MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getBaseContext()).getMovieDao();
-//            MovieDataView movieDataView = movieDao.queryMovieAsMovieDataView(movie_id, type1, ScraperSourceTools.getSource());
-//            movieDataView.is_favorite= isFavorite1;
-//            return movieDataView;
-//        }).subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new SimpleObserver<MovieDataView>() {
-//                    @Override
-//                    public void onAction(MovieDataView movieDataView) {
-//                        if(!movieDataView.is_favorite){
-//                            mMovieItemListAdapter.remove(movieDataView);
-//                        }
-//                    }
-//                });
         }
 
     }
@@ -206,16 +189,23 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
     @Override
     public void OnMovieChange(MovieDataView movieDataView, int pos) {
-
+        if(mViewModel.getType()==PaginationViewModel.OPEN_FAVORITE){
+            if(movieDataView.is_favorite){
+                mMovieItemListAdapter.insert(movieDataView,pos);
+            }else {
+                mMovieItemListAdapter.remove(movieDataView);
+            }
+        }else{
+            mMovieItemListAdapter.replace(movieDataView,pos);
+        }
     }
 
     @Override
     public void OnMovieRemove(String movie_id, String type, int pos) {
-
+        mMovieItemListAdapter.remove(movie_id,type,pos);
     }
 
     @Override
     public void OnMovieInsert(MovieDataView movieDataView, int pos) {
-
     }
 }

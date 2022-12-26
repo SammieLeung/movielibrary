@@ -226,7 +226,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
             String tagName = mVideoTag != null ? mVideoTag.tag.name() : null;
             List<MovieDataView> movieDataViewList = mMovieDao.queryUserFavorite(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, limit);
             for (MovieDataView movieDataView : movieDataViewList) {
-                movieDataView.is_user_fav = true;
+                if (mMovieDao.queryMovieDataViewByMovieId(movieDataView.movie_id, movieDataView.type.name(), movieDataView.source) == null)
+                    movieDataView.is_user_fav = true;
             }
             return movieDataViewList;
         }

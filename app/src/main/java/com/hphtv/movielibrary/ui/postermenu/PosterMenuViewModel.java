@@ -100,11 +100,12 @@ public class PosterMenuViewModel extends BaseAndroidViewModel {
 
                         MovieDataViewWithVdieoTags movieDataViewWithVdieoTags = mMovieVideoTagCrossRefDao.queryMovieDataViewWithVideoTags(movieDataView.id);
                         StringBuffer stringBuffer = new StringBuffer();
-                        for (VideoTag videoTag : movieDataViewWithVdieoTags.mVideoTagList) {
-                            stringBuffer.append(videoTag.toTagName(getApplication()) + ",");
+                        if(movieDataViewWithVdieoTags!=null) {
+                            for (VideoTag videoTag : movieDataViewWithVdieoTags.mVideoTagList) {
+                                stringBuffer.append(videoTag.toTagName(getApplication()) + ",");
+                            }
+                            mTagString.set(stringBuffer.deleteCharAt(stringBuffer.length() - 1).toString());
                         }
-
-                        mTagString.set(stringBuffer.deleteCharAt(stringBuffer.length() - 1).toString());
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
