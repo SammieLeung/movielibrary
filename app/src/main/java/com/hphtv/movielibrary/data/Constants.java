@@ -16,7 +16,7 @@ public class Constants {
     public static final String ACTION_FAVORITE_MOVIE_CHANGE_NOTIFY = "action.favorite.movie.change";
     public static final String ACTION_APP_UPDATE_MOVIE = "action.app.update.movie";
     public static final String ACTION_APP_REMOVE_MOVIE = "action.app.remove.movie";
-    public static final String ACTION_APPEND_USER_FAVORITE="action.append.user.favorite";
+    public static final String ACTION_NETWORK_AVAILABLE ="action.network.available";
 
     public static final int ANIMATION_DURATION=200;
 

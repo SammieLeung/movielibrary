@@ -3,28 +3,36 @@ package com.hphtv.movielibrary.ui.homepage.fragment;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.bean.PlayList;
-import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.GenreDao;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieUserFavoriteCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieUserFavoriteCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
+import org.fourthline.cling.support.model.Res;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,13 +42,18 @@ import java.util.List;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlin.SuccessOrFailureKt;
 
 /**
  * author: Sam Leung
  * date:  2022/10/19
  */
 public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
+    public static final String TAG = BaseAndroidViewModel.class.getSimpleName();
     public static final int LIMIT = 10;
     protected GenreDao mGenreDao;
     protected VideoFileDao mVideoFileDao;
@@ -72,7 +85,9 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
 
     protected abstract List<MovieDataView> queryRecommend(String source);
 
-
+    protected String getUserFavoriteParamsFm(){
+        return "";
+    }
     /**
      * 初始化Dao类
      */
@@ -143,26 +158,80 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
     }
 
     public Observable<List<MovieDataView>> prepareFavorite() {
-//        return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
-//            List<MovieDataView> movieDataViewList = queryFavoriteMovieDataView();
-//            if(movieDataViewList.size()<=5){
-//                List<MovieDataView> userFavoriteMovieDataViewList=queryUserFavoriteDataView();
-//               for(MovieDataView dataView:userFavoriteMovieDataViewList){
-//                   if(movieDataViewList.size()>=6)
-//                       break;
-//                    if(!movieDataViewList.contains(dataView)){
-//                        movieDataViewList.add(dataView);
-//                    }
-//               }
-//            }
-//            emitter.onNext(movieDataViewList);
-//            emitter.onComplete();
-//        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
-        if (Config.isGetUserUpdate)
+        if (MovieApplication.getInstance().isDeviceBound()) {
             return prepareUserFavorites();
-        else
+        } else {
             return prepareLocalFavorite();
+        }
     }
+
+
+
+    public void updateUserFavorites(String source, Disposable lastDisposable, OnUserFavorites disposableCallback) {
+        RxJavaGcManager.getInstance().disposableActive(lastDisposable);
+        Observable.zip(Observable.just(source), Observable.just(getUserFavoriteParamsFm()),Observable.just(0), Observable.just(6),
+                        OnlineDBApiService::getUserFavorites)
+                .subscribeOn(Schedulers.newThread())
+                .flatMap((Function<Observable<GetUserFavoriteResponse>, ObservableSource<GetUserFavoriteResponse>>) favoriteResponseObservable -> favoriteResponseObservable)
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "updateUserFavorites: " + throwable.getMessage());
+                    return new GetUserFavoriteResponse();
+                })
+                .subscribe(new SimpleObserver<GetUserFavoriteResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (disposableCallback != null)
+                            disposableCallback.onDisposableReturn(d);
+                    }
+
+                    @Override
+                    public void onAction(GetUserFavoriteResponse getUserFavoriteResponse) {
+                        MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieUserFavoriteCrossRefDao();
+                        MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+                        List<MovieWrapper> movieList = getUserFavoriteResponse.toEntity();
+                        int count = movieList.size();
+                        if (count > 0) {
+                            for (MovieWrapper movieWrapper : movieList) {
+                                Movie movie = movieWrapper.movie;
+                                if (movie != null) {
+                                    Movie dbMovie = movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name());
+                                    if (dbMovie == null) {
+                                        movieWrapper.movie.isFavorite = true;
+                                        MovieHelper.saveBaseInfo(getApplication(), movieWrapper);
+                                    } else {
+                                        dbMovie.isFavorite = true;
+                                        movieDao.update(dbMovie);
+                                    }
+                                    MovieUserFavoriteCrossRef movieUserFavoriteCrossRef = movieUserFavoriteCrossRefDao.query(movie.movieId, movie.type.name(), movie.source);
+                                    if (movieUserFavoriteCrossRef == null) {
+                                        movieUserFavoriteCrossRef = new MovieUserFavoriteCrossRef();
+                                        movieUserFavoriteCrossRef.movie_id = movie.movieId;
+                                        movieUserFavoriteCrossRef.source = movie.source;
+                                        movieUserFavoriteCrossRef.type = movie.type;
+                                        movieUserFavoriteCrossRefDao.insertOrIgnore(movieUserFavoriteCrossRef);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        if (disposableCallback != null)
+                            disposableCallback.onResultReturn(new Success(""));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        if (disposableCallback != null)
+                            disposableCallback.onResultReturn(new Error(e.getMessage()));
+                    }
+                });
+    }
+
 
     public Observable<List<MovieDataView>> prepareLocalFavorite() {
         return Observable.create((ObservableOnSubscribe<List<MovieDataView>>) emitter -> {
@@ -233,5 +302,45 @@ public abstract class BaseHomePageViewModel extends BaseAndroidViewModel {
 
     public List<MovieDataView> getRecommendList() {
         return mRecommendList;
+    }
+
+    public interface OnUserFavorites<T> {
+        void onDisposableReturn(Disposable disposable);
+
+        void onResultReturn(Result<T> result);
+    }
+
+    public interface Result<T> {
+        public T result();
+    }
+
+    public static class Success<T> implements Result<T> {
+        private T result;
+
+        public Success(T result) {
+            this.result = result;
+        }
+
+        @Override
+        public T result() {
+            return result;
+        }
+    }
+
+    public static class Error implements Result {
+        private String errMsg;
+
+        public Error(String msg) {
+            this.errMsg = msg;
+        }
+
+        public String errorMessage() {
+            return errMsg;
+        }
+
+        @Override
+        public Object result() {
+            return null;
+        }
     }
 }

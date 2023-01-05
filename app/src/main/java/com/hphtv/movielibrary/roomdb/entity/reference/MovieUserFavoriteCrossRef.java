@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.roomdb.entity.reference;
 
 import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 
@@ -20,4 +21,6 @@ public class MovieUserFavoriteCrossRef {
     public Constants.VideoType type;
     @NonNull
     public String source;
+    @ColumnInfo(defaultValue = "0")
+    public long update_time;
 }

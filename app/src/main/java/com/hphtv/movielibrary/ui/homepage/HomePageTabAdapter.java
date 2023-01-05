@@ -78,7 +78,7 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateUserFragments(int count){
+    public void updateUserFragments(){
         for (IRefreshGenre refreshGenre : mIRefreshGenreList) {
             refreshGenre.updateUserFavorite();
         }

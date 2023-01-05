@@ -1,28 +1,16 @@
 package com.hphtv.movielibrary;
 
+import static org.junit.Assert.assertEquals;
+
 import android.content.Context;
-import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
-import org.fourthline.cling.support.model.Res;
+import com.hphtv.movielibrary.device.DeviceBindStateApiService;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-
-import com.firefly.videonameparser.MovieNameInfo;
-import com.firefly.videonameparser.VideoNameParser;
-import com.firefly.videonameparser.VideoNameParser2;
-import com.firefly.videonameparser.bean.AudioCodec;
-import com.firefly.videonameparser.bean.Episodes;
-import com.firefly.videonameparser.bean.OtherItem;
-import com.firefly.videonameparser.bean.Resolution;
-import com.firefly.videonameparser.bean.Source;
-import com.firefly.videonameparser.bean.SubTitle;
-import com.firefly.videonameparser.bean.VideoCodec;
-import com.station.kit.util.LogUtil;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -40,5 +28,6 @@ public class ExampleInstrumentedTest {
         assertEquals("com.station.androidunittest", appContext.getPackageName());
 
     }
+
 
 }

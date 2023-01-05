@@ -474,7 +474,6 @@ public class MovieHelper {
     }
 
     public static int setMovieFavoriteState(Context context, String movie_id, String videoType, boolean like) {
-        Config.isGetUserUpdate=true;
         return setMovieFavoriteState(context, movie_id, videoType, like, true, true);
     }
 

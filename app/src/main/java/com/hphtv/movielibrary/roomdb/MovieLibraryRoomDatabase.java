@@ -66,7 +66,7 @@ import org.jetbrains.annotations.NotNull;
  */
 
 @Database(
-        version = 21,
+        version = 22,
         entities = {Actor.class, Device.class, Director.class, Writer.class, Genre.class, Movie.class, MovieActorCrossRef.class,
                 MovieDirectorCrossRef.class, MovieWriterCrossRef.class, MovieGenreCrossRef.class, MovieVideoFileCrossRef.class,
                 ScanDirectory.class, VideoFile.class, Trailer.class, StagePhoto.class, Shortcut.class, GenreTag.class,
@@ -75,7 +75,8 @@ import org.jetbrains.annotations.NotNull;
         autoMigrations = {
                 @AutoMigration(from=17,to=18),
                 @AutoMigration(from=19,to=20),
-                @AutoMigration(from=20,to=21)
+                @AutoMigration(from=20,to=21),
+                @AutoMigration(from=21,to=22)
         }
 )
 public abstract class MovieLibraryRoomDatabase extends RoomDatabase {

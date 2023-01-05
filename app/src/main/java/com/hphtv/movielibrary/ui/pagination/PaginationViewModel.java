@@ -1,20 +1,31 @@
 package com.hphtv.movielibrary.ui.pagination;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableField;
 
 import com.hphtv.movielibrary.BaseAndroidViewModel;
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieUserFavoriteCrossRefDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieUserFavoriteCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomePageViewModel;
+import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.PaginatedDataLoader;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +38,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -34,6 +48,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * date:  2022/4/22
  */
 public class PaginationViewModel extends BaseAndroidViewModel {
+    public static final String TAG = PaginationViewModel.class.getSimpleName();
     public static final int LIMIT = 10;
     public static final int FIRST_LIMIT = 15;
     public static final int OPEN_RECENTLY_ADD = 1;
@@ -43,6 +58,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     private int mType;
     private VideoTag mVideoTag;
     private ObservableField<String> mTitle = new ObservableField<>();
+    private PaginatedDataLoader<MovieDataView> mLastLoader;
 
     public PaginationViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -118,17 +134,21 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
     private void reloadFavoriteMovie() {
-        if (Config.isGetUserUpdate)
+        if (MovieApplication.getInstance().isDeviceBound() && MovieApplication.hasNetworkConnection) {
+            mNetworkUserFavoriteDataLoader.reload();
+            mLastLoader = mNetworkUserFavoriteDataLoader;
+        } else if (MovieApplication.getInstance().isDeviceBound() && !MovieApplication.hasNetworkConnection) {
             mUserFavoriteDataLoader.reload();
-        else
+            mLastLoader = mUserFavoriteDataLoader;
+        } else {
             mFavoriteDataLoader.reload();
+            mLastLoader = mFavoriteDataLoader;
+        }
     }
 
     private void loadFavoriteMovie() {
-        if (Config.isGetUserUpdate && mUserFavoriteDataLoader.canLoadMore())
-            mUserFavoriteDataLoader.load();
-        else if (mFavoriteDataLoader.canLoadMore())
-            mFavoriteDataLoader.load();
+        if (mLastLoader != null && mLastLoader.canLoadMore())
+            mLastLoader.load();
     }
 
     private OnRefresh mOnRefresh;
@@ -245,4 +265,151 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                 mOnRefresh.appendMovieDataViews(result);
         }
     };
+
+    private PaginatedDataLoader<MovieDataView> mNetworkUserFavoriteDataLoader = new PaginatedDataLoader<MovieDataView>() {
+        @Override
+        public int getLimit() {
+            return LIMIT;
+        }
+
+        @Override
+        public void beforeReload() {
+            super.beforeReload();
+            MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieUserFavoriteCrossRefDao();
+            movieUserFavoriteCrossRefDao.deleteAll();
+        }
+
+        @Override
+        public void reload() {
+            super.reload();
+        }
+
+        @Override
+        protected List<MovieDataView> loadDataFromDB(int offset, int limit) {
+            String tagName = mVideoTag != null ? mVideoTag.tag.name() : null;
+            int page = 1 + offset / limit;
+            GetUserFavoriteResponse response = OnlineDBApiService.getUserFavorites(ScraperSourceTools.getSource(), tagName, page, limit).blockingFirst();
+            try {
+                if (response != null) {
+                    MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieUserFavoriteCrossRefDao();
+                    MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+                    List<MovieWrapper> movieList = response.toEntity();
+                    int count = movieList.size();
+                    if (count > 0) {
+                        for (MovieWrapper movieWrapper : movieList) {
+                            Movie movie = movieWrapper.movie;
+                            if (movie != null) {
+                                Movie dbMovie = movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name());
+                                if (dbMovie == null) {
+                                    movieWrapper.movie.isFavorite = true;
+                                    MovieHelper.saveBaseInfo(getApplication(), movieWrapper);
+                                } else {
+                                    dbMovie.isFavorite = true;
+                                    movieDao.update(dbMovie);
+                                }
+                                MovieUserFavoriteCrossRef movieUserFavoriteCrossRef = movieUserFavoriteCrossRefDao.query(movie.movieId, movie.type.name(), movie.source);
+                                if (movieUserFavoriteCrossRef == null) {
+                                    movieUserFavoriteCrossRef = new MovieUserFavoriteCrossRef();
+                                    movieUserFavoriteCrossRef.movie_id = movie.movieId;
+                                    movieUserFavoriteCrossRef.source = movie.source;
+                                    movieUserFavoriteCrossRef.type = movie.type;
+                                    movieUserFavoriteCrossRef.update_time = System.currentTimeMillis();
+                                    movieUserFavoriteCrossRefDao.insertOrIgnore(movieUserFavoriteCrossRef);
+                                }
+                            }
+                        }
+                    }
+                    List<MovieDataView> movieDataViewList = mMovieDao.queryUserFavorite(ScraperSourceTools.getSource(), tagName, Config.getSqlConditionOfChildMode(), offset, limit);
+                    for (MovieDataView movieDataView : movieDataViewList) {
+                        if (mMovieDao.queryMovieDataViewByMovieId(movieDataView.movie_id, movieDataView.type.name(), movieDataView.source) == null)
+                            movieDataView.is_user_fav = true;
+                    }
+                    return movieDataViewList;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return new ArrayList<>();
+        }
+
+        @Override
+        protected void OnReloadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.newSearch(result);
+        }
+
+
+        @Override
+        protected void OnLoadResult(List<MovieDataView> result) {
+            if (mOnRefresh != null)
+                mOnRefresh.appendMovieDataViews(result);
+        }
+    };
+
+    public void updateUserFavorites(String source, Disposable lastDisposable, BaseHomePageViewModel.OnUserFavorites disposableCallback) {
+        RxJavaGcManager.getInstance().disposableActive(lastDisposable);
+        Observable.zip(Observable.just(source), Observable.just(""), Observable.just(0), Observable.just(6),
+                        OnlineDBApiService::getUserFavorites)
+                .subscribeOn(Schedulers.newThread())
+                .flatMap((Function<Observable<GetUserFavoriteResponse>, ObservableSource<GetUserFavoriteResponse>>) favoriteResponseObservable -> favoriteResponseObservable)
+                .onErrorReturn(throwable -> {
+                    Log.e(TAG, "updateUserFavorites: " + throwable.getMessage());
+                    return new GetUserFavoriteResponse();
+                })
+                .subscribe(new SimpleObserver<GetUserFavoriteResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        if (disposableCallback != null)
+                            disposableCallback.onDisposableReturn(d);
+                    }
+
+                    @Override
+                    public void onAction(GetUserFavoriteResponse getUserFavoriteResponse) {
+                        MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieUserFavoriteCrossRefDao();
+                        MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+                        List<MovieWrapper> movieList = getUserFavoriteResponse.toEntity();
+                        int count = movieList.size();
+                        if (count > 0) {
+                            for (MovieWrapper movieWrapper : movieList) {
+                                Movie movie = movieWrapper.movie;
+                                if (movie != null) {
+                                    Movie dbMovie = movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name());
+                                    if (dbMovie == null) {
+                                        movieWrapper.movie.isFavorite = true;
+                                        MovieHelper.saveBaseInfo(getApplication(), movieWrapper);
+                                    } else {
+                                        dbMovie.isFavorite = true;
+                                        movieDao.update(dbMovie);
+                                    }
+                                    MovieUserFavoriteCrossRef movieUserFavoriteCrossRef = movieUserFavoriteCrossRefDao.query(movie.movieId, movie.type.name(), movie.source);
+                                    if (movieUserFavoriteCrossRef == null) {
+                                        movieUserFavoriteCrossRef = new MovieUserFavoriteCrossRef();
+                                        movieUserFavoriteCrossRef.movie_id = movie.movieId;
+                                        movieUserFavoriteCrossRef.source = movie.source;
+                                        movieUserFavoriteCrossRef.type = movie.type;
+                                        movieUserFavoriteCrossRefDao.insertOrIgnore(movieUserFavoriteCrossRef);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        if (disposableCallback != null)
+                            disposableCallback.onResultReturn(new BaseHomePageViewModel.Success(""));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                        if (disposableCallback != null)
+                            disposableCallback.onResultReturn(new BaseHomePageViewModel.Error(e.getMessage()));
+                    }
+                });
+    }
+
+
 }

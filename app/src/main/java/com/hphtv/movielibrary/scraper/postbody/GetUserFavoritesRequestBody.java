@@ -8,5 +8,6 @@ public class GetUserFavoritesRequestBody {
     public String type="1";//1 电影|2 片单
     public int page;
     public int limit;
+    public String fm=null;
 
 }

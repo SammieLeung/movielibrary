@@ -10,8 +10,10 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.GenreTagAdapter;
@@ -23,8 +25,16 @@ import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FragmentHomepageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
+import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
+import com.hphtv.movielibrary.roomdb.dao.MovieDao;
+import com.hphtv.movielibrary.roomdb.dao.MovieUserFavoriteCrossRefDao;
+import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
+import com.hphtv.movielibrary.roomdb.entity.reference.MovieUserFavoriteCrossRef;
+import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
+import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
+import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
@@ -37,6 +47,8 @@ import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.MovieHelper;
+import com.hphtv.movielibrary.util.ScraperSourceTools;
+import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.LogUtil;
@@ -48,8 +60,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Function;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * author: Sam Leung
@@ -63,6 +78,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private NewMovieItemListAdapter mRecommendListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
     private PlayVideoReceiver mPlayVideoReceiver;
+    private Disposable mUserFavoriteDisposable=null;
 
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mMovieDataViewEventListener = (view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
@@ -128,7 +144,14 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     @Override
     public void onResume() {
         super.onResume();
+        Log.e(TAG, "onResume: "+this.toString() );
         prepareAll();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        RxJavaGcManager.getInstance().disposableActive(mUserFavoriteDisposable);
     }
 
     private void initViews() {
@@ -145,7 +168,11 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
         prepareFavorite();
+        prepareUserFavorite();
+
     }
+
+
 
     /**
      * 初始化最近观看
@@ -319,6 +346,24 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                 });
     }
 
+    public void prepareUserFavorite(){
+        if(MovieApplication.hasNetworkConnection&&MovieApplication.getInstance().isDeviceBound()) {
+            mViewModel.updateUserFavorites(ScraperSourceTools.getSource(), mUserFavoriteDisposable, new BaseHomePageViewModel.OnUserFavorites() {
+                @Override
+                public void onDisposableReturn(Disposable disposable) {
+                    mUserFavoriteDisposable = disposable;
+                }
+
+                @Override
+                public void onResultReturn(BaseHomePageViewModel.Result result) {
+                    if (result instanceof BaseHomePageViewModel.Success) {
+                        prepareFavorite();
+                    }
+                }
+            });
+        }
+    }
+
     private void prepareRecommand() {
         mViewModel.prepareRecommend()
                 .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
@@ -397,7 +442,8 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
 
     @Override
     public void updateUserFavorite() {
-
+        prepareFavorite();
+        prepareUserFavorite();
     }
 
     @Override

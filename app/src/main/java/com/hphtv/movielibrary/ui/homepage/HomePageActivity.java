@@ -29,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
@@ -132,6 +133,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MovieApplication.getInstance().isDeviceBound(true);
     }
 
     @Override
@@ -302,15 +304,14 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             mBroadcastReceiver = new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    if (Constants.ACTION_APPEND_USER_FAVORITE.equals(intent.getAction())) {
-                        int count = intent.getIntExtra("count", 0);
-                        mNewHomePageTabAdapter.updateUserFragments(count);
+                    if (Constants.ACTION_NETWORK_AVAILABLE.equals(intent.getAction())) {
+                        mNewHomePageTabAdapter.updateUserFragments();
                     }
                 }
             };
         }
         IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constants.ACTION_APPEND_USER_FAVORITE);
+        intentFilter.addAction(Constants.ACTION_NETWORK_AVAILABLE);
         LocalBroadcastManager.getInstance(getBaseContext()).registerReceiver(mBroadcastReceiver, intentFilter);
     }
 

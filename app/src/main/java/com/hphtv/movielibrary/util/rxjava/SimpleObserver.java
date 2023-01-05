@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public abstract class SimpleObserver<T> implements Observer<T> {
 
 
-    private Disposable disposable;
+    protected Disposable disposable;
 
     @Override
     public void onSubscribe(Disposable d) {

@@ -71,6 +71,11 @@ public class ThemeFragmentViewModel extends BaseHomePageViewModel {
         return mMovieDao.queryRecommend(source, mVideoType.name(), Config.getSqlConditionOfChildMode(), 0, LIMIT);
     }
 
+    @Override
+    protected String getUserFavoriteParamsFm() {
+        return mVideoType.name();
+    }
+
     public Constants.VideoType getVideoType() {
         return mVideoType;
     }

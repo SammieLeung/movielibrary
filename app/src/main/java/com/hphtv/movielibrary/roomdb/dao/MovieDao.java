@@ -351,7 +351,7 @@ public interface MovieDao {
     )
     public List<MovieDataView> queryFavoriteMovieDataViewByVideoTag(String source, String video_tag, String ap, int offset, int limit);
 
-    @Query(" SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,M.add_time,M.last_playtime,M.is_favorite,M.is_watched,-1 AS season,0 AS episode_count " +
+    @Query(" SELECT M.id,M.movie_id,M.title,M.pinyin,M.poster,M.ratings,M.year,M.source,M.type,M.ap,MUF.update_time AS add_time,M.last_playtime,M.is_favorite,M.is_watched,-1 AS season,0 AS episode_count " +
             " FROM "+TABLE.MOVIE+" AS M  " +
             " JOIN "+TABLE.MOVIE_VIDEOTAG_CROSS_REF+" AS MVCF  " +
             "  ON M.id=MVCF.id  " +
@@ -363,7 +363,7 @@ public interface MovieDao {
             " AND (:ap IS NULL OR M.ap=:ap )" +
             " AND (:video_tag IS NULL OR VT.tag=:video_tag)" +
             " GROUP BY M.id  " +
-            " ORDER BY pinyin ASC " +
+            " ORDER BY add_time ASC " +
             " LIMIT :offset,:limit")
     public List<MovieDataView> queryUserFavorite(String source,String video_tag,String ap,int offset,int limit);
 

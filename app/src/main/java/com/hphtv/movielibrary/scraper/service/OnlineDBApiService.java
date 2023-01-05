@@ -221,6 +221,11 @@ public class OnlineDBApiService {
             public void onAction(BaseRespone baseRespone) {
                 LogUtil.w("{updateLike} " + baseRespone.code + ": " + movie_id);
             }
+
+            @Override
+            public void onError(Throwable e) {
+                super.onError(e);
+            }
         });
     }
 
@@ -290,6 +295,10 @@ public class OnlineDBApiService {
     }
 
     public static Observable<GetUserFavoriteResponse> getUserFavorites(String source, int page, int limit) {
+        return getUserFavorites(source, null, page, limit);
+    }
+
+    public static Observable<GetUserFavoriteResponse> getUserFavorites(String source, String fm, int page, int limit) {
         StationMovieProtocol request;
         switch (source) {
             case Constants.Scraper.TMDB_EN:
@@ -302,6 +311,7 @@ public class OnlineDBApiService {
         GetUserFavoritesRequestBody body = new GetUserFavoritesRequestBody();
         body.page = page;
         body.limit = limit;
+        body.fm = fm;
         return request.getUserFavorites(body);
     }
 
