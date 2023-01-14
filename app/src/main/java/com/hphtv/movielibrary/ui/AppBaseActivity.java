@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -34,9 +35,12 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     private static Handler mHanlder = new Handler(Looper.getMainLooper());
     public final String TAG = this.getClass().getSimpleName();
     LoadingDialogFragment mLoadingDialogFragment;
+    private boolean isCancelable = false;
+    private DialogInterface.OnCancelListener mLoadingCancelListener;
     private ActivityResultLauncher mActivityResultLauncher;
 
     private AtomicInteger mAtomicLoading = new AtomicInteger();
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,6 +92,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         LogUtil.v(TAG, "startLoading " + i);
         if (mLoadingDialogFragment == null) {
             mLoadingDialogFragment = new LoadingDialogFragment();
+            mLoadingDialogFragment.setCancelable(isCancelable);
+            mLoadingDialogFragment.setOnCancelListener(mLoadingCancelListener);
             mLoadingDialogFragment.show(getSupportFragmentManager(), TAG);
         }
     }
@@ -110,6 +116,15 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
             mLoadingDialogFragment = null;
             mAtomicLoading.set(0);
         }
+    }
+
+
+    public void setLoadingCancelable(boolean cancelable) {
+        isCancelable = cancelable;
+    }
+
+    public void setLoadingCancelListener(DialogInterface.OnCancelListener loadingCancelListener) {
+        mLoadingCancelListener = loadingCancelListener;
     }
 
     @Override

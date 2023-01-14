@@ -151,6 +151,11 @@ public class PaginationViewModel extends BaseAndroidViewModel {
             mLastLoader.load();
     }
 
+    public void cancel() {
+        if (mLastLoader != null)
+            mLastLoader.cancel();
+    }
+
     private OnRefresh mOnRefresh;
 
     public void setOnRefresh(OnRefresh onRefresh) {
@@ -158,6 +163,8 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
     public interface OnRefresh {
+        void beforeLoad();
+
         void newSearch(List<MovieDataView> newMovieDataView);
 
         void appendMovieDataViews(List<MovieDataView> movieDataViews);
@@ -267,21 +274,21 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     };
 
     private PaginatedDataLoader<MovieDataView> mNetworkUserFavoriteDataLoader = new PaginatedDataLoader<MovieDataView>() {
+
+        private boolean isReload = false;
+
         @Override
         public int getLimit() {
             return LIMIT;
         }
 
         @Override
-        public void beforeReload() {
-            super.beforeReload();
-            MovieUserFavoriteCrossRefDao movieUserFavoriteCrossRefDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieUserFavoriteCrossRefDao();
-            movieUserFavoriteCrossRefDao.deleteAll();
-        }
-
-        @Override
         public void reload() {
+            if(mOnRefresh!=null)
+                mOnRefresh.beforeLoad();
             super.reload();
+            isReload = true;
+
         }
 
         @Override
@@ -295,7 +302,12 @@ public class PaginationViewModel extends BaseAndroidViewModel {
                     MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
                     List<MovieWrapper> movieList = response.toEntity();
                     int count = movieList.size();
+                    if (isReload) {
+                        movieUserFavoriteCrossRefDao.deleteAll();
+                        isReload = false;
+                    }
                     if (count > 0) {
+
                         for (MovieWrapper movieWrapper : movieList) {
                             Movie movie = movieWrapper.movie;
                             if (movie != null) {

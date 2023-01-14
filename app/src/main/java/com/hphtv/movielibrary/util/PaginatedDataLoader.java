@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.util;
 
 import android.util.Log;
 
+import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
@@ -23,6 +25,7 @@ public abstract class PaginatedDataLoader<T> {
     private final int mLimit;
     private final AtomicBoolean mAtomicBooleanCanLoad = new AtomicBoolean(true);
     private final AtomicInteger mPage = new AtomicInteger(0);
+    private Disposable mDisposable;
 
 
     public PaginatedDataLoader() {
@@ -63,13 +66,13 @@ public abstract class PaginatedDataLoader<T> {
         mAtomicBooleanCanLoad.set(true);
     }
 
-    public void beforeReload() {
-
+    public void cancel(){
+            RxJavaGcManager.getInstance().disposableActive(mDisposable);
     }
+
 
     public void reload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    beforeReload();
                     mPage.set(0);
                     mAtomicBooleanCanLoad.set(true);
                     List<T> dataList = reloadDataFromDB(0, mFirstLimit);
@@ -81,9 +84,22 @@ public abstract class PaginatedDataLoader<T> {
                 }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable=d;
+                    }
+
                     @Override
                     public void onAction(List<T> dataList) {
                         OnReloadResult(dataList);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        mDisposable=null;
                     }
                 });
 
@@ -121,9 +137,21 @@ public abstract class PaginatedDataLoader<T> {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable = d;
+                    }
                     @Override
                     public void onAction(List<T> dataList) {
                         OnLoadResult(dataList);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                            mDisposable = null;
                     }
                 });
     }

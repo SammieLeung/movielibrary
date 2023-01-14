@@ -1,10 +1,12 @@
 package com.hphtv.movielibrary.ui.pagination;
 
 import android.animation.ObjectAnimator;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 
 import androidx.activity.result.ActivityResult;
@@ -44,7 +46,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * author: Sam Leung
  * date:  2022/4/22
  */
-public class PaginationActivity extends AppBaseActivity<PaginationViewModel, ActivityPaginationBinding> implements OnMovieChangeListener {
+public class PaginationActivity extends AppBaseActivity<PaginationViewModel, ActivityPaginationBinding> implements OnMovieChangeListener, DialogInterface.OnCancelListener {
     public static final String EXTRA_PAGE_TYPE = "extra_page_type";
     public static final String EXTRA_VIDEO_TAG = "extra_video_tag";
     private NewMovieItemListAdapter mMovieItemListAdapter;
@@ -61,12 +63,18 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
     PaginationViewModel.OnRefresh mOnRefresh = new PaginationViewModel.OnRefresh() {
         @Override
+        public void beforeLoad() {
+            startLoading();
+        }
+
+        @Override
         public void newSearch(List<MovieDataView> newMovieDataView) {
             mMovieItemListAdapter.addAll(newMovieDataView);
             if (mMovieItemListAdapter.getItemCount() <= 5)
                 mBinding.bottomMask.setAlpha(0);
             else
                 mBinding.bottomMask.setAlpha(1);
+            stopLoading();
         }
 
         @Override
@@ -107,7 +115,16 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        forceStopLoading();
+        mViewModel.cancel();
+    }
+
     private void initView() {
+        super.setLoadingCancelable(true);
+        super.setLoadingCancelListener(this);
         mBinding.tvTitle.setOnClickListener(v -> finish());
         FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
         mBinding.recyclerview.setLayoutManager(gridLayoutManager);
@@ -136,6 +153,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
             @Override
             protected void onScrollStart() {
+                Log.w(TAG, "onScrollStart: " );
                 super.onScrollStart();
                 mHandler.removeCallbacks(mBottomMaskFadeInTask);
                 if (mBinding.bottomMask.getAlpha() > 0) {
@@ -207,5 +225,10 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
     @Override
     public void OnMovieInsert(MovieDataView movieDataView, int pos) {
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+            finish();
     }
 }
