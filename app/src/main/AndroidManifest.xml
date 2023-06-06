@@ -55,7 +55,6 @@
     <service android:name=".service.MovieScanService" />
 
     <service android:name=".service.DeviceMonitorService" />
-    <service android:name=".service.DlnaControlService" />
     <service
       android:name=".service.DeviceControlService"
       android:enabled="true"
