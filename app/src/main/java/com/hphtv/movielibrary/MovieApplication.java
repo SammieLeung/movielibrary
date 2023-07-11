@@ -19,6 +19,8 @@ import com.hphtv.movielibrary.device.DeviceBindStateApiService;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 import com.umeng.analytics.MobclickAgent;
 
 import io.reactivex.rxjava3.core.Observable;
@@ -107,6 +109,7 @@ public class MovieApplication extends Application {
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
+                        Logger.addLogAdapter(new AndroidLogAdapter());
                         //动图库
                         Fresco.initialize(getApplicationContext());
                         //初始化stetho

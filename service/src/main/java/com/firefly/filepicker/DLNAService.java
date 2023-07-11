@@ -1,5 +1,7 @@
 package com.firefly.filepicker;
 
+import android.util.Log;
+
 import com.firefly.filepicker.commom.listener.DeviceRegistryListener;
 import com.firefly.filepicker.data.Constants;
 
@@ -17,6 +19,7 @@ public class DLNAService extends AndroidUpnpServiceImpl {
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.d(TAG,"DLNAService onCreate");
 
         mRegistryListener = new DeviceRegistryListener(getApplicationContext());
 
