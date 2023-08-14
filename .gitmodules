@@ -3,7 +3,18 @@
 	url = https://github.com/4thline/cling
 [submodule "stationKit"]
 	path = stationKit
+	url = ssh://git@git.t-firefly.com:8022/stationosapp/stationuniversaldevelopmentkit.git
+	branches = master
+[submodule "stationKit"]
+	path = stationKit
 	url = git@github.com:SammieLeung/StationKit.git
+	branches = gitdev	
+[submodule "VideoNameParser"]
+	path = VideoNameParser
+	url = ssh://git@git.t-firefly.com:8022/stationosapp/videonameparser.git
+	branches = master
 [submodule "VideoNameParser"]
 	path = VideoNameParser
 	url = git@github.com:SammieLeung/VideoNameParser.git
+	branches = gitdev
+
