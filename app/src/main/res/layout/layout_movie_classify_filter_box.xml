@@ -6,6 +6,9 @@
         android:layout_height="wrap_content">
         <RelativeLayout
             android:layout_width="match_parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
             android:layout_height="@dimen/filter_box_main_h"
             android:background="@drawable/filter_box_main_bg"
             android:minHeight="@dimen/filter_box_main_h"
@@ -28,14 +31,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/lb_sort_year" />
 
-            <TextView
-                android:id="@+id/tv_type"
-                android:layout_alignStart="@id/view_sortby_type"
-                android:layout_alignEnd="@id/view_sortby_type"
-                style="@style/filter_box_title_text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/lb_sort_type" />
+<!--            <TextView-->
+<!--                android:id="@+id/tv_type"-->
+<!--                android:layout_alignStart="@id/view_sortby_type"-->
+<!--                android:layout_alignEnd="@id/view_sortby_type"-->
+<!--                style="@style/filter_box_title_text_style"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/lb_sort_type" />-->
 
 
 
@@ -61,15 +64,15 @@
                 android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tv_device"
-                android:layout_marginLeft="@dimen/common_activity_margin_lr" />
+                android:layout_marginStart="@dimen/common_activity_margin_lr" />
 
-            <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                android:id="@+id/view_sortby_type"
-                style="@style/filter_box_recyclerview_style"
-                android:layout_width="@dimen/filter_box_recyclerview_width"
-                android:layout_height="match_parent"
-                android:layout_below="@id/tv_device"
-                android:layout_toRightOf="@id/view_sortby_device" />
+<!--            <com.hphtv.movielibrary.ui.view.TvRecyclerView-->
+<!--                android:id="@+id/view_sortby_type"-->
+<!--                style="@style/filter_box_recyclerview_style"-->
+<!--                android:layout_width="@dimen/filter_box_recyclerview_width"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_below="@id/tv_device"-->
+<!--                android:layout_toRightOf="@id/view_sortby_device" />-->
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/view_sortby_genres"
@@ -77,7 +80,7 @@
                 android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
                 android:layout_below="@id/tv_device"
-                android:layout_toRightOf="@id/view_sortby_type"
+                android:layout_toEndOf="@id/view_sortby_device"
                 android:background="@drawable/filter_box_main_bg" />
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
@@ -86,7 +89,7 @@
                 style="@style/filter_box_recyclerview_style"
                 android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
-                android:layout_toRightOf="@id/view_sortby_genres" />
+                android:layout_toEndOf="@id/view_sortby_genres" />
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/view_order"
@@ -94,8 +97,7 @@
                 style="@style/filter_box_recyclerview_style"
                 android:layout_width="@dimen/filter_box_recyclerview_width"
                 android:layout_height="match_parent"
-                android:layout_marginRight="@dimen/common_activity_margin_lr"
-                android:layout_toRightOf="@id/view_sortby_year" />
+                android:layout_toEndOf="@id/view_sortby_year" />
         </RelativeLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
     <data>

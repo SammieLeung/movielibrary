@@ -1,22 +1,28 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.R;
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.LayoutMovieClassifyFilterBoxBinding;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.ui.BaseDialogFragment2;
+import com.hphtv.movielibrary.ui.homepage.HomePageActivity;
+import com.hphtv.movielibrary.ui.homepage.HomePageTabAdapter;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
+import com.orhanobut.logger.Logger;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -25,22 +31,24 @@ import org.jetbrains.annotations.NotNull;
  * date:  2021/12/6
  */
 public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewModel, LayoutMovieClassifyFilterBoxBinding> implements OnFilterBoxItemClickListener, TvRecyclerView.OnBackPressListener, TvRecyclerView.OnNoNextFocusListener {
-    private static final String TAG = FilterBoxDialogFragment.class.getSimpleName();
-
-    private FilterBoxAdapter mGenreAdapter, mYearsApdater;
-    private FilterBoxVideoTagAdapter mVideoTagAdapter;
+    private FilterBoxAdapter mGenreAdapter, mYearsAdapter;
     private FilterBoxDeviceAdapter mDeviceAdapter;
     private FilterBoxOrderAdapter mOrderAdapter;
-    private FilterPageViewModel mFilterPageViewModel;
+    private OnFilterChangerListener mFilterChangeListener;
+    public static final String EXTRA_FILTER_POS = "extra_filter_pos";
 
-
-    public static FilterBoxDialogFragment newInstance() {
+    public static FilterBoxDialogFragment newInstance(int pos, OnFilterChangerListener listener) {
         Bundle args = new Bundle();
         FilterBoxDialogFragment fragment = new FilterBoxDialogFragment();
+        args.putInt(EXTRA_FILTER_POS, pos);
+        fragment.setOnFilterChangeListener(listener);
         fragment.setArguments(args);
         return fragment;
     }
 
+    private void setOnFilterChangeListener(OnFilterChangerListener listener) {
+        mFilterChangeListener = listener;
+    }
 
     @Override
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -57,25 +65,16 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
 
     @Override
     protected FilterBoxViewModel createViewModel() {
-        if (mViewModel == null) {
-            mViewModel = new ViewModelProvider(getActivity()).get(FilterBoxViewModel.class);
-        }
-        if (mFilterPageViewModel == null) {
-            mFilterPageViewModel = new ViewModelProvider(getActivity()).get(FilterPageViewModel.class);
-            String genre = mFilterPageViewModel.getGenre();
-            VideoTag videoTag = mFilterPageViewModel.getVideoTag();
-            mViewModel.setPresetGenreName(genre);
-            mViewModel.setPresetVideoTag(videoTag);
-        }
-        return mViewModel;
+        int pos = getArguments().getInt(EXTRA_FILTER_POS, 0);
+        return new ViewModelProvider( ((HomePageActivity) getActivity()).getFragmentByPosition(pos)).get(FilterBoxViewModel.class);
     }
+
 
     @Override
     public void onResume() {
         super.onResume();
         prepareDevices();
         prepareGenres();
-        prepareTypes();
         prepareYears();
         prepareOrders();
     }
@@ -83,21 +82,18 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
     private void init() {
         mDeviceAdapter = new FilterBoxDeviceAdapter(getContext(), mViewModel.getDevicePos());
         mGenreAdapter = new FilterBoxAdapter(getContext(), mViewModel.getGenresPos());
-        mVideoTagAdapter = new FilterBoxVideoTagAdapter(getContext(), mViewModel.getVideoTypePos());
-        mYearsApdater = new FilterBoxAdapter(getContext(), mViewModel.getYearPos());
+        mYearsAdapter = new FilterBoxAdapter(getContext(), mViewModel.getYearPos());
         mOrderAdapter = new FilterBoxOrderAdapter(getContext(), mViewModel.getFilterOrderPos(), mViewModel.getDesFlag());
+
         mDeviceAdapter.setOnFilterBoxItemClickListener(this);
         mGenreAdapter.setOnFilterBoxItemClickListener(this);
-        mYearsApdater.setOnFilterBoxItemClickListener(this);
+        mYearsAdapter.setOnFilterBoxItemClickListener(this);
         mOrderAdapter.setOnFilterBoxItemClickListener(this);
-        mVideoTagAdapter.setOnFilterBoxItemClickListener(this);
-
 
         prepareRecyclerView(mBinding.viewSortbyDevice, mDeviceAdapter);
         prepareRecyclerView(mBinding.viewSortbyGenres, mGenreAdapter);
-        prepareRecyclerView(mBinding.viewSortbyYear, mYearsApdater);
+        prepareRecyclerView(mBinding.viewSortbyYear, mYearsAdapter);
         prepareRecyclerView(mBinding.viewOrder, mOrderAdapter);
-        prepareRecyclerView(mBinding.viewSortbyType, mVideoTagAdapter);
     }
 
     private void prepareRecyclerView(TvRecyclerView recyclerView, RecyclerView.Adapter adapter) {
@@ -116,34 +112,32 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
     }
 
     private void prepareYears() {
-        mViewModel.prepareYears(mYearsApdater);
+        mViewModel.prepareYears(mYearsAdapter);
     }
 
     private void prepareOrders() {
         mViewModel.prepareOrders(mOrderAdapter);
     }
 
-    private void prepareTypes() {
-        mViewModel.prepareTypes(mVideoTagAdapter);
-    }
-
-
     @Override
     public void OnFilterChange() {
         Shortcut shortcut = (Shortcut) mViewModel.getRealShortCut();
-        VideoTag videoTag = mViewModel.getRealVideoTag();
         String genre = mViewModel.getRealGenre();
-        String year = mViewModel.getRealYear();
-        mFilterPageViewModel.onFilterChange(shortcut, videoTag, genre, year);
-        mFilterPageViewModel.reloadMovieDataViews();
+        String realYear = mViewModel.getRealYear();
+        String startYear = mViewModel.getStartYear(realYear);
+        String endYear = mViewModel.getEndYear(realYear);
+        if (mFilterChangeListener != null) {
+            mFilterChangeListener.onFilterChange(shortcut, genre, startYear, endYear);
+        }
     }
 
     @Override
     public void OnOrderChange() {
         int order = mViewModel.getFilterOrderPos().get();
         boolean isDesc = mViewModel.getDesFlag().get();
-        mFilterPageViewModel.onSortByChange(order, isDesc);
-        mFilterPageViewModel.reOrderMovieDataViews();
+        if (mFilterChangeListener != null) {
+            mFilterChangeListener.onOrderChange(order, isDesc);
+        }
     }
 
     @Override
@@ -160,8 +154,6 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
         int id = ((View) currentFocusView.getParent()).getId();
         switch (id) {
             case R.id.view_sortby_device:
-                return requestChildFocus(mBinding.viewSortbyType);
-            case R.id.view_sortby_type:
                 return requestChildFocus(mBinding.viewSortbyGenres);
             case R.id.view_sortby_genres:
                 return requestChildFocus(mBinding.viewSortbyYear);
@@ -179,10 +171,8 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
     private boolean requestNextLeftFocus(View currentFocusView) {
         int id = ((View) currentFocusView.getParent()).getId();
         switch (id) {
-            case R.id.view_sortby_type:
-                return requestChildFocus(mBinding.viewSortbyDevice);
             case R.id.view_sortby_genres:
-                return requestChildFocus(mBinding.viewSortbyType);
+                return requestChildFocus(mBinding.viewSortbyDevice);
             case R.id.view_sortby_year:
                 return requestChildFocus(mBinding.viewSortbyGenres);
             case R.id.view_order:
@@ -212,7 +202,7 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
 
     @Override
     public boolean forceFocusLeft(View currentFocus) {
-       return requestNextLeftFocus(currentFocus);
+        return requestNextLeftFocus(currentFocus);
     }
 
     @Override
@@ -230,3 +220,4 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
         return false;
     }
 }
+

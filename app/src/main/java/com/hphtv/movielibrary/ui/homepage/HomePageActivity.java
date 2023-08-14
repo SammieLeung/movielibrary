@@ -1,5 +1,7 @@
 package com.hphtv.movielibrary.ui.homepage;
 
+import static com.hphtv.movielibrary.data.Constants.REQUEST_CODE_FROM_BASE_FILTER;
+
 import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
 import androidx.annotation.Nullable;
@@ -36,21 +39,24 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
+import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.PermissionActivity;
+import com.hphtv.movielibrary.ui.filterpage.FilterBoxDialogFragment;
+import com.hphtv.movielibrary.ui.filterpage.OnFilterChangerListener;
+import com.hphtv.movielibrary.ui.homepage.fragment.filter.FilterFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.moviesearch.pinyin.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
+import com.orhanobut.logger.Logger;
 import com.station.kit.util.DensityUtil;
-import com.station.kit.util.LogUtil;
 import com.station.kit.util.PackageTools;
-
-import java.util.List;
 
 /**
  * author: Sam Leung
@@ -270,6 +276,40 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                         view.getTab().select();
                     }
                 });
+        mBinding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int pos = tab.getPosition();
+                if (pos != HomePageTabAdapter.UNKNOWN && pos != HomePageTabAdapter.HOME) {
+                    ((TextView) tab.getCustomView().findViewById(R.id.tabTextView)).setCompoundDrawablesWithIntrinsicBounds(null, null, getDrawable(R.drawable.icon_filter_27dp), null);
+                    //此时注册点击监听器,点击弹出筛选窗口
+                    tab.view.setOnClickListener(v -> {
+                        FilterBoxDialogFragment dialogFragment = FilterBoxDialogFragment.newInstance(pos, new OnFilterChangerListener() {
+                            @Override
+                            public void onFilterChange(@Nullable Shortcut shortcut,  @Nullable String genre, @Nullable String startYear, @Nullable String endYear) {
+                                ((FilterFragment) mNewHomePageTabAdapter.getItem(pos)).setFilter(shortcut, genre, startYear, endYear);
+                            }
+
+                            @Override
+                            public void onOrderChange(int order, boolean isDesc) {
+                                ((FilterFragment) mNewHomePageTabAdapter.getItem(pos)).setOrder(order, isDesc);
+                            }
+                        });
+                        dialogFragment.show(getSupportFragmentManager(), "FilterBoxDialogFragment");
+                    });
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                ((TextView) tab.getCustomView().findViewById(R.id.tabTextView)).setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+                tab.view.setOnClickListener(null);
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
+        });
         mBinding.tabLayout.getTabAt(0).view.requestFocus();
     }
 
@@ -329,11 +369,18 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         //刷新显示儿童模式状态
 //        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
         mViewModel.getChildMode().set(Config.isChildMode());
-
-        //刷新各个子Fragment状态
-        if (result.getResultCode() == RESULT_OK)
+        Logger.d("result data=" + result.getData());
+        if (result.getData() != null)
+            //刷新各个子Fragment状态
             for (Fragment fragment : mNewHomePageTabAdapter.mList) {
-                if (fragment instanceof IActivityResult) {
+                Logger.d("result data=" + result.getData().getIntExtra(Constants.Extras.REQUEST_CODE, 0));
+
+                if (result.getData().getIntExtra(Constants.Extras.REQUEST_CODE, 0) == REQUEST_CODE_FROM_BASE_FILTER) {
+                    if (fragment instanceof FilterFragment) {
+                        FilterFragment baseFilterFragment = (FilterFragment) fragment;
+                        baseFilterFragment.forceRefresh();
+                    }
+                } else if (fragment instanceof IActivityResult) {
                     IActivityResult activityResult = (IActivityResult) fragment;
                     activityResult.forceRefresh();
                 }
@@ -383,6 +430,10 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
+    public Fragment getFragmentByPosition(int pos) {
+        return mNewHomePageTabAdapter.getItem(pos);
+    }
+
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent ev) {
         startBottomMaskAnimate();
@@ -424,7 +475,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         view.getViewTreeObserver()
                 .addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
                     if (newFocus != null) {
-                        LogUtil.v("newFocus " + newFocus.toString());
                         int[] ints = new int[2];
                         newFocus.getLocationInWindow(ints);
 
@@ -447,7 +497,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      * 手动滚动页面
      */
     private void pageScroll(int offset) {
-        LogUtil.v("pageScroll");
         mBinding.nsv.smoothScrollBy(0, offset);
     }
 

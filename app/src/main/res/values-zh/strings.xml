@@ -243,7 +243,7 @@
   <string name="device_DLNA">DLNA设备</string>
   <!--    空白提示-->
   <string name="homepage_empty">空空如也</string>
-  <string name="homepage_goto_add_shortcut">快去添加影片吧</string>
+  <string name="homepage_goto_add_shortcut">添加影片到影库</string>
   <string name="unknowfile_empty">没有未匹配的文件</string>
   <!--上映时间-->
   <string name="search_video_dialog_release_date">上映时间</string>
@@ -262,4 +262,6 @@
   <string name="item_count_format">%1$s项</string>
 
   <string name="state_watched">已看完</string>
+
+  <string name="finished_loading">已经加载完毕…</string>
 </resources>

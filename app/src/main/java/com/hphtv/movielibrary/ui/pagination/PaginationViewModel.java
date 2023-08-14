@@ -23,7 +23,7 @@ import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomePageViewModel;
 import com.hphtv.movielibrary.util.MovieHelper;
-import com.hphtv.movielibrary.util.PaginatedDataLoader;
+import com.hphtv.movielibrary.data.pagination.PaginatedDataLoader;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -32,8 +32,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;

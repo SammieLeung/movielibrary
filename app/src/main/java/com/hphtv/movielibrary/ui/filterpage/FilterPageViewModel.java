@@ -1,7 +1,6 @@
 package com.hphtv.movielibrary.ui.filterpage;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableField;
@@ -16,7 +15,7 @@ import com.hphtv.movielibrary.roomdb.dao.VideoTagDao;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.util.PaginatedDataLoader;
+import com.hphtv.movielibrary.data.pagination.PaginatedDataLoader;
 import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
@@ -25,8 +24,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -81,6 +78,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
                 .map(_offset -> {
                     int page = mMovieDataViewPaginatedDataLoader.getPage();
                     int limit=mMovieDataViewPaginatedDataLoader.getFirstLimit()+page*mMovieDataViewPaginatedDataLoader.getLimit();
+                    //FIX 仅仅是为了刷新排序
                     String dir_uri = null;
                     long vtid = -1;
                     if (mShortcut != null)

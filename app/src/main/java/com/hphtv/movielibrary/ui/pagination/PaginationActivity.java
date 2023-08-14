@@ -84,13 +84,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         }
     };
 
-    TvRecyclerView.OnBackPressListener mOnBackPressListener = new TvRecyclerView.OnBackPressListener() {
-
-        @Override
-        public void onBackPress() {
-            mBinding.tvTitle.requestFocus();
-        }
-    };
+    TvRecyclerView.OnBackPressListener mOnBackPressListener = () -> mBinding.tvTitle.requestFocus();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -153,7 +147,6 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
             @Override
             protected void onScrollStart() {
-                Log.w(TAG, "onScrollStart: " );
                 super.onScrollStart();
                 mHandler.removeCallbacks(mBottomMaskFadeInTask);
                 if (mBinding.bottomMask.getAlpha() > 0) {

@@ -18,6 +18,7 @@
     <dimen name="homepage_circle_btn_margin">23dp</dimen>
     <dimen name="homepage_title_margin_top">45dp</dimen>
     <dimen name="homepage_video_rv_margin_top">23dp</dimen>
+    <dimen name="homepage_tab_radius">30dp</dimen>
     <!--    -->
     <dimen name="image_btn_wh">64dp</dimen>
     <dimen name="recently_added_container_h">442dp</dimen>
@@ -32,15 +33,15 @@
     <dimen name="round_rect_item_w">275dp</dimen>
     <dimen name="round_rect_item_h">129dp</dimen>
     <dimen name="round_rect_item_margin">29dp</dimen>
-    <dimen name="round_rect_radius">8dp</dimen>
+    <dimen name="round_rect_radius">15dp</dimen>
 
-    <dimen name="poster_item_1_w">237dp</dimen>
-    <dimen name="poster_item_1_h">330dp</dimen>
+    <dimen name="poster_item_1_w">250dp</dimen>
+    <dimen name="poster_item_1_h">337dp</dimen>
     <dimen name="poster_item_1_margin">33dp</dimen>
-    <dimen name="poster_item_1_radius">8dp</dimen>
+    <dimen name="poster_item_1_radius">15dp</dimen>
     <dimen name="poster_item_1_tv_h">38dp</dimen>
     <dimen name="poster_item_1_textsize">38sp</dimen>
-    <dimen name="poster_border_width">6dp</dimen>
+    <dimen name="poster_border_width">8dp</dimen>
     <dimen name="poster_item_large_w">264dp</dimen>
     <dimen name="poster_item_large_h">367dp</dimen>
     <dimen name="genre_edit_dialog_w">305dp</dimen>
@@ -54,7 +55,7 @@
     <dimen name="filter_box_main_h">489dp</dimen>
 
     <dimen name="filter_box_common_margin">21dp</dimen>
-    <dimen name="filter_box_recyclerview_width">237dp</dimen>
+    <dimen name="filter_box_recyclerview_width">293dp</dimen>
 
     <dimen name="filter_box_item_height">51dp</dimen>
 

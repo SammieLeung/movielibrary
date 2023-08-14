@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
+import com.hphtv.movielibrary.adapter.BaseAdapter2.OnRecyclerViewItemClickListener;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.databinding.ActivityFilterpageBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
@@ -52,27 +53,21 @@ public class FilterPageActivity extends AppBaseActivity<FilterPageViewModel, Act
                 finish();
                 break;
             case R.id.btn_filter:
-                FilterBoxDialogFragment filterBoxDialogFragment = FilterBoxDialogFragment.newInstance();
+                FilterBoxDialogFragment filterBoxDialogFragment = FilterBoxDialogFragment.newInstance(-1,null);
                 filterBoxDialogFragment.show(getSupportFragmentManager(), "");
                 break;
         }
     };
 
 
-    BaseAdapter2.OnRecyclerViewItemClickListener mActionListener = new BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView>() {
+    OnRecyclerViewItemClickListener mActionListener = new OnRecyclerViewItemClickListener<MovieDataView>() {
         @Override
-        public void onItemClick(View view, int postion, MovieDataView data) {
+        public void onItemClick(View view, int position, MovieDataView data) {
             mNewpageViewModel.startDetailActivity(FilterPageActivity.this, data);
         }
     };
 
-    TvRecyclerView.OnBackPressListener mOnBackPressListener = new TvRecyclerView.OnBackPressListener() {
-
-        @Override
-        public void onBackPress() {
-            mBinding.tvTitle.requestFocus();
-        }
-    };
+    TvRecyclerView.OnBackPressListener mOnBackPressListener = () -> mBinding.tvTitle.requestFocus();
 
 
     @Override

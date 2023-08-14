@@ -53,13 +53,13 @@ import io.reactivex.rxjava3.functions.Function;
  * author: Sam Leung
  * date:  2022/10/26
  */
-public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends BaseAutofitHeightFragment<VM, FragmentHomepageBinding> implements  ILoadingState {
+public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends BaseAutofitHeightFragment<VM, FragmentHomepageBinding> implements ILoadingState {
     private HistoryListAdapter mHistoryListAdapter;
     private NewMovieItemWithMoreListAdapter mRecentlyAddListAdapter;
     private NewMovieItemListAdapter mRecommendListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
     private PlayVideoReceiver mPlayVideoReceiver;
-    private Disposable mUserFavoriteDisposable=null;
+    private Disposable mUserFavoriteDisposable = null;
 
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mMovieDataViewEventListener = (view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
@@ -96,7 +96,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     @Override
     public void onResume() {
         super.onResume();
-        Log.e(TAG, "onResume: "+this.toString() );
+        Log.e(TAG, "onResume: " + this.toString());
         prepareAll();
     }
 
@@ -118,7 +118,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         prepareRecentlyAddedMovie();
 
     }
-
 
 
     /**

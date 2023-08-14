@@ -89,6 +89,7 @@ public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding,
         binding.setCloudUserFav(movieDataView.is_user_fav);
     }
 
+
     public void remove(String movie_id, String type, int pos) {
         if (mList.get(pos).movie_id.equals(movie_id)
                 && type.equals(mList.get(pos).type.name())) {

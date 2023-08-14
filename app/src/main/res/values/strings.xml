@@ -248,7 +248,7 @@
     <string name="device_DLNA">DLNA Device</string>
     <!--    空白提示-->
     <string name="homepage_empty">There is nothing here!</string>
-    <string name="homepage_goto_add_shortcut">Let\'s go to add videos</string>
+    <string name="homepage_goto_add_shortcut">Add videos to library</string>
     <string name="unknowfile_empty">There are no unmatched files</string>
     <!--上映时间-->
     <string name="search_video_dialog_release_date">Release date</string>
@@ -266,5 +266,7 @@
     <string name="item_count_format">%1$s items</string>
 
     <string name="state_watched">Watched</string>
+    <string name="finished_loading">Finish Loading…</string>
+
 
 </resources>

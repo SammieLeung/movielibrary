@@ -47,8 +47,8 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
         super.onCreate(savedInstanceState);
         ActivityResultContracts.StartActivityForResult startActivityForResult = new ActivityResultContracts.StartActivityForResult();
         mActivityResultLauncher = registerForActivityResult(startActivityForResult, result -> {
-            Log.v(AppBaseActivity.this.getClass().getSimpleName(), "onActivityResult resultCode=" + result.getResultCode());
-            onActivityResultCallback(result);
+            if (result.getResultCode() == RESULT_OK)
+                onActivityResultCallback(result);
         });
     }
 

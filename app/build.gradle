@@ -1,11 +1,13 @@
 apply plugin: 'com.android.application'
 apply from: "../config.gradle"
+apply plugin: 'org.jetbrains.kotlin.android'
 
 def getTime() {
     return new Date().format("yyyyMMdd-hhmm", TimeZone.getDefault());
 }
 
 android {
+    namespace 'com.hphtv.movielibrary'
     signingConfigs {
         config {
             keyAlias 'lxp_project'
@@ -33,9 +35,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     packagingOptions {
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/DEPENDENCIES'
+        resources {
+            excludes += ['META-INF/LICENSE', 'META-INF/NOTICE', 'META-INF/DEPENDENCIES', 'META-INF/beans.xml']
+        }
     }
     buildTypes {
         release {
@@ -56,9 +58,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    packagingOptions {
-        exclude 'META-INF/beans.xml'
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
+
     applicationVariants.all {
         variant ->
             variant.outputs.all {
@@ -86,17 +90,17 @@ android {
 
 dependencies {
 
-    implementation fileTree(include: ['*.jar'], dir: 'libs', excludes: ['okhttp-3.6.0.jar', 'okio-1.11.0.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs', excludes: ['okhttp-3.6.0.jar', 'okio-1.11.0.jar','guava-19.0.jar'])
     implementation fileTree(include: ['*.jar'], dir: 'libs/umeng')
-
+//    implementation "com.google.guava:guava:32.1.2-android"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.legacy:legacy-support-v13:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
-    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 
     implementation 'jp.wasabeef:glide-transformations:3.3.0'
-    implementation 'org.jetbrains:annotations:15.0'
+    implementation 'org.jetbrains:annotations:16.0.1'
     //logger
     implementation 'com.orhanobut:logger:2.2.0'
 
@@ -109,11 +113,11 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
     //roomdb
-    implementation "androidx.room:room-runtime:2.4.3"
-    annotationProcessor "androidx.room:room-compiler:2.4.3"
-    implementation "androidx.room:room-rxjava3:2.4.3"
+    implementation "androidx.room:room-runtime:2.5.2"
+    annotationProcessor "androidx.room:room-compiler:2.5.2"
+    implementation "androidx.room:room-rxjava3:2.5.2"
     //room 测试迁移
-    androidTestImplementation 'androidx.room:room-testing:2.4.3'
+    androidTestImplementation 'androidx.room:room-testing:2.5.2'
     //rxAndroid;
     implementation 'io.reactivex.rxjava3:rxjava:3.0.13-RC4'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
@@ -132,9 +136,9 @@ dependencies {
     implementation 'com.facebook.stetho:stetho-okhttp3:1.6.0'
 
     //测试相关类
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     //Fresco
     implementation ('com.facebook.fresco:fresco:0.12.0')
     // 支持 GIF 动图，需要添加
@@ -143,6 +147,10 @@ dependencies {
     implementation project(':dlna')
     implementation project(':VideoNameParser')
     implementation project(':stationKit')
+
+    //Kotlin
+    implementation 'androidx.fragment:fragment-ktx:1.6.1'
+    implementation 'androidx.core:core-ktx:1.10.1'
 
 }
 

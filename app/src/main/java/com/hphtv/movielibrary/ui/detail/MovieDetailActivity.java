@@ -667,7 +667,9 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
      * 返回时刷新主页
      */
     private void refreshParent() {
-        setResult(RESULT_OK);
+        Intent intent = new Intent();
+        intent.putExtra(Constants.Extras.REQUEST_CODE,getIntent().getIntExtra(Constants.Extras.REQUEST_CODE,0));
+        setResult(RESULT_OK,intent);
     }
 
     @SuppressLint("RestrictedApi")

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="name"
+            type="String" />
+
+        <variable
+            name="isEmpty"
+            type="Boolean" />
+
+        <variable
+            name="isLoading"
+            type="boolean" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{isLoading?View.GONE:isEmpty?View.VISIBLE:View.GONE}">
+
+            <ImageView
+                android:id="@+id/iv_empty"
+                android:layout_width="158dp"
+                android:layout_height="131dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="165dp"
+                android:src="@mipmap/empty_img" />
+
+            <TextView
+                android:id="@+id/tv_empty_tips_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_empty"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:text="@string/homepage_empty"
+                android:textColor="@color/white"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btn_quick_add_shortcut"
+                style="@style/common_content_s_text_style"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_empty_tips_1"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="13dp"
+                android:background="@drawable/new_common_spinner_bg"
+                android:focusedByDefault="true"
+                android:padding="15dp"
+                android:text="@string/homepage_goto_add_shortcut" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{isLoading?View.VISIBLE:View.GONE}">
+
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/spin_kit"
+                style="@style/SpinKitView.Circle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="250dp"
+                android:background="@drawable/loading_view_bg"
+                android:maxWidth="60dp"
+                android:maxHeight="60dp"
+                android:minWidth="60dp"
+                android:minHeight="60dp"
+                android:padding="30dp"
+                app:SpinKit_Color="@color/white_light" />
+        </RelativeLayout>
+
+        <com.hphtv.movielibrary.ui.view.TvRecyclerView
+            android:id="@+id/movieList"
+            android:visibility="@{isLoading?View.GONE:!isEmpty?View.VISIBLE:View.GONE}"
+            android:layout_width="match_parent"
+            android:layout_height="960dp"
+            android:layout_marginBottom="-5dp"
+            android:paddingBottom="5dp" />
+
+    </RelativeLayout>
+</layout>

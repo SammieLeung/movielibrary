@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.ViewDataBinding;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.ViewModel;
 
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseFragment2;
@@ -23,12 +24,12 @@ import java.lang.ref.WeakReference;
  * author: Sam Leung
  * date:  2021/11/5
  */
-public abstract class BaseAutofitHeightFragment<VM extends AndroidViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IActivityResult, IRemoteRefresh {
+public abstract class BaseAutofitHeightFragment<VM extends ViewModel, VDB extends ViewDataBinding> extends BaseFragment2<VM, VDB> implements IActivityResult, IRemoteRefresh {
     public static String TAG;
     public static final String AUTO_FIT_HEIGHT = "arg_autofit";
     public static final String POSITION = "pos";
     private int mPosition;
-    private WeakReference<NoScrollAutofitHeightViewPager> mViewPagerWeakReference;
+    protected WeakReference<NoScrollAutofitHeightViewPager> mViewPagerWeakReference;
 
 
     public BaseAutofitHeightFragment(String tag) {

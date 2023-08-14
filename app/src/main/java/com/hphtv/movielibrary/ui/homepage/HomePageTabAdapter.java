@@ -6,8 +6,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.ui.homepage.fragment.filter.FilterFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
-import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
@@ -32,21 +32,12 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
     public HomePageTabAdapter(NoScrollAutofitHeightViewPager viewPager, FragmentManager fm) {
         super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
-
-        HomePageFragment homePageFragment = HomePageFragment.newInstance(viewPager, HOME);
-        ThemeFragment movieThemeFragment = ThemeFragment.newInstance(viewPager, MOVIE, Constants.VideoType.movie);
-        ThemeFragment tvThemeFragment = ThemeFragment.newInstance(viewPager, TV, Constants.VideoType.tv);
-        ThemeFragment childThemeFragment=ThemeFragment.newInstance(viewPager,CHILD,Constants.VideoType.child);
-        ThemeFragment varietyShowThemeFragment=ThemeFragment.newInstance(viewPager,VARIETY_SHOW,Constants.VideoType.variety_show);
-        UnknownFileFragment unknowFileFragment = UnknownFileFragment.newInstance(viewPager, UNKNOWN);
-
-        mList.add(homePageFragment);
-        mList.add(movieThemeFragment);
-        mList.add(tvThemeFragment);
-        mList.add(childThemeFragment);
-        mList.add(varietyShowThemeFragment);
-        mList.add(unknowFileFragment);
-
+        mList.add( HomePageFragment.newInstance(viewPager, HOME));
+        mList.add(FilterFragment.newInstance(Constants.VideoType.movie,viewPager, MOVIE));
+        mList.add(FilterFragment.newInstance(Constants.VideoType.tv,viewPager, TV));
+        mList.add(FilterFragment.newInstance(Constants.VideoType.child,viewPager, CHILD));
+        mList.add(FilterFragment.newInstance(Constants.VideoType.variety_show,viewPager, VARIETY_SHOW));
+        mList.add(UnknownFileFragment.newInstance(viewPager, UNKNOWN));
 
     }
 

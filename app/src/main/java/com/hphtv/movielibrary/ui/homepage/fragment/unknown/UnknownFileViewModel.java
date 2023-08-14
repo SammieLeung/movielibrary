@@ -9,18 +9,18 @@ import com.hphtv.movielibrary.BaseAndroidViewModel;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.data.pagination.PaginationCallback;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.dataview.ConnectedFileDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.util.MovieHelper;
-import com.hphtv.movielibrary.util.PaginatedDataLoader;
+import com.hphtv.movielibrary.data.pagination.PaginatedDataLoader;
+import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
@@ -64,33 +64,32 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
         super(application);
         mVideoFileDao = MovieLibraryRoomDatabase.getDatabase(application).getVideoFileDao();
         mUnknownRootDataViews = new ArrayList<>();
-
     }
 
-    public Observable<List<UnknownRootDataView>> reloadUnknownRoots(String root) {
+    public void reloadUnknownRoots(String root, PaginationCallback callback) {
         if (ROOT.equals(root)) {
             isLoadRoot = true;
             mParentStack.clear();
             mCurrentPath = root;
-            return mRootLoader.rxReload();
+            mRootLoader.reload(callback);
         } else {
             isLoadRoot = false;
-            return reLoadUnknownFiles(root);
+             reLoadUnknownFiles(root,callback);
         }
     }
 
-    public Observable<List<UnknownRootDataView>> loadMoreUnknownRoots() {
+    public void loadMoreUnknownRoots(PaginationCallback callback) {
         if (isLoadRoot)
-            return mRootLoader.rxLoad();
+             mRootLoader.load(callback);
         else
-            return loadMoreUnknownFiles();
+             loadMoreUnknownFiles(callback);
     }
 
-    private Observable<List<UnknownRootDataView>> reLoadUnknownFiles(String path) {
-        return Observable.create((ObservableOnSubscribe<List<UnknownRootDataView>>) emitter -> {
+    private void reLoadUnknownFiles(String path,PaginationCallback callback) {
+         Observable.create((ObservableOnSubscribe<List<UnknownRootDataView>>) emitter -> {
                     mOffset.set(0);
                     mAtomicBooleanCanLoad.set(true);
-                    if(mParentStack.isEmpty()|| !Objects.equals(mParentStack.peek(), path)) {
+                    if (mParentStack.isEmpty() || !Objects.equals(mParentStack.peek(), path)) {
                         mParentStack.push(mCurrentPath);
                         mCurrentPath = path;
                     }
@@ -121,12 +120,17 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
                     emitter.onNext(rootDataViewList);
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
+                    @Override
+                    public void onAction(List<UnknownRootDataView> unknownRootDataViews) {
+                        callback.onResult(unknownRootDataViews);
+                    }
+                });
 
     }
 
-    private Observable<List<UnknownRootDataView>> loadMoreUnknownFiles() {
-        return Observable.create((ObservableOnSubscribe<List<UnknownRootDataView>>) emitter -> {
+    private void loadMoreUnknownFiles(PaginationCallback callback) {
+        Observable.create((ObservableOnSubscribe<List<UnknownRootDataView>>) emitter -> {
                     if (mAtomicBooleanCanLoad.get()) {
                         List<UnknownRootDataView> rootDataViewList = new ArrayList<>();
                         List<ConnectedFileDataView> connectedFileDataViews = mVideoFileDao.queryConnectedFileDataViewByParentPath(mCurrentPath + "%", mCurrentPath + "%/%", Config.getSqlConditionOfChildMode(), mOffset.get(), LIMIT);
@@ -152,7 +156,16 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
                     emitter.onComplete();
                 })
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
+                    @Override
+                    public void onAction(List<UnknownRootDataView> unknownRootDataViews) {
+                        callback.onResult(unknownRootDataViews);
+                        if (!mAtomicBooleanCanLoad.get()) {
+                            callback.loadFinish();
+                        }
+                    }
+                });
     }
 
 
@@ -209,5 +222,11 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
         protected void OnLoadResult(List<UnknownRootDataView> result) {
 
         }
+
+        @Override
+        protected void OnLoadFinish() {
+            super.OnLoadFinish();
+        }
     };
+
 }

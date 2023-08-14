@@ -33,6 +33,9 @@ public interface GenreDao {
     @Query("SELECT genre_id FROM " + TABLE.GENRE + " WHERE name in (:names)")
     public long[] queryByName(List<String> names);
 
+    @Query("SELECT name FROM " + TABLE.GENRE + " WHERE genre_id=:genre_id ")
+    public String queryGenreName(long genre_id);
+
     @Query("SELECT genre_name FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
             " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
             " ON M.id=MVCF.id " +

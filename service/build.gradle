@@ -20,14 +20,15 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+    namespace 'com.firefly.filepicker'
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs',excludes: ['jcifs-ng.jar'])
-    implementation 'androidx.appcompat:appcompat:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation project(path: ':stationKit')
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13.2'
     implementation 'org.fourthline.cling:cling-core:2.1.1'
     implementation 'org.fourthline.cling:cling-support:2.1.1'
     implementation 'org.eclipse.jetty:jetty-server:8.1.18.v20150929'
@@ -44,11 +45,11 @@ dependencies {
 //    implementation group: 'eu.agno3.jcifs',name:'jcifs-ng',version:'2.1.7'
     api "eu.agno3.jcifs:jcifs-ng:2.1.7"
     //preference
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference:1.2.1'
     //roomdb
-    implementation "androidx.room:room-runtime:2.3.0"
-    annotationProcessor "androidx.room:room-compiler:2.3.0"
-    implementation "androidx.room:room-rxjava3:2.3.0"
+    implementation "androidx.room:room-runtime:2.5.2"
+    annotationProcessor "androidx.room:room-compiler:2.5.2"
+    implementation "androidx.room:room-rxjava3:2.5.2"
     //room 测试迁移
-    androidTestImplementation 'androidx.room:room-testing:2.3.0'
+    androidTestImplementation 'androidx.room:room-testing:2.5.2'
 }

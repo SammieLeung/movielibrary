@@ -1,4 +1,4 @@
-package com.hphtv.movielibrary.util;
+package com.hphtv.movielibrary.data.pagination;
 
 import android.util.Log;
 
@@ -39,8 +39,6 @@ public abstract class PaginatedDataLoader<T> {
         return getLimit();
     }
 
-    ;
-
     protected List<T> reloadDataFromDB(int offset, int limit) {
         return loadDataFromDB(offset, limit);
     }
@@ -52,6 +50,9 @@ public abstract class PaginatedDataLoader<T> {
     }
 
     protected abstract void OnLoadResult(List<T> result);
+
+    protected void OnLoadFinish() {
+    }
 
     public int getPage() {
         return mPage.get();
@@ -66,10 +67,78 @@ public abstract class PaginatedDataLoader<T> {
         mAtomicBooleanCanLoad.set(true);
     }
 
-    public void cancel(){
-            RxJavaGcManager.getInstance().disposableActive(mDisposable);
+
+
+    public void cancel() {
+        RxJavaGcManager.getInstance().disposableActive(mDisposable);
+    }
+    public void forceReload() {
+        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+                    int limit = mFirstLimit + (mPage.get()) * mLimit;
+                    mAtomicBooleanCanLoad.set(true);
+                    List<T> dataList = reloadDataFromDB(0, limit);
+                    emitter.onNext(dataList);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onAction(List<T> dataList) {
+                        OnReloadResult(dataList);
+                        if (!canLoadMore()) {
+                            OnLoadFinish();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        mDisposable = null;
+                    }
+                });
     }
 
+    public void forceReload(PaginationCallback callback) {
+        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+                    int limit = mFirstLimit + (mPage.get()) * mLimit;
+                    mAtomicBooleanCanLoad.set(true);
+                    List<T> dataList = reloadDataFromDB(0, limit);
+                    emitter.onNext(dataList);
+                    emitter.onComplete();
+                }).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onAction(List<T> dataList) {
+                        if (callback != null) {
+                            callback.onResult(dataList);
+                            if (!canLoadMore()) {
+                                callback.loadFinish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        mDisposable = null;
+                    }
+                });
+    }
 
     public void reload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
@@ -88,25 +157,28 @@ public abstract class PaginatedDataLoader<T> {
                     @Override
                     public void onSubscribe(Disposable d) {
                         super.onSubscribe(d);
-                        mDisposable=d;
+                        mDisposable = d;
                     }
 
                     @Override
                     public void onAction(List<T> dataList) {
                         OnReloadResult(dataList);
+                        if (!canLoadMore()) {
+                            OnLoadFinish();
+                        }
                     }
 
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                        mDisposable=null;
+                        mDisposable = null;
                     }
                 });
 
     }
 
-    public Observable<List<T>> rxReload() {
-        return Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+    public void reload(PaginationCallback callback) {
+        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     mPage.set(0);
                     mAtomicBooleanCanLoad.set(true);
                     List<T> dataList = reloadDataFromDB(0, mFirstLimit);
@@ -116,7 +188,32 @@ public abstract class PaginatedDataLoader<T> {
                     emitter.onNext(dataList);
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onAction(List<T> dataList) {
+                        if (callback != null) {
+                            callback.onResult(dataList);
+                            if (!canLoadMore()) {
+                                callback.loadFinish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        mDisposable = null;
+                    }
+                });
+
     }
 
     public void load() {
@@ -143,21 +240,25 @@ public abstract class PaginatedDataLoader<T> {
                         super.onSubscribe(d);
                         mDisposable = d;
                     }
+
                     @Override
                     public void onAction(List<T> dataList) {
                         OnLoadResult(dataList);
+                        if (!canLoadMore()) {
+                            OnLoadFinish();
+                        }
                     }
 
                     @Override
                     public void onComplete() {
                         super.onComplete();
-                            mDisposable = null;
+                        mDisposable = null;
                     }
                 });
     }
 
-    public Observable<List<T>> rxLoad() {
-        return Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+    public void load(PaginationCallback callback) {
+        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     if (canLoadMore()) {
                         int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
 
@@ -172,6 +273,30 @@ public abstract class PaginatedDataLoader<T> {
                     emitter.onComplete();
                 })
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onAction(List<T> dataList) {
+                        if (callback != null) {
+                            callback.onResult(dataList);
+                            if (!canLoadMore()) {
+                                callback.loadFinish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        mDisposable = null;
+                    }
+                });
     }
 }

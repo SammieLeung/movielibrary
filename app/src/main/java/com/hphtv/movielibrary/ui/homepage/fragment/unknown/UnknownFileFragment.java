@@ -19,6 +19,8 @@ import com.hphtv.movielibrary.adapter.BaseAdapter2;
 import com.hphtv.movielibrary.adapter.UnknownRootItemListAdapter;
 import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.data.pagination.BasePaginationCallback;
+import com.hphtv.movielibrary.data.pagination.PaginationCallback;
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.FragmentUnknowfileBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
@@ -88,6 +90,12 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     }
 
     @Override
+    public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        reloadUnknownFiles(mViewModel.getCurrentPath());
+    }
+
+    @Override
     protected UnknownFileViewModel createViewModel() {
         return null;
     }
@@ -107,7 +115,7 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     @Override
     public void onResume() {
         super.onResume();
-        reloadUnknownFiles(mViewModel.getCurrentPath());
+
     }
 
     @Override
@@ -128,13 +136,12 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
             @Override
             protected void onLoading(int countItem, int lastItem) {
                 if (mViewModel != null)
-                    mViewModel.loadMoreUnknownRoots()
-                            .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
-                                @Override
-                                public void onAction(List<UnknownRootDataView> unknownRootDataViews) {
-                                    mUnknownRootItemListAdapter.appendAll(unknownRootDataViews);
-                                }
-                            });
+                    mViewModel.loadMoreUnknownRoots(new BasePaginationCallback<UnknownRootDataView>() {
+                        @Override
+                        public void onResult(@NonNull List<? extends UnknownRootDataView> roots) {
+                            mUnknownRootItemListAdapter.appendAll(roots);
+                        }
+                    });
             }
         });
         mBinding.rvUnknowsfile.addItemDecoration(new GridSpacingItemDecorationVertical(
@@ -181,22 +188,19 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
                 return;
             }
 
-            mViewModel.reloadUnknownRoots(root)
-                    .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
-                        @Override
-                        public void onAction(List<UnknownRootDataView> roots) {
-                            if (roots.size() > 0) {
-                                mBinding.setIsEmpty(false);
-                                mUnknownRootItemListAdapter.addAll(roots);
-                            } else {
-                                mBinding.setIsEmpty(true);
-                                mUnknownRootItemListAdapter.clearAll();
-                            }
-                        }
-                    });
-
+            mViewModel.reloadUnknownRoots(root, new BasePaginationCallback<UnknownRootDataView>() {
+                @Override
+                public void onResult(@NonNull List<? extends UnknownRootDataView> roots) {
+                    if (roots.size() > 0) {
+                        mBinding.setIsEmpty(false);
+                        mUnknownRootItemListAdapter.addAll(roots);
+                    } else {
+                        mBinding.setIsEmpty(true);
+                        mUnknownRootItemListAdapter.clearAll();
+                    }
+                }
+            });
         }
-
     }
 
     public void playVideo(String path) {
@@ -283,24 +287,24 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
         }
         final int lastCurFocusIndex = curFocusIndex;
 
-        mViewModel.reloadUnknownRoots(mViewModel.getCurrentPath())
-                .subscribe(new SimpleObserver<List<UnknownRootDataView>>() {
-                    @Override
-                    public void onAction(List<UnknownRootDataView> roots) {
-                        if (roots.size() > 0) {
-                            mBinding.setIsEmpty(false);
-                            mUnknownRootItemListAdapter.addAll(roots);
-                        } else {
-                            mBinding.setIsEmpty(true);
-                            mUnknownRootItemListAdapter.clearAll();
-                        }
-                        mUIHandler.postDelayed(() -> {
-                            View newFocus = mBinding.rvUnknowsfile.getChildAt(lastCurFocusIndex);
-                            if (newFocus != null)
-                                newFocus.requestFocus();
-                        }, 200);
-                    }
-                });
+        mViewModel.reloadUnknownRoots(mViewModel.getCurrentPath(),new BasePaginationCallback<UnknownRootDataView>() {
+
+            @Override
+            public void onResult(@NonNull List<? extends UnknownRootDataView> roots) {
+                if (roots.size() > 0) {
+                    mBinding.setIsEmpty(false);
+                    mUnknownRootItemListAdapter.addAll(roots);
+                } else {
+                    mBinding.setIsEmpty(true);
+                    mUnknownRootItemListAdapter.clearAll();
+                }
+                mUIHandler.postDelayed(() -> {
+                    View newFocus = mBinding.rvUnknowsfile.getChildAt(lastCurFocusIndex);
+                    if (newFocus != null)
+                        newFocus.requestFocus();
+                }, 200);
+            }
+        });
     }
 
 

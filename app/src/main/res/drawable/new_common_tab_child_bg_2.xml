@@ -3,31 +3,31 @@
 
     <item android:state_pressed="true">
         <shape>
-            <corners android:radius="8dp" />
+            <corners android:radius="@dimen/homepage_tab_radius" />
             <solid android:color="#CCFFFFFF" />
         </shape>
     </item>
     <item android:state_focused="true">
         <shape>
-            <corners android:radius="8dp" />
+            <corners android:radius="@dimen/homepage_tab_radius" />
             <solid android:color="#66FFFFFF" />
         </shape>
     </item>
     <item android:state_hovered="true">
         <shape>
-            <corners android:radius="8dp" />
+            <corners android:radius="@dimen/homepage_tab_radius" />
             <solid android:color="#66FFFFFF" />
         </shape>
     </item>
     <item android:state_selected="true">
         <shape>
-            <corners android:radius="8dp" />
+            <corners android:radius="@dimen/homepage_tab_radius" />
             <solid android:color="#1AFFFFFF" />
         </shape>
     </item>
     <item android:state_checked="true">
         <shape>
-            <corners android:radius="8dp" />
+            <corners android:radius="@dimen/homepage_tab_radius" />
             <solid android:color="#1AFFFFFF" />
         </shape>
     </item>

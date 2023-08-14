@@ -20,6 +20,13 @@ public class Constants {
 
     public static final int ANIMATION_DURATION=200;
 
+    public static final int REQUEST_CODE_FROM_BASE_FILTER=1000;
+    public static final int REQUEST_CODE_PINYIN_SEARCH = 1001;
+    public static final int REQUEST_CODE_SHORTCUT_MANAGER = 1002;
+    public static final int REQUEST_CODE_SETTINGS=1003;
+    public static final int REQUEST_CODE_DETAIL=1004;
+
+
     //--------------HashMap keys------------
     //1.for LeftMenuListAdapter and HomePageActivity
     public static final String ICON = "left_menu_icon";
@@ -91,7 +98,8 @@ public class Constants {
         animate,
         variety_show,
         other,
-        custom
+        custom,
+        all
     }
 
     public enum WatchLimit {
@@ -175,6 +183,7 @@ public class Constants {
         String DEVICE_ID = "device_id";
 
         String TYPE="type";
+        String REQUEST_CODE="request_code";
 
     }
 
