@@ -157,17 +157,17 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private void initViews() {
         mBinding.btnQuickAddShortcut.setOnClickListener(getBaseActivity()::startShortcutManager);
         initRecentlyPlayedList();
-        initGenreList();
+//        initGenreList();
         initRecentlyAddedList();
-        initFavoriteList();
+//        initFavoriteList();
         initRecommendList();
     }
 
     public void prepareAll() {
         prepareHistoryData();
-        prepareMovieGenreTagData();
+//        prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
-        prepareFavorite();
+//        prepareFavorite();
         prepareUserFavorite();
 
     }
@@ -221,16 +221,16 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     /**
      * 初始化电影类型分类列表
      */
-    private void initGenreList() {
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mBinding.rvGenreList.setLayoutManager(mLayoutManager);
-        mBinding.rvGenreList.setOnBackPressListener(mOnBackPressListener);
-        mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
-        mGenreTagAdapter = new GenreTagAdapter(getContext(), mViewModel.getGenreTagList());
-        mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
-        mGenreTagAdapter.setOnGenreListener(mGenreListener);
-        mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
-    }
+//    private void initGenreList() {
+//        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//        mBinding.rvGenreList.setLayoutManager(mLayoutManager);
+//        mBinding.rvGenreList.setOnBackPressListener(mOnBackPressListener);
+//        mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
+//        mGenreTagAdapter = new GenreTagAdapter(getContext(), mViewModel.getGenreTagList());
+//        mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
+//        mGenreTagAdapter.setOnGenreListener(mGenreListener);
+//        mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
+//    }
 
     /**
      * 初始化最新添加列表
@@ -251,19 +251,19 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     /**
      * 初始化我的收藏
      */
-    private void initFavoriteList() {
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        mBinding.rvFavorite.setLayoutManager(mLayoutManager);
-        mBinding.rvFavorite.setOnBackPressListener(mOnBackPressListener);
-        mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
-        mFavoriteListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mViewModel.getFavoriteList(), PaginationViewModel.OPEN_FAVORITE);
-        mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
-        mFavoriteListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
-        mFavoriteListAdapter.setOnMoreItemClickListener(mOnMoreItemClickListener);
-
-//        mFavoriteListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
-
-    }
+//    private void initFavoriteList() {
+//        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//        mBinding.rvFavorite.setLayoutManager(mLayoutManager);
+//        mBinding.rvFavorite.setOnBackPressListener(mOnBackPressListener);
+//        mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
+//        mFavoriteListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mViewModel.getFavoriteList(), PaginationViewModel.OPEN_FAVORITE);
+//        mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
+//        mFavoriteListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
+//        mFavoriteListAdapter.setOnMoreItemClickListener(mOnMoreItemClickListener);
+//
+////        mFavoriteListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
+//
+//    }
 
     private void initRecommendList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);

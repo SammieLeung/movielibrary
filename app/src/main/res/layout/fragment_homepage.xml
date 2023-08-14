@@ -39,11 +39,11 @@
                   android:layout_height="match_parent" />
             </RelativeLayout>
 
-            <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                android:layout_marginTop="37dp"
-                android:id="@+id/rv_genre_list"
-                android:layout_width="match_parent"
-                android:layout_height="153dp"/>
+<!--            <com.hphtv.movielibrary.ui.view.TvRecyclerView-->
+<!--                android:layout_marginTop="37dp"-->
+<!--                android:id="@+id/rv_genre_list"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="153dp"/>-->
             <TextView
                 android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="47dp"
