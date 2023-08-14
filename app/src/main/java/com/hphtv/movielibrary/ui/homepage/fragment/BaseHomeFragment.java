@@ -260,9 +260,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
             prepareAll();
     }
 
-    @Override
-    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-    }
 
     @Override
     public void remoteUpdateMovieNotify(long o_id, long n_id) {

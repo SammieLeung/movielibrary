@@ -362,15 +362,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         }
     }
 
-    public void remoteUpdateFavoriteForFragment(int pos, String movie_id, String type, boolean is_favorite) {
-        if (pos < mNewHomePageTabAdapter.mList.size()) {
-            Fragment fragment = mNewHomePageTabAdapter.getItem(pos);
-            if (fragment instanceof IRemoteRefresh) {
-                IRemoteRefresh activityResult = (IRemoteRefresh) fragment;
-                activityResult.remoteUpdateFavoriteNotify(movie_id, type, is_favorite);
-            }
-        }
-    }
 
     public void remoteUpdateMovieForFragment(int pos, long o_id, long n_id) {
         if (pos < mNewHomePageTabAdapter.mList.size()) {
@@ -548,11 +539,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         remoteUpdateMovieForFragment(pos, o_id, n_id);
     }
 
-    @Override
-    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-        int pos = mBinding.tabLayout.getSelectedTabPosition();
-        remoteUpdateFavoriteForFragment(pos, movie_id, type, isFavorite);
-    }
 
     @Override
     public void remoteRemoveMovieNotify(String movie_id, String type) {

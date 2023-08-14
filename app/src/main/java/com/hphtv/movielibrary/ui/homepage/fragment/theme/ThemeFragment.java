@@ -56,10 +56,4 @@ public class ThemeFragment extends BaseHomeFragment<ThemeFragmentViewModel> {
         return mViewModel.getVideoType().name();
     }
 
-    @Override
-    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-        if (mViewModel != null && mViewModel.getVideoType().name().equals(type)) {//TODO 检查是否生效
-            super.remoteUpdateFavoriteNotify(movie_id, type, isFavorite);
-        }
-    }
 }

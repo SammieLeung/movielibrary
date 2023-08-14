@@ -144,10 +144,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
                     movieScrapeFinish();
                     break;
                 case Constants.ACTION_FAVORITE_MOVIE_CHANGE_NOTIFY:
-                    remoteUpdateFavoriteNotify(
-                            intent.getStringExtra("movie_id"),
-                            intent.getStringExtra("type"),
-                            intent.getBooleanExtra("is_favorite", false));
                     break;
                 case Constants.ACTION_APP_UPDATE_MOVIE:
                     remoteUpdateMovieNotify(
@@ -167,12 +163,6 @@ public abstract class AppBaseActivity<VM extends AndroidViewModel, VDB extends V
     protected void movieScrapeFinish() {
     }
 
-    ;
-
-    @Override
-    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-
-    }
 
     @Override
     public void remoteUpdateMovieNotify(long o_id, long n_id) {

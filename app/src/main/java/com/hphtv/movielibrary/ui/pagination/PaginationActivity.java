@@ -190,15 +190,6 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         }
     }
 
-    @Override
-    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-        super.remoteUpdateFavoriteNotify(movie_id, type, isFavorite);
-        if (mViewModel.getType() == PaginationViewModel.OPEN_FAVORITE) {
-            mViewModel.reload();
-            ToastUtil.newInstance(getApplicationContext()).toast(getString(R.string.remote_movie_sync_tips));
-        }
-
-    }
 
     @Override
     public void OnRematchPoster(MovieDataView movieDataView, int pos) {

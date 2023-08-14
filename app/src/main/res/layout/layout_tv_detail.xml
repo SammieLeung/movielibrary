@@ -172,7 +172,7 @@
                           app:layout_constraintStart_toStartOf="parent"
                           app:layout_constraintTop_toTopOf="parent"
                           app:layout_constraintBottom_toBottomOf="parent"
-                          app:layout_constraintEnd_toStartOf="@id/btn_favorite"
+                          app:layout_constraintEnd_toStartOf="@id/btn_edit"
                           >
                             <Button
                               android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.GONE:View.VISIBLE}"
@@ -192,17 +192,6 @@
                               android:visibility="@{wrapper.movie.type.equals(Constants.VideoType.tv)&amp;&amp;wrapper.season!=null?View.VISIBLE:View.GONE}" />
                         </RelativeLayout>
 
-
-                        <Button
-                          android:id="@+id/btn_favorite"
-                          style="@style/detail_btn_style"
-                          android:drawableLeft="@drawable/ic_btn_like_drawable"
-                          android:text="@string/btn_favorite"
-                          app:layout_constraintBottom_toBottomOf="parent"
-                          app:layout_constraintEnd_toStartOf="@id/btn_edit"
-                          app:layout_constraintStart_toEndOf="@id/viewgroup_playbtn"
-                          app:layout_constraintTop_toTopOf="parent" />
-
                         <Button
                           android:id="@+id/btn_edit"
                           style="@style/detail_btn_style"
@@ -211,7 +200,7 @@
                           android:visibility="@{expand?View.VISIBLE:View.GONE}"
                           app:layout_constraintBottom_toBottomOf="parent"
                           app:layout_constraintEnd_toStartOf="@id/btn_remove"
-                          app:layout_constraintStart_toEndOf="@id/btn_favorite"
+                          app:layout_constraintStart_toEndOf="@id/viewgroup_playbtn"
                           app:layout_constraintTop_toTopOf="parent" />
 
                         <Button

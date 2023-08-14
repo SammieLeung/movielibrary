@@ -185,7 +185,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         mBinding.btnPlay.setOnClickListener(mClickListener);
         mBinding.btnPlayEpisode.setOnClickListener(mClickListener);
         mBinding.btnRemove.setOnClickListener(mClickListener);
-        mBinding.btnFavorite.setOnClickListener(mClickListener);
         mBinding.btnExpand.setOnClickListener(mClickListener);
         mBinding.tvMore.setOnClickListener(mClickListener);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.HORIZONTAL, false);
@@ -316,7 +315,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                         int index = random.nextInt(wrapper.stagePhotos.size());
                         stagePhoto = wrapper.stagePhotos.get(index).imgUrl;
                     }
-                    mBinding.btnFavorite.setSelected(wrapper.movie.isFavorite);
 
                     if (!TextUtils.isEmpty(stagePhoto)) {
                         GlideTools.GlideWrapperWithCrossFade(getBaseContext(), stagePhoto).into(mBinding.ivStagephoto);
@@ -384,23 +382,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
     @Override
     protected void onDestroy() {
         super.onDestroy();
-    }
-
-    @Override
-    public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-        String curMovieId = mViewModel.getMovieWrapper() != null ? mViewModel.getMovieWrapper().movie.movieId : "";
-        if (movie_id != null && curMovieId != null && curMovieId.equals(movie_id)) {
-            mViewModel.setLike(isFavorite).subscribe(new SimpleObserver<Boolean>() {
-                @Override
-                public void onAction(Boolean isFavorite) {
-                    MovieWrapper wrapper = mViewModel.getMovieWrapper();
-                    BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);//向手机助手发送电影更改的广播
-                    mBinding.btnFavorite.setSelected(isFavorite);
-                    refreshParent();
-                    ToastUtil.newInstance(getBaseContext()).toast(getString(R.string.remote_movie_sync_tips));
-                }
-            });
-        }
     }
 
     @Override
@@ -526,7 +507,6 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                 MovieWrapper wrapper = mViewModel.getMovieWrapper();
                 //向手机助手发送电影更改的广播
                 BroadcastHelper.sendBroadcastMovieUpdateSync(getBaseContext(), wrapper.movie.movieId, wrapper.movie.movieId, wrapper.movie.isFavorite ? 1 : 0);
-                mBinding.btnFavorite.setSelected(isFavorite);
                 refreshParent();
             }
         });
