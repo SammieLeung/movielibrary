@@ -41,7 +41,6 @@ import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
-import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.moviesearch.pinyin.PinyinSearchActivity;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
@@ -305,7 +304,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     if (Constants.ACTION_NETWORK_AVAILABLE.equals(intent.getAction())) {
-                        mNewHomePageTabAdapter.updateUserFragments();
                     }
                 }
             };
@@ -519,9 +517,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         passwordDialogFragment.show(getSupportFragmentManager(), "");
     }
 
-    public List<IRefreshGenre> getAllRefreshGenreList() {
-        return mNewHomePageTabAdapter.getIRefreshGenreList();
-    }
 
     @Override
     public void OnRematchPoster(MovieDataView movieDataView, int pos) {

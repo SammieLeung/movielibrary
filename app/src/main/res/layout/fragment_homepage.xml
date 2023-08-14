@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:visibility="@{isLoading?View.GONE:hasHistory||recentAdd||favorite||recommand?View.VISIBLE:View.GONE}"
+            android:visibility="@{isLoading?View.GONE:hasHistory||recentAdd||recommand?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -39,11 +39,6 @@
                   android:layout_height="match_parent" />
             </RelativeLayout>
 
-<!--            <com.hphtv.movielibrary.ui.view.TvRecyclerView-->
-<!--                android:layout_marginTop="37dp"-->
-<!--                android:id="@+id/rv_genre_list"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="153dp"/>-->
             <TextView
                 android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
                 android:layout_marginTop="47dp"
@@ -59,20 +54,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/recently_added_container_h"/>
 
-            <TextView
-                android:visibility="@{favorite?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="@dimen/homepage_title_margin_top"
-                style="@style/homepage_head_title"
-                android:id="@+id/tv_favorite"
-                android:text="@string/my_favorite_list_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                android:visibility="@{favorite?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
-                android:id="@+id/rv_favorite"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/recently_added_container_h"/>
 
             <TextView
                 android:visibility="@{recommand?View.VISIBLE:View.GONE}"
@@ -90,7 +71,7 @@
                 android:layout_height="@dimen/recently_added_container_h"/>
         </LinearLayout>
         <RelativeLayout
-            android:visibility="@{isLoading?View.GONE:!(hasHistory||recentAdd||favorite||recommand)?View.VISIBLE:View.GONE}"
+            android:visibility="@{isLoading?View.GONE:!(hasHistory||recentAdd||recommand)?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
@@ -152,9 +133,6 @@
         <import type="com.hphtv.movielibrary.data.Constants.VideoType"/>
         <variable
             name="recentAdd"
-            type="boolean" />
-        <variable
-            name="favorite"
             type="boolean" />
         <variable
             name="recommand"

@@ -38,6 +38,7 @@ public interface MovieDao {
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source AND type=:type")
     public Movie queryByMovieIdAndType(String movie_id, String source, String type);
 
+    @Transaction
     @Query("SELECT * FROM " + TABLE.MOVIE + " WHERE movie_id=:movie_id AND source=:source AND type=:type")
     public MovieWrapper queryWrapperByMovieIdAndType(String movie_id, String source, String type);
 

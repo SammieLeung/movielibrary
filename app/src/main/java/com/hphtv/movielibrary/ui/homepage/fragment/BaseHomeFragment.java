@@ -10,13 +10,10 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.R;
 import com.hphtv.movielibrary.adapter.BaseAdapter2;
-import com.hphtv.movielibrary.adapter.GenreTagAdapter;
 import com.hphtv.movielibrary.adapter.HistoryListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.adapter.NewMovieItemWithMoreListAdapter;
@@ -25,29 +22,17 @@ import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.FragmentHomepageBinding;
 import com.hphtv.movielibrary.effect.SpacingItemDecoration;
-import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
-import com.hphtv.movielibrary.roomdb.dao.MovieDao;
-import com.hphtv.movielibrary.roomdb.dao.MovieUserFavoriteCrossRefDao;
-import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
-import com.hphtv.movielibrary.roomdb.entity.reference.MovieUserFavoriteCrossRef;
-import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
-import com.hphtv.movielibrary.scraper.respone.GetUserFavoriteResponse;
-import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.ILoadingState;
 import com.hphtv.movielibrary.ui.detail.MovieDetailActivity;
-import com.hphtv.movielibrary.ui.filterpage.FilterPageActivity;
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment;
-import com.hphtv.movielibrary.ui.homepage.genretag.AddGenreDialogFragment;
-import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.pagination.PaginationActivity;
 import com.hphtv.movielibrary.ui.pagination.PaginationViewModel;
 import com.hphtv.movielibrary.ui.view.TvRecyclerView;
 import com.hphtv.movielibrary.util.ActivityHelper;
 import com.hphtv.movielibrary.util.MovieHelper;
-import com.hphtv.movielibrary.util.ScraperSourceTools;
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.DensityUtil;
@@ -60,21 +45,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Function;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * author: Sam Leung
  * date:  2022/10/26
  */
-public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends BaseAutofitHeightFragment<VM, FragmentHomepageBinding> implements IRefreshGenre, ILoadingState {
+public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends BaseAutofitHeightFragment<VM, FragmentHomepageBinding> implements  ILoadingState {
     private HistoryListAdapter mHistoryListAdapter;
-    private GenreTagAdapter mGenreTagAdapter;
     private NewMovieItemWithMoreListAdapter mRecentlyAddListAdapter;
-    private NewMovieItemWithMoreListAdapter mFavoriteListAdapter;
     private NewMovieItemListAdapter mRecommendListAdapter;
     public AtomicInteger atomicState = new AtomicInteger();
     private PlayVideoReceiver mPlayVideoReceiver;
@@ -82,35 +63,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
 
     //电影点击监听
     private BaseAdapter2.OnRecyclerViewItemClickListener<MovieDataView> mMovieDataViewEventListener = (view, postion, data) -> mViewModel.startDetailActivity((AppBaseActivity) getActivity(), data);
-    //固定主题动作监听
-    private GenreTagAdapter.GenreListener mGenreListener = new GenreTagAdapter.GenreListener() {
-        @Override
-        public void addGenre() {
-            AddGenreDialogFragment fragment = AddGenreDialogFragment.newInstance();
-            fragment.addAllIRefreshGenreList(getBaseActivity().getAllRefreshGenreList());
-            fragment.show(getChildFragmentManager(), AddGenreDialogFragment.TAG);
-        }
-
-        @Override
-        public void browseAll() {
-            Intent intent = new Intent(getContext(), FilterPageActivity.class);
-            intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, getVideoTagName());
-            startActivityForResult(intent);
-        }
-    };
-
-    //动态主题动作监听
-    private BaseAdapter2.OnRecyclerViewItemClickListener mGenreItemClickListener = (view, postion, data) -> {
-        Intent intent = new Intent(getContext(), FilterPageActivity.class);
-        intent.putExtra(FilterPageActivity.EXTRA_GENRE, data.toString());
-        intent.putExtra(FilterPageActivity.EXTRA_VIDEO_TYPE, getVideoTagName());
-        startActivityForResult(intent);
-    };
-
-    private BaseAdapter2.OnItemLongClickListener<MovieDataView> mPosterItemLongClickListener = (view, postion, data) -> {
-        ActivityHelper.showPosterMenuDialog(getChildFragmentManager(), postion, data);
-        return false;
-    };
 
 
     private NewMovieItemWithMoreListAdapter.OnMoreItemClickListener mOnMoreItemClickListener = type -> {
@@ -157,18 +109,13 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private void initViews() {
         mBinding.btnQuickAddShortcut.setOnClickListener(getBaseActivity()::startShortcutManager);
         initRecentlyPlayedList();
-//        initGenreList();
         initRecentlyAddedList();
-//        initFavoriteList();
         initRecommendList();
     }
 
     public void prepareAll() {
         prepareHistoryData();
-//        prepareMovieGenreTagData();
         prepareRecentlyAddedMovie();
-//        prepareFavorite();
-        prepareUserFavorite();
 
     }
 
@@ -219,20 +166,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     }
 
     /**
-     * 初始化电影类型分类列表
-     */
-//    private void initGenreList() {
-//        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-//        mBinding.rvGenreList.setLayoutManager(mLayoutManager);
-//        mBinding.rvGenreList.setOnBackPressListener(mOnBackPressListener);
-//        mBinding.rvGenreList.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 12), DensityUtil.dip2px(getContext(), 12)));
-//        mGenreTagAdapter = new GenreTagAdapter(getContext(), mViewModel.getGenreTagList());
-//        mBinding.rvGenreList.setAdapter(mGenreTagAdapter);
-//        mGenreTagAdapter.setOnGenreListener(mGenreListener);
-//        mGenreTagAdapter.setOnItemClickListener(mGenreItemClickListener);
-//    }
-
-    /**
      * 初始化最新添加列表
      */
     private void initRecentlyAddedList() {
@@ -248,22 +181,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
 
     }
 
-    /**
-     * 初始化我的收藏
-     */
-//    private void initFavoriteList() {
-//        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-//        mBinding.rvFavorite.setLayoutManager(mLayoutManager);
-//        mBinding.rvFavorite.setOnBackPressListener(mOnBackPressListener);
-//        mBinding.rvFavorite.addItemDecoration(new SpacingItemDecoration(DensityUtil.dip2px(getContext(), 72), DensityUtil.dip2px(getContext(), 15), DensityUtil.dip2px(getContext(), 30)));
-//        mFavoriteListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mViewModel.getFavoriteList(), PaginationViewModel.OPEN_FAVORITE);
-//        mBinding.rvFavorite.setAdapter(mFavoriteListAdapter);
-//        mFavoriteListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
-//        mFavoriteListAdapter.setOnMoreItemClickListener(mOnMoreItemClickListener);
-//
-////        mFavoriteListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
-//
-//    }
 
     private void initRecommendList() {
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -287,7 +204,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                     @Override
                     public void onAction(List<HistoryMovieDataView> historyMovieDataViews) {
                         updateRecentlyPlayed(historyMovieDataViews);
-                        prepareRecommand();
+                        prepareRecommend();
                     }
                 });
     }
@@ -305,16 +222,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         mHistoryListAdapter.addAll(historyList);
     }
 
-    private void prepareMovieGenreTagData() {
-        if (mViewModel != null)
-            mViewModel.prepareGenreList()
-                    .subscribe(new SimpleLoadingObserver<List<String>>(this) {
-                        @Override
-                        public void onAction(List<String> list) {
-                            mGenreTagAdapter.addAll(list);
-                        }
-                    });
-    }
 
     private void prepareRecentlyAddedMovie() {
         mViewModel.prepareRecentlyAddedMovie()
@@ -331,40 +238,8 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
                 });
     }
 
-    public void prepareFavorite() {
-        mViewModel.prepareFavorite()
-                .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
-                    @Override
-                    public void onAction(List<MovieDataView> movieDataViews) {
-                        if (movieDataViews.size() > 0) {
-                            mFavoriteListAdapter.addAll(movieDataViews);
-                            mBinding.setFavorite(true);
-                        } else {
-                            mBinding.setFavorite(false);
-                        }
-                    }
-                });
-    }
 
-    public void prepareUserFavorite(){
-        if(MovieApplication.hasNetworkConnection&&MovieApplication.getInstance().isDeviceBound()) {
-            mViewModel.updateUserFavorites(ScraperSourceTools.getSource(), mUserFavoriteDisposable, new BaseHomePageViewModel.OnUserFavorites() {
-                @Override
-                public void onDisposableReturn(Disposable disposable) {
-                    mUserFavoriteDisposable = disposable;
-                }
-
-                @Override
-                public void onResultReturn(BaseHomePageViewModel.Result result) {
-                    if (result instanceof BaseHomePageViewModel.Success) {
-                        prepareFavorite();
-                    }
-                }
-            });
-        }
-    }
-
-    private void prepareRecommand() {
+    private void prepareRecommend() {
         mViewModel.prepareRecommend()
                 .subscribe(new SimpleLoadingObserver<List<MovieDataView>>(this) {
                     @Override
@@ -387,34 +262,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
 
     @Override
     public void remoteUpdateFavoriteNotify(String movie_id, String type, boolean isFavorite) {
-        if (mViewModel != null) {
-            mViewModel.getUpdatingFavorite(movie_id, type)
-                    .subscribe(new SimpleObserver<MovieDataView>() {
-                        @Override
-                        public void onAction(MovieDataView movieDataView) {
-                            if (isFavorite) {
-                                if (!mFavoriteListAdapter.getDatas().contains(movieDataView)) {
-                                    mFavoriteListAdapter.add(movieDataView);
-                                    mFavoriteListAdapter.notifyItemRangeChanged(0,mFavoriteListAdapter.getItemCount());
-                                    mBinding.setFavorite(true);
-                                }
-                            } else {
-                                mFavoriteListAdapter.remove(movieDataView);
-                                if (mFavoriteListAdapter.getItemCount() == 0) {
-                                    mBinding.setFavorite(false);
-                                }
-                            }
-                            if (mRecentlyAddListAdapter.getDatas().contains(movieDataView)) {
-                                mRecentlyAddListAdapter.updateStatus(movieDataView);
-                            }
-                            if (mRecommendListAdapter.getDatas().contains(movieDataView)) {
-                                mRecommendListAdapter.updateStatus(movieDataView);
-                            }
-                            ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_movie_sync_tips));
-
-                        }
-                    });
-        }
     }
 
     @Override
@@ -432,18 +279,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
             prepareAll();
             ToastUtil.newInstance(getContext()).toast(getString(R.string.remote_remove_movie_sync_tips));
         }
-    }
-
-
-    @Override
-    public void refreshGenreUI() {
-        prepareMovieGenreTagData();
-    }
-
-    @Override
-    public void updateUserFavorite() {
-        prepareFavorite();
-        prepareUserFavorite();
     }
 
     @Override

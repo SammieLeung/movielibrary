@@ -9,7 +9,6 @@ import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.theme.ThemeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
-import com.hphtv.movielibrary.ui.homepage.genretag.IRefreshGenre;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,6 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
     public static final int VARIETY_SHOW=4;
     public static final int UNKNOWN=5;
     protected List<Fragment> mList = new ArrayList<>(5);
-    protected List<IRefreshGenre> mIRefreshGenreList=new ArrayList<>();
 
     public HomePageTabAdapter(NoScrollAutofitHeightViewPager viewPager, FragmentManager fm) {
         super(fm,FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
@@ -49,11 +47,6 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
         mList.add(varietyShowThemeFragment);
         mList.add(unknowFileFragment);
 
-        mIRefreshGenreList.add(homePageFragment);
-        mIRefreshGenreList.add(movieThemeFragment);
-        mIRefreshGenreList.add(tvThemeFragment);
-        mIRefreshGenreList.add(childThemeFragment);
-        mIRefreshGenreList.add(varietyShowThemeFragment);
 
     }
 
@@ -78,13 +71,5 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
         }
     }
 
-    public void updateUserFragments(){
-        for (IRefreshGenre refreshGenre : mIRefreshGenreList) {
-            refreshGenre.updateUserFavorite();
-        }
-    }
 
-    public List<IRefreshGenre> getIRefreshGenreList() {
-        return mIRefreshGenreList;
-    }
 }

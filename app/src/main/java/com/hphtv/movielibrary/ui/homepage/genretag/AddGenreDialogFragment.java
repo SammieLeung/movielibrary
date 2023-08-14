@@ -31,7 +31,6 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
     public static final String TAG = AddGenreDialogFragment.class.getName();
     private GenreListApter mGenreListApter;
     private GenreListApter mGenreSortListApter;
-    private List<IRefreshGenre> mIRefreshGenreList = new ArrayList<>();
 
 
     private View.OnGenericMotionListener mOnGenericMotionListener = (v, event) -> {
@@ -139,10 +138,6 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
                 });
     }
 
-    public void addAllIRefreshGenreList(List<IRefreshGenre> iRefreshGenreList) {
-        mIRefreshGenreList.clear();
-        mIRefreshGenreList.addAll(iRefreshGenreList);
-    }
 
     public void refreshSortTips() {
         if (mBinding.rvThemeSort.isDraggable()) {
@@ -171,9 +166,6 @@ public class AddGenreDialogFragment extends BaseDialogFragment2<AddGenreDialogVi
                 .subscribe(new SimpleObserver<String>() {
                     @Override
                     public void onAction(String s) {
-                        for (IRefreshGenre refreshGenre : mIRefreshGenreList) {
-                            refreshGenre.refreshGenreUI();
-                        }
                     }
                 });
     }
