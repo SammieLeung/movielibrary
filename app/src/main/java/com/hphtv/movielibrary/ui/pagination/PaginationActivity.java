@@ -20,6 +20,7 @@ import com.hphtv.movielibrary.adapter.NewMovieItemListAdapter;
 import com.hphtv.movielibrary.databinding.ActivityPaginationBinding;
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical;
+import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical2;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.listener.OnMovieLoadListener;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
@@ -120,9 +121,12 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         super.setLoadingCancelable(true);
         super.setLoadingCancelListener(this);
         mBinding.tvTitle.setOnClickListener(v -> finish());
-        FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 5, GridLayoutManager.VERTICAL, false);
+        FilterGridLayoutManager gridLayoutManager = new FilterGridLayoutManager(this, 1920, GridLayoutManager.VERTICAL, false);
         mBinding.recyclerview.setLayoutManager(gridLayoutManager);
+
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
+        mMovieItemListAdapter.setZoomRatio(1.25688f);
+
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
         mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
             if (!data.is_user_fav)
@@ -130,14 +134,28 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
             return true;
         });
 
-        mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical(
+        mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical2(
                 getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),
-                DensityUtil.dip2px(this, 43),
-                DensityUtil.dip2px(this, 27),
-                DensityUtil.dip2px(this, 40),
-                DensityUtil.dip2px(this, 28),
+                DensityUtil.dip2px(this, 48),
+                90,
+                DensityUtil.dip2px(this, 74),
+                31,
                 5)
         );
+
+        GridLayoutManager.SpanSizeLookup lookup = new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                if (position % 5 == 0) {
+                    return 429;
+                } else if (position % 5 == 4) {
+                    return 428;
+                } else {
+                    return 354;
+                }
+            }
+        };
+        gridLayoutManager.setSpanSizeLookup(lookup);
         mBinding.recyclerview.setAdapter(mMovieItemListAdapter);
         mBinding.recyclerview.addOnScrollListener(new OnMovieLoadListener() {
             @Override
@@ -191,20 +209,20 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
     @Override
     public void OnMovieChange(MovieDataView movieDataView, int pos) {
-        if(mViewModel.getType()==PaginationViewModel.OPEN_FAVORITE){
-            if(movieDataView.is_favorite){
-                mMovieItemListAdapter.insert(movieDataView,pos);
-            }else {
+        if (mViewModel.getType() == PaginationViewModel.OPEN_FAVORITE) {
+            if (movieDataView.is_favorite) {
+                mMovieItemListAdapter.insert(movieDataView, pos);
+            } else {
                 mMovieItemListAdapter.remove(movieDataView);
             }
-        }else{
-            mMovieItemListAdapter.replace(movieDataView,pos);
+        } else {
+            mMovieItemListAdapter.replace(movieDataView, pos);
         }
     }
 
     @Override
     public void OnMovieRemove(String movie_id, String type, int pos) {
-        mMovieItemListAdapter.remove(movie_id,type,pos);
+        mMovieItemListAdapter.remove(movie_id, type, pos);
     }
 
     @Override
@@ -213,6 +231,6 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
     @Override
     public void onCancel(DialogInterface dialog) {
-            finish();
+        finish();
     }
 }

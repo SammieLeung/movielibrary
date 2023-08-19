@@ -44,104 +44,104 @@
     android:gravity="center">
 
     <RelativeLayout
-      android:layout_width="@dimen/history_w"
-      android:layout_height="wrap_content"
-      android:duplicateParentState="true"
-      android:gravity="center_horizontal">
+        android:layout_width="@dimen/history_w"
+        android:layout_height="match_parent"
+        android:duplicateParentState="true"
+        android:gravity="center_horizontal">
 
       <com.lqm.roundview.RoundImageView
-        android:id="@+id/iv_img"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/history_h"
-        android:background="@drawable/poster_item_bg"
-        android:duplicateParentState="true"
-        app:border_color="@android:color/transparent"
-        app:border_width="4dp"
-        app:corner_radius="@dimen/poster_item_1_radius" />
+          android:id="@+id/iv_img"
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/history_h"
+          android:background="@drawable/poster_item_bg"
+          android:duplicateParentState="true"
+          app:border_color="@android:color/transparent"
+          app:border_width="4dp"
+          app:corner_radius="@dimen/poster_item_1_radius" />
 
       <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/history_h"
-        android:background="@drawable/shadowline"
-        android:duplicateParentState="true" />
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/history_h"
+          android:background="@drawable/shadowline"
+          android:duplicateParentState="true" />
 
       <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="29dp"
-        android:layout_alignEnd="@id/iv_img"
-        android:layout_marginTop="11dp"
-        android:layout_marginRight="11dp"
-        android:background="@drawable/poster_item_ep_bg"
-        android:gravity="center"
-        android:paddingLeft="11dp"
-        android:paddingRight="11dp"
-        android:text="@{tag}"
-        android:textColor="@color/white"
-        android:textSize="17sp"
-        android:visibility="@{!showConrerMark||TextUtils.isEmpty(tag)?View.GONE:View.VISIBLE}" />
+          android:layout_width="wrap_content"
+          android:layout_height="29dp"
+          android:layout_alignEnd="@id/iv_img"
+          android:layout_marginTop="11dp"
+          android:layout_marginRight="11dp"
+          android:background="@drawable/poster_item_ep_bg"
+          android:gravity="center"
+          android:paddingLeft="11dp"
+          android:paddingRight="11dp"
+          android:text="@{tag}"
+          android:textColor="@color/white"
+          android:textSize="17sp"
+          android:visibility="@{!showConrerMark||TextUtils.isEmpty(tag)?View.GONE:View.VISIBLE}" />
 
       <TextView
-        android:visibility="@{max!=0&amp;&amp;progress&lt;98?View.VISIBLE:View.GONE}"
-        android:id="@+id/tv_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/pb_history"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="11dp"
-        android:background="@drawable/history_item_progress_text_bg"
-        android:gravity="center"
-        android:minHeight="23sp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@{progress_format_text}"
-        android:textColor="#e5e5e5" />
+          android:id="@+id/tv_progress"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_above="@id/pb_history"
+          android:layout_alignParentEnd="true"
+          android:layout_marginEnd="8dp"
+          android:layout_marginBottom="11dp"
+          android:background="@drawable/history_item_progress_text_bg"
+          android:gravity="center"
+          android:minHeight="23sp"
+          android:paddingStart="8dp"
+          android:paddingEnd="8dp"
+          android:text="@{progress_format_text}"
+          android:textColor="#e5e5e5"
+          android:visibility="@{max!=0&amp;&amp;progress&lt;98?View.VISIBLE:View.GONE}" />
 
       <TextView
-        android:visibility="@{progress>=98?View.VISIBLE:View.GONE}"
-        android:id="@+id/tv_playback_end"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@id/iv_img"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/history_item_progress_text_bg"
-        android:gravity="center"
-        android:minHeight="23sp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:text="@string/state_watched"
-        android:textColor="#e5e5e5" />
+          android:id="@+id/tv_playback_end"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignBottom="@id/iv_img"
+          android:layout_alignParentEnd="true"
+          android:layout_marginEnd="8dp"
+          android:layout_marginBottom="8dp"
+          android:background="@drawable/history_item_progress_text_bg"
+          android:gravity="center"
+          android:minHeight="23sp"
+          android:paddingStart="8dp"
+          android:paddingEnd="8dp"
+          android:text="@string/state_watched"
+          android:textColor="#e5e5e5"
+          android:visibility="@{progress>=98?View.VISIBLE:View.GONE}" />
 
       <ProgressBar
-        android:visibility="@{max!=0&amp;&amp;progress&lt;98?View.VISIBLE:View.GONE}"
-        android:id="@+id/pb_history"
-        style="@style/history_dataview_playback_progress"
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_alignBottom="@id/iv_img"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:progress="@{progress}" />
+          android:id="@+id/pb_history"
+          style="@style/history_dataview_playback_progress"
+          android:layout_width="match_parent"
+          android:layout_height="5dp"
+          android:layout_alignBottom="@id/iv_img"
+          android:layout_marginStart="8dp"
+          android:layout_marginEnd="8dp"
+          android:layout_marginBottom="8dp"
+          android:progress="@{progress}"
+          android:visibility="@{max!=0&amp;&amp;progress&lt;98?View.VISIBLE:View.GONE}" />
 
 
       <TextView
-        android:id="@id/tv_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/iv_img"
-        android:layout_marginTop="15dp"
-        android:duplicateParentState="true"
-        android:ellipsize="end"
-        android:gravity="center"
-        android:maxLines="2"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:text="@{title}"
-        android:textColor="@color/white"
-        android:textSize="23sp" />
+          android:id="@id/tv_title"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/iv_img"
+          android:layout_marginTop="15dp"
+          android:duplicateParentState="true"
+          android:ellipsize="end"
+          android:gravity="center"
+          android:maxLines="2"
+          android:paddingLeft="4dp"
+          android:paddingRight="4dp"
+          android:text="@{title}"
+          android:textColor="@color/white"
+          android:textSize="23sp" />
     </RelativeLayout>
 
 

@@ -12,14 +12,14 @@
         android:duplicateParentState="true"
         android:layout_width="match_parent"
         android:text="@{text}"
-        android:textSize="27sp"
+        android:textSize="24sp"
         android:paddingLeft="21dp"
         android:paddingRight="21dp"
         android:paddingTop="9dp"
         android:paddingBottom="9dp"
-        android:textStyle="bold"
         android:textColor="@drawable/new_common_tab_textcolor_state"
-        android:drawablePadding="6dp"
+        android:drawablePadding="2dp"
+        android:textFontWeight="500"
         android:layout_height="match_parent">
 
     </TextView>

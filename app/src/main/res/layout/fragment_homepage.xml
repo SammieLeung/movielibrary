@@ -4,16 +4,18 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
         <LinearLayout
             android:visibility="@{isLoading?View.GONE:hasHistory||recentAdd||recommand?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="100dp"
             android:orientation="vertical">
 
             <TextView
                 android:visibility="@{hasHistory?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="75dp"
+                android:layout_marginTop="48dp"
                 style="@style/homepage_head_title"
                 android:id="@+id/tv_history_title"
                 android:text="@string/history_list_title"

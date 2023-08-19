@@ -72,6 +72,13 @@ class FilterFragment constructor(val videoType: VideoType) :
         |-----------|-----------|-----------|-----------|-----------|
         |    429    |    354    |    354    |    354    |    428    |
       */
+    /*
+        |                      ------1440------                     |
+        |-----1-----|-----2-----|-----3-----|-----4-----|-----5-----|
+        |67.5]243[12|11] 243 [12|11] 243 [12|11] 243 [12|11]243[67.5|
+        |-----------|-----------|-----------|-----------|-----------|
+        |    321    |    265    |    265    |    265    |    321    |
+      */
     private fun initRecyclerView(movieList: TvRecyclerView) {
         adapter.setZoomRatio(1.25688f)
         movieList.adapter = adapter
@@ -81,9 +88,9 @@ class FilterFragment constructor(val videoType: VideoType) :
             GridSpacingItemDecorationVertical2(
                 /* itemWidth = */ R.dimen.poster_item_1_w.dimen,
                 /* firstRowSpacing = */ 87.dp,
-                /* edgeSpacing = */ 64.dp,
+                /* edgeSpacing = */ 90,
                 /* rowSpacing = */ 74.dp,
-                /* columnSpacing = */ 21.dp,
+                /* columnSpacing = */ 31,
                 /* spanCount = */ 5
             )
         )

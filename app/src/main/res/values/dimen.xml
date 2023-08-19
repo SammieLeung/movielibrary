@@ -35,7 +35,7 @@
     <dimen name="round_rect_item_margin">29dp</dimen>
     <dimen name="round_rect_radius">15dp</dimen>
 
-    <dimen name="poster_item_1_w">250dp</dimen>
+    <dimen name="poster_item_1_w">243dp</dimen>
     <dimen name="poster_item_1_h">337dp</dimen>
     <dimen name="poster_item_1_margin">33dp</dimen>
     <dimen name="poster_item_1_radius">15dp</dimen>

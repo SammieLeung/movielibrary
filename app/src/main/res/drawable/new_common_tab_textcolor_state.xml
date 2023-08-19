@@ -3,6 +3,6 @@
     <item android:color="#FFFFFF" android:state_hovered="true" />
     <item android:color="#FFFFFF" android:state_focused="true" />
     <item android:color="#FFFFFF" android:state_selected="true" />
-    <item android:color="#4DFFFFFF" />
+    <item android:color="#838384" />
 
 </selector>
