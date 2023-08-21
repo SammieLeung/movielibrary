@@ -56,7 +56,7 @@
           android:background="@drawable/poster_item_bg"
           android:duplicateParentState="true"
           app:border_color="@android:color/transparent"
-          app:border_width="4dp"
+          app:border_width="@dimen/poster_border_width"
           app:corner_radius="@dimen/poster_item_1_radius" />
 
       <View

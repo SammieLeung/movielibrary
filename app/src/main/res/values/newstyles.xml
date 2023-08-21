@@ -108,6 +108,8 @@
         <item name="android:paddingRight">@dimen/common_activity_margin_lr</item>
         <item name="android:textSize">35sp</item>
         <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textFontWeight">500</item>
     </style>
 
     <style name="include_size_shortcut_scan_item">

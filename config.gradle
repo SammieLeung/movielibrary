@@ -4,7 +4,7 @@ ext {
             compileSdkVersion: 33,
             buildToolsVersion: "33.0.0",
             applicationId    : "com.hphtv.movielibrary",
-            minSdkVersion    : 26,
+            minSdkVersion    : 29,
             targetSdkVersion : 33,
             versionCode      : 55,
             versionName      : "3.3.5",

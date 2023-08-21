@@ -63,6 +63,7 @@
                 style="@style/homepage_head_title"
                 android:id="@+id/tv_recommand"
                 android:text="@string/recommand_list_title"
+                android:fontFamily="sans-serif"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
             <com.hphtv.movielibrary.ui.view.TvRecyclerView

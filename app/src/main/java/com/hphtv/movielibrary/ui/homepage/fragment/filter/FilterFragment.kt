@@ -65,32 +65,34 @@ class FilterFragment constructor(val videoType: VideoType) :
         }
     }
 
+
     /*
-        |                      ------1920------                     |
-        |-----1-----|-----2-----|-----3-----|-----4-----|-----5-----|
-        |85] 333 [11|10] 333 [11|10] 333 [11|10] 333 [11|10] 333 [85|
-        |-----------|-----------|-----------|-----------|-----------|
-        |    429    |    354    |    354    |    354    |    428    |
-      */
+       |                      ------1920------                     |
+       |-----1-----|-----2-----|-----3-----|-----4-----|-----5-----|
+       |83] 338  [8|8]  338  [8|8]  338  [8|8]  338  [8|8]  338 [83|
+       |-----------|-----------|-----------|-----------|-----------|
+       |    429    |    354    |    354    |    354    |    429    |
+     */
+
     /*
-        |                      ------1440------                     |
-        |-----1-----|-----2-----|-----3-----|-----4-----|-----5-----|
-        |67.5]243[12|11] 243 [12|11] 243 [12|11] 243 [12|11]243[67.5|
-        |-----------|-----------|-----------|-----------|-----------|
-        |    321    |    265    |    265    |    265    |    321    |
-      */
+     |                      ------1920------                     |
+     |-----1-----|-----2-----|-----3-----|-----4-----|-----5-----|
+     |80] 340  [8|7]  340  [8|7]  340  [8|7]  340  [8|7]  340 [80|
+     |-----------|-----------|-----------|-----------|-----------|
+     |    429    |    354    |    354    |    354    |    429    |
+   */
     private fun initRecyclerView(movieList: TvRecyclerView) {
-        adapter.setZoomRatio(1.25688f)
+        adapter.setZoomRatio(1.208888f)
         movieList.adapter = adapter
         movieList.layoutManager =
             FilterGridLayoutManager(context, 1920, GridLayoutManager.VERTICAL, false)
         movieList.addItemDecoration(
             GridSpacingItemDecorationVertical2(
                 /* itemWidth = */ R.dimen.poster_item_1_w.dimen,
-                /* firstRowSpacing = */ 87.dp,
-                /* edgeSpacing = */ 90,
-                /* rowSpacing = */ 74.dp,
-                /* columnSpacing = */ 31,
+                /* firstRowSpacing = */ 81.dp,
+                /* edgeSpacing = */ 80,
+                /* rowSpacing = */ 65.dp,
+                /* columnSpacing = */ 16,
                 /* spanCount = */ 5
             )
         )
@@ -103,7 +105,7 @@ class FilterFragment constructor(val videoType: VideoType) :
             object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
                     return if (position % 5 == 0) {
-                        429
+                        428
                     } else if (position % 5 == 4) {
                         428
                     } else {

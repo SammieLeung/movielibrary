@@ -13,16 +13,28 @@ import org.jetbrains.annotations.NotNull;
  * date:  2022/1/17
  */
 public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
-    private int mSpecialSpace;
-    private int mLRspace;
-    private int mTBspace;
+    private int mEdgeSpace;
+    private int mLeftSpace;
+    private int mRightSpace;
+    private int mTopSpace;
+    private int mBottomSpace;
 
     public static final String TAG = SpacingItemDecoration.class.getSimpleName();
 
     public SpacingItemDecoration(int specialSpace,int lrspace,int tbspace) {
-        mSpecialSpace=specialSpace;
-        mLRspace =lrspace;
-        mTBspace=tbspace;
+        mEdgeSpace=specialSpace;
+        mLeftSpace =lrspace;
+        mRightSpace=lrspace;
+        mTopSpace=tbspace;
+        mBottomSpace=tbspace;
+    }
+
+    public SpacingItemDecoration(int edgeSpace,int leftSpace,int rightSpace,int topSpace,int bottomSpace) {
+        mEdgeSpace=edgeSpace;
+        mLeftSpace =leftSpace;
+        mRightSpace=rightSpace;
+        mTopSpace=topSpace;
+        mBottomSpace=bottomSpace;
     }
 
 
@@ -31,26 +43,26 @@ public class SpacingItemDecoration extends RecyclerView.ItemDecoration {
         if (view.getTag() != null && view.getTag() instanceof Integer) {
             int pos = (int) view.getTag();
             if (pos == 0) {
-                outRect.left = mSpecialSpace;
-                outRect.right = mLRspace;
-                outRect.top = mTBspace;
-                outRect.bottom = mTBspace;
+                outRect.left = mEdgeSpace;
+                outRect.right = mLeftSpace;
+                outRect.top = mTopSpace;
+                outRect.bottom = mBottomSpace;
             } else if (pos == state.getItemCount() - 1) {
-                outRect.left = mLRspace;
-                outRect.right = mSpecialSpace;
-                outRect.top = mTBspace;
-                outRect.bottom = mTBspace;
+                outRect.left = mLeftSpace;
+                outRect.right = mEdgeSpace;
+                outRect.top = mTopSpace;
+                outRect.bottom = mBottomSpace;
             } else {
-                outRect.left = mLRspace;
-                outRect.right = mLRspace;
-                outRect.top = mTBspace;
-                outRect.bottom = mTBspace;
+                outRect.left = mLeftSpace;
+                outRect.right = mRightSpace;
+                outRect.top = mTopSpace;
+                outRect.bottom = mBottomSpace;
             }
         } else {
-            outRect.left = mLRspace;
-            outRect.right = mLRspace;
-            outRect.top = mTBspace;
-            outRect.bottom = mTBspace;
+            outRect.left = mLeftSpace;
+            outRect.right = mRightSpace;
+            outRect.top = mTopSpace;
+            outRect.bottom = mBottomSpace;
         }
 
     }

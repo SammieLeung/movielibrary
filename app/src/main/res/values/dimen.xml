@@ -21,11 +21,9 @@
     <dimen name="homepage_tab_radius">30dp</dimen>
     <!--    -->
     <dimen name="image_btn_wh">64dp</dimen>
-    <dimen name="recently_added_container_h">442dp</dimen>
+    <dimen name="recently_added_container_h">466dp</dimen>
 
 
-    <dimen name="history_item_w">286dp</dimen>
-    <dimen name="history_item_h">158dp</dimen>
 
     <dimen name="circle_item_len">113dp</dimen>
     <dimen name="circle_item_margin">34dp</dimen>
@@ -35,13 +33,17 @@
     <dimen name="round_rect_item_margin">29dp</dimen>
     <dimen name="round_rect_radius">15dp</dimen>
 
-    <dimen name="poster_item_1_w">243dp</dimen>
-    <dimen name="poster_item_1_h">337dp</dimen>
+    <dimen name="poster_item_1_w_wrap">261dp</dimen>
+    <dimen name="poster_item_1_h_wrap">355dp</dimen>
+
+
+    <dimen name="poster_item_1_w">256dp</dimen>
+    <dimen name="poster_item_1_h">350dp</dimen>
     <dimen name="poster_item_1_margin">33dp</dimen>
     <dimen name="poster_item_1_radius">15dp</dimen>
     <dimen name="poster_item_1_tv_h">38dp</dimen>
     <dimen name="poster_item_1_textsize">38sp</dimen>
-    <dimen name="poster_border_width">8dp</dimen>
+    <dimen name="poster_border_width">7dp</dimen>
     <dimen name="poster_item_large_w">264dp</dimen>
     <dimen name="poster_item_large_h">367dp</dimen>
     <dimen name="genre_edit_dialog_w">305dp</dimen>

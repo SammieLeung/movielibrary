@@ -7,6 +7,8 @@
     <style name="MyTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/start_waiting_bg</item>
         <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:fontFamily">sans-serif-thin</item>
+        <item name="android:textFontWeight">300</item>
 <!--        <item name="android:windowIsTranslucent">true</item>-->
         <!--        <item name="android:typeface">serif</item>-->
     </style>
