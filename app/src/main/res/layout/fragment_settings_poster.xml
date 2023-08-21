@@ -54,24 +54,13 @@
             app:title="@{@string/settings_poster_show_cornermark}"
             tools:ignore="IncludeLayoutParam" />
 
-        <include
-            android:id="@+id/option_like"
-            style="@style/settings_poster_options_item_size"
-            layout="@layout/settings_options_item"
-            android:layout_below="@id/option_cornermark"
-            android:layout_marginLeft="84dp"
-            android:layout_marginBottom="15dp"
-            app:nextFocus="@{nextFocus}"
-            app:state="@{likeState}"
-            app:title="@{@string/settings_poster_show_like}"
-            tools:ignore="IncludeLayoutParam" />
 
         <include
             android:id="@+id/option_title"
             style="@style/settings_poster_options_item_size"
             layout="@layout/settings_options_item"
             android:layout_marginLeft="84dp"
-            android:layout_marginTop="170dp"
+            android:layout_marginTop="240dp"
             android:layout_marginBottom="15dp"
             app:nextFocus="@{nextFocus}"
             app:state="@{titleState}"
@@ -89,7 +78,6 @@
             app:like="@{true}"
             app:rating="@{@string/sample_rating}"
             app:showConrerMark="@{cornerMarkState}"
-            app:showLike="@{likeState}"
             app:showRating="@{ratingState}"
             app:showTitle="@{titleState}"
             app:tag="@{@string/sample_tag}"

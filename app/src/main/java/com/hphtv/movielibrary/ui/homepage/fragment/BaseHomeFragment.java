@@ -116,7 +116,6 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     public void prepareAll() {
         prepareHistoryData();
         prepareRecentlyAddedMovie();
-
     }
 
 
@@ -127,8 +126,15 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvHistoryList.setLayoutManager(mLayoutManager);
         mBinding.rvHistoryList.setOnBackPressListener(mOnBackPressListener);
-        mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelSize(R.dimen.common_activity_margin_lr), DensityUtil.dip2px(requireContext(), 5), DensityUtil.dip2px(getContext(), 15)));
+        mBinding.rvHistoryList.addItemDecoration(new SpacingItemDecoration(
+                81,
+                4,
+                3,
+                54,
+                110
+        ));
         mHistoryListAdapter = new HistoryListAdapter(getContext(), mViewModel.getRecentlyPlayedList());
+        mHistoryListAdapter.setZoomRatio(1.20888888888f);
         mBinding.rvHistoryList.setAdapter(mHistoryListAdapter);
         mHistoryListAdapter.setOnItemClickListener((view, position, data) -> {
             if (data._mid < 0 || Constants.RecentlyVideoAction.playNow
@@ -164,6 +170,14 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         });
     }
 
+    /*
+     |                      ------1920------                     |
+     |-----1-----|-----2-----|-----3-----|-----4-----|-----5-----|
+     |80] 340  [8|7]  340  [8|7]  340  [8|7]  340  [8|7]  340 [80|
+     |-----------|-----------|-----------|-----------|-----------|
+     |    429    |    354    |    354    |    354    |    429    |
+   */
+
     /**
      * 初始化最新添加列表
      */
@@ -171,7 +185,13 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecentlyAdded.setLayoutManager(mLayoutManager);
         mBinding.rvRecentlyAdded.setOnBackPressListener(mOnBackPressListener);
-        mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelSize(R.dimen.common_activity_margin_lr), DensityUtil.dip2px(requireContext(), 5), DensityUtil.dip2px(getContext(), 30)));
+        mBinding.rvRecentlyAdded.addItemDecoration(new SpacingItemDecoration(
+                80,
+                8,
+                7,
+                46,
+                131
+        ));
         mRecentlyAddListAdapter = new NewMovieItemWithMoreListAdapter(getContext(), mViewModel.getRecentlyAddedList(), PaginationViewModel.OPEN_RECENTLY_ADD);
         mRecentlyAddListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
         mRecentlyAddListAdapter.setOnMoreItemClickListener(mOnMoreItemClickListener);
@@ -185,12 +205,17 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         mBinding.rvRecommand.setLayoutManager(mLayoutManager);
         mBinding.rvRecommand.setOnBackPressListener(mOnBackPressListener);
-        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(getResources().getDimensionPixelSize(R.dimen.common_activity_margin_lr), DensityUtil.dip2px(requireContext(), 5), DensityUtil.dip2px(getContext(), 30)));
+        mBinding.rvRecommand.addItemDecoration(new SpacingItemDecoration(
+                80,
+                8,
+                7,
+                46,
+                131
+        ));
         mRecommendListAdapter = new NewMovieItemListAdapter(getContext(), mViewModel.getRecommendList());
         mRecommendListAdapter.setOnItemClickListener(mMovieDataViewEventListener);
         mBinding.rvRecommand.setAdapter(mRecommendListAdapter);
 //        mRecommandListAdapter.setOnItemLongClickListener(mPosterItemLongClickListener);
-
     }
 
     /**
@@ -210,12 +235,8 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
     private void updateRecentlyPlayed(List<HistoryMovieDataView> historyList) {
         if (historyList.size() > 0) {
             mBinding.setHasHistory(true);
-            mBinding.rvHistoryList.setVisibility(View.VISIBLE);
-            mBinding.tvHistoryEmptyTips.setVisibility(View.GONE);
         } else {
             mBinding.setHasHistory(false);
-            mBinding.tvHistoryEmptyTips.setVisibility(View.VISIBLE);
-            mBinding.rvHistoryList.setVisibility(View.GONE);
         }
         mHistoryListAdapter.addAll(historyList);
     }

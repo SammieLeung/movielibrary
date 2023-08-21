@@ -1,6 +1,9 @@
 package com.hphtv.movielibrary.ui.settings;
 
+import static com.hphtv.movielibrary.data.Constants.REQUEST_CODE_SETTINGS;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.InputDevice;
 import android.view.MotionEvent;
@@ -13,6 +16,7 @@ import androidx.databinding.ObservableInt;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.ActivitySettingsBinding;
 import com.hphtv.movielibrary.roomdb.dao.MovieVideofileCrossRefDao;
 import com.hphtv.movielibrary.ui.AppBaseActivity;
@@ -32,7 +36,7 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
     private PreferenceFragment mPreferenceFragment;
     private AboutFragment mAboutFragment;
 
-    private Observable.OnPropertyChangedCallback mPropertyChangedCallback=new Observable.OnPropertyChangedCallback() {
+    private Observable.OnPropertyChangedCallback mPropertyChangedCallback = new Observable.OnPropertyChangedCallback() {
         @Override
         public void onPropertyChanged(Observable sender, int propertyId) {
             getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -93,8 +97,11 @@ public class SettingsActivity extends AppBaseActivity<SettingsViewModel, Activit
         mViewModel.getFlagRefresh().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
             @Override
             public void onPropertyChanged(Observable sender, int propertyId) {
-                if (mViewModel.getFlagRefresh().get())
-                    setResult(Activity.RESULT_OK);
+                if (mViewModel.getFlagRefresh().get()) {
+                    Intent intent = new Intent();
+                    intent.putExtra(Constants.Extras.REQUEST_CODE, REQUEST_CODE_SETTINGS);
+                    setResult(Activity.RESULT_OK, intent);
+                }
             }
         });
         mViewModel.getSelectPos().addOnPropertyChangedCallback(mPropertyChangedCallback);

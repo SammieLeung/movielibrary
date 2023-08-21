@@ -67,7 +67,6 @@ public class PosterMenuDialog extends BaseDialogFragment2<PosterMenuViewModel, D
 
     private void initView() {
         mBinding.includeAp.view.setOnClickListener(v -> mViewModel.toggleAccessRights((OnMovieChangeListener) getActivity()));
-        mBinding.includeFavorite.view.setOnClickListener(v -> mViewModel.toggleLike((OnMovieChangeListener) getActivity()));
         mBinding.includeAddVideotag.view.setOnClickListener(v -> {
         });
         mBinding.includeSelectPoster.view.setOnClickListener(v -> showSearchDialog());

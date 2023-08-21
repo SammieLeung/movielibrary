@@ -4,101 +4,87 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
+
         <LinearLayout
-            android:visibility="@{isLoading?View.GONE:hasHistory||recentAdd||recommand?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="100dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{isLoading?View.GONE:hasHistory||recentAdd||recommand?View.VISIBLE:View.GONE}">
 
             <TextView
-                android:visibility="@{hasHistory?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="48dp"
-                style="@style/homepage_head_title"
                 android:id="@+id/tv_history_title"
+                style="@style/homepage_head_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
                 android:text="@string/history_list_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-            <RelativeLayout
-                android:visibility="@{hasHistory?View.VISIBLE:View.GONE}"
-                android:id="@+id/view_history"
-                android:layout_width="match_parent"
-                android:layout_marginTop="13dp"
-                android:layout_height="293dp">
-                <TextView
-                    android:id="@+id/tv_history_empty_tips"
-                    android:gravity="center"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:textSize="28sp"
-                    android:text="@string/history_list_empty"/>
+                android:visibility="@{hasHistory?View.VISIBLE:View.GONE}" />
 
-                <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                  android:id="@+id/rv_history_list"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent" />
-            </RelativeLayout>
+            <com.hphtv.movielibrary.ui.view.TvRecyclerView
+                android:id="@+id/rv_history_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{hasHistory?View.VISIBLE:View.GONE}" />
 
             <TextView
-                android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="47dp"
-                style="@style/homepage_head_title"
                 android:id="@+id/tv_recently_added"
-                android:text="@string/recently_added_list_title"
+                style="@style/homepage_head_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:text="@string/recently_added_list_title"
+                android:visibility="@{recentAdd?View.VISIBLE:View.GONE}" />
+
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                android:visibility="@{recentAdd?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_recently_added"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/recently_added_container_h"/>
+                android:layout_height="wrap_content"
+                android:visibility="@{recentAdd?View.VISIBLE:View.GONE}" />
 
 
             <TextView
-                android:visibility="@{recommand?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="@dimen/homepage_title_margin_top"
-                style="@style/homepage_head_title"
                 android:id="@+id/tv_recommand"
-                android:text="@string/recommand_list_title"
-                android:fontFamily="sans-serif"
+                style="@style/homepage_head_title"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
+                android:text="@string/recommand_list_title"
+                android:visibility="@{recommand?View.VISIBLE:View.GONE}" />
+
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
-                android:visibility="@{recommand?View.VISIBLE:View.GONE}"
-                android:layout_marginTop="@dimen/homepage_video_rv_margin_top"
                 android:id="@+id/rv_recommand"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/recently_added_container_h"/>
+                android:layout_height="wrap_content"
+                android:visibility="@{recommand?View.VISIBLE:View.GONE}" />
         </LinearLayout>
+
         <RelativeLayout
-            android:visibility="@{isLoading?View.GONE:!(hasHistory||recentAdd||recommand)?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            >
+            android:visibility="@{isLoading?View.GONE:!(hasHistory||recentAdd||recommand)?View.VISIBLE:View.GONE}">
+
             <ImageView
-                android:layout_marginTop="165dp"
-                android:layout_centerHorizontal="true"
                 android:id="@+id/iv_empty"
-                android:src="@mipmap/empty_img"
                 android:layout_width="158dp"
-                android:layout_height="131dp"/>
+                android:layout_height="131dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="165dp"
+                android:src="@mipmap/empty_img" />
+
             <TextView
-                android:layout_marginTop="30dp"
+                android:id="@+id/tv_empty_tips_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/iv_empty"
                 android:layout_centerHorizontal="true"
-                android:id="@+id/tv_empty_tips_1"
+                android:layout_marginTop="30dp"
                 android:text="@string/homepage_empty"
-                android:textSize="26sp"
-                android:textStyle="bold"
                 android:textColor="@color/white"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:textSize="26sp"
+                android:textStyle="bold" />
 
             <Button
-                android:focusedByDefault="true"
                 android:id="@+id/btn_quick_add_shortcut"
                 style="@style/common_content_s_text_style"
                 android:layout_width="wrap_content"
@@ -107,47 +93,57 @@
                 android:layout_centerInParent="true"
                 android:layout_marginTop="13dp"
                 android:background="@{VideoType.child.equals(type)?@drawable/new_common_spinner_child_bg:@drawable/new_common_spinner_bg}"
+                android:focusedByDefault="true"
                 android:padding="15dp"
                 android:text="@string/homepage_goto_add_shortcut" />
         </RelativeLayout>
+
         <RelativeLayout
-          android:visibility="@{isLoading?View.VISIBLE:View.GONE}"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{isLoading?View.VISIBLE:View.GONE}">
+
             <com.github.ybq.android.spinkit.SpinKitView
-              android:id="@+id/spin_kit"
-              style="@style/SpinKitView.Circle"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_marginTop="250dp"
-              android:padding="30dp"
-              android:maxWidth="60dp"
-              android:minWidth="60dp"
-              android:maxHeight="60dp"
-              android:minHeight="60dp"
-              android:layout_centerHorizontal="true"
-              android:background="@{VideoType.child.equals(type)?@drawable/loading_view_child_bg:@drawable/loading_view_bg}"
-              app:SpinKit_Color="@color/white_light" />
+                android:id="@+id/spin_kit"
+                style="@style/SpinKitView.Circle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="250dp"
+                android:background="@{VideoType.child.equals(type)?@drawable/loading_view_child_bg:@drawable/loading_view_bg}"
+                android:maxWidth="60dp"
+                android:maxHeight="60dp"
+                android:minWidth="60dp"
+                android:minHeight="60dp"
+                android:padding="30dp"
+                app:SpinKit_Color="@color/white_light" />
         </RelativeLayout>
     </RelativeLayout>
 
     <data>
-        <import type="android.view.View"/>
-        <import type="com.hphtv.movielibrary.data.Constants.VideoType"/>
+
+        <import type="android.view.View" />
+
+        <import type="com.hphtv.movielibrary.data.Constants.VideoType" />
+
         <variable
             name="recentAdd"
             type="boolean" />
+
         <variable
             name="recommand"
             type="boolean" />
+
         <variable
-          name="hasHistory"
-          type="boolean" />
+            name="hasHistory"
+            type="boolean" />
+
         <variable
-          name="isLoading"
-          type="boolean" />
+            name="isLoading"
+            type="boolean" />
+
         <variable
-          name="type"
-          type="VideoType" />
+            name="type"
+            type="VideoType" />
     </data>
 </layout>

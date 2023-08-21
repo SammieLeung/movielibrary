@@ -6,8 +6,8 @@
     <dimen name="keybtn_item_h">116dp</dimen>
 
 
-    <dimen name="history_w">410dp</dimen>
-    <dimen name="history_h">216dp</dimen>
+    <dimen name="history_w">435dp</dimen>
+    <dimen name="history_h">235.5dp</dimen>
 
 
     <dimen name="unionsearch_movie_cover_w">158dp</dimen>

@@ -47,7 +47,6 @@ public class PosterFragment extends BaseFragment2<SettingsViewModel, FragmentSet
     private void initView() {
         mBinding.optionTitle.view.setOnClickListener(mViewModel::toggleTitle);
         mBinding.optionPoster.view.setOnClickListener(mViewModel::togglePoster);
-        mBinding.optionLike.view.setOnClickListener(mViewModel::toggleLike);
         mBinding.optionRating.view.setOnClickListener(mViewModel::toggleRating);
         mBinding.optionCornermark.view.setOnClickListener(mViewModel::toggleCornermark);
         mBinding.setCornerMarkState(Config.getShowCornerMark());

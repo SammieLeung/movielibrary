@@ -89,16 +89,6 @@
               tools:ignore="IncludeLayoutParam" />
 
             <include
-              android:id="@+id/include_favorite"
-              style="@style/poster_menu_sub_item_size"
-              layout="@layout/postermenu_checkbtn_item"
-              android:layout_marginBottom="17dp"
-              android:visibility="@{isMatched?View.VISIBLE:View.GONE}"
-              app:checkstate="@{likeState}"
-              app:title="@{@string/postermenu_mark_as_like}"
-              tools:ignore="IncludeLayoutParam" />
-
-            <include
               android:id="@+id/include_clear_poster"
               style="@style/poster_menu_sub_item_size"
               layout="@layout/postermenu_more_item"

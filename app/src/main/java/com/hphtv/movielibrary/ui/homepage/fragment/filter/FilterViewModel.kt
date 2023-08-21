@@ -21,7 +21,6 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
     private val movieLibraryRoomDatabase = MovieLibraryRoomDatabase.getDatabase(getApplication())
     private val movieDao: MovieDao = movieLibraryRoomDatabase.movieDao
     private val videoTagDao: VideoTagDao = movieLibraryRoomDatabase.videoTagDao
-    private val pageMap = mutableMapOf<Int, Int>()
     private var shortcut: Shortcut? = null
     private var videoTag: VideoTag? = null
     private var genreName: String? = null
@@ -44,6 +43,11 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
                 offset: Int,
                 limit: Int
             ): List<MovieDataView> {
+
+                if (videoTag == null) {
+                    return emptyList()
+                }
+
                 return movieDao.queryMovieDataView(
                     shortcut?.uri,
                     videoTag?.vtid ?: -1,
@@ -87,19 +91,10 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
         mOnRefresh = onRefresh
     }
 
-    private fun setEmptyList(){
-        mOnRefresh?.newSearch(emptyList())
-    }
-
     fun setVideoType(videoType: VideoType) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
             videoTag = videoTagDao.queryVtidByNormalTag(videoType.name)
-            if (videoTag != null || videoType == VideoType.all) {
-                reloadMovies()
-            } else {
-                setEmptyList()
-            }
-
+            reloadMovies()
         }
     }
 

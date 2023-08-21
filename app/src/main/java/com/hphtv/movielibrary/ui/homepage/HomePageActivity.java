@@ -286,7 +286,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                     tab.view.setOnClickListener(v -> {
                         FilterBoxDialogFragment dialogFragment = FilterBoxDialogFragment.newInstance(pos, new OnFilterChangerListener() {
                             @Override
-                            public void onFilterChange(@Nullable Shortcut shortcut,  @Nullable String genre, @Nullable String startYear, @Nullable String endYear) {
+                            public void onFilterChange(@Nullable Shortcut shortcut, @Nullable String genre, @Nullable String startYear, @Nullable String endYear) {
                                 ((FilterFragment) mNewHomePageTabAdapter.getItem(pos)).setFilter(shortcut, genre, startYear, endYear);
                             }
 
@@ -370,21 +370,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 //        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
         mViewModel.getChildMode().set(Config.isChildMode());
         Logger.d("result data=" + result.getData());
-        if (result.getData() != null)
-            //刷新各个子Fragment状态
-            for (Fragment fragment : mNewHomePageTabAdapter.mList) {
-                Logger.d("result data=" + result.getData().getIntExtra(Constants.Extras.REQUEST_CODE, 0));
-
-                if (result.getData().getIntExtra(Constants.Extras.REQUEST_CODE, 0) == REQUEST_CODE_FROM_BASE_FILTER) {
-                    if (fragment instanceof FilterFragment) {
-                        FilterFragment baseFilterFragment = (FilterFragment) fragment;
-                        baseFilterFragment.forceRefresh();
-                    }
-                } else if (fragment instanceof IActivityResult) {
-                    IActivityResult activityResult = (IActivityResult) fragment;
-                    activityResult.forceRefresh();
-                }
+        for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+            if (fragment instanceof IActivityResult) {
+                IActivityResult activityResult = (IActivityResult) fragment;
+                activityResult.forceRefresh();
             }
+        }
     }
 
     /**
