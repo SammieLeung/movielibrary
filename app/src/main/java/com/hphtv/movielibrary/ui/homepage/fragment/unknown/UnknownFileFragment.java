@@ -77,7 +77,7 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
     };
 
     public UnknownFileFragment() {
-        super(UnknownFileFragment.class.getSimpleName());
+        super();
     }
 
     public static UnknownFileFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position) {

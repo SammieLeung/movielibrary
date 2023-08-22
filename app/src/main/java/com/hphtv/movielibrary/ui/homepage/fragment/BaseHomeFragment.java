@@ -78,8 +78,8 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
 
     protected abstract String getVideoTagName();
 
-    public BaseHomeFragment(String tag) {
-        super(tag);
+    public BaseHomeFragment() {
+        super();
     }
 
     @Override

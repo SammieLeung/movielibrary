@@ -15,8 +15,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.firefly.videonameparser.VideoNameParser2;
-import com.hphtv.movielibrary.data.Config;
+import com.firefly.videonameparser.VideoNameParserV2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao;
@@ -86,7 +85,7 @@ public class MovieLibraryProvider extends ContentProvider {
         matcher.addURI(AUTHORITY, "app_pre_match", APP_PRE_MATCH);
         matcher.addURI(AUTHORITY, "app_remove_videofile", APP_REMOVE_FILE);
 
-        return false;
+        return true;
     }
 
 
@@ -382,7 +381,7 @@ public class MovieLibraryProvider extends ContentProvider {
             videoFile.path = videoFilePath;
             videoFile.dirPath = shortcutUri;
             videoFile.devicePath = devicePath;
-            VideoNameParser2 parser = new VideoNameParser2();
+            VideoNameParserV2 parser = new VideoNameParserV2();
             MovieNameInfo nameInfo = parser.parseVideoName(videoFile.path);
             String keyword = nameInfo.getName();
             videoFile.keyword = keyword;

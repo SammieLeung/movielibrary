@@ -369,13 +369,13 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         //刷新显示儿童模式状态
 //        mViewModel.getChildMode().set(!Config.isTempCloseChildMode() && Config.isChildMode());
         mViewModel.getChildMode().set(Config.isChildMode());
-        Logger.d("result data=" + result.getData());
-        for (Fragment fragment : mNewHomePageTabAdapter.mList) {
-            if (fragment instanceof IActivityResult) {
-                IActivityResult activityResult = (IActivityResult) fragment;
-                activityResult.forceRefresh();
+        if (result.getResultCode() == RESULT_OK)
+            for (Fragment fragment : mNewHomePageTabAdapter.mList) {
+                if (fragment instanceof IActivityResult) {
+                    IActivityResult activityResult = (IActivityResult) fragment;
+                    activityResult.forceRefresh();
+                }
             }
-        }
     }
 
     /**

@@ -29,7 +29,7 @@ import com.orhanobut.logger.Logger
 import com.station.kit.util.DensityUtil
 
 class FilterFragment constructor(val videoType: VideoType) :
-    BaseAutofitHeightFragment<FilterViewModel, FragmentFilterBinding>(videoType.name) {
+    BaseAutofitHeightFragment<FilterViewModel, FragmentFilterBinding>() {
     private val adapter: NewMovieItemListAdapter by lazy {
         NewMovieItemListAdapter(mViewModel.getApplication(), mutableListOf())
     }

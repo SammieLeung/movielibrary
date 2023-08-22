@@ -6,25 +6,15 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
-import com.bumptech.glide.Glide;
 import com.hphtv.movielibrary.R;
-import com.hphtv.movielibrary.data.Config;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.databinding.MiniFileItemBinding;
-import com.hphtv.movielibrary.databinding.MiniFileItemBinding;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
-import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
-import com.hphtv.movielibrary.ui.homepage.fragment.unknown.MiniItem;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Stack;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.LinkedTransferQueue;
 
 /**
  * author: Sam Leung

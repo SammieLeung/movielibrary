@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 public class ThemeFragment extends BaseHomeFragment<ThemeFragmentViewModel> {
 
     public ThemeFragment() {
-        super(ThemeFragment.class.getSimpleName());
+        super();
     }
 
     public static ThemeFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position, Constants.VideoType type) {

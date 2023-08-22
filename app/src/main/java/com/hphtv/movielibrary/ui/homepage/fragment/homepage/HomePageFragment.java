@@ -13,7 +13,7 @@ import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
 public class HomePageFragment extends BaseHomeFragment<HomeFragmentViewModel> {
 
     public HomePageFragment() {
-        super( HomePageFragment.class.getSimpleName());
+        super();
     }
 
     public static HomePageFragment newInstance(NoScrollAutofitHeightViewPager viewPager, int position) {

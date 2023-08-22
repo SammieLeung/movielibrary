@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
-import com.firefly.videonameparser.VideoNameParser2;
+import com.firefly.videonameparser.VideoNameParserV2;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -148,7 +148,7 @@ public class MovieScanService extends Service {
                                 Observable.fromIterable(videoFileList)
                                         .observeOn(Schedulers.from(mNetworkExecutor))
                                         .map(videoFile -> {
-                                            VideoNameParser2 parser = new VideoNameParser2();
+                                            VideoNameParserV2 parser = new VideoNameParserV2();
                                             MovieNameInfo nameInfo;
                                             if (videoFile.path.startsWith("http://")) {
                                                 nameInfo = parser.parseVideoName(videoFile.filename);

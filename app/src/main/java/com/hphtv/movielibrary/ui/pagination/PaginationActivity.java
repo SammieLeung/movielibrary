@@ -125,22 +125,22 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         mBinding.recyclerview.setLayoutManager(gridLayoutManager);
 
         mMovieItemListAdapter = new NewMovieItemListAdapter(this, new ArrayList<>());
-        mMovieItemListAdapter.setZoomRatio(1.25688f);
+        mMovieItemListAdapter.setZoomRatio(1.2088888f);
 
         mMovieItemListAdapter.setOnItemClickListener(mActionListener);
-        mMovieItemListAdapter.setOnItemLongClickListener((view, postion, data) -> {
+        mMovieItemListAdapter.setOnItemLongClickListener((view, position, data) -> {
             if (!data.is_user_fav)
-                ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), postion, data);
+                ActivityHelper.showPosterMenuDialog(getSupportFragmentManager(), position, data);
             return true;
         });
 
         mBinding.recyclerview.addItemDecoration(new GridSpacingItemDecorationVertical2(
                 getResources().getDimensionPixelSize(R.dimen.poster_item_1_w),
-                DensityUtil.dip2px(this, 48),
-                90,
-                DensityUtil.dip2px(this, 74),
-                31,
-                5)
+                DensityUtil.dip2px(getBaseContext(), 47),
+                /* edgeSpacing = */ 80,
+                /* rowSpacing = */  DensityUtil.dip2px(getBaseContext(), 65),
+                /* columnSpacing = */ 16,
+                /* spanCount = */ 5)
         );
 
         GridLayoutManager.SpanSizeLookup lookup = new GridLayoutManager.SpanSizeLookup() {

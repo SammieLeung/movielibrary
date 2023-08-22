@@ -17,6 +17,7 @@ import com.hphtv.movielibrary.ui.AppBaseActivity;
 import com.hphtv.movielibrary.ui.BaseFragment2;
 import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager;
+import com.orhanobut.logger.Logger;
 
 import java.lang.ref.WeakReference;
 
@@ -32,10 +33,9 @@ public abstract class BaseAutofitHeightFragment<VM extends ViewModel, VDB extend
     protected WeakReference<NoScrollAutofitHeightViewPager> mViewPagerWeakReference;
 
 
-    public BaseAutofitHeightFragment(String tag) {
-        TAG = tag;
-    }
+    public BaseAutofitHeightFragment() {
 
+    }
 
     @Override
     public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -51,9 +51,9 @@ public abstract class BaseAutofitHeightFragment<VM extends ViewModel, VDB extend
         if (mViewPagerWeakReference != null) {
             mViewPagerWeakReference.get().setViewPosition(view, pos);
             mViewPagerWeakReference = null;
-            Log.w(TAG, "onCreateView:  getWeakRefence");
+            Logger.d("onCreateView:  getWeakRefence");
         } else {
-            Log.w(TAG, "onCreateView:  getBaseActivity.viewpager");
+            Logger.d("onCreateView:  getBaseActivity.viewpager");
             getBaseActivity().getBinding().viewpager.setViewPosition(view, pos);
         }
         return view;
