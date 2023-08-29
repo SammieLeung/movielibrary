@@ -1,7 +1,8 @@
 package com.hphtv.movielibrary.util.nfo.reader
 
-import com.hphtv.movielibrary.util.nfo.NFOInfo
+import com.hphtv.movielibrary.util.nfo.NFOEntity
+import java.io.InputStream
 
 interface NFOReader {
-    fun readFromXML(xml: String): NFOInfo
+    fun readFromXML(inputStream: InputStream): NFOEntity?
 }
