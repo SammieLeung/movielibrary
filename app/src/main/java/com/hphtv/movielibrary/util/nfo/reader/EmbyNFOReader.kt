@@ -5,6 +5,7 @@ import com.hphtv.movielibrary.roomdb.entity.Actor
 import com.hphtv.movielibrary.roomdb.entity.Director
 import com.hphtv.movielibrary.roomdb.entity.Writer
 import com.hphtv.movielibrary.util.nfo.NFOEntity
+import com.hphtv.movielibrary.util.nfo.NFOMovie
 import com.orhanobut.logger.Logger
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
@@ -13,7 +14,7 @@ class EmbyNFOReader: NFOReader {
     override fun readFromXML(inputStream: InputStream): NFOEntity? {
         val xmlPullParser: XmlPullParser = Xml.newPullParser()
         xmlPullParser.setInput(inputStream, "UTF-8")
-        var nfoInfo: NFOEntity? = null
+        var nfoInfo: NFOMovie? = null
         while (xmlPullParser.next() != XmlPullParser.END_DOCUMENT) {
             when (xmlPullParser.name) {
                 "movie" -> {
@@ -24,8 +25,8 @@ class EmbyNFOReader: NFOReader {
         return nfoInfo
     }
 
-    private fun parseMovie(parser: XmlPullParser): NFOEntity {
-        var bean = NFOEntity()
+    private fun parseMovie(parser: XmlPullParser): NFOMovie {
+        var bean = NFOMovie()
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.eventType != XmlPullParser.START_TAG) {
                 continue
