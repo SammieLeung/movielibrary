@@ -40,7 +40,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
     private int mSearchMode;
 
     private String mCurrentKeyword;
-    private ObservableInt mSelectPos=new ObservableInt(0);
+    private ObservableInt mSelectPos = new ObservableInt(0);
 
     public MovieSearchDialogViewModel(@NonNull @NotNull Application application) {
         super(application);
@@ -59,7 +59,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
     public void loading(MovieSearchAdapter adapter) {
         if (TextUtils.isEmpty(mCurrentKeyword))
             return;
-        notifyLoadingMore(autoSearch(mCurrentPage+1), adapter);
+        notifyLoadingMore(autoSearch(mCurrentPage + 1), adapter);
     }
 
     /**
@@ -67,6 +67,7 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
      * 电影模式
      * 电视模式
      * 混合模式（电影+电视）
+     *
      * @param page
      * @return
      */
@@ -151,22 +152,21 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
 
     public Observable<MovieWrapper> selectMovie(final String movie_id, final String source, final Constants.VideoType type) {
         return Observable.create((ObservableOnSubscribe<MovieWrapper>) emitter -> {
-            //1.获取本地数据
-            MovieDao movieDao= MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
-            MovieWrapper wrapper=movieDao.queryMovieWrapperByMovieIdAndType(movie_id,source,type.name());
-            if(wrapper!=null){
-                wrapper.movie.ap=Constants.WatchLimit.ALL_AGE;
-                emitter.onNext(wrapper);
-            }else{
-                //2.从接口获取数据
-                wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
-                        .blockingFirst().toEntity();
-                if(wrapper!=null) {
+            MovieWrapper wrapper = TmdbApiService.getDetail(movie_id, source, type.name())
+                    .blockingFirst().toEntity();
+            if (wrapper != null) {
+                MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(getApplication()).getMovieDao();
+                MovieWrapper dbWrapper = movieDao.queryMovieWrapperByMovieIdAndType(movie_id, source, type.name());
+                if (dbWrapper != null) {
                     wrapper.movie.ap = Constants.WatchLimit.ALL_AGE;
-                    emitter.onNext(wrapper);
-                }else{
-                    emitter.onError(new Throwable(getApplication().getString(R.string.toast_selectmovie_faild)));
+                    wrapper.movie.isWatched = dbWrapper.movie.isWatched;
+                    wrapper.movie.lastPlayTime = dbWrapper.movie.lastPlayTime;
+                    wrapper.movie.updateTime = System.currentTimeMillis();
+                    wrapper.movie.isFavorite = dbWrapper.movie.isFavorite;
                 }
+                emitter.onNext(wrapper);
+            } else {
+                emitter.onError(new Throwable(getApplication().getString(R.string.toast_selectmovie_faild)));
             }
             emitter.onComplete();
 
@@ -181,9 +181,9 @@ public class MovieSearchDialogViewModel extends AndroidViewModel {
         mCurrentKeyword = currentKeyword;
     }
 
-    public void setSearchMode(int searchMode,MovieSearchAdapter adapter) {
-        mSearchMode=searchMode;
-        refresh(mCurrentKeyword,adapter);
+    public void setSearchMode(int searchMode, MovieSearchAdapter adapter) {
+        mSearchMode = searchMode;
+        refresh(mCurrentKeyword, adapter);
     }
 
     public ObservableInt getSelectPos() {

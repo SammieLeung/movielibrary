@@ -69,7 +69,7 @@ public class MovieWrapper implements Serializable {
     @Relation(parentColumn = "id",
             entityColumn = "vtid",
             associateBy = @Junction(MovieVideoTagCrossRef.class))
-    public List<VideoTag> videoTags;//视频标签 ，多堆垛
+    public List<VideoTag> videoTags;//视频标签 ，多对多
 
     @Ignore
     public Season season;

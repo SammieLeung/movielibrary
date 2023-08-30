@@ -1,7 +1,11 @@
 package com.hphtv.movielibrary.util.nfo
 
+import com.hphtv.movielibrary.data.Constants
 import com.hphtv.movielibrary.roomdb.entity.Actor
 import com.hphtv.movielibrary.roomdb.entity.Director
+import com.hphtv.movielibrary.roomdb.entity.Genre
+import com.hphtv.movielibrary.roomdb.entity.GenreTag
+import com.hphtv.movielibrary.roomdb.entity.Movie
 import com.hphtv.movielibrary.roomdb.entity.Writer
 
 data class NFOMovie(
@@ -26,3 +30,23 @@ data class NFOMovie(
         return NFOType.MOVIE
     }
 }
+
+fun NFOMovie.toMovie(): Movie {
+    val that = this
+    val movie = Movie()
+    movie.apply {
+        this.movieId = that.tmdbid
+        this.title = that.title
+        this.otherTitle = that.originaltitle
+        this.plot = that.plot
+        this.ratings = that.ratings
+        this.source = Constants.Scraper.TMDB
+        this.type = Constants.VideoType.movie
+        this.poster = that.poster
+        this.releaseDate = that.premiered
+        this.year = that.year
+        this.duration = that.runtime
+    }
+    return movie
+}
+

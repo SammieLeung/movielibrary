@@ -194,14 +194,10 @@ public class MovieHelper {
         }
     }
 
-    /**
-     * 保存电影的基本信息（剧情、演员、评分、剧照等)
-     *
-     * @param context
-     * @param movieWrapper
-     * @return
-     */
-    public static long saveBaseInfo(Context context, MovieWrapper movieWrapper) {
+
+    public static long saveBaseInfo(Context context, Movie movie, List<Genre> genreList, List<Director> directorList, List<Actor> actorList, List<StagePhoto> stagePhotoList, List<Season> seasonList) {
+        if(movie==null)
+            return -1;
         MovieDao movieDao = MovieLibraryRoomDatabase.getDatabase(context).getMovieDao();
         GenreDao genreDao = MovieLibraryRoomDatabase.getDatabase(context).getGenreDao();
         ActorDao actorDao = MovieLibraryRoomDatabase.getDatabase(context).getActorDao();
@@ -212,43 +208,30 @@ public class MovieHelper {
         StagePhotoDao stagePhotoDao = MovieLibraryRoomDatabase.getDatabase(context).getStagePhotoDao();
         SeasonDao seasonDao = MovieLibraryRoomDatabase.getDatabase(context).getSeasonDao();
 
-        if (movieWrapper.movie == null) {
-            return -1;
-        }
-
-        Movie newMovie = movieWrapper.movie;
-        Movie oldMovie = movieDao.queryByMovieIdAndType(newMovie.movieId, newMovie.source, newMovie.type.name());
+        Movie oldMovie = movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name());
         if (oldMovie != null) {
-            newMovie.id = oldMovie.id;
-            newMovie.addTime = oldMovie.addTime;
-            newMovie.updateTime = System.currentTimeMillis();
-            newMovie.isFavorite = oldMovie.isFavorite;
-            newMovie.isWatched = oldMovie.isWatched;
-            newMovie.lastPlayTime = oldMovie.lastPlayTime;
-            newMovie.pinyin = oldMovie.pinyin;
-            movieDao.update(newMovie);
+            movie.id = oldMovie.id;
+            movie.addTime = oldMovie.addTime;
+            movie.updateTime = System.currentTimeMillis();
+            movie.isFavorite = oldMovie.isFavorite;
+            movie.isWatched = oldMovie.isWatched;
+            movie.lastPlayTime = oldMovie.lastPlayTime;
+            movie.pinyin = oldMovie.pinyin;
+            movieDao.update(movie);
         } else {
-            newMovie.pinyin = Observable.just(newMovie.title).map(s -> {
+            movie.pinyin = Observable.just(movie.title).map(s -> {
                 String pinyin = PinyinParseAndMatchTools.parsePinyin(s);
                 return pinyin;
             }).observeOn(Schedulers.newThread()).blockingFirst();
-            newMovie.addTime = System.currentTimeMillis();
-            newMovie.updateTime = newMovie.addTime;
-            long id = movieDao.insertOrIgnoreMovie(newMovie);
+            movie.addTime = System.currentTimeMillis();
+            movie.updateTime = movie.addTime;
+            long id = movieDao.insertOrIgnoreMovie(movie);
             if (id < 0) {
-                newMovie = movieDao.queryByMovieIdAndType(newMovie.movieId, newMovie.source, newMovie.type.name());
+                movie = movieDao.queryByMovieIdAndType(movie.movieId, movie.source, movie.type.name());
             } else {
-                newMovie.id = id;
+                movie.id = id;
             }
         }
-
-
-        List<Genre> genreList = movieWrapper.genres;
-        List<Director> directorList = movieWrapper.directors;
-        List<Actor> actorList = movieWrapper.actors;
-        List<StagePhoto> stagePhotoList = movieWrapper.stagePhotos;
-        List<Season> seasonList = movieWrapper.seasons;
-
         //多对多可以先插入数据库
         genreDao.insertGenres(genreList);
         actorDao.insertActors(actorList);
@@ -260,10 +243,10 @@ public class MovieHelper {
         }
 
         //查询影片ID
-        long movie_id = newMovie.id;
+        long movie_id = movie.id;
         long[] genre_ids = genreDao.queryByName(querySelectionGenreNames);
 
-        movieWrapper.movie.id = movie_id;
+        movie.id = movie_id;
 
         for (long genre_id : genre_ids) {
             if (genre_id != -1) {
@@ -306,9 +289,20 @@ public class MovieHelper {
             }
         }
 
-        autoClassification(context, newMovie, genreList);
+        autoClassification(context, movie, genreList);
 
         return movie_id;
+    }
+
+    /**
+     * 保存电影的基本信息（剧情、演员、评分、剧照等)
+     *
+     * @param context
+     * @param movieWrapper
+     * @return
+     */
+    public static long saveBaseInfo(Context context, MovieWrapper movieWrapper) {
+        return saveBaseInfo(context,movieWrapper.movie,movieWrapper.genres,movieWrapper.directors,movieWrapper.actors,movieWrapper.stagePhotos,movieWrapper.seasons);
     }
 
     /**
