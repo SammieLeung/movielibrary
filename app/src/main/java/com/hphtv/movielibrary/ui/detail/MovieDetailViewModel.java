@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -291,8 +292,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         tagList.add(locale.getDisplayName());
                     }
                     if (movieWrapper.genres.size() > 0) {
-                        for (int i = 0; i < movieWrapper.genres.size() && i < 3; i++) {
-                            tagList.add(movieWrapper.genres.get(i).name);
+                        for (int i = 0,tagCount=0; i < movieWrapper.genres.size() && tagCount < 3;i++ ) {
+                            if(Objects.equals(movieWrapper.genres.get(i).source, ScraperSourceTools.getSource())){
+                                tagList.add(movieWrapper.genres.get(i).name);
+                            }
                         }
                     }
                     if (!TextUtils.isEmpty(movieWrapper.movie.year)) {
