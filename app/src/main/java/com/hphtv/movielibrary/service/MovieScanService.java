@@ -16,8 +16,10 @@ import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
+import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
+import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
@@ -41,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -373,8 +376,12 @@ public class MovieScanService extends Service {
             if (entity != null) {
                 switch (entity.getNFOType()) {
                     case MOVIE:
-                        Movie movie = NFOMovieKt.toMovie((NFOMovie) entity);
-                        updateNFOMovie(movie, videoFile, movie.source);
+                        NFOMovie nfoMovie= (NFOMovie) entity;
+                        Movie movie = NFOMovieKt.toMovie(nfoMovie);
+                        List<Genre> genreList=NFOMovieKt.toGenreList(nfoMovie);
+                        List<StagePhoto> stagePhotoList=NFOMovieKt.toStagePhotoList(nfoMovie);
+                        updateNFOMovie(movie);
+                        MovieHelper.addNewMovieInfo(getBaseContext(),movie,genreList,nfoMovie.getDirectors(),nfoMovie.getActors(),stagePhotoList, Collections.emptyList(),videoFile);
                         Object[] data = new Object[2];
                         data[0] = movie.movieId;
                         data[1] = shortcut;
@@ -392,7 +399,7 @@ public class MovieScanService extends Service {
         return data;
     }
 
-    private void updateNFOMovie(Movie nfoMovie, VideoFile videoFile, String source) {
+    private void updateNFOMovie(Movie nfoMovie) {
         Movie movie = mMovieDao.queryByMovieIdAndType(nfoMovie.movieId, nfoMovie.source, nfoMovie.type.name());
         if (movie != null) {
             nfoMovie.id = movie.id;
@@ -405,18 +412,11 @@ public class MovieScanService extends Service {
             nfoMovie.lastPlayTime = movie.lastPlayTime;
             nfoMovie.isWatched = movie.isWatched;
             nfoMovie.ap = movie.ap;
-            mMovieDao.update(nfoMovie);
-            MovieHelper.establishRelationshipBetweenPosterAndVideos(getBaseContext(), movie.id, videoFile, source);
-            MovieHelper.quickAutoClassification(getBaseContext(), nfoMovie.movieId, source);
-            OnlineDBApiService.uploadMovie(movie, videoFile, source);
         } else {
             nfoMovie.addTime = System.currentTimeMillis();
             nfoMovie.updateTime = System.currentTimeMillis();
             nfoMovie.pinyin = PinyinParseAndMatchTools.parsePinyin(nfoMovie.title);
-            nfoMovie.id = mMovieDao.insertOrIgnoreMovie(nfoMovie);
-            MovieHelper.establishRelationshipBetweenPosterAndVideos(getBaseContext(), nfoMovie.id, videoFile, source);
-            MovieHelper.quickAutoClassification(getBaseContext(), nfoMovie.movieId, source);
-            OnlineDBApiService.uploadMovie(nfoMovie, videoFile, source);
+            nfoMovie.ap=Constants.WatchLimit.ALL_AGE;
         }
     }
 

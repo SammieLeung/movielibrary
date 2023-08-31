@@ -173,6 +173,16 @@ public class MovieHelper {
         }
     }
 
+    public static void addNewMovieInfo(Context context, Movie movie, List<Genre> genreList, List<Director> directorList, List<Actor> actorList, List<StagePhoto> stagePhotoList, List<Season> seasonList,VideoFile videoFile) {
+        long movie_id = saveBaseInfo(context, movie, genreList, directorList, actorList, stagePhotoList, seasonList);
+        if (movie_id != -1) {
+            //VideoFile
+            establishRelationshipBetweenPosterAndVideos(context, movie_id, videoFile, movie.source);
+            OnlineDBApiService.uploadMovie(movie, videoFile, movie.source);
+            LogUtil.v(Thread.currentThread().getName(), "saveMovie: " + movie_id + "<=>" + videoFile.filename);
+        }
+    }
+
     public static void manualSaveMovie(Context context, MovieWrapper movieWrapper, List<VideoFile> videoFileList) {
         manualSaveMovie(context, movieWrapper, videoFileList, true);
     }

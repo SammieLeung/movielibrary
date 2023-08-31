@@ -6,6 +6,7 @@ import com.hphtv.movielibrary.roomdb.entity.Director
 import com.hphtv.movielibrary.roomdb.entity.Genre
 import com.hphtv.movielibrary.roomdb.entity.GenreTag
 import com.hphtv.movielibrary.roomdb.entity.Movie
+import com.hphtv.movielibrary.roomdb.entity.StagePhoto
 import com.hphtv.movielibrary.roomdb.entity.Writer
 
 data class NFOMovie(
@@ -48,5 +49,22 @@ fun NFOMovie.toMovie(): Movie {
         this.duration = that.runtime
     }
     return movie
+}
+
+fun NFOMovie.toGenreList(): List<Genre> {
+    return this.genres.map {
+        val genre = Genre()
+        genre.name = it
+        genre.source = Constants.Scraper.TMDB
+        genre
+    }
+}
+
+fun NFOMovie.toStagePhotoList(): List<StagePhoto> {
+    return this.fanart?.let {
+        val stagePhoto = StagePhoto()
+        stagePhoto.imgUrl = it
+        listOf(stagePhoto)
+    } ?: emptyList()
 }
 
