@@ -13,6 +13,7 @@ import com.hphtv.movielibrary.roomdb.entity.Shortcut
 import com.hphtv.movielibrary.roomdb.entity.VideoTag
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView
 import com.hphtv.movielibrary.util.ScraperSourceTools
+import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,7 +44,6 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
                 offset: Int,
                 limit: Int
             ): List<MovieDataView> {
-
                 if (videoTag == null) {
                     return emptyList()
                 }
@@ -93,8 +93,10 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setVideoType(videoType: VideoType) = viewModelScope.launch {
         withContext(Dispatchers.IO) {
-            videoTag = videoTagDao.queryVtidByNormalTag(videoType.name)
-            reloadMovies()
+            if(videoTag==null) {
+                videoTag = videoTagDao.queryVtidByNormalTag(videoType.name)
+                reloadMovies()
+            }
         }
     }
 

@@ -128,7 +128,7 @@ class FilterFragment constructor(val videoType: VideoType) :
     }
 
     override fun forceRefresh() {
-        Logger.d("forceRefresh")
+        mViewModel.setVideoType(videoType)
         mViewModel.forceReloadMovies()
     }
 

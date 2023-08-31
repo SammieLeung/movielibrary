@@ -51,9 +51,7 @@ public abstract class BaseAutofitHeightFragment<VM extends ViewModel, VDB extend
         if (mViewPagerWeakReference != null) {
             mViewPagerWeakReference.get().setViewPosition(view, pos);
             mViewPagerWeakReference = null;
-            Logger.d("onCreateView:  getWeakRefence");
         } else {
-            Logger.d("onCreateView:  getBaseActivity.viewpager");
             getBaseActivity().getBinding().viewpager.setViewPosition(view, pos);
         }
         return view;

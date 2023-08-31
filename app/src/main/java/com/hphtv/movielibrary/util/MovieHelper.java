@@ -39,6 +39,7 @@ import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoFileCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.reference.MovieVideoTagCrossRef;
 import com.hphtv.movielibrary.roomdb.entity.relation.MovieWrapper;
 import com.hphtv.movielibrary.scraper.service.OnlineDBApiService;
+import com.orhanobut.logger.Logger;
 import com.station.kit.util.LogUtil;
 import com.station.kit.util.SharePreferencesTools;
 
@@ -379,6 +380,7 @@ public class MovieHelper {
             if (typeTag == null) {
                 typeTag = new VideoTag(type);
                 long vtid = videoTagDao.insertOrIgnore(typeTag);
+
                 if (vtid > -1) {
                     typeTag.vtid = vtid;
                 } else {
@@ -444,7 +446,6 @@ public class MovieHelper {
             movieVideoTagCrossRef.id = movie.id;
             movieVideoTagCrossRef.vtid = childTag.vtid;
             movieVideoTagCrossRefDao.insert(movieVideoTagCrossRef);
-
         }
 
         if (isShow) {
@@ -452,6 +453,7 @@ public class MovieHelper {
             if (showTag == null) {
                 showTag = new VideoTag(Constants.VideoType.variety_show);
                 long vtid = videoTagDao.insertOrIgnore(showTag);
+
                 if (vtid > -1) {
                     showTag.vtid = vtid;
                 } else {
