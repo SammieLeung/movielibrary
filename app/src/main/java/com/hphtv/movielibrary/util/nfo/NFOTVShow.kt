@@ -21,7 +21,6 @@ data class NFOTVShow(
     val premiered: String? = null,
     val genres: MutableList<String> = mutableListOf(),
     val actors: MutableList<Actor> = mutableListOf(),
-    val languages: String? = null,
 ) : NFOEntity {
     override fun getNFOType(): NFOType {
         return NFOType.TVSHOW
