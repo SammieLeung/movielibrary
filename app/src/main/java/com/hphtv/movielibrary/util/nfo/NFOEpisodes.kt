@@ -10,15 +10,13 @@ data class NFOEpisodes(
     val originaltitle: String? = null,
     val season:String?=null,
     val episode:String?=null,
-    val ratings: String? = null,
     val plot: String? = null,
     val runtime: String? = null,
     val poster: String? = null,
     val tmdbid: String? = null,
-    val aired:String?=null,
-    val countries: MutableList<String> = mutableListOf(),
-    val directors: MutableList<Director> = mutableListOf(),
-    val writers: MutableList<Writer> = mutableListOf(),
+    val premiered:String?=null,
+    val writers:MutableList<Writer> = mutableListOf(),
+    val directors:MutableList<Director> = mutableListOf(),
     val actors: MutableList<Actor> = mutableListOf(),
 ):NFOEntity {
     override fun getNFOType(): NFOType {

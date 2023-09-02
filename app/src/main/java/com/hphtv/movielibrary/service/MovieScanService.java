@@ -18,6 +18,7 @@ import com.hphtv.movielibrary.roomdb.dao.ShortcutDao;
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao;
 import com.hphtv.movielibrary.roomdb.entity.Genre;
 import com.hphtv.movielibrary.roomdb.entity.Movie;
+import com.hphtv.movielibrary.roomdb.entity.Season;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
 import com.hphtv.movielibrary.roomdb.entity.StagePhoto;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
@@ -31,8 +32,9 @@ import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.nfo.NFOEntity;
 import com.hphtv.movielibrary.util.nfo.NFOMovie;
 import com.hphtv.movielibrary.util.nfo.NFOMovieKt;
+import com.hphtv.movielibrary.util.nfo.NFOTVShow;
+import com.hphtv.movielibrary.util.nfo.NFOTVShowKt;
 import com.hphtv.movielibrary.util.nfo.factory.KodiNFOFactory;
-import com.hphtv.movielibrary.util.nfo.factory.NFOFactory;
 import com.hphtv.movielibrary.util.nfo.reader.NFOReader;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import com.station.kit.util.EditorDistance;
@@ -51,6 +53,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -142,7 +146,7 @@ public class MovieScanService extends Service {
         AtomicInteger successCount = new AtomicInteger();
         AtomicInteger indexAtom = new AtomicInteger();
         AtomicInteger currentTaskCount = new AtomicInteger();
-        Boolean tryReadNFO = shortcut.deviceType <= Constants.DeviceType.DEVICE_TYPE_HARD_DISK ? true : false;
+        Boolean tryReadNFO = true;
         Observable.combineLatest(Observable.just(shortcut), Observable.just(searchType), Observable.just(videoFileList).concatMap((Function<List<VideoFile>, ObservableSource<List<VideoFile>>>) videoFileList1 -> {
                             //为了支持4线程搜索,将数据分成大于4份,并行数量取决于mNetworkExecutor
                             //[1,2,3,4,11,12,13,14,21,22,23,24,31,32]
@@ -165,9 +169,16 @@ public class MovieScanService extends Service {
                                         .observeOn(Schedulers.from(mNetworkExecutor))
                                         .map(videoFile -> {
                                             if (tryReadNFO) {
-                                                File nfoFile = new File(videoFile.path.substring(0, videoFile.path.lastIndexOf(".")) + ".nfo");
-                                                if (nfoFile.exists()) {
-                                                    return getMovieInfoFromNFO(nfoFile, videoFile, shortcut1);
+                                                if (seamLikeEpisode(videoFile.filename).find()||seamLikeEpisode(videoFile.filename).find()) {
+                                                    File nfoFile=findTVShowInfoFile(videoFile.path, 2);
+                                                    if(nfoFile!=null){
+                                                        return getMovieInfoFromNFO(nfoFile, videoFile, shortcut1);
+                                                    }
+                                                }else{
+                                                    File nfoFile = new File(videoFile.path.substring(0, videoFile.path.lastIndexOf(".")) + ".nfo");
+                                                    if (nfoFile.exists()) {
+                                                        return getMovieInfoFromNFO(nfoFile, videoFile, shortcut1);
+                                                    }
                                                 }
                                             }
                                             return getMovieInfoFromApi(videoFile, searchType1, shortcut1);
@@ -376,19 +387,33 @@ public class MovieScanService extends Service {
             if (entity != null) {
                 switch (entity.getNFOType()) {
                     case MOVIE:
-                        NFOMovie nfoMovie= (NFOMovie) entity;
+                        NFOMovie nfoMovie = (NFOMovie) entity;
                         Movie movie = NFOMovieKt.toMovie(nfoMovie);
-                        List<Genre> genreList=NFOMovieKt.toGenreList(nfoMovie);
-                        List<StagePhoto> stagePhotoList=NFOMovieKt.toStagePhotoList(nfoMovie);
+                        List<Genre> movieGenreList = NFOMovieKt.toGenreList(nfoMovie);
+                        List<StagePhoto> movieThumbList = NFOMovieKt.toStagePhotoList(nfoMovie);
                         updateNFOMovie(movie);
-                        MovieHelper.addNewMovieInfo(getBaseContext(),movie,genreList,nfoMovie.getDirectors(),nfoMovie.getActors(),stagePhotoList, Collections.emptyList(),videoFile);
+                        MovieHelper.addNewMovieInfo(getBaseContext(), movie, movieGenreList, nfoMovie.getDirectors(), nfoMovie.getActors(), movieThumbList, Collections.emptyList(), videoFile);
                         Object[] data = new Object[2];
                         data[0] = movie.movieId;
                         data[1] = shortcut;
                         return data;
                     case TVSHOW:
-                        break;
+                        NFOTVShow nfotvShow = (NFOTVShow) entity;
+                        Movie tvShow = NFOTVShowKt.toMovie(nfotvShow);
+                        List<Genre> tvGenreList = NFOTVShowKt.toGenreList(nfotvShow);
+                        List<StagePhoto> tvStagePhotoList = NFOTVShowKt.toStagePhotoList(nfotvShow);
+                        List<Season> tvSeasonList = NFOTVShowKt.toSeasonList(nfotvShow);
+                        updateNFOMovie(tvShow);
+                        MovieHelper.addNewMovieInfo(getBaseContext(), tvShow, tvGenreList, nfotvShow.getDirectors(), nfotvShow.getActors(), tvStagePhotoList, tvSeasonList, videoFile);
+                        Object[] tvData = new Object[2];
+                        tvData[0] = tvShow.movieId;
+                        tvData[1] = shortcut;
+                        return tvData;
                     case EPISODE:
+                        File tvNFOFile=findTVShowInfoFile(nfoFile.getPath(),2);
+                        if(tvNFOFile!=null){
+                            return getMovieInfoFromNFO(tvNFOFile, videoFile, shortcut);
+                        }
                         break;
                 }
             }
@@ -396,6 +421,7 @@ public class MovieScanService extends Service {
             throw new RuntimeException(e);
         }
         Object[] data = new Object[1];
+        data[0]=shortcut;
         return data;
     }
 
@@ -416,7 +442,7 @@ public class MovieScanService extends Service {
             nfoMovie.addTime = System.currentTimeMillis();
             nfoMovie.updateTime = System.currentTimeMillis();
             nfoMovie.pinyin = PinyinParseAndMatchTools.parsePinyin(nfoMovie.title);
-            nfoMovie.ap=Constants.WatchLimit.ALL_AGE;
+            nfoMovie.ap = Constants.WatchLimit.ALL_AGE;
         }
     }
 
@@ -490,6 +516,53 @@ public class MovieScanService extends Service {
      */
     public boolean isRunning() {
         return mGlobalTaskCount.get() == 0 ? false : true;
+    }
+
+    /**
+     * 找寻当前目录上两级的名为tvshow.nfo的文件
+     *
+     * @param
+     * @return
+     */
+    private File findTVShowInfoFile(String path, int depth) {
+        if (depth <0) {
+            return null;
+        }
+        File file = new File(path);
+        if(file.isDirectory()){
+            File[] subFiles=file.listFiles();
+            for(int i=0;i<subFiles.length;i++){
+                File subFile=subFiles[i];
+                if(subFile.getName().equalsIgnoreCase("tvshow.nfo")){
+                    return subFile;
+                }
+            }
+        }
+        return findTVShowInfoFile(file.getParentFile().getPath(), depth -1);
+    }
+
+    private Matcher seamLikeVarietyShow(String fileName){
+        String regex="20\\d{2}[-_\\.\\s]?\\d{2}[-_\\.\\s]?\\d{2}.*\\.";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(fileName);
+    }
+
+    private Matcher seamLikeEpisode(String fileName) {
+        String regex = "(?:(?:s(?:eason)?0?[0-9]+)?ep?(?:isode)?0?[0-9]+.*\\..*)|(^0?[0-9]+\\..*)";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(fileName);
+    }
+
+    private Matcher matchSeason(String folderName) {
+        String regex = "^[s|S](?:eason)?[\\s|_|+]?([0]?[0-9]+)";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(folderName);
+    }
+
+    private Matcher matchSP(String seasonSp) {
+        String regex = "^(?:[s|S](?:eason)?)?[\\s|_|+]?sp(ecial)?";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(seasonSp);
     }
 
 }

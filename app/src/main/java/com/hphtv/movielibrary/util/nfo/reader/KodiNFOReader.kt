@@ -5,6 +5,7 @@ import com.hphtv.movielibrary.roomdb.entity.Actor
 import com.hphtv.movielibrary.roomdb.entity.Director
 import com.hphtv.movielibrary.roomdb.entity.Writer
 import com.hphtv.movielibrary.util.nfo.NFOEntity
+import com.hphtv.movielibrary.util.nfo.NFOEpisodes
 import com.hphtv.movielibrary.util.nfo.NFOMovie
 import com.hphtv.movielibrary.util.nfo.NFOTVShow
 import com.orhanobut.logger.Logger
@@ -25,9 +26,105 @@ class KodiNFOReader : NFOReader {
                 "tvshow" -> {
                     nfoInfo = parseTvShow(xmlPullParser)
                 }
+
+                "episodedetails" -> {
+                    nfoInfo = parseEpisodeDetail(xmlPullParser)
+                }
             }
         }
         return nfoInfo
+    }
+
+    private fun parseEpisodeDetail(parser: XmlPullParser): NFOEpisodes? {
+        var bean = NFOEpisodes()
+        while (parser.next() != XmlPullParser.END_TAG) {
+            if (parser.eventType != XmlPullParser.START_TAG) {
+                continue
+            }
+            when (parser.name) {
+
+                "title" -> {
+                    bean = bean.copy(title = parseTitle(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "title")
+                }
+
+                "originaltitle" -> {
+                    bean = bean.copy(originaltitle = parseOriginalTitle(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "originaltitle")
+                }
+
+                "showtitle" -> {
+                    bean = bean.copy(showtitle = parseShowTitle(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "showtitle")
+                }
+
+                "season" -> {
+                    parseSeason(parser)?.let {
+                        bean = bean.copy(season = it)
+                        parser.require(XmlPullParser.END_TAG, null, "season")
+                    }
+                }
+
+                "episode" -> {
+                    parseEpisode(parser)?.let {
+                        bean = bean.copy(episode = it)
+                        parser.require(XmlPullParser.END_TAG, null, "episode")
+                    }
+                }
+
+                "uniqueid" -> {
+                    parseTmdbIdFromUniqueid(parser)?.let {
+                        bean = bean.copy(tmdbid = it)
+                        parser.require(XmlPullParser.END_TAG, null, "uniqueid")
+                    }
+                }
+
+                "plot" -> {
+                    bean = bean.copy(plot = parsePlot(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "plot")
+                }
+
+                "runtime" -> {
+                    bean = bean.copy(runtime = parseRuntime(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "runtime")
+                }
+
+                "thumb" -> {
+                    parser.require(XmlPullParser.START_TAG, null, "thumb")
+                    parsePoster(parser).let { bean = bean.copy(poster = it) }
+                    parser.require(XmlPullParser.END_TAG, null, "thumb")
+                }
+
+
+                "premiered" -> {
+                    bean = bean.copy(premiered = parsePremiered(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "premiered")
+                }
+
+
+                "credits" -> {
+                    bean.writers.add(parseCredits(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "credits")
+                }
+
+                "director" -> {
+                    bean.directors.add(parseDirector(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "director")
+                }
+
+                "actor" -> {
+                    bean.actors.add(parseActor(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "actor")
+                }
+
+                else -> {
+                    skip(parser)
+                }
+
+            }
+        }
+        Logger.d(bean)
+        return bean
     }
 
     private fun parseTvShow(parser: XmlPullParser): NFOTVShow {
@@ -38,6 +135,11 @@ class KodiNFOReader : NFOReader {
             }
             // Starts by looking for the entry tag.
             when (parser.name) {
+
+                "showtitle" -> {
+                    bean = bean.copy(showtitle = parseShowTitle(parser))
+                }
+
                 "title" -> {
                     bean = bean.copy(title = parseTitle(parser))
                     parser.require(XmlPullParser.END_TAG, null, "title")
@@ -58,6 +160,11 @@ class KodiNFOReader : NFOReader {
                     parser.require(XmlPullParser.END_TAG, null, "ratings")
                 }
 
+                "rating" -> {
+                    bean = bean.copy(ratings = parseTVShowRating(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "rating")
+                }
+
                 "plot" -> {
                     bean = bean.copy(plot = parsePlot(parser))
                     parser.require(XmlPullParser.END_TAG, null, "plot")
@@ -71,20 +178,19 @@ class KodiNFOReader : NFOReader {
                 "thumb" -> {
                     parser.require(XmlPullParser.START_TAG, null, "thumb")
                     if (parser.getAttributeValue(null, "aspect") == "poster") {
-                        if(parser.getAttributeValue(null,"type")=="season"){
+                        if (parser.getAttributeValue(null, "type") == "season") {
                             bean.seasonPosters.putAll(parseSeasonPoster(parser))
-                        }else{
-                            bean = bean.copy(poster =  parsePoster(parser))
+                        } else {
+                            bean = bean.copy(poster = parsePoster(parser))
                         }
                         parser.require(XmlPullParser.END_TAG, null, "thumb")
-                    }else{
+                    } else {
                         skip(parser)
                     }
-
                 }
 
                 "namedseason" -> {
-                    skip(parser)
+                    bean.seasonNames.putAll(parseNamedSeason(parser))
                 }
 
                 "fanart" -> {
@@ -117,6 +223,10 @@ class KodiNFOReader : NFOReader {
                     parser.require(XmlPullParser.END_TAG, null, "actor")
                 }
 
+                "directors" -> {
+                    bean.directors.add(parseDirector(parser))
+                    parser.require(XmlPullParser.END_TAG, null, "directors")
+                }
 
                 else -> {
                     skip(parser)
@@ -126,6 +236,7 @@ class KodiNFOReader : NFOReader {
         Logger.d(bean)
         return bean
     }
+
 
     private fun parseMovie(parser: XmlPullParser): NFOMovie {
         var bean = NFOMovie()
@@ -225,6 +336,11 @@ class KodiNFOReader : NFOReader {
         return bean
     }
 
+    private fun parseShowTitle(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, null, "showtitle")
+        return parser.nextText()
+    }
+
     private fun parseTitle(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, null, "title")
         return parser.nextText()
@@ -235,8 +351,32 @@ class KodiNFOReader : NFOReader {
         return parser.nextText()
     }
 
+    private fun parseSeason(parser: XmlPullParser): String? {
+        parser.require(XmlPullParser.START_TAG, null, "season")
+        return parser.nextText()
+    }
+
+    private fun parseEpisode(parser: XmlPullParser): String? {
+        parser.require(XmlPullParser.START_TAG, null, "episode")
+        return parser.nextText()
+    }
+
+    private fun parseTmdbIdFromUniqueid(parser: XmlPullParser): String? {
+        parser.require(XmlPullParser.START_TAG, null, "uniqueid")
+        if (parser.getAttributeValue(null, "type") == "tmdb") {
+            return parser.nextText()
+        }
+        skip(parser)
+        return null;
+    }
+
     private fun parseYear(parser: XmlPullParser): String {
         parser.require(XmlPullParser.START_TAG, null, "year")
+        return parser.nextText()
+    }
+
+    private fun parseTVShowRating(parser: XmlPullParser): String {
+        parser.require(XmlPullParser.START_TAG, null, "rating")
         return parser.nextText()
     }
 
@@ -293,6 +433,15 @@ class KodiNFOReader : NFOReader {
         val season = parser.getAttributeValue(null, "season").toInt()
         val poster = parser.nextText()
         return mapOf(season to poster)
+    }
+
+
+    private fun parseNamedSeason(parser: XmlPullParser): Map<Int, String> {
+        parser.require(XmlPullParser.START_TAG, null, "namedseason")
+        val season = parser.getAttributeValue(null, "number").toInt()
+        val name = parser.nextText()
+        parser.require(XmlPullParser.END_TAG, null, "namedseason")
+        return mapOf(season to name)
     }
 
     private fun parsePoster(parser: XmlPullParser): String {
@@ -402,7 +551,6 @@ class KodiNFOReader : NFOReader {
     }
 
     private fun skip(parser: XmlPullParser) {
-        Logger.d("skip ${parser.name}")
         if (parser.eventType != XmlPullParser.START_TAG) {
             throw IllegalStateException()
         }

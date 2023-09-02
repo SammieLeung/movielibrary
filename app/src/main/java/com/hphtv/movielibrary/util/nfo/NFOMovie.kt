@@ -51,6 +51,8 @@ fun NFOMovie.toMovie(): Movie {
     return movie
 }
 
+
+
 fun NFOMovie.toGenreList(): List<Genre> {
     return this.genres.map {
         val genre = Genre()

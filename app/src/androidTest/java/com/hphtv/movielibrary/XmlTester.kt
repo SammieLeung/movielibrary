@@ -1,191 +1,194 @@
 package com.hphtv.movielibrary
 
-import android.util.Xml
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.hphtv.movielibrary.roomdb.entity.Actor
-import com.hphtv.movielibrary.roomdb.entity.Director
-import com.hphtv.movielibrary.roomdb.entity.Writer
-import com.hphtv.movielibrary.util.nfo.NFOEntity
 import com.hphtv.movielibrary.util.nfo.factory.KodiNFOFactory
-import com.hphtv.movielibrary.util.nfo.factory.NFOFactory
-import com.hphtv.movielibrary.util.nfo.reader.KodiNFOReader
-import com.orhanobut.logger.Logger
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.xmlpull.v1.XmlPullParser
+import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 class XmlTester {
 
     @Test
     fun parseXML() {
-val inputStream = data.byteInputStream()
-        val reader= KodiNFOFactory().createReader()
+        val inputStream = data.byteInputStream()
+        val reader = KodiNFOFactory().createReader()
         reader.readFromXML(inputStream)
     }
 
+    @Test
+    fun testFile(){
+        val file = findTVShowInfoFile("/storage/emulated/0/KStation/庆余年/S1E01.mp4", 2)
+        println(file?.absolutePath)
+    }
+
+    fun findTVShowInfoFile(path: String, depth: Int): File? {
+        if (depth < 0) {
+            return null
+        }
+        val file = File(path)
+        if (file.isDirectory) {
+            val subFiles = file.listFiles()
+            for (i in subFiles.indices) {
+                val subFile = subFiles[i]
+                if (subFile.name.equals("tvshow.nfo", ignoreCase = true)) {
+                    return subFile
+                }
+            }
+        }
+        return findTVShowInfoFile(file.parentFile.path, depth - 1)
+    }
 
 
     companion object {
-        private const val data ="""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!--created on 2023-08-30 11:30:02 - tinyMediaManager 4.3.13-->
-<tvshow>
-  <title>鬼灭之刃</title>
-  <originaltitle>鬼滅の刃</originaltitle>
-  <showtitle>鬼灭之刃</showtitle>
-  <sorttitle/>
-  <year>2019</year>
-  <ratings>
-    <rating default="true" max="10" name="themoviedb">
-      <value>8.7</value>
-      <votes>5557</votes>
-    </rating>
-  </ratings>
+        private const val data = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--created on 2023-09-02 14:43:50 - tinyMediaManager 4.3.13-->
+<episodedetails>
+  <title>逍遥梦境</title>
+  <originaltitle>逍遥梦境</originaltitle>
+  <showtitle>仙剑奇侠传</showtitle>
+  <season>1</season>
+  <episode>1</episode>
+  <displayseason>-1</displayseason>
+  <displayepisode>-1</displayepisode>
+  <id>2283651</id>
+  <uniqueid default="false" type="tmdb">399558</uniqueid>
+  <uniqueid default="true" type="tvdb">2283651</uniqueid>
+  <ratings/>
   <userrating>0.0</userrating>
-  <outline/>
-  <plot>电视动画《鬼灭之刃》改编自吾峠呼世晴创作的同名漫画，由 ufotable 制作。日本大正时期，那是一个吃人的恶鬼横行的世界，一名家人被鬼杀死，妹妹也变成了鬼的主人公炭治郎，在猎鬼人的指引下，成为了鬼猎人组织“鬼杀队”的一员，为了让妹妹祢豆子变回人类，为了讨伐杀害家人的恶鬼，为了斩断悲伤的连锁而展开了战斗。</plot>
-  <tagline/>
-  <runtime>24</runtime>
-  <thumb aspect="poster">https://image.tmdb.org/t/p/original/taT33NroOl2Fn8bUGj8bwdmNw3G.jpg</thumb>
-  <thumb aspect="logo">https://image.tmdb.org/t/p/original/vcyhBrJi1SH5mKMDaOBA4K73EH7.png</thumb>
-  <namedseason number="0">特别篇</namedseason>
-  <namedseason number="1">立志篇</namedseason>
-  <namedseason number="2">无限列车篇</namedseason>
-  <namedseason number="3">游郭篇</namedseason>
-  <namedseason number="4">刀匠村篇</namedseason>
-  <namedseason number="5">柱训练篇</namedseason>
-  <thumb aspect="poster" season="0" type="season">https://image.tmdb.org/t/p/original/qr3wE5cEfXd6E7opPF9I0GsgKj8.jpg</thumb>
-  <thumb aspect="poster" season="1" type="season">https://image.tmdb.org/t/p/original/gRIOC9sEqSLuLeJI3rEFud9IeAB.jpg</thumb>
-  <thumb aspect="poster" season="2" type="season">https://image.tmdb.org/t/p/original/FuBnPbS4SmGiiwwrk4CMKSb7Pf.jpg</thumb>
-  <thumb aspect="poster" season="3" type="season">https://image.tmdb.org/t/p/original/ton0zwuKsg7PVuZB79IaaQnnrOo.jpg</thumb>
-  <thumb aspect="poster" season="4" type="season">https://image.tmdb.org/t/p/w500/7QakGpfNQOtvqt1bg1a7ZBZtof7.jpg</thumb>
-  <fanart>
-    <thumb>https://image.tmdb.org/t/p/original/nTvM4mhqNlHIvUkI1gVnW6XP7GG.jpg</thumb>
-  </fanart>
-  <mpaa>US:TV-MA</mpaa>
-  <certification>US:TV-MA</certification>
-  <episodeguide>{"tmdb":"85937","imdb":"tt9335498","tvdb":"348545"}</episodeguide>
-  <id>348545</id>
-  <imdbid>tt9335498</imdbid>
-  <tmdbid>85937</tmdbid>
-  <uniqueid default="false" type="tmdb">85937</uniqueid>
-  <uniqueid default="false" type="imdb">tt9335498</uniqueid>
-  <uniqueid default="true" type="tvdb">348545</uniqueid>
-  <premiered>2019-04-06</premiered>
-  <status>Continuing</status>
+  <plot>李逍遥梦境：与罗刹鬼婆空中激战，被打落掉回床上，被李大婶打醒。李大婶吩咐李逍遥去开店门。李逍遥刚一开门就见三个古怪的拜月教徒。三人在李家客栈（云来云去客栈）住下，其实另有目的。他们使李大婶昏迷，为救李大婶，李逍遥中计上了仙灵岛，巧遇赵灵儿，但赵灵儿和姥姥却说早在十年前就认识李逍遥，李逍遥大惑不解，姥姥让李逍遥与赵灵儿成亲。</plot>
+  <runtime>46</runtime>
+  <thumb/>
+  <mpaa/>
+  <premiered>2005-01-24</premiered>
+  <aired>2005-01-24</aired>
   <watched>false</watched>
-  <playcount/>
-  <genre>Animation</genre>
-  <genre>Action</genre>
-  <genre>Science Fiction</genre>
-  <studio>Fuji TV</studio>
-  <studio>Gunma TV</studio>
-  <studio>Tokyo MX</studio>
-  <studio>BS11</studio>
-  <studio>Tokai Television Broadcasting</studio>
-  <studio>Kansai TV</studio>
-  <studio>Tochigi TV</studio>
-  <studio>Fukui TV</studio>
-  <studio>Hokkaido Cultural Broadcasting</studio>
-  <studio>Iwate Menkoi Television</studio>
-  <studio>Television Oita System</studio>
-  <studio>Sendai Television</studio>
-  <studio>SAGA TV</studio>
-  <studio>Ishikawa TV</studio>
-  <studio>Television Nishinippon</studio>
-  <studio>OHK</studio>
-  <studio>Kochi Sun Sun Broadcasting</studio>
-  <studio>Television Shin Hiroshima System</studio>
-  <studio>TV Shizuoka</studio>
-  <studio>UMK TV Miyazaki</studio>
-  <studio>NST</studio>
-  <studio>NBS</studio>
-  <studio>Sakuranbo TV</studio>
-  <studio>TSK</studio>
-  <studio>Ehime Broadcasting</studio>
-  <studio>KTS</studio>
-  <studio>Fukushima TV</studio>
-  <studio>NIB</studio>
-  <studio>AKT</studio>
-  <studio>Toyama Television</studio>
-  <studio>TV Kumamoto</studio>
-  <studio>Okinawa Television Broadcasting</studio>
-  <studio>ufotable</studio>
-  <studio>Aniplex</studio>
-  <studio>Shueisha</studio>
-  <studio>STUDIO MAUSU</studio>
-  <country>日本</country>
-  <tag>sibling relationship</tag>
-  <tag>swordplay</tag>
-  <tag>magic</tag>
-  <tag>supernatural</tag>
-  <tag>undead</tag>
-  <tag>coming of age</tag>
-  <tag>tragedy</tag>
-  <tag>based on manga</tag>
-  <tag>demon</tag>
-  <tag>mutilation</tag>
-  <tag>dark fantasy</tag>
-  <tag>anachronism</tag>
-  <tag>shounen</tag>
-  <tag>anime</tag>
-  <tag>time skip</tag>
-  <tag>taisho</tag>
-  <tag>lacrimation</tag>
+  <playcount>0</playcount>
+  <studio>CTV</studio>
+  <studio>唐人影视</studio>
+  <director tmdbid="2749214">Lee Kwok-Lap</director>
   <actor>
-    <name>Natsuki Hanae</name>
-    <role>Tanjiro Kamado (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/A1lGrpBEdAUxZA7RoAw4Zr4ved3.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/1256603</profile>
-    <tmdbid>1256603</tmdbid>
+    <name>Hu Ge</name>
+    <role>Li Xiaoyao</role>
+    <thumb>https://image.tmdb.org/t/p/h632/yMDKxcljmEFhxSGk3oeW3sl2YKu.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/1106514</profile>
+    <tmdbid>1106514</tmdbid>
   </actor>
   <actor>
-    <name>Akari Kito</name>
-    <role>Nezuko Kamado (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/43SgANYtj7vpsHmz68hgPDlxC15.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/1563442</profile>
-    <tmdbid>1563442</tmdbid>
+    <name>Liu Yifei</name>
+    <role>Zhao Ling'er</role>
+    <thumb>https://image.tmdb.org/t/p/h632/Gj4gFStxpl6SsKnrkxrAsKBYqD.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/122503</profile>
+    <tmdbid>122503</tmdbid>
   </actor>
   <actor>
-    <name>Kengo Kawanishi</name>
-    <role>Muichiro Tokito (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/fBzVAY4gcUvs5EfRWQMViYgp9xV.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/1324472</profile>
-    <tmdbid>1324472</tmdbid>
+    <name>Ady An</name>
+    <role>Lin Yueru</role>
+    <thumb>https://image.tmdb.org/t/p/h632/xmPVIj1Vtzltq0KNNWx0LvMlvdo.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/1241442</profile>
+    <tmdbid>1241442</tmdbid>
   </actor>
   <actor>
-    <name>Kana Hanazawa</name>
-    <role>Mitsuri Kanroji (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/5bK9ttcRydQBWmyZp7gXDmJYOPF.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/119143</profile>
-    <tmdbid>119143</tmdbid>
+    <name>Eddie Peng</name>
+    <role>Tang Yu</role>
+    <thumb>https://image.tmdb.org/t/p/h632/ro73UewPtqFAO9OifEknW2kXqd7.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/126778</profile>
+    <tmdbid>126778</tmdbid>
   </actor>
   <actor>
-    <name>Nobuhiko Okamoto</name>
-    <role>Genya Shinazugawa (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/qyZpSYva9O9JQIZ0nVmXTf90FlL.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/1245094</profile>
-    <tmdbid>1245094</tmdbid>
+    <name>Esther Liu</name>
+    <role>A'nu</role>
+    <thumb>https://image.tmdb.org/t/p/h632/dZWLoOK2XNpwU5U8oA3JEmdjLQS.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/1241444</profile>
+    <tmdbid>1241444</tmdbid>
   </actor>
   <actor>
-    <name>Toshio Furukawa</name>
-    <role>Hantengu (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/zZjO0NxIbEhYW3507gXVnvWeRkG.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/85286</profile>
-    <tmdbid>85286</tmdbid>
+    <name>Limin Deng</name>
+    <role>Shi Zhanglao</role>
+    <thumb>https://image.tmdb.org/t/p/h632/BP2VOf7z6siJ3047ZyMSnWG5Oq.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/1436153</profile>
+    <tmdbid>1436153</tmdbid>
   </actor>
   <actor>
-    <name>Kohsuke Toriumi</name>
-    <role>Gyokko (voice)</role>
-    <thumb>https://image.tmdb.org/t/p/h632/vlRQ77taCCKh7itCZn3IWJUiYQr.jpg</thumb>
-    <profile>https://www.themoviedb.org/person/122647</profile>
-    <tmdbid>122647</tmdbid>
+    <name>Jiang Xin</name>
+    <role>Nüyuan / Jiang Wan'er</role>
+    <thumb>https://image.tmdb.org/t/p/h632/mw1jQzfF8QgGOJFyfMZCQJxmh4f.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/1241445</profile>
+    <tmdbid>1241445</tmdbid>
   </actor>
-  <trailer>plugin://plugin.video.youtube/?action=play_video&amp;videoid=SWAMTXfqer0</trailer>
-  <dateadded>2023-08-30 11:01:27</dateadded>
+  <actor>
+    <name>Achel Chang</name>
+    <role>Ding Xianglan</role>
+    <thumb>https://image.tmdb.org/t/p/h632/m6yJfiZibIgjtZrYvlmwaMivnbh.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/2485043</profile>
+    <tmdbid>2485043</tmdbid>
+  </actor>
+  <actor>
+    <name>Elvis Tsui</name>
+    <role>Moon Worshipping Cult's leader</role>
+    <thumb>https://image.tmdb.org/t/p/h632/x110WbXYXMQjVNoPjEMoPo7qEKi.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/83631</profile>
+    <tmdbid>83631</tmdbid>
+  </actor>
+  <actor>
+    <name>Bryan Wong</name>
+    <role>Liu Jinyuan</role>
+    <thumb>https://image.tmdb.org/t/p/h632/oYaNjBXQfcJK5CClqooJPenmw4v.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/1240197</profile>
+    <tmdbid>1240197</tmdbid>
+  </actor>
+  <actor>
+    <name>Tse Kwan-Ho</name>
+    <role>Jiu Jian Xian Wine Sword Immortal</role>
+    <thumb>https://image.tmdb.org/t/p/h632/a5y4CekUSOguVV2FOBtAVIFHMz7.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/931254</profile>
+    <tmdbid>931254</tmdbid>
+  </actor>
+  <actor>
+    <name>Yang Kun</name>
+    <role>李大婶</role>
+    <thumb>https://image.tmdb.org/t/p/h632/840dRWZEowkt5HcfDPTzyA4cWx7.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/2594974</profile>
+    <tmdbid>2594974</tmdbid>
+  </actor>
+  <actor>
+    <name>Wang Lei</name>
+    <role>南蛮娘</role>
+    <thumb>https://image.tmdb.org/t/p/h632/4pR6WRgvpBQlQqEIVuGh0KnCKc5.jpg</thumb>
+    <profile>https://www.themoviedb.org/person/2443168</profile>
+    <tmdbid>2443168</tmdbid>
+  </actor>
+  <trailer/>
+  <dateadded>2023-09-02 14:42:40</dateadded>
+  <epbookmark/>
+  <code/>
+  <fileinfo>
+    <streamdetails>
+      <video>
+        <codec>h264</codec>
+        <aspect>1.78</aspect>
+        <width>3840</width>
+        <height>2160</height>
+        <durationinseconds>634</durationinseconds>
+        <stereomode/>
+      </video>
+      <audio>
+        <codec>MP3</codec>
+        <language/>
+        <channels>2</channels>
+      </audio>
+      <audio>
+        <codec>AC3</codec>
+        <language/>
+        <channels>6</channels>
+      </audio>
+    </streamdetails>
+  </fileinfo>
   <!--tinyMediaManager meta data-->
+  <source>UNKNOWN</source>
+  <original_filename>01.mp4</original_filename>
   <user_note/>
-</tvshow>
+</episodedetails>
         """
     }
 }
