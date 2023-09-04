@@ -30,10 +30,12 @@ import com.hphtv.movielibrary.scraper.respone.MovieSearchRespone;
 import com.hphtv.movielibrary.util.MovieHelper;
 import com.hphtv.movielibrary.util.PinyinParseAndMatchTools;
 import com.hphtv.movielibrary.util.nfo.NFOEntity;
+import com.hphtv.movielibrary.util.nfo.NFOEpisodes;
 import com.hphtv.movielibrary.util.nfo.NFOMovie;
 import com.hphtv.movielibrary.util.nfo.NFOMovieKt;
 import com.hphtv.movielibrary.util.nfo.NFOTVShow;
 import com.hphtv.movielibrary.util.nfo.NFOTVShowKt;
+import com.hphtv.movielibrary.util.nfo.NFOType;
 import com.hphtv.movielibrary.util.nfo.factory.KodiNFOFactory;
 import com.hphtv.movielibrary.util.nfo.reader.NFOReader;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
@@ -169,12 +171,12 @@ public class MovieScanService extends Service {
                                         .observeOn(Schedulers.from(mNetworkExecutor))
                                         .map(videoFile -> {
                                             if (tryReadNFO) {
-                                                if (seamLikeEpisode(videoFile.filename).find()||seamLikeEpisode(videoFile.filename).find()) {
-                                                    File nfoFile=findTVShowInfoFile(videoFile.path, 2);
-                                                    if(nfoFile!=null){
+                                                if (seamLikeEpisode(videoFile.filename).find() || seamLikeEpisode(videoFile.filename).find()) {
+                                                    File nfoFile = findTVShowInfoFile(videoFile.path, 2);
+                                                    if (nfoFile != null) {
                                                         return getMovieInfoFromNFO(nfoFile, videoFile, shortcut1);
                                                     }
-                                                }else{
+                                                } else {
                                                     File nfoFile = new File(videoFile.path.substring(0, videoFile.path.lastIndexOf(".")) + ".nfo");
                                                     if (nfoFile.exists()) {
                                                         return getMovieInfoFromNFO(nfoFile, videoFile, shortcut1);
@@ -403,6 +405,7 @@ public class MovieScanService extends Service {
                         List<Genre> tvGenreList = NFOTVShowKt.toGenreList(nfotvShow);
                         List<StagePhoto> tvStagePhotoList = NFOTVShowKt.toStagePhotoList(nfotvShow);
                         List<Season> tvSeasonList = NFOTVShowKt.toSeasonList(nfotvShow);
+                        getEpisodeInfoFromNFO(videoFile);
                         updateNFOMovie(tvShow);
                         MovieHelper.addNewMovieInfo(getBaseContext(), tvShow, tvGenreList, nfotvShow.getDirectors(), nfotvShow.getActors(), tvStagePhotoList, tvSeasonList, videoFile);
                         Object[] tvData = new Object[2];
@@ -410,19 +413,43 @@ public class MovieScanService extends Service {
                         tvData[1] = shortcut;
                         return tvData;
                     case EPISODE:
-                        File tvNFOFile=findTVShowInfoFile(nfoFile.getPath(),2);
-                        if(tvNFOFile!=null){
+                        File tvNFOFile = findTVShowInfoFile(nfoFile.getPath(), 2);
+                        if (tvNFOFile != null) {
                             return getMovieInfoFromNFO(tvNFOFile, videoFile, shortcut);
                         }
                         break;
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         Object[] data = new Object[1];
-        data[0]=shortcut;
+        data[0] = shortcut;
         return data;
+    }
+
+    private void getEpisodeInfoFromNFO(VideoFile videoFile) {
+        try {
+            File nfoFile = new File(videoFile.path.substring(0, videoFile.path.lastIndexOf(".")) + ".nfo");
+            FileInputStream fileInputStream = new FileInputStream(nfoFile);
+            NFOEntity entity = mNFOReader.readFromXML(fileInputStream);
+            if (entity != null) {
+                if (entity.getNFOType() == NFOType.EPISODE) {
+                    NFOEpisodes nfoEpisodes = (NFOEpisodes) entity;
+                    if (nfoEpisodes.getSeason() != null) {
+                        videoFile.season = Integer.parseInt(nfoEpisodes.getSeason());
+                    }
+                    if (nfoEpisodes.getEpisode() != null) {
+                        videoFile.episode = Integer.parseInt(nfoEpisodes.getEpisode());
+                    }
+                    if (nfoEpisodes.getPremiered() != null) {
+                        videoFile.aired = nfoEpisodes.getPremiered();
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateNFOMovie(Movie nfoMovie) {
@@ -525,24 +552,24 @@ public class MovieScanService extends Service {
      * @return
      */
     private File findTVShowInfoFile(String path, int depth) {
-        if (depth <0) {
+        if (depth < 0) {
             return null;
         }
         File file = new File(path);
-        if(file.isDirectory()){
-            File[] subFiles=file.listFiles();
-            for(int i=0;i<subFiles.length;i++){
-                File subFile=subFiles[i];
-                if(subFile.getName().equalsIgnoreCase("tvshow.nfo")){
+        if (file.isDirectory()) {
+            File[] subFiles = file.listFiles();
+            for (int i = 0; i < subFiles.length; i++) {
+                File subFile = subFiles[i];
+                if (subFile.getName().equalsIgnoreCase("tvshow.nfo")) {
                     return subFile;
                 }
             }
         }
-        return findTVShowInfoFile(file.getParentFile().getPath(), depth -1);
+        return findTVShowInfoFile(file.getParentFile().getPath(), depth - 1);
     }
 
-    private Matcher seamLikeVarietyShow(String fileName){
-        String regex="20\\d{2}[-_\\.\\s]?\\d{2}[-_\\.\\s]?\\d{2}.*\\.";
+    private Matcher seamLikeVarietyShow(String fileName) {
+        String regex = "20\\d{2}[-_\\.\\s]?\\d{2}[-_\\.\\s]?\\d{2}.*\\.";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         return pattern.matcher(fileName);
     }
