@@ -287,12 +287,20 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
                     if (Constants.VideoType.tv.equals(wrapper.movie.type) && wrapper.season != null) {
                         if (wrapper.containVideoTags(Constants.VideoType.variety_show)) {
                             mEpisodeItemListAdapter.setVarietyShow(true);
-                            mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
+                            if(wrapper.season.episodeCount<=0){
+                                mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title_without_count));
+                            }else {
+                                mBinding.setEpisodesTitle(getString(R.string.detail_varietyshow_list_title, wrapper.season.episodeCount));
+                            }
                             mEpisodeItemListAdapter.addAll(mViewModel.getEpisodeList());
                         } else {
                             mEpisodeItemListAdapter.setVarietyShow(false);
                             mEpisodeItemListAdapter.setEpisodeCount(mViewModel.getEpisodeList().size());//设置总集数
-                            mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
+                            if(wrapper.season.episodeCount<=0){
+                                mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title_without_count));
+                            }else{
+                                mBinding.setEpisodesTitle(getString(R.string.detail_episodes_list_title, wrapper.season.episodeCount));
+                            }
                             TabLayout tabLayout = mBinding.tabEpisodeSet;
                             tabLayout.removeAllTabs();
 

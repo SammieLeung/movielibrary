@@ -253,6 +253,7 @@
     <!--上映时间-->
     <string name="search_video_dialog_release_date">Release date</string>
     <!--电视剧详情-->
+    <string name="detail_episodes_list_title_without_count">Episode list</string>
     <string name="detail_episodes_list_title">Episode list (%1$d Episodes)</string>
     <string name="detail_varietyshow_list_title">Episode list (%1$d Episodes)</string>
     <string name="season_name_for_unknow">Season %1$d</string>

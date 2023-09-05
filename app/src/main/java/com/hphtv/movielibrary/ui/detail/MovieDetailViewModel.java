@@ -157,9 +157,11 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                             }
                         } else {
                             //根据处理海报信息先创建剧集
-                            for (int i = 0; i < mMovieWrapper.season.episodeCount; i++) {
-                                ArrayList<VideoFile> episodeFiles = new ArrayList<>();
-                                mEpisodeList.add(episodeFiles);
+                            if (mMovieWrapper.season.episodeCount > 0) {
+                                for (int i = 0; i < mMovieWrapper.season.episodeCount; i++) {
+                                    ArrayList<VideoFile> episodeFiles = new ArrayList<>();
+                                    mEpisodeList.add(episodeFiles);
+                                }
                             }
 
                             //将合资格的影片分类到具体剧集里，未成功分类则放到mUnknownEpisodeList中
@@ -195,6 +197,17 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                 }
                             }
 
+                            //根据上次播放的文件标记他集数列表中的位置
+                            if (mLastPlayEpisodeVideoFile != null) {
+                                if (mLastPlayEpisodeVideoFile.episode < 0) {
+                                    mLastPlayEpisodePos.set(lastPlayUnknownEpisodePos);
+                                    mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_resume));
+                                } else {
+                                    mLastPlayEpisodePos.set(lastPlayUnknownEpisodePos);//episode从1开始，所以索引应该是episode-1;
+                                    mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
+                                }
+                            }
+
                             //从其他影片中寻找
                             if (mUnknownEpisodeList.size() > 0) {
                                 mUnknownEpisodeList.sort(Comparator.comparing(o -> o.path));
@@ -219,7 +232,7 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                                     mLastPlayEpisodePos.set(lastPlayUnknownEpisodePos);
                                     mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_resume));
                                 } else {
-                                    mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
+                                    mLastPlayEpisodePos.set(lastPlayUnknownEpisodePos);//episode从1开始，所以索引应该是episode-1;
                                     mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
                                 }
                             }
@@ -292,8 +305,8 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                         tagList.add(locale.getDisplayName());
                     }
                     if (movieWrapper.genres.size() > 0) {
-                        for (int i = 0,tagCount=0; i < movieWrapper.genres.size() && tagCount < 3;i++ ) {
-                            if(Objects.equals(movieWrapper.genres.get(i).source, ScraperSourceTools.getSource())){
+                        for (int i = 0, tagCount = 0; i < movieWrapper.genres.size() && tagCount < 3; i++) {
+                            if (Objects.equals(movieWrapper.genres.get(i).source, ScraperSourceTools.getSource())) {
                                 tagList.add(movieWrapper.genres.get(i).name);
                             }
                         }
@@ -316,9 +329,9 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .map(wrapper -> {
                     boolean isFavorite = isLike;
                     String movieId = wrapper.movie.movieId;
-                    String type=wrapper.movie.type.name();
+                    String type = wrapper.movie.type.name();
                     mMovieWrapper.movie.isFavorite = isLike;
-                    MovieHelper.setMovieFavoriteState(getApplication(),movieId,type,isFavorite);
+                    MovieHelper.setMovieFavoriteState(getApplication(), movieId, type, isFavorite);
                     return isFavorite;
                 }).subscribeOn(Schedulers.from(mSingleThreadPool))
                 .observeOn(AndroidSchedulers.mainThread());
@@ -390,8 +403,28 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
             }
         } else {
             if (mLastPlayEpisodeVideoFile.episode > 0) {
-                mLastPlayEpisodePos.set(mLastPlayEpisodeVideoFile.episode - 1);//episode从1开始，所以索引应该是episode-1;
-                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
+                if(mEpisodeList.size()>0){
+                    for (int i = 0; i < mEpisodeList.size(); i++) {
+                        for (VideoFile tmp : mEpisodeList.get(i)) {
+                            if (tmp.equals(videoFile)) {
+                                mLastPlayEpisodePos.set(i);//episode从1开始，所以索引应该是episode-1;
+                                mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
+                                break;
+                            }
+                        }
+
+                    }
+                }else{
+                    //当最后播放文件没有剧集信息则在未分类中寻找匹配
+                    for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
+                        VideoFile tmp = mUnknownEpisodeList.get(i);
+                        if (tmp.equals(videoFile)) {
+                            mLastPlayEpisodePos.set(mEpisodeList.size() + i);
+                            mEpisodePlayBtnText.set(getApplication().getString(R.string.btn_play_episode, mLastPlayEpisodeVideoFile.episode));
+                            break;
+                        }
+                    }
+                }
             } else {
                 //当最后播放文件没有剧集信息则在未分类中寻找匹配
                 for (int i = 0; i < mUnknownEpisodeList.size(); i++) {
