@@ -26,7 +26,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/02/10
  */
-public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLargeBinding, BaseScaleAdapter.ViewHolder, MovieDataView> implements Filterable {
+public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLargeBinding, MovieDataView> implements Filterable {
     private List<MovieDataView> mFilterMovieDataViewList;
 
     public NewMovieLargeItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {
@@ -54,7 +54,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
                 title += " " + mContext.getResources().getString(R.string.season_name_for_unknow, movieDataView.season);
             if (movieDataView.episode_count != 0) {
                 binding.setTag(mContext.getString(R.string.total_episodes, movieDataView.episode_count));
-            }else{
+            } else {
                 binding.setTag(null);
             }
         } else {
@@ -62,7 +62,7 @@ public class NewMovieLargeItemListAdapter extends BaseScaleAdapter<PosterItemLar
                 binding.setTag(movieDataView.video_source);
             } else if (!TextUtils.isEmpty(movieDataView.resolution)) {
                 binding.setTag(movieDataView.resolution);
-            }else{
+            } else {
                 binding.setTag(null);
             }
         }

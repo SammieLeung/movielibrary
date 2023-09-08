@@ -44,7 +44,9 @@ class FilterFragment constructor(val videoType: VideoType) :
 
             override fun newSearch(newMovieDataView: List<MovieDataView?>?) {
                 mBinding.isEmpty = newMovieDataView?.isEmpty() ?: true
-                adapter.addAll(newMovieDataView)
+                newMovieDataView?.let{
+                    adapter.addAll(it)
+                }
             }
 
             override fun appendMovieDataViews(movieDataViews: List<MovieDataView?>?) {

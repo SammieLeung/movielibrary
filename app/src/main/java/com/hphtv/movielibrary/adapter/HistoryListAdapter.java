@@ -25,7 +25,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, BaseScaleAdapter.ViewHolder, HistoryMovieDataView> {
+public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, HistoryMovieDataView> {
     public HistoryListAdapter(Context context, List<HistoryMovieDataView> historyList) {
         super(context, historyList);
         setZoomRatio(1.1f);
@@ -68,12 +68,12 @@ public class HistoryListAdapter extends BaseScaleAdapter<HistoryItemBinding, Bas
             binding.setMax(100);
             long duration = dataView.duration;
             long lastPosition = dataView.last_position;
-            int progress = (int) Math.floorDiv(lastPosition*100, duration);
+            int progress = (int) Math.floorDiv(lastPosition * 100, duration);
             binding.setProgress(progress);
             String durationHRS = TimeFormatter.formatMillisecondToHumanReadableString(duration);
             String lastPositionHRS = TimeFormatter.formatMillisecondToHumanReadableString(lastPosition);
             binding.setProgressFormatText(lastPositionHRS + "/" + durationHRS);
-        }else{
+        } else {
             binding.setMax(0);
         }
     }

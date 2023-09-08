@@ -153,6 +153,7 @@
   <string name="video_type_animate">动画</string>
   <string name="video_type_variety_show">综艺</string>
   <string name="video_type_other">其他</string>
+  <string name="video_type_all_file">全部文件</string>
 
   <!--本地搜索页tab-->
   <string name="tab_local_search_all">全部 (%d)</string>
@@ -245,6 +246,7 @@
   <string name="homepage_empty">空空如也</string>
   <string name="homepage_goto_add_shortcut">添加影片到影库</string>
   <string name="unknowfile_empty">没有未匹配的文件</string>
+  <string name="allfile_empty">没有视频文件</string>
   <!--上映时间-->
   <string name="search_video_dialog_release_date">上映时间</string>
 

@@ -152,7 +152,7 @@
     <string name="video_type_animate">Animate</string>
     <string name="video_type_variety_show">Variety Show</string>
     <string name="video_type_other">Other</string>
-
+    <string name="video_type_all_file">Files</string>
     <!--本地搜索页tab-->
     <string name="tab_local_search_all">All (%d)</string>
     <string name="tab_local_search_movie">Movie (%d)</string>
@@ -250,6 +250,8 @@
     <string name="homepage_empty">There is nothing here!</string>
     <string name="homepage_goto_add_shortcut">Add videos to library</string>
     <string name="unknowfile_empty">There are no unmatched files</string>
+    <string name="allfile_empty">No video files</string>
+
     <!--上映时间-->
     <string name="search_video_dialog_release_date">Release date</string>
     <!--电视剧详情-->

@@ -20,7 +20,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class UnknownRootItemListAdapter extends BaseScaleAdapter<MiniFileItemBinding, BaseScaleAdapter.ViewHolder, UnknownRootDataView> {
+public class UnknownRootItemListAdapter extends BaseScaleAdapter<MiniFileItemBinding, UnknownRootDataView> {
 
     public UnknownRootItemListAdapter(Context context, List<UnknownRootDataView> list) {
         super(context, list);
@@ -44,7 +44,7 @@ public class UnknownRootItemListAdapter extends BaseScaleAdapter<MiniFileItemBin
         String text;
         String subText = null;
         if (dataView.type.equals(Constants.UnknownRootType.FILE)) {
-            text = dataView.root.substring(dataView.root.lastIndexOf("/")+1);
+            text = dataView.root.substring(dataView.root.lastIndexOf("/") + 1);
             binding.setType(UnknownFileViewModel.TYPE_FILE);
         } else if (dataView.type.equals(Constants.UnknownRootType.FOLDER)) {
             text = dataView.root;
@@ -52,18 +52,17 @@ public class UnknownRootItemListAdapter extends BaseScaleAdapter<MiniFileItemBin
             {
                 text = text.substring(0, text.length() - 1);
             }
-            text = text.substring(text.lastIndexOf("/")+1);
-            subText= mContext.getString(R.string.item_count_format,String.valueOf(dataView.count));
+            text = text.substring(text.lastIndexOf("/") + 1);
+            subText = mContext.getString(R.string.item_count_format, String.valueOf(dataView.count));
             binding.setType(UnknownFileViewModel.TYPE_FOLDER);
 
         } else {
-            text= mContext.getString(R.string.goback);
+            text = mContext.getString(R.string.goback);
             binding.setType(UnknownFileViewModel.TYPE_BACK);
         }
         binding.setText(text);
         binding.setSubText(subText);
     }
-
 
 
 }

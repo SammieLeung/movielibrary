@@ -483,6 +483,10 @@ public class MovieDetailViewModel extends BaseAndroidViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * 获取文件列表
+     * @return
+     */
     public Observable<String> loadFileList() {
         return Observable.just(mMovieWrapper)
                 .subscribeOn(Schedulers.from(mSingleThreadPool))

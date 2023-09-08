@@ -14,7 +14,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/11/9
  */
-public class RoundRectItemAdapter extends BaseScaleAdapter<RoundRectItemBinding, BaseScaleAdapter.ViewHolder, String> {
+public class RoundRectItemAdapter extends BaseScaleAdapter<RoundRectItemBinding, String> {
 
 
     public RoundRectItemAdapter(Context context, List<String> list) {

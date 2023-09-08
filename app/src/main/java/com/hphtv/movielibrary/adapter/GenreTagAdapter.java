@@ -86,15 +86,6 @@ public class GenreTagAdapter extends RoundRectItemAdapter {
         }
     }
 
-    @Override
-    public boolean onHover(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
-        } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
-        }
-        return false;
-    }
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull BaseScaleAdapter.ViewHolder holder, int position) {

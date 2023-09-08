@@ -20,7 +20,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class UnknownFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, ConnectedFileDataView> {
+public class UnknownFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, ConnectedFileDataView> {
 
     public UnknownFileItemListAdapter(Context context, List<ConnectedFileDataView> list) {
         super(context, list);
@@ -30,7 +30,7 @@ public class UnknownFileItemListAdapter extends BaseScaleAdapter<PosterItemBindi
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
-        PosterItemBinding itemBinding= (PosterItemBinding) viewHolder.mBinding;
+        PosterItemBinding itemBinding = (PosterItemBinding) viewHolder.mBinding;
         itemBinding.setShowConrerMark(Config.getShowCornerMark());
         itemBinding.setShowLike(Config.getShowLike());
         itemBinding.setShowRating(Config.getShowRating());
@@ -45,7 +45,7 @@ public class UnknownFileItemListAdapter extends BaseScaleAdapter<PosterItemBindi
         super.onBindViewHolder(holder, position);
         ConnectedFileDataView dataView = mList.get(position);
         PosterItemBinding binding = (PosterItemBinding) holder.mBinding;
-            Glide.with(mContext).load(R.drawable.default_poster).into(binding.rvPoster);
+        Glide.with(mContext).load(R.drawable.default_poster).into(binding.rvPoster);
         binding.setTitle(dataView.filename);
     }
 //

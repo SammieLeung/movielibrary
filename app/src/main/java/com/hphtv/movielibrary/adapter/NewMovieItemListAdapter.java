@@ -25,7 +25,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, MovieDataView> {
+public class NewMovieItemListAdapter extends BaseScaleAdapter<PosterItemBinding, MovieDataView> {
     public static final String TAG = NewMovieItemListAdapter.class.getSimpleName();
 
     public NewMovieItemListAdapter(Context context, List<MovieDataView> movieDataViewList) {

@@ -17,7 +17,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public class NewVideoFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, BaseScaleAdapter.ViewHolder, ConnectedFileDataView> {
+public class NewVideoFileItemListAdapter extends BaseScaleAdapter<PosterItemBinding, ConnectedFileDataView> {
 
     public NewVideoFileItemListAdapter(Context context, List<ConnectedFileDataView> movieDataViewList) {
         super(context, movieDataViewList);

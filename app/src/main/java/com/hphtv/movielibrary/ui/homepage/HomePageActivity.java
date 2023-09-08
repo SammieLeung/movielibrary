@@ -1,7 +1,5 @@
 package com.hphtv.movielibrary.ui.homepage;
 
-import static com.hphtv.movielibrary.data.Constants.REQUEST_CODE_FROM_BASE_FILTER;
-
 import android.animation.ObjectAnimator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -40,13 +38,13 @@ import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding;
 import com.hphtv.movielibrary.databinding.TabitemHomepageMenuBinding;
 import com.hphtv.movielibrary.listener.OnMovieChangeListener;
 import com.hphtv.movielibrary.roomdb.entity.Shortcut;
-import com.hphtv.movielibrary.roomdb.entity.VideoTag;
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView;
 import com.hphtv.movielibrary.service.DeviceMonitorService;
 import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterBoxDialogFragment;
 import com.hphtv.movielibrary.ui.filterpage.OnFilterChangerListener;
+import com.hphtv.movielibrary.ui.homepage.fragment.allfile.AllFileFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.filter.FilterFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
 import com.hphtv.movielibrary.ui.moviesearch.pinyin.PinyinSearchActivity;
@@ -54,7 +52,6 @@ import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
-import com.orhanobut.logger.Logger;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.PackageTools;
 
@@ -232,7 +229,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.HOME).setCustomView(buildTabView(getString(R.string.tab_homepage)));
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.MOVIE).setCustomView(buildTabView(getString(R.string.video_type_movie)));
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.TV).setCustomView(buildTabView(getString(R.string.video_type_tv)));
-        mBinding.tabLayout.getTabAt(HomePageTabAdapter.UNKNOWN).setCustomView(buildTabView(getString(R.string.video_type_undefine)));
+        mBinding.tabLayout.getTabAt(HomePageTabAdapter.ALL_FILE).setCustomView(buildTabView(getString(R.string.video_type_all_file)));
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.CHILD).setCustomView(buildTabView(getString(R.string.video_type_cartoon)));
         mBinding.tabLayout.getTabAt(HomePageTabAdapter.VARIETY_SHOW).setCustomView(buildTabView(getString(R.string.video_type_variety_show)));
 
@@ -280,7 +277,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int pos = tab.getPosition();
-                if (pos != HomePageTabAdapter.UNKNOWN && pos != HomePageTabAdapter.HOME) {
+                if (pos != HomePageTabAdapter.ALL_FILE && pos != HomePageTabAdapter.HOME) {
                     ((TextView) tab.getCustomView().findViewById(R.id.tabTextView)).setCompoundDrawablesWithIntrinsicBounds(null, null, getDrawable(R.drawable.icon_filter_27dp), null);
                     //此时注册点击监听器,点击弹出筛选窗口
                     tab.view.setOnClickListener(v -> {
@@ -588,10 +585,10 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public void onBackPressed() {
-        if (mBinding.viewpager.getCurrentItem() == HomePageTabAdapter.UNKNOWN) {
-            if (mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN) instanceof UnknownFileFragment) {
-                UnknownFileFragment unknownFileFragment = (UnknownFileFragment) mNewHomePageTabAdapter.getItem(HomePageTabAdapter.UNKNOWN);
-                boolean res = unknownFileFragment.OnBackPress();
+        if (mBinding.viewpager.getCurrentItem() == HomePageTabAdapter.ALL_FILE) {
+            if (mNewHomePageTabAdapter.getItem(HomePageTabAdapter.ALL_FILE) instanceof AllFileFragment) {
+                AllFileFragment allFileFragment = (AllFileFragment) mNewHomePageTabAdapter.getItem(HomePageTabAdapter.ALL_FILE);
+                boolean res = allFileFragment.OnBackPress();
                 if (!res) {
                     super.onBackPressed();
                 }

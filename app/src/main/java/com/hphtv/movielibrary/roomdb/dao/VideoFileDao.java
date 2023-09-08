@@ -17,7 +17,6 @@ import com.hphtv.movielibrary.roomdb.entity.dataview.HistoryMovieDataView;
 import com.hphtv.movielibrary.roomdb.entity.VideoFile;
 import com.hphtv.movielibrary.roomdb.entity.dataview.UnknownRootDataView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -126,7 +125,8 @@ public interface VideoFileDao {
             " WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path))")
     public List<String> queryVideoFileNameList(String path);
 
-
+    @Query("SELECT PATH FROM VIDEOFILE WHERE PATH LIKE :PATH_LIKE")
+    public List<String> queryFilePathList(String PATH_LIKE);
 
     @Query("SELECT * FROM "+TABLE.VIDEOFILE+" WHERE add_time<:addTime AND dir_path=:dir_path")
     public List<VideoFile> queryRedundantFile(String dir_path,long addTime);

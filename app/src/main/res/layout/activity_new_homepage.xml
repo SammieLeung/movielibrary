@@ -95,11 +95,11 @@
     </androidx.core.widget.NestedScrollView>
 
     <View
-      android:id="@+id/bottomMask"
-      android:layout_width="match_parent"
-      android:layout_height="230dp"
-      android:layout_alignParentBottom="true"
-      android:background="@drawable/bottom_mask"></View>
+        android:id="@+id/bottomMask"
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bottom_mask" />
   </RelativeLayout>
 
   <data>

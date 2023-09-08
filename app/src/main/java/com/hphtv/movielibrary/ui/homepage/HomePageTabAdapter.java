@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.hphtv.movielibrary.data.Constants;
+import com.hphtv.movielibrary.ui.homepage.fragment.allfile.AllFileFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.filter.FilterFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.homepage.HomePageFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
@@ -26,7 +27,7 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
     public static final int TV=2;
     public static final int CHILD=3;
     public static final int VARIETY_SHOW=4;
-    public static final int UNKNOWN=5;
+    public static final int ALL_FILE =5;
     protected List<Fragment> mList = new ArrayList<>(5);
 
     public HomePageTabAdapter(NoScrollAutofitHeightViewPager viewPager, FragmentManager fm) {
@@ -37,7 +38,7 @@ public class HomePageTabAdapter extends FragmentPagerAdapter {
         mList.add(FilterFragment.newInstance(Constants.VideoType.tv,viewPager, TV));
         mList.add(FilterFragment.newInstance(Constants.VideoType.child,viewPager, CHILD));
         mList.add(FilterFragment.newInstance(Constants.VideoType.variety_show,viewPager, VARIETY_SHOW));
-        mList.add(UnknownFileFragment.newInstance(viewPager, UNKNOWN));
+        mList.add(AllFileFragment.newInstance(viewPager, ALL_FILE));
 
     }
 

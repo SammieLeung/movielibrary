@@ -90,7 +90,7 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
         return false;
     }
 
-    public void addAll(List data) {
+    public void addAll(@NonNull @NotNull List<? extends T> data) {
         mList.clear();
         mList.addAll(data);
         notifyDataSetChanged();

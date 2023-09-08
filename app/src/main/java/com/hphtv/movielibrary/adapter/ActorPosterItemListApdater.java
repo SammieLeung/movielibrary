@@ -17,7 +17,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2022/1/19
  */
-public class ActorPosterItemListApdater extends BaseScaleAdapter<ActorPosterItemBinding, BaseScaleAdapter.ViewHolder, Actor> {
+public class ActorPosterItemListApdater extends BaseScaleAdapter<ActorPosterItemBinding, Actor> {
 
     public ActorPosterItemListApdater(Context context, List<Actor> list) {
         super(context, list);
