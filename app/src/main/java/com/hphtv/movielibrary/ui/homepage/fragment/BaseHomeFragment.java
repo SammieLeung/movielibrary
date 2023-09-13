@@ -342,7 +342,7 @@ public abstract class BaseHomeFragment<VM extends BaseHomePageViewModel> extends
         unregisterPlayReceiver();
     }
 
-    private class PlayVideoReceiver extends BroadcastReceiver {
+    public class PlayVideoReceiver extends BroadcastReceiver {
         public static final String ACTION_PLAYER_CALLBACK = "com.firefly.video.player";
         public static final String EXTRA_PATH = "video_address";
         public static final String EXTRA_POSITION = "video_position";

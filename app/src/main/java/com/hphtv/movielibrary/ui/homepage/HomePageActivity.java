@@ -44,6 +44,7 @@ import com.hphtv.movielibrary.ui.IRemoteRefresh;
 import com.hphtv.movielibrary.ui.PermissionActivity;
 import com.hphtv.movielibrary.ui.filterpage.FilterBoxDialogFragment;
 import com.hphtv.movielibrary.ui.filterpage.OnFilterChangerListener;
+import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.allfile.AllFileFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.filter.FilterFragment;
 import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileFragment;
@@ -310,6 +311,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.tabLayout.getTabAt(0).view.requestFocus();
     }
 
+    /**
+     * 更新主页的历史播放记录
+     */
+    public void updateHistory() {
+        ((BaseHomeFragment)mNewHomePageTabAdapter.getItem(0)).prepareHistoryData();
+    }
     /**
      * 自动搜索本地设备
      */
@@ -597,4 +604,6 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
             super.onBackPressed();
         }
     }
+
+
 }

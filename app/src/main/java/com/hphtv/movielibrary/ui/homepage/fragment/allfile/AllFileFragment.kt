@@ -1,7 +1,7 @@
 package com.hphtv.movielibrary.ui.homepage.fragment.allfile
 
+import android.content.IntentFilter
 import android.os.Bundle
-import android.view.FocusFinder
 import android.view.View
 import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.lifecycle.lifecycleScope
@@ -10,15 +10,14 @@ import com.hphtv.movielibrary.R
 import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding
 import com.hphtv.movielibrary.databinding.FragmentAllfileBinding
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager
-import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical2
 import com.hphtv.movielibrary.ui.ILoadingState
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment
-import com.hphtv.movielibrary.ui.homepage.fragment.unknown.UnknownFileViewModel
+import com.hphtv.movielibrary.ui.homepage.HomePageActivity
+import com.hphtv.movielibrary.ui.homepage.PlayVideoReceiver
+import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
-import com.orhanobut.logger.Logger
 import com.station.kit.util.DensityUtil
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
@@ -27,6 +26,7 @@ class AllFileFragment :
     BaseAutofitHeightFragment<AllFileViewModel, FragmentAllfileBinding>(), ILoadingState {
     var atomicState = AtomicInteger()
     lateinit var fileTreeAdapter: FileTreeAdapter
+    private var mPlayVideoReceiver: PlayVideoReceiver? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.bindState(
@@ -35,8 +35,6 @@ class AllFileFragment :
         )
         lifecycleScope.launch {
             mViewModel.accept(UiAction.GoToRoot)
-//            delay(1000)
-//            mBinding.rvAllFilesView.adapter?.notifyDataSetChanged()
         }
     }
 
@@ -121,8 +119,41 @@ class AllFileFragment :
                         fileTreeAdapter.addAll(uiState.rootList)
                     }
                     isLoading=uiState.isLoading
+                    if(isLoading){
+                        registerPlayReceiver()
+                    }
                 }
             }
+        }
+    }
+
+    private fun registerPlayReceiver() {
+        try {
+            unregisterPlayReceiver()
+            if (mPlayVideoReceiver == null)
+                mPlayVideoReceiver =PlayVideoReceiver(
+                    context = requireContext(),
+                    refreshAction = {
+                        (baseActivity as HomePageActivity).updateHistory()
+                    },
+                    unregisterAction = this::unregisterPlayReceiver
+                )
+            val intentFilter = IntentFilter()
+            intentFilter.addAction("com.firefly.video.player")
+            requireContext().registerReceiver(mPlayVideoReceiver, intentFilter)
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
+    }
+
+    private fun unregisterPlayReceiver() {
+        try {
+            if (mPlayVideoReceiver != null) {
+                requireContext().unregisterReceiver(mPlayVideoReceiver)
+                mPlayVideoReceiver = null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
