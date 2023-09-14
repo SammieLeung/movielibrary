@@ -275,6 +275,18 @@ public interface MovieDao {
     )
     List<MovieDataView> queryMovieDataViewForRecentlyAddedByVideoTag(String source, String video_tag, String ap, int offset, int limit);
 
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW + " AS M " +
+            " JOIN " + TABLE.MOVIE_VIDEOTAG_CROSS_REF + " AS MVCF " +
+            " ON M.id=MVCF.id " +
+            " JOIN " + TABLE.VIDEO_TAG + " AS VT " +
+            " ON VT.vtid=MVCF.vtid " +
+            " WHERE source=:source AND M.poster!=\"\" " +
+            " GROUP BY M.id " +
+            " ORDER BY add_time DESC" +
+            " LIMIT :offset,:limit"
+    )
+    List<MovieDataView> queryMovieDataViewFilterPoster(String source, int offset, int limit);
 
     @Query("SELECT * FROM " + VIEW.MOVIE_DATAVIEW +
             " WHERE source=:source " +

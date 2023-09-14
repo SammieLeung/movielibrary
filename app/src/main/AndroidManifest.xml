@@ -41,7 +41,13 @@
         <activity
             android:name=".ui.detail.MovieDetailActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateUnchanged" />
+            android:exported="true"
+            android:windowSoftInputMode="stateUnchanged" >
+            <intent-filter>
+                <action android:name="com.hphtv.movielibrary.detail"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.homepage.HomePageActivity"
             android:launchMode="singleTask"

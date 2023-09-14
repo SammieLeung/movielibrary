@@ -59,4 +59,8 @@ public interface GenreDao {
     @Query("SELECT * FROM " + TABLE.GENRE_TAG + " WHERE source=:source ORDER BY weight")
     public List<GenreTag> queryGenreTagBySource(String source);
 
+    @Query("SELECT G.name FROM "+TABLE.MOVIE_GENRE_CROSS_REF+" AS MGCF " +
+            "JOIN "+TABLE.GENRE+" AS G ON MGCF.genre_id=G.genre_id " +
+            "WHERE MGCF.id=:id AND G.source=:source")
+    public List<String> queryGenreNamesById(Long id, String source);
 }

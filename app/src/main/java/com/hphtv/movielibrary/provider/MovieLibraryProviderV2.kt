@@ -2,32 +2,45 @@ package com.hphtv.movielibrary.provider
 
 import android.content.ContentProvider
 import android.content.ContentValues
+import android.content.Context
 import android.content.UriMatcher
 import android.database.Cursor
+import android.database.MatrixCursor
 import android.net.Uri
+import com.alibaba.fastjson.JSON
 import com.firefly.videonameparser.VideoNameParserV2
+import com.hphtv.movielibrary.R
+import com.hphtv.movielibrary.data.Config
 import com.hphtv.movielibrary.data.Constants
 import com.hphtv.movielibrary.data.Constants.DeviceType
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase
 import com.hphtv.movielibrary.roomdb.dao.DeviceDao
+import com.hphtv.movielibrary.roomdb.dao.GenreDao
 import com.hphtv.movielibrary.roomdb.dao.MovieDao
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao
+import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao
+import com.hphtv.movielibrary.roomdb.entity.Movie
 import com.hphtv.movielibrary.roomdb.entity.Shortcut
 import com.hphtv.movielibrary.roomdb.entity.VideoFile
+import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView
 import com.hphtv.movielibrary.scraper.respone.MovieDetailRespone
 import com.hphtv.movielibrary.scraper.service.TmdbApiService
 import com.hphtv.movielibrary.util.MovieHelper
+import com.hphtv.movielibrary.util.ScraperSourceTools
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver
 import com.orhanobut.logger.Logger
 import com.station.kit.util.FileUtils
 import java.io.File
+import java.util.regex.Pattern
 
 class MovieLibraryProviderV2 : ContentProvider() {
     var matcher: UriMatcher? = null
     override fun onCreate(): Boolean {
         matcher = UriMatcher(UriMatcher.NO_MATCH);
         matcher?.addURI(AUTHORITY, "addPoster", ADD_POSTER)
+        matcher?.addURI(AUTHORITY, "recommends", RECOMMENDS)
+        matcher?.addURI(AUTHORITY, "thumb/#", THUMB)
         return true
     }
 
@@ -38,6 +51,67 @@ class MovieLibraryProviderV2 : ContentProvider() {
         selectionArgs: Array<out String>?,
         sortOrder: String?
     ): Cursor? {
+        when (matcher?.match(uri)) {
+            RECOMMENDS -> {
+                val matcher = sortOrder?.let { Pattern.compile("limit (\\d+),(\\d+)").matcher(it) }
+                val offset =
+                    if (matcher?.matches() == true) matcher.group(1)?.toInt()
+                        ?: 0 else 0
+                val limit =
+                    if (matcher?.matches() == true) matcher.group(2)?.toInt()
+                        ?: 10 else 10
+                val appContext = context?.applicationContext ?: return null
+                val dataBase = MovieLibraryRoomDatabase.getDatabase(appContext)
+                val movieDataViewList =
+                    dataBase.movieDao.queryMovieDataViewFilterPoster(
+                        ScraperSourceTools.getSource(),
+                        offset,
+                        limit
+                    )
+
+                val columns = arrayOf("id", "season", "data")
+                val cursor = MatrixCursor(columns)
+                for (movieDataView in movieDataViewList) {
+                    val row =
+                        arrayOf(
+                            movieDataView.id,
+                            movieDataView.season,
+                            JSON.toJSON(
+                                movieDataView.toLauncherRecommend(
+                                    appContext,
+                                    dataBase.movieDao,
+                                    dataBase.genreDao,
+                                    dataBase.stagePhotoDao
+                                )
+                            )
+                        )
+                    cursor.addRow(row)
+                }
+                return cursor
+            }
+
+            THUMB -> {
+                val matcher = sortOrder?.let { Pattern.compile("limit (\\d+),(\\d+)").matcher(it) }
+                val offset =
+                    if (matcher?.matches() == true) matcher.group(1)?.toInt()
+                        ?: 0 else 0
+                val limit =
+                    if (matcher?.matches() == true) matcher.group(2)?.toInt()
+                        ?: 10 else 10
+                val id: Long = uri.lastPathSegment?.toLong() ?: return null
+                val appContext = context?.applicationContext ?: return null
+                val dataBase = MovieLibraryRoomDatabase.getDatabase(appContext)
+                val stagePhotoDao = dataBase.stagePhotoDao
+                val stagePhotoList = stagePhotoDao.queryStagePhotosById(id, limit, offset)
+                val columns = arrayOf("thumb")
+                val cursor = MatrixCursor(columns)
+                for (stagePhoto in stagePhotoList) {
+                    val row = arrayOf(stagePhoto.imgUrl)
+                    cursor.addRow(row)
+                }
+                return cursor
+            }
+        }
         return null
     }
 
@@ -98,7 +172,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
         if (downloadPath != null) {
             val shortcut = getShortcutUriInDB(downloadPath, filePaths, shortcutDao)
             if (shortcut != null) {
-                shortcutUri=shortcut.uri
+                shortcutUri = shortcut.uri
                 devicePath = shortcut.devicePath
                 shortcutDao.updateShortcut(shortcut)
             } else {
@@ -112,7 +186,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
         }
 
         devicePath?.let {
-            if (shortcutUri==null){
+            if (shortcutUri == null) {
                 Logger.e("No shortcut uri found")
                 return
             }
@@ -201,7 +275,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
         } ?: return null
         shortcut.devicePath = mountDevice.path
         shortcut.deviceType = mountDevice.type
-        shortcut.isScanned=1
+        shortcut.isScanned = 1
         shortcutDao.insertShortcut(shortcut)
         return shortcut.devicePath
     }
@@ -216,7 +290,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
         for (relativeFilePath in filePaths) {
             var videoFile = VideoFile()
             videoFile.filename = relativeFilePath.substring(relativeFilePath.lastIndexOf("/") + 1)
-            videoFile.path = File(shortcutUri,relativeFilePath).path
+            videoFile.path = File(shortcutUri, relativeFilePath).path
             videoFile.dirPath = shortcutUri
             videoFile.devicePath = devicePath
             val parser = VideoNameParserV2()
@@ -248,9 +322,61 @@ class MovieLibraryProviderV2 : ContentProvider() {
         return deviceType != DeviceType.DEVICE_TYPE_DLNA && deviceType != DeviceType.DEVICE_TYPE_SMB
     }
 
+    private fun MovieDataView.toLauncherRecommend(
+        context: Context,
+        movieDao: MovieDao,
+        genreDao: GenreDao,
+        stagePhotoDao: StagePhotoDao
+    ): LauncherRecommend {
+        val movieType = when (this.type) {
+            Constants.VideoType.tv -> {
+                context.getString(R.string.video_type_tv)
+            }
+
+            else -> {
+                context.getString(R.string.video_type_movie)
+            }
+        }
+        val genreList = genreDao.queryGenreNamesById(this.id,this.source)
+        val summary = "$year·$movieType·${genreList.joinToString("·")}"
+
+        val stageList = stagePhotoDao.queryStagePhotosById(this.id, 1, 0)
+        val movie = movieDao.queryByMovieIdAndType(this.movie_id, this.source, this.type.name)
+        val title = if (this.type == Constants.VideoType.tv) {
+            "${this.title} ${this.season_name}"
+        } else {
+            this.title
+        }
+        val poster = if (this.type == Constants.VideoType.tv) {
+            this.season_poster.ifEmpty {
+                this.poster
+            }
+        } else this.poster
+
+        return LauncherRecommend(
+            title = title,
+            summary = summary,
+            poster = poster,
+            thumb = if (stageList.size > 0) stageList[0].imgUrl else "",
+            description = movie.plot,
+            cmd = "am start -a com.hphtv.movielibrary.detail --el \"movie_id\" ${this.id} --ei \"season\" ${this.season}"
+        )
+    }
+
+    private data class LauncherRecommend(
+        val title: String,
+        val summary: String,
+        val poster: String,
+        val thumb: String,
+        val description: String,
+        val cmd: String
+    )
+
     companion object {
         const val AUTHORITY = "com.hphtv.movielibrary.provider.v2"
         const val ADD_POSTER = 1
+        const val RECOMMENDS = 2
+        const val THUMB = 3
 
     }
 

@@ -257,7 +257,7 @@ public class MovieDetailActivity extends AppBaseActivity<MovieDetailViewModel, L
         super.onNewIntent(intent);
         if (intent != null) {
             long movieId = intent.getLongExtra(Constants.Extras.MOVIE_ID, -1);
-            int season = intent.getIntExtra(Constants.Extras.SEASON, 0);
+            int season = intent.getIntExtra(Constants.Extras.SEASON, -1);
             prepareMovieWrapper(movieId, season);//1.加载电影数据
         }
     }
