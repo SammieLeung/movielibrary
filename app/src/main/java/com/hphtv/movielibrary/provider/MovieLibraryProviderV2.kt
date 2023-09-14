@@ -347,7 +347,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
         } else {
             this.title
         }
-        val poster = if (this.type == Constants.VideoType.tv) {
+        val thumb = if (this.type == Constants.VideoType.tv) {
             this.season_poster.ifEmpty {
                 this.poster
             }
@@ -356,8 +356,8 @@ class MovieLibraryProviderV2 : ContentProvider() {
         return LauncherRecommend(
             title = title,
             summary = summary,
-            poster = poster,
-            thumb = if (stageList.size > 0) stageList[0].imgUrl else "",
+            poster = if (stageList.size > 0) stageList[0].imgUrl else "",
+            thumb = thumb,
             description = movie.plot,
             cmd = "am start -a com.hphtv.movielibrary.detail --el \"movie_id\" ${this.id} --ei \"season\" ${this.season}"
         )
