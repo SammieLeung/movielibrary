@@ -96,6 +96,9 @@ public interface VideoFileDao {
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE dir_path=:dirPath")
     public List<VideoFile> queryVideoFilesOnShortcut(String dirPath);
 
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE dir_path=:dirPath LIMIT :offset,:limit")
+    public List<VideoFile> queryVideoFilesOnShortcut(String dirPath, int offset, int limit);
+
     @Query("SELECT * FROM " + VIEW.UNKNOWN_ROOT_DATAVIEW +
             " WHERE (:s_ap IS NULL OR s_ap=:s_ap) " +
             " AND (:type IS NULL OR type=:type) " +
@@ -115,28 +118,28 @@ public interface VideoFileDao {
 
     @Query("SELECT path FROM " + TABLE.VIDEOFILE +
             " WHERE path IN (" +
-            "SELECT path FROM  "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+
-            " WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path))")
+            "SELECT path FROM  " + TABLE.MOVIE_VIDEOFILE_CROSS_REF +
+            " WHERE id=(SELECT id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE path=:path))")
     public List<String> queryVideoFilePathList(String path);
 
     @Query("SELECT filename FROM " + TABLE.VIDEOFILE +
             " WHERE path IN (" +
-            "SELECT path FROM  "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+
-            " WHERE id=(SELECT id FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:path))")
+            "SELECT path FROM  " + TABLE.MOVIE_VIDEOFILE_CROSS_REF +
+            " WHERE id=(SELECT id FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE path=:path))")
     public List<String> queryVideoFileNameList(String path);
 
     @Query("SELECT PATH FROM VIDEOFILE WHERE PATH LIKE :PATH_LIKE")
     public List<String> queryFilePathList(String PATH_LIKE);
 
-    @Query("SELECT * FROM "+TABLE.VIDEOFILE+" WHERE add_time<:addTime AND dir_path=:dir_path")
-    public List<VideoFile> queryRedundantFile(String dir_path,long addTime);
+    @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE add_time<:addTime AND dir_path=:dir_path")
+    public List<VideoFile> queryRedundantFile(String dir_path, long addTime);
 
     @Delete
     public int delete(VideoFile videoFile);
 
-    @Query("DELETE FROM "+TABLE.MOVIE_VIDEOFILE_CROSS_REF+" WHERE path=:filePath")
+    @Query("DELETE FROM " + TABLE.MOVIE_VIDEOFILE_CROSS_REF + " WHERE path=:filePath")
     public int removeRelation(String filePath);
 
-    @Query("DELETE FROM "+TABLE.VIDEOFILE+" WHERE path=:filePath")
+    @Query("DELETE FROM " + TABLE.VIDEOFILE + " WHERE path=:filePath")
     public int deleteByPath(String filePath);
 }

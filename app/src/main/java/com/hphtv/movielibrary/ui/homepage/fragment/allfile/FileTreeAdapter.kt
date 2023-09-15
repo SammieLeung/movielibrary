@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.recyclerview.widget.DiffUtil
 import com.hphtv.movielibrary.adapter.BaseScaleAdapter
 import com.hphtv.movielibrary.databinding.MiniAllFileItemBinding
 
@@ -31,8 +32,32 @@ class FileTreeAdapter(context: Context, list: List<FolderItem>) :
         itemBinding.viewIcon.setImageDrawable(getDrawable(mContext, folderItem.icon))
     }
 
+    fun setData(newList: List<FolderItem>){
+        val diffResult= DiffUtil.calculateDiff(FileTreeDiffCallback(mList, newList))
+        mList=newList
+        diffResult.dispatchUpdatesTo(this)
+    }
+
     companion object {
         const val TYPE_BACK = 1
         const val TYPE_NORMAL = 0
     }
+}
+
+class FileTreeDiffCallback(
+    private val oldList: List<FolderItem>,
+    private val newList: List<FolderItem>
+) : DiffUtil.Callback() {
+    override fun getOldListSize(): Int = oldList.size
+
+    override fun getNewListSize(): Int = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        oldList[oldItemPosition].type == newList[newItemPosition].type &&
+                oldList[oldItemPosition].path == newList[newItemPosition].path &&
+                oldList[oldItemPosition].name == newList[newItemPosition].name
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+        oldList[oldItemPosition] == newList[newItemPosition]
+
 }

@@ -11,27 +11,32 @@ import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding
 import com.hphtv.movielibrary.databinding.FragmentAllfileBinding
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical2
+import com.hphtv.movielibrary.listener.OnMovieLoadListener
 import com.hphtv.movielibrary.ui.ILoadingState
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment
 import com.hphtv.movielibrary.ui.homepage.HomePageActivity
 import com.hphtv.movielibrary.ui.homepage.PlayVideoReceiver
 import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
+import com.hphtv.movielibrary.util.DLogger
+import com.orhanobut.logger.Logger
 import com.station.kit.util.DensityUtil
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
-class AllFileFragment :
-    BaseAutofitHeightFragment<AllFileViewModel, FragmentAllfileBinding>(), ILoadingState {
+class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllfileBinding>(),
+    ILoadingState, DLogger {
     var atomicState = AtomicInteger()
     lateinit var fileTreeAdapter: FileTreeAdapter
     private var mPlayVideoReceiver: PlayVideoReceiver? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.bindState(
-            mViewModel.uiState,
-            mViewModel.accept
+            mViewModel.uiState, mViewModel.accept
         )
         lifecycleScope.launch {
             mViewModel.accept(UiAction.GoToRoot)
@@ -39,25 +44,18 @@ class AllFileFragment :
     }
 
     fun FragmentAllfileBinding.bindState(
-        uiStateFlow: StateFlow<UiState>,
-        accept: (UiAction) -> Unit
+        uiStateFlow: StateFlow<UiState>, accept: (UiAction) -> Unit
     ) {
         isEmpty = true
         isLoading = false
-        fileTreeAdapter = FileTreeAdapter(requireContext(), mutableListOf())
-        rvAllFilesView.layoutManager =
-            FilterGridLayoutManager(
-                context, 1440, GridLayoutManager.VERTICAL, false
-            )
+        fileTreeAdapter = FileTreeAdapter(requireContext(), emptyList())
+        rvAllFilesView.layoutManager = FilterGridLayoutManager(
+            context, 1440, GridLayoutManager.VERTICAL, false
+        )
 
         rvAllFilesView.addItemDecoration(
             GridSpacingItemDecorationVertical2(
-                R.dimen.unknown_root_width.dimen,
-                60.dp,
-                68.dp,
-                35.dp,
-                45.dp,
-                6
+                R.dimen.unknown_root_width.dimen, 60.dp, 68.dp, 35.dp, 45.dp, 6
             )
         );
 
@@ -73,11 +71,6 @@ class AllFileFragment :
                     }
                 }
             }
-        rvAllFilesView.setOnBackPressListener {
-            val binding: ActivityNewHomepageBinding = baseActivity.binding
-            val pos = binding.tabLayout.selectedTabPosition
-            binding.tabLayout.getTabAt(pos)?.view?.requestFocus();
-        }
 
         rvAllFilesView.adapter = fileTreeAdapter
 
@@ -91,6 +84,12 @@ class AllFileFragment :
             }
         }
 
+        rvAllFilesView.addOnScrollListener(object : OnMovieLoadListener() {
+            override fun onLoading(countItem: Int, lastItem: Int) {
+                accept(UiAction.LoadMore)
+            }
+        })
+
         fileTreeAdapter.setOnItemClickListener { _, position, data ->
             data?.let {
                 accept(UiAction.ClickItem(position, it))
@@ -100,10 +99,15 @@ class AllFileFragment :
 
         lifecycleScope.launch {
             uiStateFlow.collect { uiState ->
+            logger("collect uiStateFlow $uiState")
                 if (uiState.rootList.isNotEmpty()) {
                     isEmpty = false
                     val firstItem = uiState.rootList[0]
-                    if (firstItem.type == FolderType.BACK || firstItem.type == FolderType.DEVICE) {
+                    if (firstItem.type == FolderType.BACK
+                        || firstItem.type == FolderType.DEVICE
+                        || firstItem.type == FolderType.SMB
+                        || firstItem.type == FolderType.DLNA
+                    ) {
                         rvAllFilesView.viewTreeObserver.addOnPreDrawListener(object :
                             OnPreDrawListener {
                             override fun onPreDraw(): Boolean {
@@ -116,12 +120,20 @@ class AllFileFragment :
                             }
 
                         })
-                        fileTreeAdapter.addAll(uiState.rootList)
+                        fileTreeAdapter.setData(uiState.rootList)
                     }
-                    isLoading=uiState.isLoading
-                    if(isLoading){
-                        registerPlayReceiver()
-                    }
+
+                }
+            }
+
+        }
+
+        lifecycleScope.launch {
+            uiStateFlow.map { it.isLoading }.distinctUntilChanged().collect {
+                logger("collect isLoading $it")
+                isLoading = it
+                if (isLoading) {
+                    registerPlayReceiver()
                 }
             }
         }
@@ -130,14 +142,11 @@ class AllFileFragment :
     private fun registerPlayReceiver() {
         try {
             unregisterPlayReceiver()
-            if (mPlayVideoReceiver == null)
-                mPlayVideoReceiver =PlayVideoReceiver(
-                    context = requireContext(),
-                    refreshAction = {
-                        (baseActivity as HomePageActivity).updateHistory()
-                    },
-                    unregisterAction = this::unregisterPlayReceiver
-                )
+            if (mPlayVideoReceiver == null) mPlayVideoReceiver = PlayVideoReceiver(
+                context = requireContext(), refreshAction = {
+                    (baseActivity as HomePageActivity).updateHistory()
+                }, unregisterAction = this::unregisterPlayReceiver
+            )
             val intentFilter = IntentFilter()
             intentFilter.addAction("com.firefly.video.player")
             requireContext().registerReceiver(mPlayVideoReceiver, intentFilter)
@@ -157,8 +166,10 @@ class AllFileFragment :
         }
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun forceRefresh() {
+        lifecycleScope.launch {
+            mViewModel.accept(UiAction.GoToRoot)
+        }
     }
 
     override fun startLoading() {
@@ -181,6 +192,10 @@ class AllFileFragment :
         return false
     }
 
+    override fun DLogger.tag(): String {
+        return "AllFileFragment"
+    }
+
     private val Int.dimen
         get() = resources.getDimensionPixelSize(this)
     private val Int.dp
@@ -193,8 +208,7 @@ class AllFileFragment :
     companion object {
         @JvmStatic
         fun newInstance(
-            viewPager: NoScrollAutofitHeightViewPager,
-            position: Int
+            viewPager: NoScrollAutofitHeightViewPager, position: Int
         ): AllFileFragment {
             val args = Bundle()
             val fragment = AllFileFragment()

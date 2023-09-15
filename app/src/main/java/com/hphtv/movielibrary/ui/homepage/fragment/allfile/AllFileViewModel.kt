@@ -8,13 +8,10 @@ import com.hphtv.movielibrary.R
 import com.hphtv.movielibrary.data.Constants.DeviceType
 import com.hphtv.movielibrary.data.pagination.PaginatedDataLoader
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase
-import com.hphtv.movielibrary.ui.homepage.fragment.SimpleLoadingObserver
 import com.hphtv.movielibrary.util.MovieHelper
 import com.hphtv.movielibrary.util.StringTools
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver
 import com.orhanobut.logger.Logger
-import io.reactivex.rxjava3.core.ObservableSource
-import io.reactivex.rxjava3.functions.Function
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,7 +34,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
     var accept: (UiAction) -> Unit
 
+    var lastParentFolder: FolderItem? = null
+
+
     var folderItemPagerLoader = AllFilePaginatedLoader()
+    var dlnaPagerLoader = DLNAPaginatedLoader()
 
     init {
         accept = initAcceptAction()
@@ -47,9 +48,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         val actionStateFlow: MutableSharedFlow<UiAction> = MutableSharedFlow()
         val gotoRootAction = actionStateFlow.filterIsInstance<UiAction.GoToRoot>()
         val clickItemAction = actionStateFlow.filterIsInstance<UiAction.ClickItem>()
+        val loadMoreAction = actionStateFlow.filterIsInstance<UiAction.LoadMore>()
 
         handleGotoRootAction(gotoRootAction)
         handleItemClickAction(clickItemAction)
+        handleLoadMoreAction(loadMoreAction)
 
         return { action ->
             viewModelScope.launch {
@@ -109,13 +112,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
             }
-
             gotoRootAction.collect {
                 _uiState.update {
                     it.copy(
                         isRoot = true,
                         currentPath = "",
-                        rootList = rootList,
+                        rootList = rootList.sortedBy { it.type.ordinal },
                         focusPosition = lastFocusPosition
                     )
                 }
@@ -127,20 +129,30 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             clickItemAction.collect {
                 lastFocusPosition = it.itemPosition
                 it.folderItem.let {
+                    Logger.d("click item ${it.name}\npath:${it.path}\ntype:${it.type}\n\ncurrentPath=${uiState.value.currentPath}")
                     when (it.type) {
                         FolderType.DEVICE -> {
+                            lastParentFolder = it
                             updateLocalDevices(it)
                         }
 
                         FolderType.SMB -> {
+                            lastParentFolder = it
                             updateSmbDevices(it)
                         }
 
                         FolderType.DLNA -> {
+                            lastParentFolder = it
+                            updateDLNADevices(it)
+                        }
 
+                        FolderType.DLNA_GROUP, FolderType.DLNA_SHARE -> {
+                            lastParentFolder = it
+                            dlnaPagerLoader.reload(it)
                         }
 
                         FolderType.FOLDER -> {
+                            lastParentFolder = it
                             folderItemPagerLoader.reload(it)
                         }
 
@@ -163,8 +175,13 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                             if (uiState.value.currentPath?.isEmpty() == true) {
                                 accept(UiAction.GoToRoot)
                             } else {
-                                folderItemPagerLoader.back()
+                                if (lastParentFolder?.type != FolderType.FOLDER)
+                                    dlnaPagerLoader.back()
+                                else
+                                    folderItemPagerLoader.back()
+
                             }
+                            lastParentFolder = lastParentFolder?.parent
                         }
 
 
@@ -173,6 +190,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
 
             }
+        }
+
+    private fun handleLoadMoreAction(loadMoreAction: Flow<UiAction.LoadMore>) =
+        viewModelScope.launch {
+
         }
 
     private fun updateLocalDevices(parentFolder: FolderItem) {
@@ -209,7 +231,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     parentFolder
                 )
             }
-        }.withAppendBackBtn()
+        }.withAppendBackBtn(parentFolder)
         _uiState.update {
             it.copy(
                 isRoot = false,
@@ -234,7 +256,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 FolderType.FOLDER,
                 parentFolder
             )
-        }.withAppendBackBtn()
+        }.withAppendBackBtn(parentFolder)
         _uiState.update {
             it.copy(
                 isRoot = false,
@@ -245,23 +267,164 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    private fun updateDLNADevices(parentFolder: FolderItem) {
+        val shortcutList =
+            shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_DLNA)
+        val folderList = shortcutList.let { it ->
+            val dlnaDeviceSet = mutableSetOf<Pair<String, String>>()
+            for (shortcut in it) {
+                val splits = shortcut.uri.split(":")
+                if (splits.size != 4)
+                    continue
+                dlnaDeviceSet.add(splits[0] to splits[2])
+            }
+            dlnaDeviceSet.toList().map { pair ->
+                FolderItem(
+                    pair.second,
+                    R.mipmap.icon_dlna,
+                    pair.first,
+                    FolderType.DLNA_GROUP,
+                    parentFolder
+                )
+            }
+        }.withAppendBackBtn(parentFolder)
+        _uiState.update {
+            it.copy(
+                isRoot = false,
+                currentPath = "",
+                rootList = folderList,
+                focusPosition = lastFocusPosition
+            )
+        }
+    }
+
     private fun getString(res: Int): String {
         return getApplication<Application>().getString(res)
     }
 
-    private fun List<FolderItem>.withAppendBackBtn(): List<FolderItem> {
+    private fun List<FolderItem>.withAppendBackBtn(parentFolder: FolderItem? = null): List<FolderItem> {
         return this.toMutableList().apply {
             add(
                 0, FolderItem(
                     getString(R.string.goback),
                     R.mipmap.icon_mini_back,
                     "",
-                    FolderType.BACK
+                    FolderType.BACK,
+                    parent = parentFolder
                 )
             )
         }
     }
 
+    inner class DLNAPaginatedLoader : PaginatedDataLoader<FolderItem>() {
+        var currentFolder: FolderItem? = null
+        override fun getLimit(): Int {
+            return PAGE_LIMIT
+        }
+
+        override fun getFirstLimit(): Int {
+            return FIRST_PAGE_LIMIT
+        }
+
+        fun back(){
+           currentFolder?.parent?.let {
+               when(it.type){
+                   FolderType.DLNA -> {
+                       updateDLNADevices(it)
+                   }
+                   else -> {reload(it)}
+               }
+           }
+        }
+
+
+        fun reload(parentFolder: FolderItem) {
+            this.currentFolder = parentFolder
+            super.reload()
+        }
+
+        override fun reloadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
+            return super.reloadDataFromDB(offset, limit).withAppendBackBtn()
+        }
+
+        override fun loadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
+            currentFolder?.let { folderItem ->
+                when (folderItem.type) {
+                    FolderType.DLNA_GROUP -> {
+                        val shortcutList =
+                            shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_DLNA)
+                        val folderList = shortcutList.filter {
+                            val splits = it.uri.split(":")
+                            if (splits.size != 4)
+                                return@filter false
+                            splits[0] == folderItem.path
+                        }.let {
+                            val dlnaDeviceSet = mutableSetOf<Pair<String, String>>()
+                            for (shortcut in it) {
+                                val splits = shortcut.uri.split(":")
+                                if (splits.size != 4)
+                                    continue
+                                dlnaDeviceSet.add(shortcut.uri to splits[3])
+                            }
+                            dlnaDeviceSet.toList().map { pair ->
+                                FolderItem(
+                                    pair.second,
+                                    R.mipmap.icon_folder,
+                                    pair.first,
+                                    FolderType.DLNA_SHARE,
+                                    folderItem
+                                )
+                            }
+                        }
+                        return folderList
+                    }
+
+                    FolderType.DLNA_SHARE -> {
+                        val videoFileList =
+                            videoFileDao.queryVideoFilesOnShortcut(folderItem.path, offset, limit)
+                        return videoFileList.map {
+                            FolderItem(
+                                it.filename,
+                                R.mipmap.icon_mini_file,
+                                it.path,
+                                FolderType.FILE,
+                                folderItem
+                            )
+                        }
+
+                    }
+
+                    else -> {}
+                }
+            }
+            return emptyList()
+        }
+
+        override fun OnReloadResult(result: MutableList<FolderItem>?) {
+            _uiState.update {
+                it.copy(
+                    isRoot = false,
+                    isAppend = false,
+                    currentPath = currentFolder?.path,
+                    rootList = result ?: emptyList(),
+                    focusPosition = result?.let { if (result.size > lastFocusPosition) lastFocusPosition else result.size - 1 }
+                        ?: 0
+                )
+            }
+        }
+
+        override fun OnLoadResult(result: MutableList<FolderItem>?) {
+            _uiState.update {
+                it.copy(
+                    isRoot = false,
+                    isAppend = true,
+                    currentPath = currentFolder?.path,
+                    rootList = result ?: emptyList(),
+                )
+            }
+        }
+
+    }
 
     inner class AllFilePaginatedLoader : PaginatedDataLoader<FolderItem>() {
         var currentFolder: FolderItem? = null
@@ -292,7 +455,10 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                             updateSmbDevices(it)
                         }
 
-                        FolderType.DLNA -> {}
+                        FolderType.DLNA -> {
+                            updateDLNADevices(it)
+                        }
+
                         FolderType.FOLDER -> {
                             reload(it)
                         }
@@ -375,6 +541,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+
     private fun String.withoutPathSeparator(): String {
         if (this.endsWith("/")) {
             return this.substringBeforeLast("/")
@@ -402,8 +569,9 @@ data class UiState(
     val rootList: List<FolderItem> = emptyList(),
     val isLoading: Boolean = false,
     val isEmpty: Boolean = false,
-    val focusPosition: Int = 0
+    val focusPosition: Int = 0,
 )
+
 
 data class FolderItem(
     val name: String,
@@ -416,6 +584,7 @@ data class FolderItem(
 sealed class UiAction {
     object GoToRoot : UiAction()
     data class ClickItem(val itemPosition: Int, val folderItem: FolderItem) : UiAction()
+    object LoadMore : UiAction()
 }
 
 
@@ -424,6 +593,8 @@ enum class FolderType {
     DEVICE,
     SMB,
     DLNA,
+    DLNA_GROUP,
+    DLNA_SHARE,
     FOLDER,
     FILE
 }
