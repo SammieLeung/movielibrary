@@ -54,10 +54,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         val gotoRootAction = actionStateFlow.filterIsInstance<UiAction.GoToRoot>()
         val clickItemAction = actionStateFlow.filterIsInstance<UiAction.ClickItem>()
         val loadMoreAction = actionStateFlow.filterIsInstance<UiAction.LoadMore>()
+        val backAction=actionStateFlow.filterIsInstance<UiAction.BackAction>()
 
         handleGotoRootAction(gotoRootAction)
         handleItemClickAction(clickItemAction)
         handleLoadMoreAction(loadMoreAction)
+        handleBackAction(backAction)
 
         return { action ->
             viewModelScope.launch {
@@ -68,7 +70,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
 
     private fun handleGotoRootAction(gotoRootAction: Flow<UiAction.GoToRoot>) =
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             lastFocusPosition = 0
             val rootList = mutableListOf<FolderItem>()
 
@@ -134,11 +136,10 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
 
     private fun handleItemClickAction(clickItemAction: Flow<UiAction.ClickItem>) =
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             clickItemAction.collect {
                 lastFocusPosition = it.itemPosition
                 it.folderItem.let {
-                    Logger.d("click item ${it.name}\npath:${it.path}\ntype:${it.type}\n\ncurrentPath=${uiState.value.currentPath}\nparent : $lastParentFolder")
                     when (it.type) {
                         FolderType.DEVICE -> {
                             lastParentFolder = it
@@ -203,8 +204,27 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
+    private fun handleBackAction(backAction: Flow<UiAction.BackAction>) =
+        viewModelScope.launch(Dispatchers.Default) {
+            backAction.collect {
+                if (lastParentFolder?.type == FolderType.SMB
+                    || lastParentFolder?.type == FolderType.DEVICE
+                    || lastParentFolder?.type == FolderType.DLNA
+                ) {
+                    accept(UiAction.GoToRoot)
+                } else {
+                    if (lastParentFolder?.type != FolderType.FOLDER)
+                        dlnaPagerLoader.back()
+                    else
+                        folderItemPagerLoader.back()
+                }
+                lastParentFolder = lastParentFolder?.parent
+            }
+        }
+
     private fun handleLoadMoreAction(loadMoreAction: Flow<UiAction.LoadMore>) =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default ) {
+
             loadMoreAction.collect {
                 lastParentFolder?.let {
                     when (it.type) {
@@ -271,6 +291,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun updateSmbDevices(parentFolder: FolderItem) {
+        Logger.d("test")
         val shortcutList =
             shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_SMB)
         val folderItemList = shortcutList.map { shortcut ->
@@ -648,8 +669,10 @@ data class FolderItem(
 
 sealed class UiAction {
     object GoToRoot : UiAction()
+    object BackAction:UiAction()
     data class ClickItem(val itemPosition: Int, val folderItem: FolderItem) : UiAction()
     object LoadMore : UiAction()
+
 }
 
 

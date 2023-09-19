@@ -80,7 +80,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                 val pos = binding.tabLayout.selectedTabPosition
                 binding.tabLayout.getTabAt(pos)?.view?.requestFocus()
             } else {
-                accept(UiAction.ClickItem(0, uiStateFlow.value.rootList[0]))
+                accept(UiAction.BackAction)
             }
         }
 
@@ -190,6 +190,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
 
     fun OnBackPress(): Boolean {
         if (!mViewModel.uiState.value.isRoot && mBinding.rvAllFilesView.findFocus() != null) {
+            mViewModel.accept(UiAction.BackAction)
             return true
         }
         return false
