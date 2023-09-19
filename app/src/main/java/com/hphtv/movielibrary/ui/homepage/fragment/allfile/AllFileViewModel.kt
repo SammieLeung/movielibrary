@@ -86,10 +86,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     DeviceType.DEVICE_TYPE_LOCAL -> {
                         rootList.add(
                             FolderItem(
-                                getString(R.string.filter_box_local_device),
-                                R.mipmap.icon_folder,
-                                "",
-                                FolderType.DEVICE,
+                                name = getString(R.string.filter_box_local_device),
+                                icon = R.mipmap.icon_folder,
+                                path = "",
+                                friendlyPath = "/${getString(R.string.filter_box_local_device)}/",
+                                type = FolderType.DEVICE,
                             )
                         )
                     }
@@ -97,10 +98,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     DeviceType.DEVICE_TYPE_SMB -> {
                         rootList.add(
                             FolderItem(
-                                getString(R.string.filter_box_smb_device),
-                                R.mipmap.icon_samba,
-                                "",
-                                FolderType.SMB,
+                                name = getString(R.string.filter_box_smb_device),
+                                icon = R.mipmap.icon_samba,
+                                path = "",
+                                friendlyPath = "/${getString(R.string.filter_box_smb_device)}/",
+                                type = FolderType.SMB,
                             )
                         )
                     }
@@ -108,10 +110,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     DeviceType.DEVICE_TYPE_DLNA -> {
                         rootList.add(
                             FolderItem(
-                                getString(R.string.filter_box_dlna_device),
-                                R.mipmap.icon_dlna,
-                                "",
-                                FolderType.DLNA
+                                name = getString(R.string.filter_box_dlna_device),
+                                icon = R.mipmap.icon_dlna,
+                                path = "",
+                                friendlyPath = "/${getString(R.string.filter_box_dlna_device)}/",
+                                type = FolderType.DLNA
                             )
                         )
                     }
@@ -122,6 +125,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     it.copy(
                         isRoot = true,
                         currentPath = "",
+                        friendlyPath = "/",
                         rootList = rootList.sortedBy { it.type.ordinal },
                         focusPosition = lastFocusPosition
                     )
@@ -223,16 +227,17 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         val folderItemList = deviceList.map { device ->
             if (device.type == DeviceType.DEVICE_TYPE_INTERNAL_STORAGE) {
                 FolderItem(
-                    getString(R.string.device_internal_storage),
-                    R.mipmap.icon_folder,
-                    device.path.withoutPathSeparator(),
-                    FolderType.FOLDER,
-                    parentFolder
+                    name = getString(R.string.device_internal_storage),
+                    icon = R.mipmap.icon_folder,
+                    path = device.path.withoutPathSeparator(),
+                    friendlyPath = "${parentFolder.friendlyPath}${getString(R.string.device_internal_storage)}/",
+                    type = FolderType.FOLDER,
+                    parent = parentFolder
                 )
             } else {
                 FolderItem(
-                    device.name,
-                    when (device.type) {
+                    name = device.name,
+                    icon = when (device.type) {
                         DeviceType.DEVICE_TYPE_USB,
                         DeviceType.DEVICE_TYPE_HARD_DISK,
                         DeviceType.DEVICE_TYPE_PCIE -> {
@@ -247,9 +252,10 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                             R.mipmap.icon_folder
                         }
                     },
-                    device.path.withoutPathSeparator(),
-                    FolderType.FOLDER,
-                    parentFolder
+                    path = device.path.withoutPathSeparator(),
+                    friendlyPath = "${parentFolder.friendlyPath}${device.name}/",
+                    type = FolderType.FOLDER,
+                    parent = parentFolder
                 )
             }
         }.withAppendBackBtn(parentFolder)
@@ -257,6 +263,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             it.copy(
                 isRoot = false,
                 currentPath = "",
+                friendlyPath = parentFolder.friendlyPath,
                 rootList = folderItemList,
                 focusPosition = if (folderItemList.size > lastFocusPosition) lastFocusPosition else folderItemList.size - 1
             )
@@ -271,17 +278,19 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             val ip = Uri.parse(noAuthInfoUri).host
 
             FolderItem(
-                ip ?: noAuthInfoUri,
-                R.mipmap.icon_samba,
-                shortcut.uri.withoutPathSeparator(),
-                FolderType.FOLDER,
-                parentFolder
+                name = ip ?: noAuthInfoUri,
+                icon = R.mipmap.icon_samba,
+                path = shortcut.uri.withoutPathSeparator(),
+                friendlyPath = "${parentFolder.friendlyPath}${ip ?: noAuthInfoUri}/",
+                type = FolderType.FOLDER,
+                parent = parentFolder
             )
         }.withAppendBackBtn(parentFolder)
         _uiState.update {
             it.copy(
                 isRoot = false,
                 currentPath = "",
+                friendlyPath = parentFolder.friendlyPath,
                 rootList = folderItemList,
                 focusPosition = if (folderItemList.size > lastFocusPosition) lastFocusPosition else folderItemList.size - 1
             )
@@ -304,6 +313,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     pair.second,
                     R.mipmap.icon_dlna,
                     pair.first,
+                    "${parentFolder.friendlyPath}${pair.second}/",
                     FolderType.DLNA_GROUP,
                     parentFolder
                 )
@@ -313,6 +323,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             it.copy(
                 isRoot = false,
                 currentPath = "",
+                friendlyPath = parentFolder.friendlyPath,
                 rootList = folderList,
                 focusPosition = lastFocusPosition
             )
@@ -327,10 +338,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         return this.toMutableList().apply {
             add(
                 0, FolderItem(
-                    getString(R.string.goback),
-                    R.mipmap.icon_mini_back,
-                    "",
-                    FolderType.BACK,
+                    name = getString(R.string.goback),
+                    icon = R.mipmap.icon_mini_back,
+                    path = "",
+                    friendlyPath = "",
+                    type = FolderType.BACK,
                     parent = parentFolder
                 )
             )
@@ -392,11 +404,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                             }
                             dlnaDeviceSet.toList().map { pair ->
                                 FolderItem(
-                                    pair.second,
-                                    R.mipmap.icon_folder,
-                                    pair.first,
-                                    FolderType.DLNA_SHARE,
-                                    folderItem
+                                    name = pair.second,
+                                    icon = R.mipmap.icon_folder,
+                                    path = pair.first,
+                                    friendlyPath = currentFolder?.friendlyPath.plus("${pair.second}/"),
+                                    type = FolderType.DLNA_SHARE,
+                                    parent = folderItem
                                 )
                             }
                         }
@@ -408,11 +421,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                             videoFileDao.queryVideoFilesOnShortcut(folderItem.path, offset, limit)
                         return videoFileList.map {
                             FolderItem(
-                                it.filename,
-                                R.mipmap.icon_mini_file,
-                                it.path,
-                                FolderType.FILE,
-                                folderItem
+                                name = it.filename,
+                                icon = R.mipmap.icon_mini_file,
+                                path = it.path,
+                                friendlyPath = currentFolder?.friendlyPath.plus("${it.filename}/"),
+                                type = FolderType.FILE,
+                                parent = folderItem
                             )
                         }
 
@@ -430,6 +444,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     isRoot = false,
                     isAppend = false,
                     currentPath = currentFolder?.path,
+                    friendlyPath = currentFolder?.friendlyPath,
                     rootList = result ?: emptyList(),
                     focusPosition = result?.let { if (result.size > lastFocusPosition) lastFocusPosition else result.size - 1 }
                         ?: 0
@@ -525,6 +540,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                 name = it,
                                 icon = R.mipmap.icon_folder,
                                 path = "$parentFolder$it",
+                                friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
                                 type = FolderType.FOLDER,
                                 parent = currentFolder
                             )
@@ -545,6 +561,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                 name = it,
                                 icon = R.mipmap.icon_mini_file,
                                 path = "$parentFolder$it",
+                                friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
                                 type = FolderType.FILE,
                                 parent = currentFolder
                             )
@@ -563,6 +580,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     isRoot = false,
                     isAppend = false,
                     currentPath = currentFolder?.path,
+                    friendlyPath = currentFolder?.friendlyPath,
                     rootList = result ?: emptyList(),
                     focusPosition = result?.let { if (result.size > lastFocusPosition) lastFocusPosition else result.size - 1 }
                         ?: 0
@@ -608,6 +626,7 @@ data class UiState(
     val isRoot: Boolean = true,
     val isAppend: Boolean = false,
     val currentPath: String? = "",
+    val friendlyPath: String? = "/",
     val rootList: List<FolderItem> = emptyList(),
     val isEmpty: Boolean = false,
     val focusPosition: Int = 0,
@@ -622,6 +641,7 @@ data class FolderItem(
     val name: String,
     val icon: Int = R.mipmap.icon_mini_file,
     val path: String,
+    val friendlyPath: String,
     val type: FolderType,
     val parent: FolderItem? = null,
 )

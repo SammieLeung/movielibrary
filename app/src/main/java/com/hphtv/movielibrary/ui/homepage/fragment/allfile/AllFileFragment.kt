@@ -55,7 +55,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
 
         rvAllFilesView.addItemDecoration(
             GridSpacingItemDecorationVertical2(
-                R.dimen.unknown_root_width.dimen, 60.dp, 68.dp, 35.dp, 45.dp, 6
+                R.dimen.unknown_root_width.dimen, 40.dp, 68.dp, 35.dp, 45.dp, 6
             )
         );
 
@@ -99,7 +99,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
 
         lifecycleScope.launch {
             uiStateFlow.collect { uiState ->
-            logger("collect uiStateFlow $uiState")
+                currentPath=uiState.friendlyPath
                 if (uiState.rootList.isNotEmpty()) {
                     isEmpty = false
                     val firstItem = uiState.rootList[0]
