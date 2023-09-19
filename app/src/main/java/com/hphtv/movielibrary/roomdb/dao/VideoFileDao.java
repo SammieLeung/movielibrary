@@ -3,11 +3,14 @@ package com.hphtv.movielibrary.roomdb.dao;
 import androidx.annotation.Nullable;
 import androidx.room.Dao;
 import androidx.room.Delete;
+import androidx.room.Ignore;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.RawQuery;
 import androidx.room.RewriteQueriesToDropUnusedColumns;
 import androidx.room.Update;
+import androidx.sqlite.db.SupportSQLiteQuery;
 
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.TABLE;
@@ -25,6 +28,10 @@ import java.util.List;
  */
 @Dao
 public interface VideoFileDao {
+    @Ignore
+    public static final String QUERY_FOLDERS_SQL="SELECT SUBSTR(PATH,LENGTH(?) + 1,INSTR(SUBSTR(PATH,LENGTH(?) + 1),'/') - 1) AS FOLDER FROM "+TABLE.VIDEOFILE+" WHERE REGEXP(?,path) GROUP BY FOLDER LIMIT ?,?";
+    @Ignore
+    public static final String QUERY_FILES_SQL="SELECT SUBSTR(path, LENGTH(?) + 1) AS FILE FROM "+TABLE.VIDEOFILE+" WHERE REGEXP(?,path) LIMIT ?,?";
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public long insertOrIgnore(VideoFile videoFile);
@@ -133,6 +140,14 @@ public interface VideoFileDao {
 
     @Query("SELECT * FROM " + TABLE.VIDEOFILE + " WHERE add_time<:addTime AND dir_path=:dir_path")
     public List<VideoFile> queryRedundantFile(String dir_path, long addTime);
+
+    //    @Query("SELECT SUBSTR(PATH,LENGTH(:parentPath)+1,INSTR(SUBSTR(PATH,LENGTH(:parentPath)+1),\"/\")-1) AS DATA " +
+//            "FROM " + TABLE.VIDEOFILE + " " +
+//            "WHERE REGEXP(:regexp,path) GROUP BY DATA " +
+//            "LIMIT :offset,:limit")
+//    public List<String> querySubFiles(String parentPath, String regexp, int offset, int limit);
+    @RawQuery
+    public List<String> querySubFiles(SupportSQLiteQuery query);
 
     @Delete
     public int delete(VideoFile videoFile);

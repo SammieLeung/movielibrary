@@ -44,6 +44,9 @@ public interface ShortcutDao {
     @Query("SELECT * FROM " + TABLE.SHORTCUT + " WHERE uri=:uri")
     public Shortcut queryShortcutByUri(String uri);
 
+    @Query("SELECT uri FROM "+TABLE.SHORTCUT+" WHERE uri LIKE :uri")
+    public List<String> queryShortcutUris(String uri);
+
     @Query("SELECT COUNT(*) FROM "+TABLE.VIDEOFILE+" WHERE dir_path=:dir_path")
     public int queryTotalFiles(String dir_path);
 

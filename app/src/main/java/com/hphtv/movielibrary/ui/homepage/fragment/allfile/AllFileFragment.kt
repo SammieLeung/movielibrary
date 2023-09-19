@@ -36,7 +36,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.bindState(
-            mViewModel.uiState, mViewModel.accept
+            mViewModel.uiState,mViewModel.loadingState, mViewModel.accept
         )
         lifecycleScope.launch {
             mViewModel.accept(UiAction.GoToRoot)
@@ -44,11 +44,11 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
     }
 
     fun FragmentAllfileBinding.bindState(
-        uiStateFlow: StateFlow<UiState>, accept: (UiAction) -> Unit
+        uiStateFlow: StateFlow<UiState>, loadingStateFlow: StateFlow<LoadingState>,accept: (UiAction) -> Unit
     ) {
         isEmpty = true
         isLoading = false
-        fileTreeAdapter = FileTreeAdapter(requireContext(), emptyList())
+        fileTreeAdapter = FileTreeAdapter(requireContext(), mutableListOf())
         rvAllFilesView.layoutManager = FilterGridLayoutManager(
             context, 1440, GridLayoutManager.VERTICAL, false
         )
@@ -120,7 +120,11 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                             }
 
                         })
-                        fileTreeAdapter.setData(uiState.rootList)
+                    }
+                    if(uiState.isAppend){
+                        fileTreeAdapter.appendAll(uiState.rootList)
+                    }else{
+                        fileTreeAdapter.addAll(uiState.rootList)
                     }
 
                 }
@@ -129,8 +133,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
         }
 
         lifecycleScope.launch {
-            uiStateFlow.map { it.isLoading }.distinctUntilChanged().collect {
-                logger("collect isLoading $it")
+            loadingStateFlow.map { it.isLoading }.distinctUntilChanged().collect {
                 isLoading = it
                 if (isLoading) {
                     registerPlayReceiver()

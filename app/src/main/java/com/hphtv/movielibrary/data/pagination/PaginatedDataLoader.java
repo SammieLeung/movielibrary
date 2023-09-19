@@ -68,6 +68,10 @@ public abstract class PaginatedDataLoader<T> {
         mAtomicBooleanCanLoad.set(true);
     }
 
+    protected int nextOffset(){
+        return mFirstLimit + (mPage.getAndIncrement()) * mLimit;
+    }
+
 
 
     public void cancel() {
@@ -220,8 +224,8 @@ public abstract class PaginatedDataLoader<T> {
     public void load() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     if (canLoadMore()) {
-                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
-
+//                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
+                        int offset=nextOffset();
                         List<T> dataList = loadDataFromDB(offset, mLimit);
                         if (dataList.size() < mLimit) {
                             mAtomicBooleanCanLoad.set(false);
@@ -261,8 +265,8 @@ public abstract class PaginatedDataLoader<T> {
     public void load(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     if (canLoadMore()) {
-                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
-
+//                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
+                        int offset=nextOffset();
                         List<T> dataList = loadDataFromDB(offset, mLimit);
                         if (dataList.size() < mLimit) {
                             mAtomicBooleanCanLoad.set(false);
