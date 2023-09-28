@@ -76,51 +76,51 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
         @Override
         public void onPageSelected(int position) {
-            if (position != HomePageTabAdapter.CHILD && mLastPos == HomePageTabAdapter.CHILD) {
-                if (mObjectAnimator != null) {
-                    mObjectAnimator.cancel();
-                    mObjectAnimator = null;
-                }
-                mObjectAnimator = ObjectAnimator.ofFloat(mBinding.viewBg2, View.ALPHA, 1);
-                mObjectAnimator.setDuration(300);
-                mObjectAnimator.start();
-                mBinding.btnPinyinSearch.setBackgroundResource(R.drawable.circle_btn_bg);
-                mBinding.btnShortcutmanager.setBackgroundResource(R.drawable.circle_btn_bg);
-                mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_bg);
-                mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_bg);
-
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch, getColorStateList(R.color.circle_btn_color_list));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager, getColorStateList(R.color.circle_btn_color_list));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode, getColorStateList(R.color.circle_btn_color_list));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, getColorStateList(R.color.circle_btn_color_list));
-                //为child tabview设置特殊的背景
-                ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
-                View childTab = viewGroup.getChildAt(HomePageTabAdapter.CHILD);
-                ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_bg_2));
-
-            } else if (position == HomePageTabAdapter.CHILD) {
-                if (mObjectAnimator != null) {
-                    mObjectAnimator.cancel();
-                    mObjectAnimator = null;
-                }
-                mObjectAnimator = ObjectAnimator.ofFloat(mBinding.viewBg2, View.ALPHA, 0);
-                mObjectAnimator.setDuration(300);
-                mObjectAnimator.start();
-                mBinding.btnPinyinSearch.setBackgroundResource(R.drawable.circle_btn_child_bg);
-                mBinding.btnShortcutmanager.setBackgroundResource(R.drawable.circle_btn_child_bg);
-                mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_child_bg);
-                mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_child_bg);
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch, ColorStateList.valueOf(Color.WHITE));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager, ColorStateList.valueOf(Color.WHITE));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode, ColorStateList.valueOf(Color.WHITE));
-                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, ColorStateList.valueOf(Color.WHITE));
-                //为child tabview设置特殊的背景
-                ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
-                View childTab = viewGroup.getChildAt(HomePageTabAdapter.CHILD);
-                ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_child_bg_2));
-
-
-            }
+//            if (position != HomePageTabAdapter.CHILD && mLastPos == HomePageTabAdapter.CHILD) {
+//                if (mObjectAnimator != null) {
+//                    mObjectAnimator.cancel();
+//                    mObjectAnimator = null;
+//                }
+//                mObjectAnimator = ObjectAnimator.ofFloat(mBinding.viewBg2, View.ALPHA, 1);
+//                mObjectAnimator.setDuration(300);
+//                mObjectAnimator.start();
+//                mBinding.btnPinyinSearch.setBackgroundResource(R.drawable.circle_btn_bg);
+//                mBinding.btnShortcutmanager.setBackgroundResource(R.drawable.circle_btn_bg);
+//                mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_bg);
+//                mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_bg);
+//
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch, getColorStateList(R.color.circle_btn_color_list));
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager, getColorStateList(R.color.circle_btn_color_list));
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode, getColorStateList(R.color.circle_btn_color_list));
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, getColorStateList(R.color.circle_btn_color_list));
+//                //为child tabview设置特殊的背景
+//                ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
+//                View childTab = viewGroup.getChildAt(HomePageTabAdapter.CHILD);
+//                ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_bg_2));
+//
+//            } else if (position == HomePageTabAdapter.CHILD) {
+//                if (mObjectAnimator != null) {
+//                    mObjectAnimator.cancel();
+//                    mObjectAnimator = null;
+//                }
+//                mObjectAnimator = ObjectAnimator.ofFloat(mBinding.viewBg2, View.ALPHA, 0);
+//                mObjectAnimator.setDuration(300);
+//                mObjectAnimator.start();
+//                mBinding.btnPinyinSearch.setBackgroundResource(R.drawable.circle_btn_child_bg);
+//                mBinding.btnShortcutmanager.setBackgroundResource(R.drawable.circle_btn_child_bg);
+//                mBinding.btnChildmode.setBackgroundResource(R.drawable.circle_btn_child_bg);
+//                mBinding.btnSettings.setBackgroundResource(R.drawable.circle_btn_child_bg);
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnPinyinSearch, ColorStateList.valueOf(Color.WHITE));
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnShortcutmanager, ColorStateList.valueOf(Color.WHITE));
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnChildmode, ColorStateList.valueOf(Color.WHITE));
+//                TextViewCompat.setCompoundDrawableTintList(mBinding.btnSettings, ColorStateList.valueOf(Color.WHITE));
+//                //为child tabview设置特殊的背景
+//                ViewGroup viewGroup = (ViewGroup) mBinding.tabLayout.getChildAt(0);
+//                View childTab = viewGroup.getChildAt(HomePageTabAdapter.CHILD);
+//                ViewCompat.setBackground(childTab, AppCompatResources.getDrawable(childTab.getContext(), R.drawable.new_common_tab_child_bg_2));
+//
+//
+//            }
 
             mLastPos = position;
         }
@@ -215,7 +215,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         mBinding.btnShortcutmanager.setOnClickListener(this::startShortcutManager);
         mBinding.btnSettings.setOnClickListener(this::startSettings);
         mBinding.btnChildmode.setOnClickListener(this::toggleChildmode);
-        mBinding.nsv.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
+//        mBinding.nsv.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> startBottomMaskAnimate());
         initTab();
     }
 
@@ -431,19 +431,19 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
 
     @Override
     public boolean dispatchGenericMotionEvent(MotionEvent ev) {
-        startBottomMaskAnimate();
+//        startBottomMaskAnimate();
         return super.dispatchGenericMotionEvent(ev);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        startBottomMaskAnimate();
+//        startBottomMaskAnimate();
         return super.dispatchKeyEvent(event);
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        startBottomMaskAnimate();
+//        startBottomMaskAnimate();
         return super.dispatchTouchEvent(ev);
     }
 
