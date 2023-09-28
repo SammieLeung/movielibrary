@@ -2,7 +2,10 @@ package com.hphtv.movielibrary.ui.homepage.fragment.allfile
 
 import android.content.IntentFilter
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
+import android.view.ViewPropertyAnimator
 import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -33,10 +36,14 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
     var atomicState = AtomicInteger()
     lateinit var fileTreeAdapter: FileTreeAdapter
     private var mPlayVideoReceiver: PlayVideoReceiver? = null
+    private val uiHandler: Handler by lazy {
+        Handler(Looper.getMainLooper())
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mBinding.bindState(
-            mViewModel.uiState,mViewModel.loadingState, mViewModel.accept
+            mViewModel.uiState, mViewModel.loadingState, mViewModel.accept
         )
         lifecycleScope.launch {
             mViewModel.accept(UiAction.GoToRoot)
@@ -44,8 +51,11 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
     }
 
     fun FragmentAllfileBinding.bindState(
-        uiStateFlow: StateFlow<UiState>, loadingStateFlow: StateFlow<LoadingState>,accept: (UiAction) -> Unit
+        uiStateFlow: StateFlow<UiState>,
+        loadingStateFlow: StateFlow<LoadingState>,
+        accept: (UiAction) -> Unit
     ) {
+        pathView.visibility = View.GONE
         isEmpty = true
         isLoading = false
         fileTreeAdapter = FileTreeAdapter(requireContext(), mutableListOf())
@@ -96,15 +106,20 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
             }
         }
 
+        fileTreeAdapter.setOnItemFocusListener { _, position, data ->
+            data?.let {
+                showPathView(mBinding.pathView)
+            }
+        }
+
 
         lifecycleScope.launch {
             uiStateFlow.collect { uiState ->
-                currentPath=uiState.friendlyPath
+                currentPath = uiState.friendlyPath
                 if (uiState.rootList.isNotEmpty()) {
                     isEmpty = false
                     val firstItem = uiState.rootList[0]
-                    if (firstItem.type == FolderType.BACK
-                        || firstItem.type == FolderType.DEVICE
+                    if (firstItem.type == FolderType.DEVICE
                         || firstItem.type == FolderType.SMB
                         || firstItem.type == FolderType.DLNA
                     ) {
@@ -121,9 +136,9 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
 
                         })
                     }
-                    if(uiState.isAppend){
+                    if (uiState.isAppend) {
                         fileTreeAdapter.appendAll(uiState.rootList)
-                    }else{
+                    } else {
                         fileTreeAdapter.addAll(uiState.rootList)
                     }
 
@@ -140,6 +155,20 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                 }
             }
         }
+    }
+
+    /**
+     * 暂时显示路径组件
+     */
+    private fun showPathView(view: View) {
+        view.visibility = View.VISIBLE
+        uiHandler.removeCallbacksAndMessages(null)
+        uiHandler.postDelayed({
+            view.animate().alpha(1f).setDuration(300).withEndAction {
+                view.visibility = View.GONE
+                view.alpha = 1f
+            }.start()
+        }, 3000)
     }
 
     private fun registerPlayReceiver() {

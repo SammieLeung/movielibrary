@@ -180,27 +180,8 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                     }
                                 })
                         }
-
-                        FolderType.BACK -> {
-                            if (lastParentFolder?.type == FolderType.SMB
-                                || lastParentFolder?.type == FolderType.DEVICE
-                                || lastParentFolder?.type == FolderType.DLNA
-                            ) {
-                                accept(UiAction.GoToRoot)
-                            } else {
-                                if (lastParentFolder?.type != FolderType.FOLDER)
-                                    dlnaPagerLoader.back()
-                                else
-                                    folderItemPagerLoader.back()
-                            }
-                            lastParentFolder = lastParentFolder?.parent
-                        }
-
-
                     }
                 }
-
-
             }
         }
 
@@ -278,7 +259,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     parent = parentFolder
                 )
             }
-        }.withAppendBackBtn(parentFolder)
+        }
         _uiState.update {
             it.copy(
                 isRoot = false,
@@ -306,7 +287,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 type = FolderType.FOLDER,
                 parent = parentFolder
             )
-        }.withAppendBackBtn(parentFolder)
+        }
         _uiState.update {
             it.copy(
                 isRoot = false,
@@ -339,7 +320,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     parentFolder
                 )
             }
-        }.withAppendBackBtn(parentFolder)
+        }
         _uiState.update {
             it.copy(
                 isRoot = false,
@@ -353,21 +334,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
     private fun getString(res: Int): String {
         return getApplication<Application>().getString(res)
-    }
-
-    private fun List<FolderItem>.withAppendBackBtn(parentFolder: FolderItem? = null): List<FolderItem> {
-        return this.toMutableList().apply {
-            add(
-                0, FolderItem(
-                    name = getString(R.string.goback),
-                    icon = R.mipmap.icon_mini_back,
-                    path = "",
-                    friendlyPath = "",
-                    type = FolderType.BACK,
-                    parent = parentFolder
-                )
-            )
-        }
     }
 
     inner class DLNAPaginatedLoader : PaginatedDataLoader<FolderItem>() {
@@ -398,10 +364,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         fun reload(parentFolder: FolderItem) {
             this.currentFolder = parentFolder
             super.reload()
-        }
-
-        override fun reloadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
-            return super.reloadDataFromDB(offset, limit).withAppendBackBtn()
         }
 
         override fun loadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
@@ -533,9 +495,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        override fun reloadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
-            return super.reloadDataFromDB(offset, limit).withAppendBackBtn()
-        }
 
         override fun loadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
             currentFolder?.let {
@@ -672,12 +631,10 @@ sealed class UiAction {
     object BackAction:UiAction()
     data class ClickItem(val itemPosition: Int, val folderItem: FolderItem) : UiAction()
     object LoadMore : UiAction()
-
 }
 
 
 enum class FolderType {
-    BACK,
     DEVICE,
     SMB,
     DLNA,

@@ -6,23 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:ellipsize="start"
-            android:lines="1"
-            android:id="@+id/pathView"
-            android:background="@drawable/all_file_page_path_background"
-            android:text="@{currentPath}"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="67.5dp"
-            android:layout_marginEnd="67.5dp"
-            android:textSize="18sp"
-            android:padding="10dp"
-            android:textFontWeight="500"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <com.hphtv.movielibrary.ui.view.TvRecyclerView
-            android:layout_below="@id/pathView"
             android:id="@+id/rvAllFilesView"
             android:layout_width="match_parent"
             android:layout_height="660dp"
@@ -30,18 +15,36 @@
             android:paddingBottom="5dp"
             android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />
 
+        <TextView
+            android:id="@+id/pathView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="67dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/all_file_page_path_background"
+            android:ellipsize="start"
+            android:lines="1"
+            android:padding="11dp"
+            android:paddingStart="39dp"
+            android:paddingEnd="39dp"
+            android:text="@{currentPath}"
+            android:textColor="#DADADA"
+            android:textSize="18sp" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="@{isLoading?View.GONE:isEmpty?View.VISIBLE:View.GONE}">
 
             <ImageView
-              android:id="@+id/iv_empty"
-              android:layout_width="158dp"
-              android:layout_height="131dp"
-              android:layout_centerHorizontal="true"
-              android:layout_marginTop="165dp"
-              android:src="@mipmap/empty_img" />
+                android:id="@+id/iv_empty"
+                android:layout_width="158dp"
+                android:layout_height="131dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="165dp"
+                android:src="@mipmap/empty_img" />
 
             <TextView
                 android:id="@+id/tv_empty_tips_1"
@@ -66,35 +69,39 @@
         </RelativeLayout>
 
         <RelativeLayout
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:visibility="@{isLoading?View.VISIBLE:View.GONE}">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{isLoading?View.VISIBLE:View.GONE}">
 
             <com.github.ybq.android.spinkit.SpinKitView
-              android:id="@+id/spin_kit"
-              style="@style/SpinKitView.Circle"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_centerHorizontal="true"
-              android:layout_marginTop="250dp"
-              android:background="@drawable/loading_view_bg"
-              android:maxWidth="60dp"
-              android:maxHeight="60dp"
-              android:minWidth="60dp"
-              android:minHeight="60dp"
-              android:padding="30dp"
-              app:SpinKit_Color="@color/white_light" />
+                android:id="@+id/spin_kit"
+                style="@style/SpinKitView.Circle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="250dp"
+                android:background="@drawable/loading_view_bg"
+                android:maxWidth="60dp"
+                android:maxHeight="60dp"
+                android:minWidth="60dp"
+                android:minHeight="60dp"
+                android:padding="30dp"
+                app:SpinKit_Color="@color/white_light" />
         </RelativeLayout>
     </RelativeLayout>
 
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="isEmpty"
             type="boolean" />
+
         <variable
-          name="isLoading"
-          type="boolean" />
+            name="isLoading"
+            type="boolean" />
+
         <variable
             name="currentPath"
             type="String" />
