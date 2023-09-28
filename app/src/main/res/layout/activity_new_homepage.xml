@@ -79,10 +79,9 @@
           android:id="@+id/tab_layout"
           android:layout_width="wrap_content"
           android:layout_height="56dp"
-          android:layout_below="@id/btn_pinyin_search"
           android:layout_marginLeft="@dimen/common_activity_margin_lr"
-          android:layout_marginTop="5dp"
-          app:tabBackground="@drawable/new_common_tab_bg_2"
+          android:layout_marginTop="60dp"
+          app:tabBackground="@android:color/transparent"
           app:tabIndicatorHeight="0dp"
           app:tabRippleColor="@android:color/transparent" />
 

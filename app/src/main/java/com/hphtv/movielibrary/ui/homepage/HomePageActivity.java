@@ -274,6 +274,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                         view.getTab().select();
                     }
                 });
+
         mBinding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -296,12 +297,17 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                         dialogFragment.show(getSupportFragmentManager(), "FilterBoxDialogFragment");
                     });
                 }
+                ViewCompat.animate(tab.view).scaleX(1.125f).scaleY(1.125f).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
+
             }
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
+
                 ((TextView) tab.getCustomView().findViewById(R.id.tabTextView)).setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
                 tab.view.setOnClickListener(null);
+                ViewCompat.animate(tab.view).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
+
             }
 
             @Override
@@ -315,8 +321,9 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
      * 更新主页的历史播放记录
      */
     public void updateHistory() {
-        ((BaseHomeFragment)mNewHomePageTabAdapter.getItem(0)).prepareHistoryData();
+        ((BaseHomeFragment) mNewHomePageTabAdapter.getItem(0)).prepareHistoryData();
     }
+
     /**
      * 自动搜索本地设备
      */

@@ -8,18 +8,19 @@
     </data>
 
     <TextView
+        android:background="@drawable/new_common_tab_bg_2"
         android:id="@+id/tabTextView"
         android:duplicateParentState="true"
         android:layout_width="match_parent"
         android:text="@{text}"
         android:textSize="24sp"
-        android:paddingLeft="21dp"
-        android:paddingRight="21dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
         android:paddingTop="9dp"
         android:paddingBottom="9dp"
         android:textColor="@drawable/new_common_tab_textcolor_state"
         android:drawablePadding="2dp"
-        android:textFontWeight="500"
+        android:textFontWeight="700"
         android:layout_height="match_parent">
 
     </TextView>

@@ -66,7 +66,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">@dimen/homepage_circle_btn_w</item>
         <item name="android:layout_marginLeft">23dp</item>
-        <item name="android:layout_marginTop">23dp</item>
+        <item name="android:layout_marginTop">66dp</item>
         <item name="android:paddingLeft">@dimen/common_circle_btn_min_padding</item>
         <item name="android:paddingRight">@dimen/common_circle_btn_min_padding</item>
         <item name="android:drawablePadding">@dimen/common_circle_btn_drawable_padding</item>
