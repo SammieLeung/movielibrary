@@ -59,6 +59,14 @@
           app:border_width="@dimen/poster_border_width"
           app:corner_radius="@dimen/poster_item_1_radius" />
 
+      <LinearLayout
+          android:duplicateParentState="true"
+          android:background="@drawable/history_item_bottom_mask_bg"
+          android:layout_alignBottom="@id/iv_img"
+          android:layout_width="match_parent"
+          android:layout_margin="4dp"
+          android:layout_height="101dp"/>
+
 
       <TextView
           android:layout_width="wrap_content"
@@ -110,6 +118,8 @@
           android:textColor="@color/white"
           android:textSize="23sp" />
     </RelativeLayout>
+
+
 
 
   </LinearLayout>
