@@ -597,8 +597,8 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     private fun String.regexEscape() = Regex.escape(this)
 
     companion object {
-        const val PAGE_LIMIT = 12
-        const val FIRST_PAGE_LIMIT = 17
+        const val PAGE_LIMIT = 18
+        const val FIRST_PAGE_LIMIT = 24
     }
 }
 
