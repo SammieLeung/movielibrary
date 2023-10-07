@@ -139,6 +139,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch(Dispatchers.Default) {
             clickItemAction.collect {
                 lastFocusPosition = it.itemPosition
+                Logger.d("lastFocusPosition=$lastFocusPosition")
                 it.folderItem.let {
                     when (it.type) {
                         FolderType.DEVICE -> {
@@ -272,7 +273,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun updateSmbDevices(parentFolder: FolderItem) {
-        Logger.d("test")
         val shortcutList =
             shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_SMB)
         val folderItemList = shortcutList.map { shortcut ->
@@ -467,7 +467,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
 
         fun back() {
-            Logger.d(currentFolder?.path)
             currentFolder?.let { it ->
                 it.parent?.let {
                     when (it.type) {

@@ -21,6 +21,7 @@ import com.hphtv.movielibrary.ui.homepage.HomePageActivity
 import com.hphtv.movielibrary.ui.homepage.PlayVideoReceiver
 import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
+import com.hphtv.movielibrary.ui.view.TvRecyclerView.OnNoNextFocusListener
 import com.hphtv.movielibrary.util.DLogger
 import com.orhanobut.logger.Logger
 import com.station.kit.util.DensityUtil
@@ -99,6 +100,23 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                 accept(UiAction.LoadMore)
             }
         })
+        rvAllFilesView.setOnNoNextFocusListener(object : OnNoNextFocusListener {
+            override fun forceFocusLeft(currentFocus: View?): Boolean {
+                return true
+            }
+
+            override fun forceFocusRight(currentFocus: View?): Boolean {
+                return true
+            }
+
+            override fun forceFocusUp(currentFocus: View?): Boolean {
+                return false
+            }
+
+            override fun forceFocusDown(currentFocus: View?): Boolean {
+                return false
+            }
+        })
 
         fileTreeAdapter.setOnItemClickListener { _, position, data ->
             data?.let {
@@ -118,27 +136,23 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                 currentPath = uiState.friendlyPath
                 if (uiState.rootList.isNotEmpty()) {
                     isEmpty = false
-                    val firstItem = uiState.rootList[0]
-                    if (firstItem.type == FolderType.DEVICE
-                        || firstItem.type == FolderType.SMB
-                        || firstItem.type == FolderType.DLNA
-                    ) {
+                    if (uiState.isAppend) {
+                        fileTreeAdapter.appendAll(uiState.rootList)
+                    } else {
                         rvAllFilesView.viewTreeObserver.addOnPreDrawListener(object :
                             OnPreDrawListener {
                             override fun onPreDraw(): Boolean {
                                 rvAllFilesView.viewTreeObserver.removeOnPreDrawListener(this)
                                 rvAllFilesView.requestFocus()
                                 rvAllFilesView.scrollToPosition(uiState.focusPosition)
-                                rvAllFilesView.layoutManager?.findViewByPosition(uiState.focusPosition)
-                                    ?.requestFocus()
-                                return true
+                                return rvAllFilesView.layoutManager?.findViewByPosition(uiState.focusPosition)
+                                    ?.let {
+                                        it.requestFocus()
+                                        return@let true
+                                    } ?: false
                             }
 
                         })
-                    }
-                    if (uiState.isAppend) {
-                        fileTreeAdapter.appendAll(uiState.rootList)
-                    } else {
                         fileTreeAdapter.addAll(uiState.rootList)
                     }
 

@@ -30,7 +30,7 @@ public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, T> extends B
 
     @NonNull
     @Override
-    public BaseScaleAdapter<VDB,T>.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public BaseScaleAdapter<VDB, T>.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         return super.onCreateViewHolder(parent, viewType);
     }
 
@@ -45,6 +45,10 @@ public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, T> extends B
             ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
             if (mOnItemFocusListener != null) {
                 int pos = (int) v.getTag();
+                if (getItemCount() == 0)
+                    return;
+                if (pos < 0 || pos >= getItemCount())
+                    pos = 0;
                 T data = mList.get(pos);
                 mOnItemFocusListener.onItemFocus(v, pos, data);
             }
