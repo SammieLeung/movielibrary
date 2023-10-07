@@ -16,13 +16,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hphtv.movielibrary.effect.FilterGridLayoutManager;
 import com.hphtv.movielibrary.ui.BaseFragment2;
 
 /**
  * author: Sam Leung
  * date:  2022/2/19
- *
  */
 public class TvRecyclerView extends RecyclerView {
     private static final String TAG = "TvRecyclerView";
@@ -283,40 +281,32 @@ public class TvRecyclerView extends RecyclerView {
                         View rightView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_RIGHT);
                         if (rightView != null) {
                             rightView.requestFocus();
-                            int rightOffset = rightView.getLeft() - getWidth() / 2 + rightView.getWidth() / 2;
-                            this.customSmoothScrollBy(rightOffset, 0);
-                            return true;
+                            return handleSmoothScrollToCenterActionForDpadRight(rightView);
                         } else {
                             boolean focusResult = false;
                             if (mOnNoNextFocusListener != null)
-                                focusResult = mOnNoNextFocusListener.forceFocusRight(focusView);
+                                focusResult = mOnNoNextFocusListener.enforceHandleFocusRight(focusView);
                             if (focusResult) {
                                 return true;
                             } else {
-                                if (isVertical())
-                                    return false;
-                                else
-                                    return true;//横向 最右一项，不响应
+                                //横向 最右一项，不响应
+                                return !isVertical();
                             }
                         }
                     case KeyEvent.KEYCODE_DPAD_LEFT:
                         View leftView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_LEFT);
                         if (leftView != null) {
                             leftView.requestFocus();
-                            int leftOffset = leftView.getWidth() / 2 + getWidth() / 2 - leftView.getRight();
-                            this.customSmoothScrollBy(-leftOffset, 0);
-                            return true;
+                            return handleSmoothScrollToCenterActionForDpadLeft(leftView);
                         } else {
                             boolean focusResult = false;
                             if (mOnNoNextFocusListener != null)
-                                focusResult = mOnNoNextFocusListener.forceFocusLeft(focusView);
+                                focusResult = mOnNoNextFocusListener.enforceHandleFocusLeft(focusView);
                             if (focusResult) {
                                 return true;
                             } else {
-                                if (isVertical())
-                                    return false;
-                                else
-                                    return true;//横向 最左一项，不响应
+                                //横向 最左一项，不响应
+                                return !isVertical();
                             }
                         }
                     case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -324,41 +314,31 @@ public class TvRecyclerView extends RecyclerView {
                         View downView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_DOWN);
                         if (downView != null) {
                             downView.requestFocus();
-                            int downOffset = downView.getTop() + downView.getHeight() / 2 - getHeight() / 2;
-                            this.customSmoothScrollBy(0, downOffset);
-                            return true;
+                            return handleSmoothScrollToCenterActionForDpadDown(downView);
                         } else {
                             boolean focusResult = false;
                             if (mOnNoNextFocusListener != null)
-                                focusResult = mOnNoNextFocusListener.forceFocusDown(focusView);
+                                focusResult = mOnNoNextFocusListener.enforceHandleFocusDown(focusView);
                             if (focusResult) {
                                 return true;
                             } else {
-                                if (isVertical())
-                                    return true;//垂直最下一项 ，不响应
-                                else
-                                    return false;
+                                return isVertical();//垂直最下一项 ，不响应
                             }
                         }
                     case KeyEvent.KEYCODE_DPAD_UP:
                         View upView = FocusFinder.getInstance().findNextFocus(this, focusView, View.FOCUS_UP);
                         if (upView != null) {
                             upView.requestFocus();
-                            int upOffset = getHeight() / 2 - (upView.getBottom() - upView.getHeight() / 2);
-                            this.customSmoothScrollBy(0, -upOffset);
-                            return true;
+                            return handleSmoothScrollToCenterActionForDpadUp(upView);
                         } else {
                             boolean focusResult = false;
                             if (mOnNoNextFocusListener != null)
-                                focusResult = mOnNoNextFocusListener.forceFocusUp(focusView);
+                                focusResult = mOnNoNextFocusListener.enforceHandleFocusUp(focusView);
                             if (focusResult) {
                                 return true;
                             } else {
                                 if (isVertical()) {
-                                    if (getLayoutManager() instanceof GridLayoutManager)
-                                        return false;
-                                    else
-                                        return true;
+                                    return !(getLayoutManager() instanceof GridLayoutManager);
                                 } else
                                     return false;
                             }
@@ -373,6 +353,47 @@ public class TvRecyclerView extends RecyclerView {
             }
         }
         return result;
+    }
+
+    private boolean handleSmoothScrollToCenterActionForDpadLeft(View nextView) {
+        int leftOffset = nextView.getWidth() / 2 + getWidth() / 2 - nextView.getRight();
+        this.customSmoothScrollBy(-leftOffset, 0);
+        return true;
+    }
+
+    private boolean handleSmoothScrollToCenterActionForDpadRight(View nextView) {
+        int rightOffset = nextView.getLeft() - getWidth() / 2 + nextView.getWidth() / 2;
+        this.customSmoothScrollBy(rightOffset, 0);
+        return true;
+
+    }
+
+    private boolean handleSmoothScrollToCenterActionForDpadUp(View nextView) {
+        int upOffset = getHeight() / 2 - (nextView.getBottom() - nextView.getHeight() / 2);
+        this.customSmoothScrollBy(0, -upOffset);
+        return true;
+    }
+
+    private boolean handleSmoothScrollToCenterActionForDpadDown(View nextView) {
+        int downOffset = nextView.getTop() + nextView.getHeight() / 2 - getHeight() / 2;
+        this.customSmoothScrollBy(0, downOffset);
+        return true;
+    }
+
+    public void smoothToCenterAgainForUp(View focusView){
+        handleSmoothScrollToCenterActionForDpadUp(focusView);
+    }
+
+    public void smoothToCenterAgainForDown(View focusView){
+        handleSmoothScrollToCenterActionForDpadDown(focusView);
+    }
+
+    public void smoothToCenterAgainForLeft(View focusView){
+        handleSmoothScrollToCenterActionForDpadLeft(focusView);
+    }
+
+    public void smoothToCenterAgainForRight(View focusView){
+        handleSmoothScrollToCenterActionForDpadRight(focusView);
     }
 
     @Override
@@ -593,14 +614,13 @@ public class TvRecyclerView extends RecyclerView {
     }
 
     public interface OnNoNextFocusListener {
-        boolean forceFocusLeft(View currentFocus);
+        boolean enforceHandleFocusLeft(View currentFocus);
 
-        boolean forceFocusRight(View currentFocus);
+        boolean enforceHandleFocusRight(View currentFocus);
 
-        boolean forceFocusUp(View currentFocus);
+        boolean enforceHandleFocusUp(View currentFocus);
 
-        boolean forceFocusDown(View currentFocus);
-
+        boolean enforceHandleFocusDown(View currentFocus);
     }
 
     private OnNoNextFocusListener mOnNoNextFocusListener;

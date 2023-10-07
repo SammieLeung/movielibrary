@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener {
     private int countItem;
     private int lastItem;
+    private int firstItem;
     private boolean isScolled = false;//是否可以滑动
 
     /**
@@ -61,6 +62,8 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
 
             countItem = layoutManager.getItemCount();
             lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
+            firstItem = layoutManager.findFirstCompletelyVisibleItemPosition();
+            Log.d("test", "countItem:" + countItem + ",lastItem:" + lastItem + ",firstItem:" + firstItem);
             if (layoutManager instanceof VisibleItemListener)
                 ((VisibleItemListener) layoutManager).getFirstVisibleItem(layoutManager.findViewByPosition(layoutManager.findFirstVisibleItemPosition()));
         }

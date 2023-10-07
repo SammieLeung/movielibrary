@@ -70,7 +70,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
     }
 
     public void loadMovieDataViews() {
-        mMovieDataViewPaginatedDataLoader.load();
+        mMovieDataViewPaginatedDataLoader.loadNext();
     }
 
     public void reOrderMovieDataViews() {
@@ -260,7 +260,7 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
         }
 
         @Override
-        protected void OnLoadResult(List<MovieDataView> result) {
+        protected void OnLoadNextResult(List<MovieDataView> result) {
             if (mOnRefresh != null)
                 mOnRefresh.appendMovieDataViews(result);
         }

@@ -10,7 +10,6 @@ import android.view.ViewTreeObserver.OnPreDrawListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hphtv.movielibrary.R
-import com.hphtv.movielibrary.databinding.ActivityNewHomepageBinding
 import com.hphtv.movielibrary.databinding.FragmentAllfileBinding
 import com.hphtv.movielibrary.effect.FilterGridLayoutManager
 import com.hphtv.movielibrary.effect.GridSpacingItemDecorationVertical2
@@ -19,14 +18,11 @@ import com.hphtv.movielibrary.ui.ILoadingState
 import com.hphtv.movielibrary.ui.homepage.BaseAutofitHeightFragment
 import com.hphtv.movielibrary.ui.homepage.HomePageActivity
 import com.hphtv.movielibrary.ui.homepage.PlayVideoReceiver
-import com.hphtv.movielibrary.ui.homepage.fragment.BaseHomeFragment
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
 import com.hphtv.movielibrary.ui.view.TvRecyclerView.OnNoNextFocusListener
 import com.hphtv.movielibrary.util.DLogger
-import com.orhanobut.logger.Logger
 import com.station.kit.util.DensityUtil
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -97,23 +93,23 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
 
         rvAllFilesView.addOnScrollListener(object : OnMovieLoadListener() {
             override fun onLoading(countItem: Int, lastItem: Int) {
-                accept(UiAction.LoadMore)
+                accept(UiAction.LoadNext)
             }
         })
         rvAllFilesView.setOnNoNextFocusListener(object : OnNoNextFocusListener {
-            override fun forceFocusLeft(currentFocus: View?): Boolean {
+            override fun enforceHandleFocusLeft(currentFocus: View?): Boolean {
                 return true
             }
 
-            override fun forceFocusRight(currentFocus: View?): Boolean {
+            override fun enforceHandleFocusRight(currentFocus: View?): Boolean {
                 return true
             }
 
-            override fun forceFocusUp(currentFocus: View?): Boolean {
+            override fun enforceHandleFocusUp(currentFocus: View?): Boolean {
                 return false
             }
 
-            override fun forceFocusDown(currentFocus: View?): Boolean {
+            override fun enforceHandleFocusDown(currentFocus: View?): Boolean {
                 return false
             }
         })
@@ -138,6 +134,12 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                     isEmpty = false
                     if (uiState.isAppend) {
                         fileTreeAdapter.appendAll(uiState.rootList)
+                        rvAllFilesView.apply {
+                            this.focusedChild?.let {
+                                this.smoothToCenterAgainForDown(it)
+                            }
+                        }
+
                     } else {
                         rvAllFilesView.viewTreeObserver.addOnPreDrawListener(object :
                             OnPreDrawListener {

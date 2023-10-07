@@ -80,7 +80,7 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
 
     public void loadMoreUnknownRoots(PaginationCallback callback) {
         if (isLoadRoot)
-             mRootLoader.load(callback);
+             mRootLoader.loadNext(callback);
         else
              loadMoreUnknownFiles(callback);
     }
@@ -219,7 +219,7 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
         }
 
         @Override
-        protected void OnLoadResult(List<UnknownRootDataView> result) {
+        protected void OnLoadNextResult(List<UnknownRootDataView> result) {
 
         }
 

@@ -13,7 +13,6 @@ import com.hphtv.movielibrary.roomdb.entity.Shortcut
 import com.hphtv.movielibrary.roomdb.entity.VideoTag
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView
 import com.hphtv.movielibrary.util.ScraperSourceTools
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,7 +66,7 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
                 mOnRefresh?.newSearch(result)
             }
 
-            override fun OnLoadResult(result: List<MovieDataView>) {
+            override fun OnLoadNextResult(result: List<MovieDataView>) {
                 mOnRefresh?.appendMovieDataViews(result)
             }
         }
@@ -80,7 +79,7 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun loadMoreMovies() {
-        mLoader.load()
+        mLoader.loadNext()
     }
 
     fun forceReloadMovies() {

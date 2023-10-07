@@ -201,22 +201,22 @@ public class FilterBoxDialogFragment extends BaseDialogFragment2<FilterBoxViewMo
 
 
     @Override
-    public boolean forceFocusLeft(View currentFocus) {
+    public boolean enforceHandleFocusLeft(View currentFocus) {
         return requestNextLeftFocus(currentFocus);
     }
 
     @Override
-    public boolean forceFocusRight(View currentFocus) {
+    public boolean enforceHandleFocusRight(View currentFocus) {
         return requestNextRightFocus(currentFocus);
     }
 
     @Override
-    public boolean forceFocusUp(View currentFocus) {
+    public boolean enforceHandleFocusUp(View currentFocus) {
         return false;
     }
 
     @Override
-    public boolean forceFocusDown(View currentFocus) {
+    public boolean enforceHandleFocusDown(View currentFocus) {
         return false;
     }
 }

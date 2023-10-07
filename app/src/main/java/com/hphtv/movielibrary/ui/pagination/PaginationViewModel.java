@@ -128,7 +128,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
     private void loadRecentlyAddedMovie() {
-        mRecentlyAddedDataLoader.load();
+        mRecentlyAddedDataLoader.loadNext();
     }
 
     private void reloadFavoriteMovie() {
@@ -146,7 +146,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
     private void loadFavoriteMovie() {
         if (mLastLoader != null && mLastLoader.canLoadMore())
-            mLastLoader.load();
+            mLastLoader.loadNext();
     }
 
     public void cancel() {
@@ -193,7 +193,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
         }
 
         @Override
-        public void OnLoadResult(List<MovieDataView> result) {
+        public void OnLoadNextResult(List<MovieDataView> result) {
             if (mOnRefresh != null)
                 mOnRefresh.appendMovieDataViews(result);
         }
@@ -225,7 +225,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
         }
 
         @Override
-        protected void OnLoadResult(List<MovieDataView> result) {
+        protected void OnLoadNextResult(List<MovieDataView> result) {
             if (mOnRefresh != null)
                 mOnRefresh.appendMovieDataViews(result);
         }
@@ -265,7 +265,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
 
         @Override
-        protected void OnLoadResult(List<MovieDataView> result) {
+        protected void OnLoadNextResult(List<MovieDataView> result) {
             if (mOnRefresh != null)
                 mOnRefresh.appendMovieDataViews(result);
         }
@@ -350,7 +350,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
 
 
         @Override
-        protected void OnLoadResult(List<MovieDataView> result) {
+        protected void OnLoadNextResult(List<MovieDataView> result) {
             if (mOnRefresh != null)
                 mOnRefresh.appendMovieDataViews(result);
         }

@@ -46,23 +46,23 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
 
     private TvRecyclerView.OnNoNextFocusListener mOnNoNextFocusListener = new TvRecyclerView.OnNoNextFocusListener() {
         @Override
-        public boolean forceFocusLeft(View currentFocus) {
+        public boolean enforceHandleFocusLeft(View currentFocus) {
             return false;
         }
 
         @Override
-        public boolean forceFocusRight(View currentFocus) {
+        public boolean enforceHandleFocusRight(View currentFocus) {
             return false;
         }
 
         @Override
-        public boolean forceFocusUp(View currentFocus) {
+        public boolean enforceHandleFocusUp(View currentFocus) {
             mBinding.etBoxName.requestFocus();
             return true;
         }
 
         @Override
-        public boolean forceFocusDown(View currentFocus) {
+        public boolean enforceHandleFocusDown(View currentFocus) {
             return false;
         }
     };

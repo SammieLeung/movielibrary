@@ -8,7 +8,6 @@ import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
@@ -24,7 +23,8 @@ public abstract class PaginatedDataLoader<T> {
     public static final String TAG = PaginatedDataLoader.class.getSimpleName();
     private final int mFirstLimit;
     private final int mLimit;
-    private final AtomicBoolean mAtomicBooleanCanLoad = new AtomicBoolean(true);
+    private final AtomicBoolean canLoadNext = new AtomicBoolean(true);
+    private final AtomicBoolean canLoadPre=new AtomicBoolean(false);
     private final AtomicInteger mPage = new AtomicInteger(0);
     private Disposable mDisposable;
 
@@ -47,10 +47,11 @@ public abstract class PaginatedDataLoader<T> {
     protected abstract List<T> loadDataFromDB(int offset, int limit);
 
     protected void OnReloadResult(List<T> result) {
-        OnLoadResult(result);
+        OnLoadNextResult(result);
     }
 
-    protected abstract void OnLoadResult(List<T> result);
+    protected abstract void OnLoadNextResult(List<T> result);
+    protected void OnLoadPreResult(List<T> result){}
 
     protected void OnLoadFinish() {
     }
@@ -60,12 +61,12 @@ public abstract class PaginatedDataLoader<T> {
     }
 
     public boolean canLoadMore() {
-        return mAtomicBooleanCanLoad.get();
+        return canLoadNext.get();
     }
 
     public void reset() {
         mPage.set(0);
-        mAtomicBooleanCanLoad.set(true);
+        canLoadNext.set(true);
     }
 
     protected int nextOffset(){
@@ -80,7 +81,7 @@ public abstract class PaginatedDataLoader<T> {
     public void forceReload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     int limit = mFirstLimit + (mPage.get()) * mLimit;
-                    mAtomicBooleanCanLoad.set(true);
+                    canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, limit);
                     emitter.onNext(dataList);
                     emitter.onComplete();
@@ -113,7 +114,7 @@ public abstract class PaginatedDataLoader<T> {
     public void forceReload(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     int limit = mFirstLimit + (mPage.get()) * mLimit;
-                    mAtomicBooleanCanLoad.set(true);
+                    canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, limit);
                     emitter.onNext(dataList);
                     emitter.onComplete();
@@ -148,10 +149,10 @@ public abstract class PaginatedDataLoader<T> {
     public void reload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     mPage.set(0);
-                    mAtomicBooleanCanLoad.set(true);
+                    canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, mFirstLimit);
                     if (dataList.size() < mFirstLimit) {
-                        mAtomicBooleanCanLoad.set(false);
+                        canLoadNext.set(false);
                     }
                     emitter.onNext(dataList);
                     emitter.onComplete();
@@ -185,10 +186,10 @@ public abstract class PaginatedDataLoader<T> {
     public void reload(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     mPage.set(0);
-                    mAtomicBooleanCanLoad.set(true);
+                    canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, mFirstLimit);
                     if (dataList.size() < mFirstLimit) {
-                        mAtomicBooleanCanLoad.set(false);
+                        canLoadNext.set(false);
                     }
                     emitter.onNext(dataList);
                     emitter.onComplete();
@@ -221,14 +222,14 @@ public abstract class PaginatedDataLoader<T> {
 
     }
 
-    public void load() {
+    public void loadNext() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     if (canLoadMore()) {
 //                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
                         int offset=nextOffset();
                         List<T> dataList = loadDataFromDB(offset, mLimit);
                         if (dataList.size() < mLimit) {
-                            mAtomicBooleanCanLoad.set(false);
+                            canLoadNext.set(false);
                         }
                         emitter.onNext(dataList);
                     } else {
@@ -248,7 +249,7 @@ public abstract class PaginatedDataLoader<T> {
 
                     @Override
                     public void onAction(List<T> dataList) {
-                        OnLoadResult(dataList);
+                        OnLoadNextResult(dataList);
                         if (!canLoadMore()) {
                             OnLoadFinish();
                         }
@@ -262,14 +263,14 @@ public abstract class PaginatedDataLoader<T> {
                 });
     }
 
-    public void load(PaginationCallback callback) {
+    public void loadNext(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     if (canLoadMore()) {
 //                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
                         int offset=nextOffset();
                         List<T> dataList = loadDataFromDB(offset, mLimit);
                         if (dataList.size() < mLimit) {
-                            mAtomicBooleanCanLoad.set(false);
+                            canLoadNext.set(false);
                         }
                         emitter.onNext(dataList);
                     } else {
@@ -303,5 +304,13 @@ public abstract class PaginatedDataLoader<T> {
                         mDisposable = null;
                     }
                 });
+    }
+
+    public void loadPre(){
+
+    }
+
+    public void loadPre(PaginationCallback callback){
+
     }
 }

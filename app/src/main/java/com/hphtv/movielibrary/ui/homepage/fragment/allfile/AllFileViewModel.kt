@@ -53,12 +53,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         val actionStateFlow: MutableSharedFlow<UiAction> = MutableSharedFlow()
         val gotoRootAction = actionStateFlow.filterIsInstance<UiAction.GoToRoot>()
         val clickItemAction = actionStateFlow.filterIsInstance<UiAction.ClickItem>()
-        val loadMoreAction = actionStateFlow.filterIsInstance<UiAction.LoadMore>()
+        val loadMoreAction = actionStateFlow.filterIsInstance<UiAction.LoadNext>()
         val backAction=actionStateFlow.filterIsInstance<UiAction.BackAction>()
 
         handleGotoRootAction(gotoRootAction)
         handleItemClickAction(clickItemAction)
-        handleLoadMoreAction(loadMoreAction)
+        handleLoadNextAction(loadMoreAction)
         handleBackAction(backAction)
 
         return { action ->
@@ -204,18 +204,18 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-    private fun handleLoadMoreAction(loadMoreAction: Flow<UiAction.LoadMore>) =
+    private fun handleLoadNextAction(loadMoreAction: Flow<UiAction.LoadNext>) =
         viewModelScope.launch(Dispatchers.Default ) {
 
             loadMoreAction.collect {
                 lastParentFolder?.let {
                     when (it.type) {
                         FolderType.DLNA_SHARE -> {
-                            dlnaPagerLoader.load()
+                            dlnaPagerLoader.loadNext()
                         }
 
                         FolderType.FOLDER -> {
-                            folderItemPagerLoader.load()
+                            folderItemPagerLoader.loadNext()
                         }
 
                         else -> {}
@@ -435,7 +435,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        override fun OnLoadResult(result: MutableList<FolderItem>?) {
+        override fun OnLoadNextResult(result: MutableList<FolderItem>?) {
             _uiState.update {
                 it.copy(
                     isRoot = false,
@@ -567,7 +567,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
-        override fun OnLoadResult(result: MutableList<FolderItem>?) {
+        override fun OnLoadNextResult(result: MutableList<FolderItem>?) {
             _uiState.update {
                 it.copy(
                     isRoot = false,
@@ -629,7 +629,7 @@ sealed class UiAction {
     object GoToRoot : UiAction()
     object BackAction:UiAction()
     data class ClickItem(val itemPosition: Int, val folderItem: FolderItem) : UiAction()
-    object LoadMore : UiAction()
+    object LoadNext : UiAction()
 }
 
 
