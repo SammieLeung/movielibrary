@@ -36,8 +36,8 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
     var atomicState = AtomicInteger()
     lateinit var fileTreeAdapter: FileTreeAdapter
     private var mPlayVideoReceiver: PlayVideoReceiver? = null
-    private val uiHandler: Handler by lazy {
-        Handler(Looper.getMainLooper())
+    private val uiHandler: AnimateHandler by lazy {
+        AnimateHandler()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -161,14 +161,8 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
      * 暂时显示路径组件
      */
     private fun showPathView(view: View) {
-        view.visibility = View.VISIBLE
         uiHandler.removeCallbacksAndMessages(null)
-        uiHandler.postDelayed({
-            view.animate().alpha(1f).setDuration(300).withEndAction {
-                view.visibility = View.GONE
-                view.alpha = 1f
-            }.start()
-        }, 3000)
+        uiHandler.delayDisappear(view)
     }
 
     private fun registerPlayReceiver() {
@@ -237,6 +231,23 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
         get() = DensityUtil.dip2px(context, this)
     private val Double.dp
         get() = this.toFloat().dp
+
+    inner class AnimateHandler : Handler(Looper.getMainLooper()) {
+        private var animator: ViewPropertyAnimator? = null
+
+        fun delayDisappear(view: View) {
+            animator?.cancel()
+            view.visibility = View.VISIBLE
+            view.alpha = 1f
+            postDelayed({
+                animator = view.animate().alpha(0f).setDuration(1000).withEndAction {
+                    view.visibility = View.GONE
+                    view.alpha = 1f
+                }
+                animator?.start()
+            }, 2000)
+        }
+    }
 
     companion object {
         @JvmStatic
