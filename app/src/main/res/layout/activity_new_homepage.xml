@@ -1,116 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-  <RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
->
-
-    <View
-      android:id="@+id/view_bg_1"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:background="@mipmap/child_bg"/>
-    <View
-      android:id="@+id/view_bg_2"
-      android:background="@drawable/new_main_background"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      />
-    <androidx.core.widget.NestedScrollView
-      android:id="@+id/nsv"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:background="@android:color/transparent">
-
-      <RelativeLayout
-        android:id="@+id/constraintLayout"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@drawable/new_main_background">
 
-        <com.hphtv.movielibrary.ui.view.CollapseButton
-          android:id="@+id/btn_pinyin_search"
-          style="@style/homepage_circle_btn_style"
-          android:layout_width="wrap_content"
-          android:layout_toStartOf="@id/btn_shortcutmanager"
-          android:drawableLeft="@drawable/icon_circle_search"
-          android:text="@string/search" />
+        <ImageView
+            android:id="@+id/view_bg_2"
+            android:scaleType="fitXY"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/main_bg_colorful_explotion" />
 
-        <com.hphtv.movielibrary.ui.view.CollapseButton
-          android:id="@+id/btn_shortcutmanager"
-          style="@style/homepage_circle_btn_style"
-          android:layout_width="wrap_content"
-          android:layout_toStartOf="@id/btn_childmode"
-          android:drawableLeft="@drawable/icon_circle_folder"
-          android:text="@string/shortcut_manager" />
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nsv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent">
 
-        <com.hphtv.movielibrary.ui.view.CollapseButton
-          android:id="@+id/btn_settings"
-          style="@style/homepage_circle_btn_style"
-          android:layout_width="wrap_content"
-          android:layout_alignParentEnd="true"
-          android:layout_marginRight="@dimen/common_activity_margin_lr"
-          android:drawableLeft="@drawable/icon_circle_setting"
-          android:text="@string/settings" />
+            <RelativeLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-        <com.hphtv.movielibrary.ui.view.CollapseButton
-          android:id="@+id/btn_childmode"
-          style="@style/homepage_circle_btn_style"
-          android:layout_width="wrap_content"
-          android:layout_toStartOf="@id/btn_settings"
-          android:background="@drawable/circle_checkbox_bg"
-          android:button="@null"
-          android:drawableLeft="@drawable/icon_circle_childmode"
-          android:text="@string/childmode"
-          android:visibility="@{childmode?View.VISIBLE:View.GONE}" />
+                <com.hphtv.movielibrary.ui.view.CollapseButton
+                    android:id="@+id/btn_pinyin_search"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_toStartOf="@id/btn_shortcutmanager"
+                    android:drawableLeft="@drawable/icon_circle_search"
+                    android:text="@string/search" />
 
-        <!--        <Button-->
-        <!--            android:id="@+id/btn_child_mode"-->
-        <!--            style="@style/homepage_circle_btn_style"-->
-        <!--            android:layout_toStartOf="@id/btn_settings" />-->
+                <com.hphtv.movielibrary.ui.view.CollapseButton
+                    android:id="@+id/btn_shortcutmanager"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_toStartOf="@id/btn_childmode"
+                    android:drawableLeft="@drawable/icon_circle_folder"
+                    android:text="@string/shortcut_manager" />
 
-        <!--        <Button-->
-        <!--            android:id="@+id/btn_settings"-->
-        <!--            style="@style/homepage_circle_btn_style"-->
-        <!--            android:layout_marginRight="@dimen/common_activity_margin_lr"-->
-        <!--            android:layout_alignParentEnd="true" />-->
-        <com.google.android.material.tabs.TabLayout
-          android:id="@+id/tab_layout"
-          android:layout_width="wrap_content"
-          android:layout_height="56dp"
-          android:layout_marginLeft="@dimen/common_activity_margin_lr"
-          android:layout_marginTop="60dp"
-          app:tabBackground="@android:color/transparent"
-          app:tabIndicatorHeight="0dp"
-          app:tabRippleColor="@android:color/transparent" />
+                <com.hphtv.movielibrary.ui.view.CollapseButton
+                    android:id="@+id/btn_settings"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="@dimen/common_activity_margin_lr"
+                    android:drawableLeft="@drawable/icon_circle_setting"
+                    android:text="@string/settings" />
 
-        <com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
-          android:id="@+id/viewpager"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/tab_layout" />
-      </RelativeLayout>
-    </androidx.core.widget.NestedScrollView>
+                <com.hphtv.movielibrary.ui.view.CollapseButton
+                    android:id="@+id/btn_childmode"
+                    style="@style/homepage_circle_btn_style"
+                    android:layout_width="wrap_content"
+                    android:layout_toStartOf="@id/btn_settings"
+                    android:background="@drawable/circle_checkbox_bg"
+                    android:button="@null"
+                    android:drawableLeft="@drawable/icon_circle_childmode"
+                    android:text="@string/childmode"
+                    android:visibility="@{childmode?View.VISIBLE:View.GONE}" />
 
-    <View
-        android:visibility="gone"
-        android:id="@+id/bottomMask"
-        android:layout_width="match_parent"
-        android:layout_height="230dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/bottom_mask" />
-  </RelativeLayout>
+                <!--        <Button-->
+                <!--            android:id="@+id/btn_child_mode"-->
+                <!--            style="@style/homepage_circle_btn_style"-->
+                <!--            android:layout_toStartOf="@id/btn_settings" />-->
 
-  <data>
+                <!--        <Button-->
+                <!--            android:id="@+id/btn_settings"-->
+                <!--            style="@style/homepage_circle_btn_style"-->
+                <!--            android:layout_marginRight="@dimen/common_activity_margin_lr"-->
+                <!--            android:layout_alignParentEnd="true" />-->
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tab_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="56dp"
+                    android:layout_marginLeft="@dimen/common_activity_margin_lr"
+                    android:layout_marginTop="60dp"
+                    app:tabBackground="@android:color/transparent"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabRippleColor="@android:color/transparent" />
 
-    <import type="android.view.View" />
+                <com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
+                    android:id="@+id/viewpager"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tab_layout" />
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
 
-    <import type="androidx.databinding.ObservableBoolean" />
+        <View
+            android:id="@+id/bottomMask"
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/bottom_mask"
+            android:visibility="gone" />
+    </RelativeLayout>
 
-    <variable
-      name="childmode"
-      type="ObservableBoolean" />
+    <data>
 
-  </data>
+        <import type="android.view.View" />
+
+        <import type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="childmode"
+            type="ObservableBoolean" />
+
+    </data>
 </layout>
