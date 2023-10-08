@@ -3,6 +3,7 @@ package com.hphtv.movielibrary.listener;
 import android.util.Log;
 
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -22,7 +23,10 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
      * @param countItem 总数量
      * @param lastItem  最后显示的position
      */
-    protected abstract void onLoading(int countItem, int lastItem);
+    protected abstract void onLoadingNext(int countItem, int lastItem);
+
+    protected  void onLoadingPre(int count, int firstItem){
+    }
 
     protected void onScrollStart() {
     }
@@ -57,8 +61,8 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        if (recyclerView.getLayoutManager() instanceof GridLayoutManager) {
-            GridLayoutManager layoutManager = (GridLayoutManager) recyclerView.getLayoutManager();
+        if (recyclerView.getLayoutManager() instanceof LinearLayoutManager) {
+            LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
             countItem = layoutManager.getItemCount();
             lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
@@ -67,7 +71,10 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
                 ((VisibleItemListener) layoutManager).getFirstVisibleItem(layoutManager.findViewByPosition(layoutManager.findFirstVisibleItemPosition()));
         }
         if (isScolled && countItem != lastItem && lastItem == countItem - 1) {
-            onLoading(countItem, lastItem);
+            onLoadingNext(countItem, lastItem);
+        }
+        if (isScolled &&  firstItem == 0) {
+            onLoadingPre(countItem, firstItem);
         }
     }
 }

@@ -134,7 +134,7 @@ public class UnknownFileFragment extends BaseAutofitHeightFragment<UnknownFileVi
         mBinding.rvUnknowsfile.setAdapter(mUnknownRootItemListAdapter);
         mBinding.rvUnknowsfile.addOnScrollListener(new OnMovieLoadListener() {
             @Override
-            protected void onLoading(int countItem, int lastItem) {
+            protected void onLoadingNext(int countItem, int lastItem) {
                 if (mViewModel != null)
                     mViewModel.loadMoreUnknownRoots(new BasePaginationCallback<UnknownRootDataView>() {
                         @Override

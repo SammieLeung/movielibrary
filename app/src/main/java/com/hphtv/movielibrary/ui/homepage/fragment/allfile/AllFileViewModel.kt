@@ -21,8 +21,10 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class AllFileViewModel(application: Application) : AndroidViewModel(application) {
@@ -53,12 +55,14 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         val actionStateFlow: MutableSharedFlow<UiAction> = MutableSharedFlow()
         val gotoRootAction = actionStateFlow.filterIsInstance<UiAction.GoToRoot>()
         val clickItemAction = actionStateFlow.filterIsInstance<UiAction.ClickItem>()
-        val loadMoreAction = actionStateFlow.filterIsInstance<UiAction.LoadNext>()
-        val backAction=actionStateFlow.filterIsInstance<UiAction.BackAction>()
+        val loadNextAction = actionStateFlow.filterIsInstance<UiAction.LoadNext>()
+        val backAction = actionStateFlow.filterIsInstance<UiAction.BackAction>()
+        val loadPreAction = actionStateFlow.filterIsInstance<UiAction.LoadPre>()
 
         handleGotoRootAction(gotoRootAction)
         handleItemClickAction(clickItemAction)
-        handleLoadNextAction(loadMoreAction)
+        handleLoadNextAction(loadNextAction)
+        handleLoadPreAction(loadPreAction)
         handleBackAction(backAction)
 
         return { action ->
@@ -83,8 +87,8 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     deviceTypes.add(it.deviceType)
                 }
             }
-            deviceTypes.forEach {
-                when (it) {
+            deviceTypes.forEachIndexed { index, type ->
+                when (type) {
                     DeviceType.DEVICE_TYPE_LOCAL -> {
                         rootList.add(
                             FolderItem(
@@ -92,6 +96,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                 icon = R.mipmap.icon_folder,
                                 path = "",
                                 friendlyPath = "/${getString(R.string.filter_box_local_device)}/",
+                                pos = index,
                                 type = FolderType.DEVICE,
                             )
                         )
@@ -104,6 +109,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                 icon = R.mipmap.icon_samba,
                                 path = "",
                                 friendlyPath = "/${getString(R.string.filter_box_smb_device)}/",
+                                pos = index,
                                 type = FolderType.SMB,
                             )
                         )
@@ -116,6 +122,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                 icon = R.mipmap.icon_dlna,
                                 path = "",
                                 friendlyPath = "/${getString(R.string.filter_box_dlna_device)}/",
+                                pos = index,
                                 type = FolderType.DLNA
                             )
                         )
@@ -126,6 +133,9 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 _uiState.update {
                     it.copy(
                         isRoot = true,
+                        isReload = true,
+                        isAppend = false,
+                        isAddInFront = false,
                         currentPath = "",
                         friendlyPath = "/",
                         rootList = rootList.sortedBy { it.type.ordinal },
@@ -139,7 +149,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch(Dispatchers.Default) {
             clickItemAction.collect {
                 lastFocusPosition = it.itemPosition
-                Logger.d("lastFocusPosition=$lastFocusPosition")
+//                Logger.d("lastFocusPosition=$lastFocusPosition")
                 it.folderItem.let {
                     when (it.type) {
                         FolderType.DEVICE -> {
@@ -205,7 +215,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
 
     private fun handleLoadNextAction(loadMoreAction: Flow<UiAction.LoadNext>) =
-        viewModelScope.launch(Dispatchers.Default ) {
+        viewModelScope.launch(Dispatchers.Default) {
 
             loadMoreAction.collect {
                 lastParentFolder?.let {
@@ -224,9 +234,28 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             }
         }
 
+
+    private fun handleLoadPreAction(loadPreAction: Flow<UiAction.LoadPre>) = viewModelScope.launch {
+        loadPreAction.collect {
+            lastParentFolder?.let {
+                when (it.type) {
+                    FolderType.DLNA_SHARE -> {
+                        dlnaPagerLoader.loadPre()
+                    }
+
+                    FolderType.FOLDER -> {
+                        folderItemPagerLoader.loadPre()
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+    }
+
     private fun updateLocalDevices(parentFolder: FolderItem) {
         val deviceList = deviceDao.qureyAll()
-        val folderItemList = deviceList.map { device ->
+        val folderItemList = deviceList.mapIndexed { index, device ->
             if (device.type == DeviceType.DEVICE_TYPE_INTERNAL_STORAGE) {
                 FolderItem(
                     name = getString(R.string.device_internal_storage),
@@ -234,6 +263,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     path = device.path.withoutPathSeparator(),
                     friendlyPath = "${parentFolder.friendlyPath}${getString(R.string.device_internal_storage)}/",
                     type = FolderType.FOLDER,
+                    pos = index,
                     parent = parentFolder
                 )
             } else {
@@ -257,6 +287,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     path = device.path.withoutPathSeparator(),
                     friendlyPath = "${parentFolder.friendlyPath}${device.name}/",
                     type = FolderType.FOLDER,
+                    pos = index,
                     parent = parentFolder
                 )
             }
@@ -264,6 +295,9 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         _uiState.update {
             it.copy(
                 isRoot = false,
+                isReload = true,
+                isAppend = false,
+                isAddInFront = false,
                 currentPath = "",
                 friendlyPath = parentFolder.friendlyPath,
                 rootList = folderItemList,
@@ -275,7 +309,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     private fun updateSmbDevices(parentFolder: FolderItem) {
         val shortcutList =
             shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_SMB)
-        val folderItemList = shortcutList.map { shortcut ->
+        val folderItemList = shortcutList.mapIndexed { index, shortcut ->
             val noAuthInfoUri = StringTools.hideSmbAuthInfo(shortcut.uri)
             val ip = Uri.parse(noAuthInfoUri).host
 
@@ -285,12 +319,16 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 path = shortcut.uri.withoutPathSeparator(),
                 friendlyPath = "${parentFolder.friendlyPath}${ip ?: noAuthInfoUri}/",
                 type = FolderType.FOLDER,
+                pos = index,
                 parent = parentFolder
             )
         }
         _uiState.update {
             it.copy(
                 isRoot = false,
+                isReload = true,
+                isAppend = false,
+                isAddInFront = false,
                 currentPath = "",
                 friendlyPath = parentFolder.friendlyPath,
                 rootList = folderItemList,
@@ -310,20 +348,24 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     continue
                 dlnaDeviceSet.add(splits[0] to splits[2])
             }
-            dlnaDeviceSet.toList().map { pair ->
+            dlnaDeviceSet.toList().mapIndexed { index, pair ->
                 FolderItem(
-                    pair.second,
-                    R.mipmap.icon_dlna,
-                    pair.first,
-                    "${parentFolder.friendlyPath}${pair.second}/",
-                    FolderType.DLNA_GROUP,
-                    parentFolder
+                    name = pair.second,
+                    icon = R.mipmap.icon_dlna,
+                    path = pair.first,
+                    friendlyPath = "${parentFolder.friendlyPath}${pair.second}/",
+                    type = FolderType.DLNA_GROUP,
+                    pos = index,
+                    parent = parentFolder
                 )
             }
         }
         _uiState.update {
             it.copy(
                 isRoot = false,
+                isReload = true,
+                isAppend = false,
+                isAddInFront = false,
                 currentPath = "",
                 friendlyPath = parentFolder.friendlyPath,
                 rootList = folderList,
@@ -385,13 +427,14 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                     continue
                                 dlnaDeviceSet.add(shortcut.uri to splits[3])
                             }
-                            dlnaDeviceSet.toList().map { pair ->
+                            dlnaDeviceSet.toList().mapIndexed { index, pair ->
                                 FolderItem(
                                     name = pair.second,
                                     icon = R.mipmap.icon_folder,
                                     path = pair.first,
                                     friendlyPath = currentFolder?.friendlyPath.plus("${pair.second}/"),
                                     type = FolderType.DLNA_SHARE,
+                                    pos = index,
                                     parent = folderItem
                                 )
                             }
@@ -402,13 +445,14 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     FolderType.DLNA_SHARE -> {
                         val videoFileList =
                             videoFileDao.queryVideoFilesOnShortcut(folderItem.path, offset, limit)
-                        return videoFileList.map {
+                        return videoFileList.mapIndexed { index, it ->
                             FolderItem(
                                 name = it.filename,
                                 icon = R.mipmap.icon_mini_file,
                                 path = it.path,
                                 friendlyPath = currentFolder?.friendlyPath.plus("${it.filename}/"),
                                 type = FolderType.FILE,
+                                pos = offset + index,
                                 parent = folderItem
                             )
                         }
@@ -425,7 +469,9 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             _uiState.update {
                 it.copy(
                     isRoot = false,
+                    isReload = true,
                     isAppend = false,
+                    isAddInFront = false,
                     currentPath = currentFolder?.path,
                     friendlyPath = currentFolder?.friendlyPath,
                     rootList = result ?: emptyList(),
@@ -439,7 +485,9 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             _uiState.update {
                 it.copy(
                     isRoot = false,
+                    isReload = false,
                     isAppend = true,
+                    isAddInFront = false,
                     currentPath = currentFolder?.path,
                     rootList = result ?: emptyList(),
                 )
@@ -466,9 +514,15 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             super.reload()
         }
 
+        fun reloadParent(parentFolder: FolderItem, position: Int) {
+            hasMoreFolders = true
+            this.currentFolder = parentFolder
+            super.reload(position)
+        }
+
         fun back() {
-            currentFolder?.let { it ->
-                it.parent?.let {
+            currentFolder?.let { folder ->
+                folder.parent?.let {
                     when (it.type) {
                         FolderType.DEVICE -> {
                             updateLocalDevices(it)
@@ -483,7 +537,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                         }
 
                         FolderType.FOLDER -> {
-                            reload(it)
+                            reloadParent(it, folder.pos)
                         }
 
                         else -> {
@@ -500,41 +554,41 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 val parentFolder = it.path.withPathSeparator()
                 var remainingCapacity = limit
                 val folderItemList = mutableListOf<FolderItem>()
-                if (hasMoreFolders) {
-                    val queryFolderRegex = "${parentFolder.regexEscape()}[^/]+/.*"
-                    val queryFolders = SimpleSQLiteQuery(
-                        QUERY_FOLDERS_SQL,
-                        arrayOf(parentFolder, parentFolder, queryFolderRegex, offset, limit)
-                    )
-                    val folderList = videoFileDao.querySubFiles(
-                        queryFolders
-                    )
-                    remainingCapacity = limit - folderList.size
-                    if (folderList.size < limit) {
-                        hasMoreFolders = false
-                    }
-                    folderList.forEach {
-                        folderItemList.add(
-                            FolderItem(
-                                name = it,
-                                icon = R.mipmap.icon_folder,
-                                path = "$parentFolder$it",
-                                friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
-                                type = FolderType.FOLDER,
-                                parent = currentFolder
-                            )
+
+                val queryFolderRegex = "${parentFolder.regexEscape()}[^/]+/.*"
+                val queryFolders = SimpleSQLiteQuery(
+                    QUERY_FOLDERS_SQL,
+                    arrayOf(parentFolder, parentFolder, queryFolderRegex, offset, limit)
+                )
+                val folderList = videoFileDao.querySubFiles(
+                    queryFolders
+                )
+                remainingCapacity = limit - folderList.size
+
+                folderList.forEachIndexed { index, it ->
+                    folderItemList.add(
+                        FolderItem(
+                            name = it,
+                            icon = R.mipmap.icon_folder,
+                            path = "$parentFolder$it",
+                            friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
+                            type = FolderType.FOLDER,
+                            pos = offset + index,
+                            parent = currentFolder
                         )
-                    }
+                    )
                 }
 
+
                 if (remainingCapacity > 0) {
+                    val currentOffset = if (remainingCapacity == limit) offset else 0
                     val queryFilesRegex = "${parentFolder.regexEscape()}[^/]+\$"
                     val queryFiles = SimpleSQLiteQuery(
                         QUERY_FILES_SQL,
-                        arrayOf(parentFolder, queryFilesRegex, offset, remainingCapacity)
+                        arrayOf(parentFolder, queryFilesRegex, currentOffset, remainingCapacity)
                     )
                     val filesList = videoFileDao.querySubFiles(queryFiles)
-                    filesList.forEach {
+                    filesList.forEachIndexed { index, it ->
                         folderItemList.add(
                             FolderItem(
                                 name = it,
@@ -542,6 +596,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                                 path = "$parentFolder$it",
                                 friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
                                 type = FolderType.FILE,
+                                pos = if (remainingCapacity == limit) offset + index else offset + (limit - remainingCapacity) + index,
                                 parent = currentFolder
                             )
                         )
@@ -557,7 +612,9 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             _uiState.update {
                 it.copy(
                     isRoot = false,
+                    isReload = true,
                     isAppend = false,
+                    isAddInFront = false,
                     currentPath = currentFolder?.path,
                     friendlyPath = currentFolder?.friendlyPath,
                     rootList = result ?: emptyList(),
@@ -571,7 +628,22 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             _uiState.update {
                 it.copy(
                     isRoot = false,
+                    isReload = false,
                     isAppend = true,
+                    isAddInFront = false,
+                    currentPath = currentFolder?.path,
+                    rootList = result ?: emptyList(),
+                )
+            }
+        }
+
+        override fun OnLoadPreResult(result: MutableList<FolderItem>?) {
+            _uiState.update {
+                it.copy(
+                    isRoot = false,
+                    isReload = false,
+                    isAppend = false,
+                    isAddInFront = true,
                     currentPath = currentFolder?.path,
                     rootList = result ?: emptyList(),
                 )
@@ -603,7 +675,9 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
 data class UiState(
     val isRoot: Boolean = true,
+    val isReload: Boolean = true,
     val isAppend: Boolean = false,
+    val isAddInFront: Boolean = false,
     val currentPath: String? = "",
     val friendlyPath: String? = "/",
     val rootList: List<FolderItem> = emptyList(),
@@ -622,14 +696,16 @@ data class FolderItem(
     val path: String,
     val friendlyPath: String,
     val type: FolderType,
+    val pos: Int = -1,
     val parent: FolderItem? = null,
 )
 
 sealed class UiAction {
     object GoToRoot : UiAction()
-    object BackAction:UiAction()
+    object BackAction : UiAction()
     data class ClickItem(val itemPosition: Int, val folderItem: FolderItem) : UiAction()
     object LoadNext : UiAction()
+    object LoadPre : UiAction()
 }
 
 

@@ -21,6 +21,7 @@ import com.hphtv.movielibrary.ui.homepage.PlayVideoReceiver
 import com.hphtv.movielibrary.ui.view.NoScrollAutofitHeightViewPager
 import com.hphtv.movielibrary.ui.view.TvRecyclerView.OnNoNextFocusListener
 import com.hphtv.movielibrary.util.DLogger
+import com.orhanobut.logger.Logger
 import com.station.kit.util.DensityUtil
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -60,6 +61,8 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
             context, 1440, GridLayoutManager.VERTICAL, false
         )
 
+        rvAllFilesView.itemAnimator=null
+
         rvAllFilesView.addItemDecoration(
             GridSpacingItemDecorationVertical2(
                 R.dimen.unknown_root_width.dimen, 40.dp, 68.dp, 35.dp, 45.dp, 6
@@ -92,8 +95,12 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
         }
 
         rvAllFilesView.addOnScrollListener(object : OnMovieLoadListener() {
-            override fun onLoading(countItem: Int, lastItem: Int) {
+            override fun onLoadingNext(countItem: Int, lastItem: Int) {
                 accept(UiAction.LoadNext)
+            }
+
+            override fun onLoadingPre(count: Int, firstItem: Int) {
+                accept(UiAction.LoadPre)
             }
         })
         rvAllFilesView.setOnNoNextFocusListener(object : OnNoNextFocusListener {
@@ -132,15 +139,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                 currentPath = uiState.friendlyPath
                 if (uiState.rootList.isNotEmpty()) {
                     isEmpty = false
-                    if (uiState.isAppend) {
-                        fileTreeAdapter.appendAll(uiState.rootList)
-                        rvAllFilesView.apply {
-                            this.focusedChild?.let {
-                                this.smoothToCenterAgainForDown(it)
-                            }
-                        }
-
-                    } else {
+                    if (uiState.isReload) {
                         rvAllFilesView.viewTreeObserver.addOnPreDrawListener(object :
                             OnPreDrawListener {
                             override fun onPreDraw(): Boolean {
@@ -156,8 +155,21 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
 
                         })
                         fileTreeAdapter.addAll(uiState.rootList)
+                    } else if (uiState.isAppend) {
+                        fileTreeAdapter.appendAll(uiState.rootList)
+                        rvAllFilesView.apply {
+                            this.focusedChild?.let {
+                                this.smoothToCenterAgainForDown(it)
+                            }
+                        }
+                    } else if(uiState.isAddInFront){
+                        fileTreeAdapter.addInFrontAll(uiState.rootList)
+                        rvAllFilesView.apply {
+                            this.focusedChild?.let {
+                                this.smoothToCenterAgainForUp(it)
+                            }
+                        }
                     }
-
                 }
             }
 

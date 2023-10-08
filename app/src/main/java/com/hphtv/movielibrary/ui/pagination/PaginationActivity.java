@@ -159,7 +159,7 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
         mBinding.recyclerview.setAdapter(mMovieItemListAdapter);
         mBinding.recyclerview.addOnScrollListener(new OnMovieLoadListener() {
             @Override
-            protected void onLoading(int countItem, int lastItem) {
+            protected void onLoadingNext(int countItem, int lastItem) {
                 mViewModel.loadMore();
             }
 

@@ -121,6 +121,11 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
         notifyItemRangeInserted(oldSize, newSize);
     }
 
+    public void addInFrontAll(List data){
+        mList.addAll(0,data);
+        notifyItemRangeInserted(0, data.size());
+    }
+
     public void clearAll() {
         mList.clear();
         notifyDataSetChanged();

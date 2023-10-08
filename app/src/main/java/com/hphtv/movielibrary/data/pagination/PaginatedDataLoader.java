@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.hphtv.movielibrary.util.rxjava.RxJavaGcManager;
 import com.hphtv.movielibrary.util.rxjava.SimpleObserver;
+import com.orhanobut.logger.Logger;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,8 +25,9 @@ public abstract class PaginatedDataLoader<T> {
     private final int mFirstLimit;
     private final int mLimit;
     private final AtomicBoolean canLoadNext = new AtomicBoolean(true);
-    private final AtomicBoolean canLoadPre=new AtomicBoolean(false);
-    private final AtomicInteger mPage = new AtomicInteger(0);
+    private final AtomicBoolean canLoadPre = new AtomicBoolean(false);
+    private final AtomicInteger mNextPage = new AtomicInteger(0);
+    private final AtomicInteger mPrePage = new AtomicInteger(0);
     private Disposable mDisposable;
 
 
@@ -51,36 +53,46 @@ public abstract class PaginatedDataLoader<T> {
     }
 
     protected abstract void OnLoadNextResult(List<T> result);
-    protected void OnLoadPreResult(List<T> result){}
+
+    protected void OnLoadPreResult(List<T> result) {
+    }
 
     protected void OnLoadFinish() {
     }
 
     public int getPage() {
-        return mPage.get();
+        return mNextPage.get();
     }
 
-    public boolean canLoadMore() {
+    public boolean canLoadNext() {
         return canLoadNext.get();
     }
 
+    public boolean canLoadPre() {
+        return canLoadPre.get();
+    }
+
     public void reset() {
-        mPage.set(0);
+        mNextPage.set(0);
         canLoadNext.set(true);
     }
 
-    protected int nextOffset(){
-        return mFirstLimit + (mPage.getAndIncrement()) * mLimit;
+    protected int nextOffset() {
+        return mNextPage.getAndIncrement() * mLimit;
     }
 
+    protected int preOffset() {
+        return mPrePage.getAndDecrement() * mLimit;
+    }
 
 
     public void cancel() {
         RxJavaGcManager.getInstance().disposableActive(mDisposable);
     }
+
     public void forceReload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    int limit = mFirstLimit + (mPage.get()) * mLimit;
+                    int limit = mFirstLimit + (mNextPage.get()) * mLimit;
                     canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, limit);
                     emitter.onNext(dataList);
@@ -98,7 +110,7 @@ public abstract class PaginatedDataLoader<T> {
                     @Override
                     public void onAction(List<T> dataList) {
                         OnReloadResult(dataList);
-                        if (!canLoadMore()) {
+                        if (!canLoadNext()) {
                             OnLoadFinish();
                         }
                     }
@@ -113,7 +125,7 @@ public abstract class PaginatedDataLoader<T> {
 
     public void forceReload(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    int limit = mFirstLimit + (mPage.get()) * mLimit;
+                    int limit = mFirstLimit + (mNextPage.get()) * mLimit;
                     canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, limit);
                     emitter.onNext(dataList);
@@ -132,7 +144,7 @@ public abstract class PaginatedDataLoader<T> {
                     public void onAction(List<T> dataList) {
                         if (callback != null) {
                             callback.onResult(dataList);
-                            if (!canLoadMore()) {
+                            if (!canLoadNext()) {
                                 callback.loadFinish();
                             }
                         }
@@ -147,15 +159,37 @@ public abstract class PaginatedDataLoader<T> {
     }
 
     public void reload() {
+        reload(0);
+    }
+
+    public void reload(int pos) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    mPage.set(0);
+                    int realPage = pos / mLimit;
+                    Logger.d("realPage = " + realPage);
+                    mNextPage.set(realPage);
+                    mPrePage.set(realPage - 1);
                     canLoadNext.set(true);
-                    List<T> dataList = reloadDataFromDB(0, mFirstLimit);
-                    if (dataList.size() < mFirstLimit) {
-                        canLoadNext.set(false);
+                    canLoadPre.set(true);
+                    if(realPage == 0) {
+                        canLoadPre.set(false);
+                        List<T> dataList = reloadDataFromDB(nextOffset(), mLimit * 3);
+                        nextOffset();
+                        nextOffset();
+                        if (dataList.size() < mLimit * 3) {
+                            canLoadNext.set(false);
+                        }
+                        emitter.onNext(dataList);
+                        emitter.onComplete();
+                    }else{
+                        List<T> dataList = reloadDataFromDB(preOffset(), mLimit * 3);
+                        nextOffset();
+                        if (dataList.size() < mLimit * 3) {
+                            canLoadNext.set(false);
+                        }
+                        emitter.onNext(dataList);
+                        emitter.onComplete();
                     }
-                    emitter.onNext(dataList);
-                    emitter.onComplete();
+
                 }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SimpleObserver<List<T>>() {
@@ -169,7 +203,7 @@ public abstract class PaginatedDataLoader<T> {
                     @Override
                     public void onAction(List<T> dataList) {
                         OnReloadResult(dataList);
-                        if (!canLoadMore()) {
+                        if (!canLoadNext()) {
                             OnLoadFinish();
                         }
                     }
@@ -180,12 +214,49 @@ public abstract class PaginatedDataLoader<T> {
                         mDisposable = null;
                     }
                 });
-
     }
+
+
+//    public void reload() {
+//        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+//                    mNextPage.set(0);
+//                    canLoadNext.set(true);
+//                    List<T> dataList = reloadDataFromDB(0, mFirstLimit);
+//                    if (dataList.size() < mFirstLimit) {
+//                        canLoadNext.set(false);
+//                    }
+//                    emitter.onNext(dataList);
+//                    emitter.onComplete();
+//                }).subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new SimpleObserver<List<T>>() {
+//
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        super.onSubscribe(d);
+//                        mDisposable = d;
+//                    }
+//
+//                    @Override
+//                    public void onAction(List<T> dataList) {
+//                        OnReloadResult(dataList);
+//                        if (!canLoadMore()) {
+//                            OnLoadFinish();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        super.onComplete();
+//                        mDisposable = null;
+//                    }
+//                });
+//
+//    }
 
     public void reload(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    mPage.set(0);
+                    mNextPage.set(0);
                     canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, mFirstLimit);
                     if (dataList.size() < mFirstLimit) {
@@ -207,7 +278,7 @@ public abstract class PaginatedDataLoader<T> {
                     public void onAction(List<T> dataList) {
                         if (callback != null) {
                             callback.onResult(dataList);
-                            if (!canLoadMore()) {
+                            if (!canLoadNext()) {
                                 callback.loadFinish();
                             }
                         }
@@ -224,10 +295,8 @@ public abstract class PaginatedDataLoader<T> {
 
     public void loadNext() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    if (canLoadMore()) {
-//                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
-                        int offset=nextOffset();
-                        List<T> dataList = loadDataFromDB(offset, mLimit);
+                    if (canLoadNext()) {
+                        List<T> dataList = loadDataFromDB(nextOffset(), mLimit);
                         if (dataList.size() < mLimit) {
                             canLoadNext.set(false);
                         }
@@ -250,7 +319,7 @@ public abstract class PaginatedDataLoader<T> {
                     @Override
                     public void onAction(List<T> dataList) {
                         OnLoadNextResult(dataList);
-                        if (!canLoadMore()) {
+                        if (!canLoadNext()) {
                             OnLoadFinish();
                         }
                     }
@@ -265,10 +334,8 @@ public abstract class PaginatedDataLoader<T> {
 
     public void loadNext(PaginationCallback callback) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    if (canLoadMore()) {
-//                        int offset = mFirstLimit + (mPage.getAndIncrement()) * mLimit;
-                        int offset=nextOffset();
-                        List<T> dataList = loadDataFromDB(offset, mLimit);
+                    if (canLoadNext()) {
+                        List<T> dataList = loadDataFromDB(nextOffset(), mLimit);
                         if (dataList.size() < mLimit) {
                             canLoadNext.set(false);
                         }
@@ -292,7 +359,7 @@ public abstract class PaginatedDataLoader<T> {
                     public void onAction(List<T> dataList) {
                         if (callback != null) {
                             callback.onResult(dataList);
-                            if (!canLoadMore()) {
+                            if (!canLoadNext()) {
                                 callback.loadFinish();
                             }
                         }
@@ -306,11 +373,52 @@ public abstract class PaginatedDataLoader<T> {
                 });
     }
 
-    public void loadPre(){
 
+    public void loadPre() {
+        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+                    if (canLoadPre()) {
+                        int offset = preOffset();
+                        Logger.d("offset = " + offset);
+                        if(offset<0) {
+                            canLoadPre.set(false);
+                        }else {
+                            List<T> dataList = loadDataFromDB(offset, mLimit);
+                            Logger.d("mPrePage = " + mPrePage);
+                            canLoadPre.set(mPrePage.get() >= 0);
+                            emitter.onNext(dataList);
+                        }
+                    } else {
+                        Log.w(TAG, "Unable to load pre data");
+                    }
+                    emitter.onComplete();
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SimpleObserver<List<T>>() {
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mDisposable = d;
+                    }
+
+                    @Override
+                    public void onAction(List<T> dataList) {
+                        OnLoadPreResult(dataList);
+                        if (!canLoadPre()) {
+                            OnLoadFinish();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        mDisposable = null;
+                    }
+                });
     }
 
-    public void loadPre(PaginationCallback callback){
+    public void loadPre(PaginationCallback callback) {
 
     }
 }

@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.ui.BaseFragment2;
+import com.orhanobut.logger.Logger;
 
 /**
  * author: Sam Leung

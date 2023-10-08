@@ -136,7 +136,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
     @Override
     protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MovieApplication.getInstance().isDeviceBound(true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                MovieApplication.getInstance().isDeviceBound(true);
+            }
+        }).start();
     }
 
     @Override

@@ -107,7 +107,7 @@ class FilterFragment constructor(val videoType: VideoType) :
                 }
             }
         movieList.addOnScrollListener(object : OnMovieLoadListener() {
-            override fun onLoading(countItem: Int, lastItem: Int) {
+            override fun onLoadingNext(countItem: Int, lastItem: Int) {
                 mViewModel.loadMoreMovies()
             }
         })

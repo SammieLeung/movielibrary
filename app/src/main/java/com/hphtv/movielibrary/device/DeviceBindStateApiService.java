@@ -8,8 +8,11 @@ import com.station.device.BaseUrl;
 import com.station.device.FConfigTools;
 import com.station.kit.util.SystemPropertiesReflect;
 
+import java.util.concurrent.TimeUnit;
+
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -34,8 +37,14 @@ public class DeviceBindStateApiService {
                     bindStateUrl = "https://device.stationpc.cn/";
                 }
             }
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(5000, TimeUnit.MILLISECONDS)
+                    .readTimeout(5000, TimeUnit.MILLISECONDS)
+                    .writeTimeout(5000, TimeUnit.MILLISECONDS)
+                    .build();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(bindStateUrl)
+                    .client(client)
                     .addConverterFactory(GsonConverterFactory.create())// 设置数据解析器
                     .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .build();
@@ -46,7 +55,7 @@ public class DeviceBindStateApiService {
             BindStateResponse bindStateResponse = rxResponse.subscribeOn(Schedulers.io()).blockingFirst();
             if (bindStateResponse != null && bindStateResponse.data != null)
                 return bindStateResponse.data.bind;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return 0;

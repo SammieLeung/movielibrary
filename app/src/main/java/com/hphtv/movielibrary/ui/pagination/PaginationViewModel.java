@@ -145,7 +145,7 @@ public class PaginationViewModel extends BaseAndroidViewModel {
     }
 
     private void loadFavoriteMovie() {
-        if (mLastLoader != null && mLastLoader.canLoadMore())
+        if (mLastLoader != null && mLastLoader.canLoadNext())
             mLastLoader.loadNext();
     }
 

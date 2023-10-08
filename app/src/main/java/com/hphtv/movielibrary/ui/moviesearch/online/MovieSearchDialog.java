@@ -135,7 +135,7 @@ public class MovieSearchDialog extends BaseDialogFragment2<MovieSearchDialogView
         mBinding.recyclerviewSearchResult.setAdapter(mAdapter);
         mBinding.recyclerviewSearchResult.addOnScrollListener(new OnMovieLoadListener() {
             @Override
-            protected void onLoading(int countItem, int lastItem) {
+            protected void onLoadingNext(int countItem, int lastItem) {
                 mViewModel.loading(mAdapter);
             }
         });
