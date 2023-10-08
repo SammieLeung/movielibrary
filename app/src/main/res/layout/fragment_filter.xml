@@ -87,7 +87,9 @@
             android:id="@+id/movieList"
             android:visibility="@{isLoading?View.GONE:!isEmpty?View.VISIBLE:View.GONE}"
             android:layout_width="match_parent"
-            android:layout_height="960dp"
+            android:layout_height="694dp"
+            android:requiresFadingEdge="vertical"
+            android:fadingEdgeLength="30dp"
             android:layout_marginBottom="-5dp"
             android:paddingBottom="5dp" />
 

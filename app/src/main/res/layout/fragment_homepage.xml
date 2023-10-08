@@ -26,6 +26,7 @@
                 android:id="@+id/rv_history_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:requiresFadingEdge="horizontal"
                 android:visibility="@{hasHistory?View.VISIBLE:View.GONE}" />
 
             <TextView
@@ -40,6 +41,7 @@
                 android:id="@+id/rv_recently_added"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:requiresFadingEdge="horizontal"
                 android:visibility="@{recentAdd?View.VISIBLE:View.GONE}" />
 
 
@@ -54,6 +56,7 @@
 
             <com.hphtv.movielibrary.ui.view.TvRecyclerView
                 android:id="@+id/rv_recommand"
+                android:requiresFadingEdge="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="@{recommand?View.VISIBLE:View.GONE}" />

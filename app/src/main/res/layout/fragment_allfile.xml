@@ -10,7 +10,9 @@
         <com.hphtv.movielibrary.ui.view.TvRecyclerView
             android:id="@+id/rvAllFilesView"
             android:layout_width="match_parent"
-            android:layout_height="660dp"
+            android:layout_height="694dp"
+            android:requiresFadingEdge="vertical"
+            android:fadingEdgeLength="30dp"
             android:layout_marginBottom="-5dp"
             android:paddingBottom="5dp"
             android:visibility="@{!isEmpty?View.VISIBLE:View.GONE}" />

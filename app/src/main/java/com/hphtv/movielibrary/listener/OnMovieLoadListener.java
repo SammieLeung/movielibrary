@@ -63,7 +63,6 @@ public abstract class OnMovieLoadListener extends RecyclerView.OnScrollListener 
             countItem = layoutManager.getItemCount();
             lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
             firstItem = layoutManager.findFirstCompletelyVisibleItemPosition();
-            Log.d("test", "countItem:" + countItem + ",lastItem:" + lastItem + ",firstItem:" + firstItem);
             if (layoutManager instanceof VisibleItemListener)
                 ((VisibleItemListener) layoutManager).getFirstVisibleItem(layoutManager.findViewByPosition(layoutManager.findFirstVisibleItemPosition()));
         }
