@@ -165,9 +165,8 @@ public abstract class PaginatedDataLoader<T> {
     public void reload(int pos) {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     int realPage = pos / mLimit;
-                    Logger.d("realPage = " + realPage);
                     mNextPage.set(realPage);
-                    mPrePage.set(realPage - 1);
+                    mPrePage.set(realPage-1);
                     canLoadNext.set(true);
                     canLoadPre.set(true);
                     if(realPage == 0) {
@@ -255,41 +254,41 @@ public abstract class PaginatedDataLoader<T> {
 //    }
 
     public void reload(PaginationCallback callback) {
-        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    mNextPage.set(0);
-                    canLoadNext.set(true);
-                    List<T> dataList = reloadDataFromDB(0, mFirstLimit);
-                    if (dataList.size() < mFirstLimit) {
-                        canLoadNext.set(false);
-                    }
-                    emitter.onNext(dataList);
-                    emitter.onComplete();
-                }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<T>>() {
-
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onAction(List<T> dataList) {
-                        if (callback != null) {
-                            callback.onResult(dataList);
-                            if (!canLoadNext()) {
-                                callback.loadFinish();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        mDisposable = null;
-                    }
-                });
+//        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
+//                    mNextPage.set(0);
+//                    canLoadNext.set(true);
+//                    List<T> dataList = reloadDataFromDB(0, mFirstLimit);
+//                    if (dataList.size() < mFirstLimit) {
+//                        canLoadNext.set(false);
+//                    }
+//                    emitter.onNext(dataList);
+//                    emitter.onComplete();
+//                }).subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new SimpleObserver<List<T>>() {
+//
+//                    @Override
+//                    public void onSubscribe(Disposable d) {
+//                        super.onSubscribe(d);
+//                        mDisposable = d;
+//                    }
+//
+//                    @Override
+//                    public void onAction(List<T> dataList) {
+//                        if (callback != null) {
+//                            callback.onResult(dataList);
+//                            if (!canLoadNext()) {
+//                                callback.loadFinish();
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onComplete() {
+//                        super.onComplete();
+//                        mDisposable = null;
+//                    }
+//                });
 
     }
 
@@ -378,12 +377,10 @@ public abstract class PaginatedDataLoader<T> {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
                     if (canLoadPre()) {
                         int offset = preOffset();
-                        Logger.d("offset = " + offset);
                         if(offset<0) {
                             canLoadPre.set(false);
                         }else {
                             List<T> dataList = loadDataFromDB(offset, mLimit);
-                            Logger.d("mPrePage = " + mPrePage);
                             canLoadPre.set(mPrePage.get() >= 0);
                             emitter.onNext(dataList);
                         }
@@ -416,9 +413,5 @@ public abstract class PaginatedDataLoader<T> {
                         mDisposable = null;
                     }
                 });
-    }
-
-    public void loadPre(PaginationCallback callback) {
-
     }
 }

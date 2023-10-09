@@ -4,6 +4,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.ViewPropertyAnimator
 import android.view.ViewTreeObserver.OnPreDrawListener
@@ -62,7 +63,7 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
         )
 
         rvAllFilesView.itemAnimator=null
-
+        rvAllFilesView.setHolderFocusView(holderFocusView)
         rvAllFilesView.addItemDecoration(
             GridSpacingItemDecorationVertical2(
                 R.dimen.unknown_root_width.dimen, 40.dp, 68.dp, 35.dp, 45.dp, 6
@@ -145,15 +146,14 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                             override fun onPreDraw(): Boolean {
                                 rvAllFilesView.viewTreeObserver.removeOnPreDrawListener(this)
                                 rvAllFilesView.requestFocus()
-                                rvAllFilesView.scrollToPosition(uiState.focusPosition)
-                                return rvAllFilesView.layoutManager?.findViewByPosition(uiState.focusPosition)
-                                    ?.let {
-                                        it.requestFocus()
-                                        return@let true
-                                    } ?: false
+
+//                                Logger.d("rvChildCount=${rvAllFilesView.childCount} managerItemCount=${rvAllFilesView.layoutManager?.itemCount} dest=${uiState.focusPosition}")
+                                rvAllFilesView.scrollToCenter(uiState.focusPosition)
+                                return true
                             }
 
                         })
+//                        Logger.d("reloadsize=${uiState.rootList.size}")
                         fileTreeAdapter.addAll(uiState.rootList)
                     } else if (uiState.isAppend) {
                         fileTreeAdapter.appendAll(uiState.rootList)

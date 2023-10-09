@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.ui.BaseFragment2;
-import com.orhanobut.logger.Logger;
 
 /**
  * author: Sam Leung
@@ -27,6 +26,7 @@ public class TvRecyclerView extends RecyclerView {
     private static final String TAG = "TvRecyclerView";
     private int mPosition;
     private BaseFragment2 mBindFragment;
+    private View mHolderFocusView;
 
     public TvRecyclerView(Context context) {
         this(context, null);
@@ -90,6 +90,7 @@ public class TvRecyclerView extends RecyclerView {
     public boolean hasFocus() {
         return super.hasFocus();
     }
+
 
     @Override
     public boolean isInTouchMode() {
@@ -176,6 +177,10 @@ public class TvRecyclerView extends RecyclerView {
     @Override
     public void setLayoutManager(LayoutManager layout) {
         super.setLayoutManager(layout);
+    }
+
+    public void setHolderFocusView(View mHolderFocusView) {
+        this.mHolderFocusView = mHolderFocusView;
     }
 
     /**
@@ -369,6 +374,18 @@ public class TvRecyclerView extends RecyclerView {
 
     }
 
+    private boolean handleScrollToCenterActionForDpadUp(View nextView) {
+        int upOffset = getHeight() / 2 - (nextView.getBottom() - nextView.getHeight() / 2);
+        this.scrollBy(0, -upOffset);
+        return true;
+    }
+
+    private boolean handleScrollToCenterActionForDpadDown(View nextView) {
+        int downOffset = nextView.getTop() + nextView.getHeight() / 2 - getHeight() / 2;
+        this.scrollBy(0, downOffset);
+        return true;
+    }
+
     private boolean handleSmoothScrollToCenterActionForDpadUp(View nextView) {
         int upOffset = getHeight() / 2 - (nextView.getBottom() - nextView.getHeight() / 2);
         this.customSmoothScrollBy(0, -upOffset);
@@ -381,19 +398,76 @@ public class TvRecyclerView extends RecyclerView {
         return true;
     }
 
-    public void smoothToCenterAgainForUp(View focusView){
+    public void scrollToCenter(int desPos) {
+        int firstItemPosition = getChildLayoutPosition(getChildAt(0));
+        int lastItemPosition = getChildLayoutPosition(getChildAt(getChildCount() - 1));
+        if (mHolderFocusView != null) {
+            mHolderFocusView.setFocusable(true);
+            mHolderFocusView.requestFocus();
+        }
+        if (desPos > lastItemPosition) {
+//            Log.d(TAG, "scrollToCenter: case 1");
+            getLayoutManager().scrollToPosition(desPos);
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    View desView = getLayoutManager().findViewByPosition(desPos);
+                    if (desView == null) {
+                        postDelayed(this, 10);
+                        return;
+                    }
+                    desView.requestFocus();
+                    if (mHolderFocusView != null) {
+                        mHolderFocusView.setFocusable(false);
+                    }
+                    handleScrollToCenterActionForDpadDown(desView);
+                }
+            }, 10);
+        } else if (desPos < firstItemPosition) {
+//            Log.d(TAG, "scrollToCenter: case 2");
+
+            getLayoutManager().scrollToPosition(desPos);
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    View desView = getLayoutManager().findViewByPosition(desPos);
+                    if (desView == null) {
+                        postDelayed(this, 10);
+                        return;
+
+                    }
+                    desView.requestFocus();
+                    if (mHolderFocusView != null) {
+                        mHolderFocusView.setFocusable(false);
+                    }
+                    handleScrollToCenterActionForDpadUp(desView);
+                }
+            }, 10);
+        } else {
+//            Log.d(TAG, "scrollToCenter: case 3");
+
+            View desView = getLayoutManager().findViewByPosition(desPos);
+            desView.requestFocus();
+            handleScrollToCenterActionForDpadDown(desView);
+            if (mHolderFocusView != null) {
+                mHolderFocusView.setFocusable(false);
+            }
+        }
+    }
+
+    public void smoothToCenterAgainForUp(View focusView) {
         handleSmoothScrollToCenterActionForDpadUp(focusView);
     }
 
-    public void smoothToCenterAgainForDown(View focusView){
+    public void smoothToCenterAgainForDown(View focusView) {
         handleSmoothScrollToCenterActionForDpadDown(focusView);
     }
 
-    public void smoothToCenterAgainForLeft(View focusView){
+    public void smoothToCenterAgainForLeft(View focusView) {
         handleSmoothScrollToCenterActionForDpadLeft(focusView);
     }
 
-    public void smoothToCenterAgainForRight(View focusView){
+    public void smoothToCenterAgainForRight(View focusView) {
         handleSmoothScrollToCenterActionForDpadRight(focusView);
     }
 

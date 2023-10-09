@@ -2,6 +2,7 @@ package com.hphtv.movielibrary.ui.homepage.fragment.allfile
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -21,10 +22,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class AllFileViewModel(application: Application) : AndroidViewModel(application) {
@@ -35,7 +35,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState())
     private val _loadingState: MutableStateFlow<LoadingState> = MutableStateFlow(LoadingState())
 
-    private var lastFocusPosition = 0
 
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
     val loadingState: StateFlow<LoadingState> = _loadingState.asStateFlow()
@@ -73,9 +72,11 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     }
 
 
-    private fun handleGotoRootAction(gotoRootAction: Flow<UiAction.GoToRoot>) =
+    private fun handleGotoRootAction(
+        gotoRootAction: Flow<UiAction.GoToRoot>,
+        parentFolderType: FolderType? = null
+    ) =
         viewModelScope.launch(Dispatchers.Default) {
-            lastFocusPosition = 0
             val rootList = mutableListOf<FolderItem>()
 
             val shortcutList = shortcutDao.queryAllConnectShortcuts()
@@ -129,6 +130,14 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     }
                 }
             }
+            var lastFocusPosition = 0
+            parentFolderType?.let { folderType ->
+                rootList.forEach {
+                    if (it.type == folderType) {
+                        lastFocusPosition = it.pos
+                    }
+                }
+            }
             gotoRootAction.collect {
                 _uiState.update {
                     it.copy(
@@ -148,8 +157,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     private fun handleItemClickAction(clickItemAction: Flow<UiAction.ClickItem>) =
         viewModelScope.launch(Dispatchers.Default) {
             clickItemAction.collect {
-                lastFocusPosition = it.itemPosition
-//                Logger.d("lastFocusPosition=$lastFocusPosition")
                 it.folderItem.let {
                     when (it.type) {
                         FolderType.DEVICE -> {
@@ -203,7 +210,10 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                     || lastParentFolder?.type == FolderType.DEVICE
                     || lastParentFolder?.type == FolderType.DLNA
                 ) {
-                    accept(UiAction.GoToRoot)
+                    handleGotoRootAction(
+                        gotoRootAction = flowOf(UiAction.GoToRoot),
+                        lastParentFolder?.type
+                    )
                 } else {
                     if (lastParentFolder?.type != FolderType.FOLDER)
                         dlnaPagerLoader.back()
@@ -253,7 +263,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun updateLocalDevices(parentFolder: FolderItem) {
+    private fun updateLocalDevices(parentFolder: FolderItem, defaultPosition: Int = 0) {
         val deviceList = deviceDao.qureyAll()
         val folderItemList = deviceList.mapIndexed { index, device ->
             if (device.type == DeviceType.DEVICE_TYPE_INTERNAL_STORAGE) {
@@ -301,12 +311,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 currentPath = "",
                 friendlyPath = parentFolder.friendlyPath,
                 rootList = folderItemList,
-                focusPosition = if (folderItemList.size > lastFocusPosition) lastFocusPosition else folderItemList.size - 1
+                focusPosition = if (folderItemList.size > defaultPosition) defaultPosition else folderItemList.size - 1
             )
         }
     }
 
-    private fun updateSmbDevices(parentFolder: FolderItem) {
+    private fun updateSmbDevices(parentFolder: FolderItem, defaultPosition: Int = 0) {
         val shortcutList =
             shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_SMB)
         val folderItemList = shortcutList.mapIndexed { index, shortcut ->
@@ -332,12 +342,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 currentPath = "",
                 friendlyPath = parentFolder.friendlyPath,
                 rootList = folderItemList,
-                focusPosition = if (folderItemList.size > lastFocusPosition) lastFocusPosition else folderItemList.size - 1
+                focusPosition = if (folderItemList.size > defaultPosition) defaultPosition else folderItemList.size - 1
             )
         }
     }
 
-    private fun updateDLNADevices(parentFolder: FolderItem) {
+    private fun updateDLNADevices(parentFolder: FolderItem, defaultPosition: Int = 0) {
         val shortcutList =
             shortcutDao.queryAllShortcutsByDevcietype(DeviceType.DEVICE_TYPE_DLNA)
         val folderList = shortcutList.let { it ->
@@ -369,7 +379,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 currentPath = "",
                 friendlyPath = parentFolder.friendlyPath,
                 rootList = folderList,
-                focusPosition = lastFocusPosition
+                focusPosition = defaultPosition
             )
         }
     }
@@ -380,6 +390,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
     inner class DLNAPaginatedLoader : PaginatedDataLoader<FolderItem>() {
         var currentFolder: FolderItem? = null
+        var focusPosition: Int = 0
         override fun getLimit(): Int {
             return PAGE_LIMIT
         }
@@ -389,23 +400,33 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
 
         fun back() {
-            currentFolder?.parent?.let {
-                when (it.type) {
-                    FolderType.DLNA -> {
-                        updateDLNADevices(it)
-                    }
+            currentFolder?.let { current ->
+                current.parent?.let {
+                    when (it.type) {
+                        FolderType.DLNA -> {
+                            updateDLNADevices(it,current.pos)
+                        }
 
-                    else -> {
-                        reload(it)
+                        else -> {
+                            backReload(it, current.pos)
+                        }
                     }
                 }
             }
+
         }
 
 
         fun reload(parentFolder: FolderItem) {
             this.currentFolder = parentFolder
+            focusPosition=0
             super.reload()
+        }
+
+        fun backReload(parentFolder: FolderItem, position: Int) {
+            this.currentFolder = parentFolder
+            focusPosition = position
+            super.reload(position)
         }
 
         override fun loadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
@@ -467,6 +488,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
         override fun OnReloadResult(result: MutableList<FolderItem>?) {
             _uiState.update {
+                var lastFocusPosition = 0
+                result?.find {
+                    it.pos == focusPosition
+                }?.let {
+                    lastFocusPosition = result.indexOf(it)
+                }
                 it.copy(
                     isRoot = false,
                     isReload = true,
@@ -498,8 +525,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
     inner class AllFilePaginatedLoader : PaginatedDataLoader<FolderItem>() {
         var currentFolder: FolderItem? = null
-        var hasMoreFolders = true
-
+        var focusPosition: Int = 0
         override fun getLimit(): Int {
             return PAGE_LIMIT
         }
@@ -509,35 +535,35 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         }
 
         fun reload(parentFolder: FolderItem) {
-            hasMoreFolders = true
             this.currentFolder = parentFolder
+            focusPosition = 0
             super.reload()
         }
 
-        fun reloadParent(parentFolder: FolderItem, position: Int) {
-            hasMoreFolders = true
+        fun backReload(parentFolder: FolderItem, position: Int) {
             this.currentFolder = parentFolder
+            focusPosition = position
             super.reload(position)
         }
 
         fun back() {
-            currentFolder?.let { folder ->
-                folder.parent?.let {
+            currentFolder?.let { current ->
+                current.parent?.let {
                     when (it.type) {
                         FolderType.DEVICE -> {
-                            updateLocalDevices(it)
+                            updateLocalDevices(it, current.pos)
                         }
 
                         FolderType.SMB -> {
-                            updateSmbDevices(it)
+                            updateSmbDevices(it, current.pos)
                         }
 
                         FolderType.DLNA -> {
-                            updateDLNADevices(it)
+                            updateDLNADevices(it, current.pos)
                         }
 
                         FolderType.FOLDER -> {
-                            reloadParent(it, folder.pos)
+                            backReload(it, current.pos)
                         }
 
                         else -> {
@@ -552,7 +578,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         override fun loadDataFromDB(offset: Int, limit: Int): List<FolderItem> {
             currentFolder?.let {
                 val parentFolder = it.path.withPathSeparator()
-                var remainingCapacity = limit
                 val folderItemList = mutableListOf<FolderItem>()
 
                 val queryFolderRegex = "${parentFolder.regexEscape()}[^/]+/.*"
@@ -563,12 +588,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 val folderList = videoFileDao.querySubFiles(
                     queryFolders
                 )
-                remainingCapacity = limit - folderList.size
+                val remainingCapacity = limit - folderList.size
 
                 folderList.forEachIndexed { index, it ->
                     folderItemList.add(
                         FolderItem(
-                            name = it,
+                            name = "(${offset+index},$it)",
                             icon = R.mipmap.icon_folder,
                             path = "$parentFolder$it",
                             friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
@@ -610,6 +635,12 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
         override fun OnReloadResult(result: MutableList<FolderItem>?) {
             _uiState.update {
+                var lastFocusPosition = 0
+                result?.find {
+                    it.pos == focusPosition
+                }?.let {
+                    lastFocusPosition = result.indexOf(it)
+                }
                 it.copy(
                     isRoot = false,
                     isReload = true,

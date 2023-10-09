@@ -1,6 +1,7 @@
 package com.hphtv.movielibrary.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hphtv.movielibrary.util.ViewHolderCreator;
+import com.orhanobut.logger.Logger;
 import com.station.kit.view.mvvm.ViewDataBindingHelper;
 
 import org.jetbrains.annotations.NotNull;
@@ -124,6 +126,7 @@ public class BaseAdapter2<VDB extends ViewDataBinding, VH extends BaseAdapter2.V
     public void addInFrontAll(List data){
         mList.addAll(0,data);
         notifyItemRangeInserted(0, data.size());
+        notifyItemRangeChanged(data.size(),mList.size());
     }
 
     public void clearAll() {
