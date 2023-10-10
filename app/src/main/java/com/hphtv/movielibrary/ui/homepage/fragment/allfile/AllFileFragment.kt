@@ -218,7 +218,9 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
     }
 
     override fun forceRefresh() {
+        Log.d("TAG","AllFileFragment forceRefresh")
         lifecycleScope.launch {
+            Log.d("TAG","lifecycleScope luanch")
             mViewModel.accept(UiAction.GoToRoot)
         }
     }

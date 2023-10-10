@@ -51,6 +51,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun initAcceptAction(): (UiAction) -> Unit {
+        Logger.d("initAcceptAction")
         val actionStateFlow: MutableSharedFlow<UiAction> = MutableSharedFlow()
         val gotoRootAction = actionStateFlow.filterIsInstance<UiAction.GoToRoot>()
         val clickItemAction = actionStateFlow.filterIsInstance<UiAction.ClickItem>()
@@ -77,68 +78,69 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         parentFolderType: FolderType? = null
     ) =
         viewModelScope.launch(Dispatchers.Default) {
-            val rootList = mutableListOf<FolderItem>()
-
-            val shortcutList = shortcutDao.queryAllConnectShortcuts()
-            val deviceTypes = mutableSetOf<Int>()
-            shortcutList.forEach {
-                if (it.deviceType <= DeviceType.DEVICE_TYPE_HARD_DISK) {
-                    deviceTypes.add(DeviceType.DEVICE_TYPE_LOCAL)
-                } else {
-                    deviceTypes.add(it.deviceType)
-                }
-            }
-            deviceTypes.forEachIndexed { index, type ->
-                when (type) {
-                    DeviceType.DEVICE_TYPE_LOCAL -> {
-                        rootList.add(
-                            FolderItem(
-                                name = getString(R.string.filter_box_local_device),
-                                icon = R.mipmap.icon_folder,
-                                path = "",
-                                friendlyPath = "/${getString(R.string.filter_box_local_device)}/",
-                                pos = index,
-                                type = FolderType.DEVICE,
-                            )
-                        )
-                    }
-
-                    DeviceType.DEVICE_TYPE_SMB -> {
-                        rootList.add(
-                            FolderItem(
-                                name = getString(R.string.filter_box_smb_device),
-                                icon = R.mipmap.icon_samba,
-                                path = "",
-                                friendlyPath = "/${getString(R.string.filter_box_smb_device)}/",
-                                pos = index,
-                                type = FolderType.SMB,
-                            )
-                        )
-                    }
-
-                    DeviceType.DEVICE_TYPE_DLNA -> {
-                        rootList.add(
-                            FolderItem(
-                                name = getString(R.string.filter_box_dlna_device),
-                                icon = R.mipmap.icon_dlna,
-                                path = "",
-                                friendlyPath = "/${getString(R.string.filter_box_dlna_device)}/",
-                                pos = index,
-                                type = FolderType.DLNA
-                            )
-                        )
-                    }
-                }
-            }
-            var lastFocusPosition = 0
-            parentFolderType?.let { folderType ->
-                rootList.forEach {
-                    if (it.type == folderType) {
-                        lastFocusPosition = it.pos
-                    }
-                }
-            }
             gotoRootAction.collect {
+                Logger.d("handleGotoRootAction")
+                val rootList = mutableListOf<FolderItem>()
+
+                val shortcutList = shortcutDao.queryAllConnectShortcuts()
+                val deviceTypes = mutableSetOf<Int>()
+                shortcutList.forEach {
+                    if (it.deviceType <= DeviceType.DEVICE_TYPE_HARD_DISK) {
+                        deviceTypes.add(DeviceType.DEVICE_TYPE_LOCAL)
+                    } else {
+                        deviceTypes.add(it.deviceType)
+                    }
+                }
+                deviceTypes.forEachIndexed { index, type ->
+                    when (type) {
+                        DeviceType.DEVICE_TYPE_LOCAL -> {
+                            rootList.add(
+                                FolderItem(
+                                    name = getString(R.string.filter_box_local_device),
+                                    icon = R.mipmap.icon_folder,
+                                    path = "",
+                                    friendlyPath = "/${getString(R.string.filter_box_local_device)}/",
+                                    pos = index,
+                                    type = FolderType.DEVICE,
+                                )
+                            )
+                        }
+
+                        DeviceType.DEVICE_TYPE_SMB -> {
+                            rootList.add(
+                                FolderItem(
+                                    name = getString(R.string.filter_box_smb_device),
+                                    icon = R.mipmap.icon_samba,
+                                    path = "",
+                                    friendlyPath = "/${getString(R.string.filter_box_smb_device)}/",
+                                    pos = index,
+                                    type = FolderType.SMB,
+                                )
+                            )
+                        }
+
+                        DeviceType.DEVICE_TYPE_DLNA -> {
+                            rootList.add(
+                                FolderItem(
+                                    name = getString(R.string.filter_box_dlna_device),
+                                    icon = R.mipmap.icon_dlna,
+                                    path = "",
+                                    friendlyPath = "/${getString(R.string.filter_box_dlna_device)}/",
+                                    pos = index,
+                                    type = FolderType.DLNA
+                                )
+                            )
+                        }
+                    }
+                }
+                var lastFocusPosition = 0
+                parentFolderType?.let { folderType ->
+                    rootList.forEach {
+                        if (it.type == folderType) {
+                            lastFocusPosition = it.pos
+                        }
+                    }
+                }
                 _uiState.update {
                     it.copy(
                         isRoot = true,
