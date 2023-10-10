@@ -588,7 +588,7 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
                 folderList.forEachIndexed { index, it ->
                     folderItemList.add(
                         FolderItem(
-                            name = "(${offset+index},$it)",
+                            name = it,
                             icon = R.mipmap.icon_folder,
                             path = "$parentFolder$it",
                             friendlyPath = currentFolder?.friendlyPath.plus("$it/"),
