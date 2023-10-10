@@ -53,6 +53,7 @@ import com.hphtv.movielibrary.ui.settings.PasswordDialogFragment;
 import com.hphtv.movielibrary.ui.settings.PasswordDialogFragmentViewModel;
 import com.hphtv.movielibrary.ui.settings.SettingsActivity;
 import com.hphtv.movielibrary.ui.shortcutmanager.ShortcutManagerActivity;
+import com.orhanobut.logger.Logger;
 import com.station.kit.util.DensityUtil;
 import com.station.kit.util.PackageTools;
 
@@ -258,10 +259,12 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
                 } else if (i == mBinding.tabLayout.getTabCount() - 1) {
                     view.setNextFocusLeftId(mBinding.tabLayout.getTabAt(i - 1).view.getId());
                 } else {
-                    view.setId(View.generateViewId());
-                    int nextRightId = View.generateViewId();
-                    mBinding.tabLayout.getTabAt(i + 1).view.setId(nextRightId);
-                    view.setNextFocusRightId(nextRightId);
+                    View nextView= mBinding.tabLayout.getTabAt(i + 1).view;
+                    if (view.getId() == View.NO_ID)
+                        view.setId(View.generateViewId());
+                    if(nextView.getId()==View.NO_ID)
+                        nextView.setId(View.generateViewId());
+                    view.setNextFocusRightId(nextView.getId());
                     view.setNextFocusLeftId(mBinding.tabLayout.getTabAt(i - 1).view.getId());
                 }
             }
