@@ -11,6 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.firefly.videonameparser.MovieNameInfo;
 import com.firefly.videonameparser.VideoNameParserV2;
+import com.hphtv.movielibrary.MovieApplication;
 import com.hphtv.movielibrary.data.Constants;
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase;
 import com.hphtv.movielibrary.roomdb.dao.MovieDao;
@@ -308,7 +309,7 @@ public class MovieScanService extends Service {
         }
         LogUtil.v(Thread.currentThread().getName(), "[" + videoFile.filename + "]关键字->[" + keyword + "]:" + api);
         //keyword不能为空
-        if (!TextUtils.isEmpty(keyword)) {
+        if (MovieApplication.hasNetworkConnection&& !TextUtils.isEmpty(keyword)) {
             Observable<MovieSearchRespone> tmdbSearchRespone;
             switch (searchType1) {
                 case movie:
