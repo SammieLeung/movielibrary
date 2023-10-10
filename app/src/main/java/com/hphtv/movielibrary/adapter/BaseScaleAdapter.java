@@ -19,7 +19,7 @@ import java.util.List;
  * author: Sam Leung
  * date:  2021/6/26
  */
-public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, T> extends BaseAdapter2<VDB, BaseScaleAdapter.ViewHolder, T> implements View.OnFocusChangeListener {
+public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, T> extends BaseAdapter2<VDB, BaseScaleAdapter.ViewHolder, T> implements View.OnFocusChangeListener,View.OnHoverListener {
     protected float mZoomRatio = 1.15f;
 
     public BaseScaleAdapter(Context context, List<T> list) {
@@ -57,27 +57,28 @@ public abstract class BaseScaleAdapter<VDB extends ViewDataBinding, T> extends B
         }
     }
 
-//    @Override
-//    public boolean onHover(View v, MotionEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
-//            ViewCompat.animate((View) v).scaleX(mZoomRatio).scaleY(mZoomRatio).translationZ(1).setDuration(Constants.ANIMATION_DURATION).start();
-//            if (mOnItemFocusListener != null) {
-//                int pos = (int) v.getTag();
-//                T data = mList.get(pos);
-//                mOnItemFocusListener.onItemFocus(v, pos, data);
-//            }
-//        } else if (event.getAction() == MotionEvent.ACTION_HOVER_EXIT) {
-//            ViewCompat.animate((View) v).scaleX(1f).scaleY(1f).translationZ(0).setDuration(Constants.ANIMATION_DURATION).start();
-//        }
-//        return false;
-//    }
+    @Override
+    public boolean onHover(View v, MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_HOVER_ENTER) {
+            if (mOnItemFocusListener != null) {
+                int pos = (int) v.getTag();
+                if (getItemCount() == 0)
+                    return false;
+                if (pos < 0 || pos >= getItemCount())
+                    pos = 0;
+                T data = mList.get(pos);
+                mOnItemFocusListener.onItemFocus(v, pos, data);
+            }
+        }
+        return false;
+    }
 
     public class ViewHolder extends BaseAdapter2.ViewHolder {
 
         public ViewHolder(ViewDataBinding binding) {
             super(binding);
             mBinding.getRoot().setOnFocusChangeListener(BaseScaleAdapter.this);
-//            mBinding.getRoot().setOnHoverListener(BaseScaleAdapter.this);
+            mBinding.getRoot().setOnHoverListener(BaseScaleAdapter.this);
         }
     }
 
