@@ -139,7 +139,7 @@ public class HomePageActivity extends PermissionActivity<HomePageViewModel, Acti
         new Thread(new Runnable() {
             @Override
             public void run() {
-                MovieApplication.getInstance().isDeviceBound(true);
+//                MovieApplication.getInstance().isDeviceBound(true);
             }
         }).start();
     }
