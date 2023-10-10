@@ -80,8 +80,13 @@ public class PaginationActivity extends AppBaseActivity<PaginationViewModel, Act
 
         @Override
         public void appendMovieDataViews(List<MovieDataView> movieDataViews) {
-            if (movieDataViews.size() > 0)
+            if (movieDataViews.size() > 0) {
                 mMovieItemListAdapter.appendAll(movieDataViews);
+                View focusChild=mBinding.recyclerview.getFocusedChild();
+                if(focusChild==null)
+                    return;
+                mBinding.recyclerview.smoothToCenterAgainForDown(focusChild);
+            }
         }
     };
 

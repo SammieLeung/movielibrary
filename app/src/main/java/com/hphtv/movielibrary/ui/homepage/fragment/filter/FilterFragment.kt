@@ -51,6 +51,12 @@ class FilterFragment constructor(val videoType: VideoType) :
 
             override fun appendMovieDataViews(movieDataViews: List<MovieDataView?>?) {
                 adapter.appendAll(movieDataViews)
+                mBinding.movieList.apply {
+                    this.focusedChild?.let{
+                        this.smoothToCenterAgainForDown(it)
+                    }
+
+                }
             }
         })
     }

@@ -40,7 +40,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class UnknownFileViewModel extends BaseAndroidViewModel {
     public static final String ROOT = "root";
     public static final String TAG = UnknownRootDataView.class.getSimpleName();
-    public static final int FIRST_LIMIT = 18;
     public static final int LIMIT = 12;
     public static final int TYPE_FOLDER = 1;
     public static final int TYPE_FILE = 2;
@@ -93,7 +92,7 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
                         mParentStack.push(mCurrentPath);
                         mCurrentPath = path;
                     }
-                    int limit = FIRST_LIMIT - 1;
+                    int limit = LIMIT - 1;
                     List<UnknownRootDataView> rootDataViewList = new ArrayList<>();
                     UnknownRootDataView rootDataView = new UnknownRootDataView();
                     rootDataView.root = getString(R.string.goback);
@@ -200,11 +199,6 @@ public class UnknownFileViewModel extends BaseAndroidViewModel {
         @Override
         public int getLimit() {
             return LIMIT;
-        }
-
-        @Override
-        public int getFirstLimit() {
-            return FIRST_LIMIT;
         }
 
         @Override

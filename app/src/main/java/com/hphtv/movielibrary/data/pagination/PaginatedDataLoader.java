@@ -22,7 +22,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  */
 public abstract class PaginatedDataLoader<T> {
     public static final String TAG = PaginatedDataLoader.class.getSimpleName();
-    private final int mFirstLimit;
     private final int mLimit;
     private final AtomicBoolean canLoadNext = new AtomicBoolean(true);
     private final AtomicBoolean canLoadPre = new AtomicBoolean(false);
@@ -33,14 +32,10 @@ public abstract class PaginatedDataLoader<T> {
 
     public PaginatedDataLoader() {
         mLimit = getLimit();
-        mFirstLimit = getFirstLimit();
     }
 
     public abstract int getLimit();
 
-    public int getFirstLimit() {
-        return getLimit();
-    }
 
     protected List<T> reloadDataFromDB(int offset, int limit) {
         return loadDataFromDB(offset, limit);
@@ -72,11 +67,6 @@ public abstract class PaginatedDataLoader<T> {
         return canLoadPre.get();
     }
 
-    public void reset() {
-        mNextPage.set(0);
-        canLoadNext.set(true);
-    }
-
     protected int nextOffset() {
         return mNextPage.getAndIncrement() * mLimit;
     }
@@ -92,9 +82,12 @@ public abstract class PaginatedDataLoader<T> {
 
     public void forceReload() {
         Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    int limit = mFirstLimit + (mNextPage.get()) * mLimit;
+                    int limit =  (mNextPage.get()) * mLimit;
                     canLoadNext.set(true);
                     List<T> dataList = reloadDataFromDB(0, limit);
+                    if (dataList.size() < limit) {
+                        canLoadNext.set(false);
+                    }
                     emitter.onNext(dataList);
                     emitter.onComplete();
                 }).subscribeOn(Schedulers.newThread())
@@ -123,40 +116,7 @@ public abstract class PaginatedDataLoader<T> {
                 });
     }
 
-    public void forceReload(PaginationCallback callback) {
-        Observable.create((ObservableOnSubscribe<List<T>>) emitter -> {
-                    int limit = mFirstLimit + (mNextPage.get()) * mLimit;
-                    canLoadNext.set(true);
-                    List<T> dataList = reloadDataFromDB(0, limit);
-                    emitter.onNext(dataList);
-                    emitter.onComplete();
-                }).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SimpleObserver<List<T>>() {
 
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        super.onSubscribe(d);
-                        mDisposable = d;
-                    }
-
-                    @Override
-                    public void onAction(List<T> dataList) {
-                        if (callback != null) {
-                            callback.onResult(dataList);
-                            if (!canLoadNext()) {
-                                callback.loadFinish();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        super.onComplete();
-                        mDisposable = null;
-                    }
-                });
-    }
 
     public void reload() {
         reload(0);

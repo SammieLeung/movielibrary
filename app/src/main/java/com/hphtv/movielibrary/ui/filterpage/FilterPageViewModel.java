@@ -77,7 +77,8 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
         Observable.just("")
                 .map(_offset -> {
                     int page = mMovieDataViewPaginatedDataLoader.getPage();
-                    int limit=mMovieDataViewPaginatedDataLoader.getFirstLimit()+page*mMovieDataViewPaginatedDataLoader.getLimit();
+//                    int limit=mMovieDataViewPaginatedDataLoader.getFirstLimit()+page*mMovieDataViewPaginatedDataLoader.getLimit();
+                    int limit=page*mMovieDataViewPaginatedDataLoader.getLimit();
                     //FIX 仅仅是为了刷新排序
                     String dir_uri = null;
                     long vtid = -1;
@@ -234,10 +235,6 @@ public class FilterPageViewModel extends BaseAndroidViewModel {
             return 10;
         }
 
-        @Override
-        public int getFirstLimit() {
-            return 15;
-        }
 
         @Override
         protected List<MovieDataView> loadDataFromDB(int offset, int limit) {

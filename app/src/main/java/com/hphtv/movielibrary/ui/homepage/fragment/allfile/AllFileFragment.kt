@@ -146,14 +146,11 @@ class AllFileFragment : BaseAutofitHeightFragment<AllFileViewModel, FragmentAllf
                             override fun onPreDraw(): Boolean {
                                 rvAllFilesView.viewTreeObserver.removeOnPreDrawListener(this)
                                 rvAllFilesView.requestFocus()
-
-//                                Logger.d("rvChildCount=${rvAllFilesView.childCount} managerItemCount=${rvAllFilesView.layoutManager?.itemCount} dest=${uiState.focusPosition}")
                                 rvAllFilesView.scrollToCenter(uiState.focusPosition)
                                 return true
                             }
 
                         })
-//                        Logger.d("reloadsize=${uiState.rootList.size}")
                         fileTreeAdapter.addAll(uiState.rootList)
                     } else if (uiState.isAppend) {
                         fileTreeAdapter.appendAll(uiState.rootList)

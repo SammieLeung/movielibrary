@@ -31,9 +31,6 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
 
     private val mLoader: PaginatedDataLoader<MovieDataView> =
         object : PaginatedDataLoader<MovieDataView>() {
-            override fun getFirstLimit(): Int {
-                return FIRST_LIMIT
-            }
 
             override fun getLimit(): Int {
                 return LIMIT
@@ -126,6 +123,5 @@ class FilterViewModel(application: Application) : AndroidViewModel(application) 
     companion object {
         const val TAG = "FilterViewModel"
         const val LIMIT = 15
-        const val FIRST_LIMIT = 20
     }
 }

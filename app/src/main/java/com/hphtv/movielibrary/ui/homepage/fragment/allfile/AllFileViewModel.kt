@@ -395,9 +395,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
             return PAGE_LIMIT
         }
 
-        override fun getFirstLimit(): Int {
-            return FIRST_PAGE_LIMIT
-        }
 
         fun back() {
             currentFolder?.let { current ->
@@ -528,10 +525,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
         var focusPosition: Int = 0
         override fun getLimit(): Int {
             return PAGE_LIMIT
-        }
-
-        override fun getFirstLimit(): Int {
-            return FIRST_PAGE_LIMIT
         }
 
         fun reload(parentFolder: FolderItem) {
@@ -700,7 +693,6 @@ class AllFileViewModel(application: Application) : AndroidViewModel(application)
 
     companion object {
         const val PAGE_LIMIT = 18
-        const val FIRST_PAGE_LIMIT = 24
     }
 }
 

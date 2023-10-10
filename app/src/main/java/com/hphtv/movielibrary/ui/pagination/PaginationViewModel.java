@@ -48,7 +48,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class PaginationViewModel extends BaseAndroidViewModel {
     public static final String TAG = PaginationViewModel.class.getSimpleName();
     public static final int LIMIT = 10;
-    public static final int FIRST_LIMIT = 15;
     public static final int OPEN_RECENTLY_ADD = 1;
     public static final int OPEN_FAVORITE = 2;
     private MovieDao mMovieDao;
@@ -174,10 +173,6 @@ public class PaginationViewModel extends BaseAndroidViewModel {
             return LIMIT;
         }
 
-        @Override
-        public int getFirstLimit() {
-            return FIRST_LIMIT;
-        }
 
         @Override
         public List<MovieDataView> loadDataFromDB(int offset, int limit) {
