@@ -98,7 +98,7 @@ public class MovieLibraryProvider extends ContentProvider {
             case MOVIE_LIST:
                 int offset = 0;
                 int limit = -1;
-                if (TextUtils.isEmpty(sortOrder)) {
+                if (!TextUtils.isEmpty(sortOrder)) {
                     Matcher matcher = RegexMatcher.match("limit ([0-9]+),([0-9]+)", sortOrder);
                     if (!matcher.matches())
                         matcher = RegexMatcher.match("limit ([0-9]+) offset ([0-9]+)", sortOrder);
