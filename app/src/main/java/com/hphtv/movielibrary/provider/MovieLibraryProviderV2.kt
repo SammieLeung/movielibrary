@@ -7,6 +7,7 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
+import android.util.Log
 import com.alibaba.fastjson.JSON
 import com.firefly.videonameparser.VideoNameParserV2
 import com.hphtv.movielibrary.R
@@ -309,7 +310,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
             //2.3、添加文件入数据库
             val vid: Long = videoFileDao.insertOrIgnore(videoFile)
             if (vid < 0) {
-                videoFile = videoFileDao.queryByPath(relativeFilePath)
+                videoFile = videoFileDao.queryByPath(videoFile.path)
             } else {
                 videoFile.vid = vid
             }
