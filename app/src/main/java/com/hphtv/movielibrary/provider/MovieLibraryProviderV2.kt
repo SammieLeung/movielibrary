@@ -7,11 +7,9 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
-import android.util.Log
 import com.alibaba.fastjson.JSON
 import com.firefly.videonameparser.VideoNameParserV2
 import com.hphtv.movielibrary.R
-import com.hphtv.movielibrary.data.Config
 import com.hphtv.movielibrary.data.Constants
 import com.hphtv.movielibrary.data.Constants.DeviceType
 import com.hphtv.movielibrary.roomdb.MovieLibraryRoomDatabase
@@ -21,7 +19,6 @@ import com.hphtv.movielibrary.roomdb.dao.MovieDao
 import com.hphtv.movielibrary.roomdb.dao.ShortcutDao
 import com.hphtv.movielibrary.roomdb.dao.StagePhotoDao
 import com.hphtv.movielibrary.roomdb.dao.VideoFileDao
-import com.hphtv.movielibrary.roomdb.entity.Movie
 import com.hphtv.movielibrary.roomdb.entity.Shortcut
 import com.hphtv.movielibrary.roomdb.entity.VideoFile
 import com.hphtv.movielibrary.roomdb.entity.dataview.MovieDataView
@@ -158,31 +155,25 @@ class MovieLibraryProviderV2 : ContentProvider() {
         movieDao: MovieDao,
         values: ContentValues?
     ) {
-        var downloadPath = values?.getAsString("download_path")
-        val movieId = values?.getAsString("movie_id")
+        val downloadPath = values?.getAsString("download_path") ?: return
+        val movieId = values?.getAsString("movie_id")?:return
         val movieType = values?.getAsString("movie_type")
         val fileList = values?.getAsString("file_list") ?: return
-        val filePaths = fileList.split(";;").filter { FileUtils.isMediaFile(it) }
-        if (filePaths.isEmpty())
-            return
-        if (movieId == null)
-            return
+        val fileNames = fileList.split(";;").filter { FileUtils.isMediaFile(it) }.ifEmpty { return  }
 
         var devicePath: String? = null
-        var shortcutUri: String? = null
-        if (downloadPath != null) {
-            val shortcut = getShortcutUriInDB(downloadPath, filePaths, shortcutDao)
-            if (shortcut != null) {
-                shortcutUri = shortcut.uri
-                devicePath = shortcut.devicePath
-                shortcutDao.updateShortcut(shortcut)
+        var shortcutUri: String?
+        val shortcut = syncShortcutUriFileCount(downloadPath, fileNames, shortcutDao)
+        if (shortcut != null) {
+            shortcutUri = shortcut.uri
+            devicePath = shortcut.devicePath
+            shortcutDao.updateShortcut(shortcut)//syncShortcutUriFileCount时会更新shortcut中文件的数量，所以需要更新数据库
+        } else {
+            shortcutUri = getCommonShortcutUri(downloadPath, fileNames)
+            if (shortcutUri != null) {
+                devicePath = addShortcut(shortcutDao, deviceDao, shortcutUri)
             } else {
-                shortcutUri = getCommonShortcutUri(downloadPath, filePaths)
-                if (shortcutUri != null) {
-                    devicePath = addShortcut(shortcutDao, deviceDao, shortcutUri)
-                } else {
-                    Logger.e("No mount device found")
-                }
+                Logger.e("No mount device found")
             }
         }
 
@@ -191,7 +182,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
                 Logger.e("No shortcut uri found")
                 return
             }
-            val videoFileList = addVideoFile(videoFileDao, filePaths, shortcutUri, it)
+            val videoFileList = addVideoFile(videoFileDao, fileNames, downloadPath,shortcutUri, it)
             val type = movieType?.lowercase() ?: return
 
             //3.查询/插入电影
@@ -228,7 +219,10 @@ class MovieLibraryProviderV2 : ContentProvider() {
         }
     }
 
-    private fun getShortcutUriInDB(
+    /**
+     * 同步shortcut中文件的数量
+     */
+    private fun syncShortcutUriFileCount(
         downloadPath: String,
         fileList: List<String>,
         shortcutDao: ShortcutDao
@@ -247,6 +241,12 @@ class MovieLibraryProviderV2 : ContentProvider() {
         return null
     }
 
+    /**
+     * 获取多个文件的公共路径
+     * @param downloadPath String
+     * @param filePaths List<String>
+     * @return String?
+     */
     private fun getCommonShortcutUri(downloadPath: String, filePaths: List<String>): String? {
         var shortcutUri: String? = null
         for (filePath in filePaths) {
@@ -284,6 +284,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
     private fun addVideoFile(
         videoFileDao: VideoFileDao,
         filePaths: List<String>,
+        downloadPath: String,
         shortcutUri: String,
         devicePath: String
     ): List<VideoFile> {
@@ -291,7 +292,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
         for (relativeFilePath in filePaths) {
             var videoFile = VideoFile()
             videoFile.filename = relativeFilePath.substring(relativeFilePath.lastIndexOf("/") + 1)
-            videoFile.path = File(shortcutUri, relativeFilePath).path
+            videoFile.path = File(downloadPath, relativeFilePath).path
             videoFile.dirPath = shortcutUri
             videoFile.devicePath = devicePath
             val parser = VideoNameParserV2()
@@ -338,7 +339,7 @@ class MovieLibraryProviderV2 : ContentProvider() {
                 context.getString(R.string.video_type_movie)
             }
         }
-        val genreList = genreDao.queryGenreNamesById(this.id,this.source)
+        val genreList = genreDao.queryGenreNamesById(this.id, this.source)
         val summary = "$year·$movieType·${genreList.joinToString("·")}"
 
         val stageList = stagePhotoDao.queryStagePhotosById(this.id, 1, 0)
